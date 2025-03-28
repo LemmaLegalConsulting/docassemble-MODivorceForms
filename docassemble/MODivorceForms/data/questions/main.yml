@@ -1,0 +1,1285 @@
+---
+include:
+  - docassemble.AssemblyLine:assembly_line.yml
+  - form_17.yml
+---
+metadata:
+  title: >-
+    Divorce Forms
+  short title: >-
+    Divorce Forms
+  description: |-
+    This interview helps someone in Missouri prepare forms for a divorce.
+  can_I_use_this_form: |
+    If you are a Missouri resident, you can use this interview to prepare forms for a divorce.
+  before_you_start: |
+    This interview will help you ask the court for a Certificate of dissolution of marriage.
+    
+    Before you get started, please gather:
+    
+    1. 
+    1. 
+    1. 
+    
+    When you are finished, you will need to:
+    
+    1. 
+    1.
+  maturity: production
+  estimated_completion_minutes: 10
+  estimated_completion_delta: 5
+  LIST_topics: 
+    - "FA-06-00-00-00"
+  tags:
+    - "FA-06-00-00-00"
+  authors:
+    - Toby Fey
+    - Kelly McGuire
+    - Quinten Steenhuis
+    - Brandi Ashby
+    - Maura Weber
+  original_form:
+    - https://www.courts.mo.gov/hosted/circuit11/Documents/dissolution_cert.pdf
+  original_form_published_on: 2021-01-05
+  help_page_url: >-
+    https://www.courts.mo.gov/page.jsp?id=3832
+  help_page_title: >-
+    Divorce Forms - Petitioner
+  allowed_courts: []
+  typical_role: "plaintiff"
+  al_weaver_version: "1.11.0"
+  generated_on: "2025-03-13"
+  languages:
+    - en
+  jurisdiction: NAM-US-US+MO
+  review_date: 2025-03-13
+  form_titles:
+    - Certificate of dissolution of marriage
+  form_numbers: []
+  update_notes: |
+---
+code: |
+  # This controls the default country and list of states in address field questions
+  AL_DEFAULT_COUNTRY = "US"
+---
+code: |
+  # This controls the default state in address field questions
+  AL_DEFAULT_STATE = "MO"
+---
+code: |
+  github_repo_name =  'docassemble-MODivorceForms'
+---
+code: |
+  interview_short_title = "Prepare forms for divorce"
+---
+code: |
+  al_form_type = "starts_case" 
+---
+objects:
+  - users: ALPeopleList.using(ask_number=True,target_number=2,complete_attribute='complete')
+---
+objects:
+  - users[i].employment_address: Address
+---
+code: |
+  users[i].complete = True
+---
+generic object: ALIndividual
+objects:
+  - x.attorney: ALIndividual
+---
+objects:
+  - children: ALPeopleList
+---
+sections:
+  - review_certificate_of_dissolution_of_marri: Review your answers
+---
+#################### Interview order #####################
+comment: |
+  Controls order and branching logic for questions specific to this form
+id: interview_order_certificate_of_dissolution_of_marri
+code: |
+  # Set the allowed courts for this interview
+  allowed_courts = []
+  nav.set_section("review_certificate_of_dissolution_of_marri")
+  if case_type == "Custody":
+    custody_exit
+  users.gather()
+  if case_filed == "unknown":
+    how_to_find_your_case
+    reconsider('case_filed')
+  elif case_filed in ['user0_filed','user1_filed']:
+    case_information
+  if is_case_contested in ['contested','unknown']:
+    mediation_info
+  if pregnant:
+    pregnant_exit
+  if child_outside_marriage:
+    child_outside_marriage_exit
+  if minor_children or minor_children_before_marriage:
+    if minor_children_before_marriage:
+      minor_children_before_marriage_information
+    presumption_video
+    legal_custody
+    physical_custody
+    parenting_plan
+    family_information
+    others_with_physical_custody
+  else:
+    party_information
+  # if len(assets.matches(source=['house','401k','business'])) > 0:
+  #    asset_warning
+  if case_filed == "user0_filed" and respondent_served:
+      served_information
+  else:
+    if case_filed == "user0_field" or case_filed == "not_filed":
+      if service_type == "publication":
+        service_by_publication_information
+      else:
+        type_of_personal_service
+        personal_service_information
+    filing_pleadings_video
+
+  interview_order_mo_divorce_forms = True
+---
+###################### Main order ######################
+comment: |
+  This block includes the logic for standalone interviews.
+  Delete mandatory: True to include in another interview
+mandatory: True
+code: |
+  al_intro_screen
+  # mo_divorce_forms_intro
+  interview_order_mo_divorce_forms
+  signature_date
+  # Store anonymous data for analytics / statistics
+  store_variables_snapshot(
+      persistent=True,
+      data={
+          "zip": showifdef("users[0].address.zip"),
+          "reached_interview_end": True,
+      },
+  )
+  mo_divorce_forms_download
+---
+id: Certificate_of_dissolution_of_marriage
+continue button field: certificate_of_dissolution_of_marri_intro
+question: |
+  Certificate of dissolution of marriage
+subquestion: |
+  This interview will help you ask the court for a Certificate of dissolution of marriage.
+  
+  Before you get started, please gather:
+  
+  1. 
+  1. 
+  1. 
+  
+  When you are finished, you will need to:
+  
+  1. 
+  1.
+
+  If you are a _____________, you can use this interview to ____________.
+
+  Most people take about 10 minutes to complete this interview.
+---
+question: Welcome
+fields:
+  - What issue are you looking for help with?:  case_type
+    datatype: radio
+    choices:
+      - Divorce
+      - Custody
+---
+event: custody_exit
+question: Child Custody
+subquestion: |
+  Unfortunately, this system is unable to address custody issues at this time.  Click the link below to find legal help bettersuited for your situation.
+---
+question: Court Case
+fields: 
+  - Has your case already been filed?: case_filed
+    datatype: radio
+    choices:
+      - Yes, I filed myself: user0_filed
+      - Yes, my spouse filed: user1_filed
+      - Filed jointly: jointly_filed
+      - Not yet: not_filed
+      - I'm not sure: unknown
+validation code: |
+  if  case_filed == "user0_filed":
+    petitioner = users[0]
+    respondent = users[1]
+    previous_petitions = 1
+  elif case_filed == "user1_filed":
+    petitioner = users[1]
+    respondent = users[0]
+    previous_petitions = 1
+  else:
+    previous_petitions = 0
+---
+question: How to find your case
+subquestion: |
+  Link and info on how to find a case in casenet
+continue button field: how_to_find_your_case
+---
+question: Case Information
+fields:
+  - Case number: case_number
+    required: False
+  - Case county: case_county
+    required: False
+  - Case court: case_court
+    choices:
+      - Kansas City
+      - Independence
+    show if:
+      variable: case_county
+      is: Jackson
+  - Does your spouse have an attorney?:  users[1].represented
+    datatype: yesnoradio
+    required: False
+  - Name of attorney for your spouse: users[1].attorney.name.text
+    required: False
+    show if:
+      variable: users[1].represented
+      is: True
+  - Address of attorney for your spouse: users[1].attorney.address
+    required: False
+    show if:
+      variable: users[1].represented
+      is: True
+  - City: users[1].attorney.city
+    required: False
+    show if:
+      variable: users[1].represented
+      is: True
+  - State: users[1].attorney.state
+    required: False
+    show if:
+      variable: users[1].represented
+      is: True
+  - Zip code: users[1].attorney.zip
+    required: False
+    show if:
+      variable: users[1].represented
+      is: True
+  - Hearing date: hearing_date
+    required: False
+    datatype: date
+continue button field: case_information
+---
+id: Petitioner s Attorney
+question: |
+  Petitioner's Attorney
+fields:
+  - "NAME OF PETITIONER’S ATTORNEY (Type or Print)": petitioner_attorney
+    maxlength: 72
+    required: False
+---
+question: Do you believe your case will be uncontested?
+fields:
+  - In other words, do you and your spouse agree on how you will divide APP property, debt, and/or parenting time?: is_case_contested
+    datatype: radio
+    choices:
+      - Uncontested: uncontested
+      - Contested: contested
+      - I don't know: unknown
+---
+id: mediation information screen
+question: Mediation
+subquestion: |
+  You may be surprised how much you and your spouse can work things out for yourselves through mediation!  
+  
+  Video on how mediation works.  
+  
+  Link to finding a mediator.
+continue button field: mediation_info
+---
+question: Children
+fields:
+  - Do you and your spouse have children currently under the age of 18?: minor_children
+    datatype: yesnoradio
+  - Do you or your spouse have any children born before the marriage?: minor_children_before_marriage
+    datatype: yesnoradio
+  - Have you or your spouse physically gave birth during the marriage with a third party?: child_outside_marriage
+    datatype: yesnoradio
+  - Are you or your spouse currently pregnant?: pregnant
+    datatype: yesnoradio
+---
+depends on:
+  - minor_children
+  - minor_children_before_marriage
+code: |
+  if minor_children or minor_children_before_marriage:
+    children.there_are_any = True
+  else:
+    children.there_are_any = False
+---
+event: pregnant_exit
+question: Pregnancy
+subquestion: |
+  Pursuant to RSMo 452.305 & 452.310, the court will not be able to grant a divorce.  Please come back when either yourself or your spouse is no longer pregnant.
+---
+event: child_outside_marriage_exit
+question: Children Born Outside of Marriage
+subquestion: |
+  Missouri law automatically assumes that the husband is the father of the child unless a separate case is filed establishing paternity of the biological father and non-paternity of the husband, even if the biological father is the one on the birth certificate.  It would be in your best interest to find an attorney.  
+  
+  Link to finding an attorney
+---
+question: Children Born Before Marriage
+subquestion: |
+  Sometimes when a child is born to two people before they get married, the court will require a separate case to establish paternity (even if everybody agrees).  However, most courts will move forward with just the divorce, assuming that paternity is acknowledged through the marriage.  For now, we'll move forward with the understanding that the paternity has been acknowledged.  However, a judge may direct you to file something else or speak to an attorney.
+continue button field: 
+  minor_children_before_marriage_information
+---
+question: Presumption of 50/50 Custody
+subquestion: |
+  RSMo 452.375 & 454.1005 Video
+continue button field: presumption_video
+---
+question: Legal Custody
+subquestion: |
+  Info on Legal Custody
+fields:
+ - What would you like to ask the court to give you in terms of legal custody?: legal_custody
+   choices:
+     - Joint
+     - Sole
+---
+question: Physical Custody
+subquestion: |
+  Info on Physical Custody
+fields:
+ - What would you like to ask the court to give you in terms of legal custody?: physical_custody
+   choices:
+     - Joint
+     - Sole
+---
+question: Parenting Plan
+subquestion: |
+  Calendar Month w/ 5 weekends feature
+continue button field: parenting_plan
+---
+id: Child Support Award
+question: |
+  Child Support Award
+fields:
+  - Who is awarded child support?: child_support_award
+    datatype: radio
+    choices:
+      - You
+      - Your spouse or partner
+      - Other
+      - No child support awarded
+    required: False
+  - "Marriage number children awarded users1": marriage_number_children_awarded_users1
+    maxlength: 3
+    required: False
+  - "Marriage number children awarded users2": marriage_number_children_awarded_users2
+    maxlength: 3
+    required: False
+  - "Marriage child support awarded to users2": marriage_child_support_awarded_to_users2
+    datatype: yesno
+    required: False
+  - "Marriage child support awarded to other": marriage_child_support_awarded_to_other
+    datatype: yesno
+    required: False
+  - "Marriage number children awarded joint": marriage_number_children_awarded_joint
+    maxlength: 3
+    required: False
+  - "Marriage number children awarded other": marriage_number_children_awarded_other
+    maxlength: 3
+    required: False
+  - "Marriage number children awarded no children": marriage_number_children_awarded_no_children
+    datatype: yesno
+    required: False
+  - "Marriage child support awarded to none": marriage_child_support_awarded_to_none
+    datatype: yesno
+    required: False
+---
+id: interview order with children
+code: |
+  users[0].name.first
+  users[1].name.first
+  marriage_info
+  children.gather()
+  family_information = True
+---
+id: interview order without children
+code: |
+  users[0].name.first
+  users[1].name.first
+  marriage_info
+  party_information = True 
+---
+sets:
+ - users[0].name.first
+id: Your Information
+question: |
+  Information about You
+fields:
+  - code: |
+      users[0].name_fields()
+  - "LAST NAME PRIOR TO FIRST MARRIAGE (If different)": users[0].prior_name
+    maxlength: 39
+    required: False
+  - Last 4 digits of your social security number: users[0].ssn
+    maxlength: 4
+    required: False
+  - "Driver's License Number": users[1].driver_license_number
+    required: False
+  - code: |
+      users[0].address.address_fields()
+  - Phone: users[1].phone
+    required: False
+  - Birthdate: users[0].birthdate
+    datatype: ThreePartsDate
+  - "BIRTHPLACE (State or Foreign Country)": users1_birthplace
+    maxlength: 40
+    required: False
+  - "Elementary/Secondary Education": users[0].education_elementary
+    input type: dropdown
+    choices:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 11
+      - 12
+    required: False
+  - "College (1-4 or 5+)": users[0].education_college
+    input type: dropdown
+    choices:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5+
+    required: False
+  - Active duty military?: users[0].active_duty
+    datatype: yesnoradio
+  - Race: users[0].race
+    input type: dropdown
+    choices:
+      - White
+      - Black
+      - American Indian
+      - Other
+    required: False
+  - Other description: users[0].race_other
+    show if:
+      variable: users[0].race
+      is: Other
+    required: False
+  - Previously married?: users[0].previously_married
+    datatype: yesnoradio
+  - Number of previous marriages: users[0].number_of_marriages
+    datatype: number
+    show if: users[0].previously_married
+  - Date Last Marriage Ended: users[0].last_marriage_end_date
+    datatype: date
+    show if: users[0].previously_married
+  - How Last Marriage Ended: users[0].last_marriage_end
+    datatype: dropdown
+    choices:
+      - Death
+      - Divorce
+    show if: users[0].previously_married
+  - What is your current employment status?: users[0].employment_status
+    choices:
+      - Employed
+      - Unemployed
+      - Self-employed
+  - Employer's name: users[0].employment_description
+    show if:
+      variable: users[0].employment_status
+      is: Employed
+  - Type of self employment: users[0].employment_description
+    show if:
+      variable: users[0].employment_status
+      is: Self-employed
+  - Employment address: users[0].employment_address.address
+    js show if: |
+      val("users[0].employment_status") === "Employed" || val("users[0].employment_status") === "Self-employed" 
+  - Employment city: users[0].employment_address.city
+    js show if: |
+      val("users[0].employment_status") === "Employed" || val("users[0].employment_status") === "Self-employed" 
+  - Employment state: users[0].employment_address.state
+    js show if: |
+      val("users[0].employment_status") === "Employed" || val("users[0].employment_status") === "Self-employed" 
+  - Employment phone: users[0].employment_address.phone
+    js show if: |
+      val("users[0].employment_status") === "Employed" || val("users[0].employment_status") === "Self-employed" 
+  - Total gross monthly income: users[0].monthly_income
+    datatype: currency
+  - Can you support yourself through the combined income from your employment and income from property that you will receive in the dissolution?: users[0].self_supported
+    datatype: yesnoradio
+      
+---
+sets:
+ - users[1].name.first
+id: Spouse Information
+question: |
+  Information about Your Spouse
+fields:
+  - code: |
+      users[1].name_fields()
+  - "LAST NAME PRIOR TO FIRST MARRIAGE (If different)": users[1].prior_name
+    maxlength: 39
+    required: False
+  - "Last 4 digits of your social security number": users[1].ssn
+    maxlength: 20
+    required: False
+  - "Driver's License Number": users[1].driver_license_number
+    required: False
+  - code: |
+      users[1].address.address_fields()
+  - Phone: users[1].phone
+    required: False
+  - Birthdate: users[1].birthdate
+    datatype: ThreePartsDate
+  - "BIRTHPLACE (State or Foreign Country)": users1_birthplace
+    maxlength: 40
+    required: False
+  - "Elementary/Secondary Education": users[1].education_elementary
+    input type: dropdown
+    choices:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 11
+      - 12
+    required: False
+  - "College (1-4 or 5+)": users[1].education_college
+    input type: dropdown
+    choices:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5+
+    required: False
+  - Active duty military?: users[1].active_duty
+    datatype: yesnoradio
+  - Race: users[1].race
+    input type: dropdown
+    choices:
+      - White
+      - Black
+      - American Indian
+      - Other
+    required: False
+  - Other description: users[1].race_other
+    show if:
+      variable: users[1].race
+      is: Other
+    required: False
+  - Previously married?: users[1].previously_married
+    datatype: yesnoradio
+  - Number of previous marriages: users[1].number_of_marriages
+    datatype: number
+    show if: users[1].previously_married
+  - Date Last Marriage Ended: users[1].last_marriage_end_date
+    datatype: date
+    show if: users[1].previously_married
+  - How Last Marriage Ended: users[1].last_marriage_end
+    datatype: dropdown
+    choices:
+      - Death
+      - Divorce
+    show if: users[1].previously_married
+  - What is your current employment status?: users[1].employment_status
+    choices:
+      - Employed
+      - Unemployed
+      - Self-employed
+  - Employer's name: users[1].employment_description
+    show if:
+      variable: users[1].employment_status
+      is: Employed
+  - Type of self employment: users[1].employment_description
+    show if:
+      variable: users[1].employment_status
+      is: Self-employed
+  - Employment address: users[1].employment_address.address
+    js show if: |
+      val("users[1].employment_status") === "Employed" || val("users[1].employment_status") === "Self-employed" 
+  - Employment city: users[0].employment_address.city
+    js show if: |
+      val("users[1].employment_status") === "Employed" || val("users[1].employment_status") === "Self-employed" 
+  - Employment state: users[1].employment_address.state
+    js show if: |
+      val("users[1].employment_status") === "Employed" || val("users[1].employment_status") === "Self-employed" 
+  - Employment phone: users[1].employment_address.phone
+    js show if: |
+      val("users[1].employment_status") === "Employed" || val("users[1].employment_status") === "Self-employed" 
+  - Total gross monthly income: users[1].monthly_income
+    datatype: currency
+  - Can you support yourself through the combined income from your employment and income from property that you will receive in the dissolution?: users[1].self_supported
+    datatype: yesnoradio
+  
+---
+id: Marriage questions
+question: |
+  Information about Your Marriage
+fields:
+  - "PLACE OF THIS MARRIAGE - CITY, TOWN, OR LOCATION": marriage_address_city
+    maxlength: 36
+    required: False
+  - "COUNTY": marriage_address_county
+    maxlength: 24
+    required: False
+  - "STATE OR FOREIGN COUNTRY": marriage_address_state
+    maxlength: 32
+    required: False
+  - "DATE OF THIS MARRIAGE": marriage_date
+    datatype: date
+    required: False
+continue button field: marriage_info
+---
+id: Type of Dissolution
+question: |
+  Type of Dissolution
+fields:
+  - "Marriage type dissolution true": dissolution_type
+    datatype: radio
+    required: False
+    choices: 
+      - Dissolution
+      - Legal Separation
+      - Annulment
+  - "DATE OF separation": separation_date
+    datatype: date
+    required: False
+  - "DATE COUPLE LAST RESIDED IN SAME HOUSEHOLD (MONTH, DAY, YEAR)": marriage_last_resided_date
+    datatype: date
+    required: False
+  - "NUMBER OF CHILDREN UNDER 18 IN THIS HOUSEHOLD AS OF THE DATE IN ITEM 23": marriage_last_resided_number_children
+    maxlength: 8
+    required: False
+  - Can the marriage be preserved?: marriage_preserved
+    datatype: yesnoradio
+    required: False
+  - Is the marriage irretrievably broken?: marriage_broken
+    datatype: yesnoradio
+    required: False
+  - "I CERTIFY THAT THE MARRIAGE OF THE ABOVE-NAMED PERSONS WAS DISSOLVED ON: (Month, Day, Year)": marriage_dissolved_date
+    datatype: date
+    required: False
+  - "DATE RECORDED (Month, Day, Year)": decree_recorded_date
+    datatype: date
+    required: False
+  - "COUNTY OF DECREE": decree_county
+    maxlength: 54
+    required: False
+  - "TITLE OF COURT": marriage_decree_court
+    input type: area
+    maxlength: 105
+    required: False
+  - "TITLE OF CERTIFYING OFFICE": marriage_decree_certifying_office
+    input type: area
+    maxlength: 102
+    required: False
+---
+id: Relief Requested
+question: Request for Relief
+fields:
+  - What do you want the court to do?: relief
+    datatype: checkboxes
+    choices: 
+      - Grant a dissolution of my marriage: dissolution
+      - Grant custody of the children.noun_plural: custody
+      - Enter appropriate orders whith respect to the support of the children: child_support
+      - Divide the marital property and debts: divide_property
+      - Award maintenance to me: maintenance_to_me
+      - Award maintenance to my spouse: maintenance_to_spouse
+      - Change my name to my former name: change_name
+      - Other: other
+  - Explain: relief_other
+    show if: relief['other']
+---
+sets:
+  - children[i].name.first
+id: Children question
+question: ${ ordinal(i) } child
+subquestion: |
+  % if i > 0:
+  So far you have added:
+
+  % for child in children.complete_elements():
+   - ${ child.name_full() }
+  % endfor
+  
+  % endif
+fields:
+  - code: |
+      children[i].name_fields()
+  - code: |
+      children[i].address_fields()
+  - Last four digits of Social Security Number: children[i].ssn
+    datatype: number
+    required: False
+  - Birthdate: children[i].birthdate
+    datatype: ThreePartsDate
+  - Check all of the following that apply: children[i].special_factors
+    datatype: checkboxes
+    choices:
+      - This child is married: married
+      - This child is on active duty in the military: active_duty
+      - This child is self-supporting: self_supporting
+      - This child is attending high school: high_school
+      - This child is attending college or vocational school: college
+  - Who has the child lived with in the previous 60 days?: children[i].lived_with
+    datatype: radio
+    choices:
+      - ${ users[0] }
+      - ${ users[1] }
+      - Other
+  - First name: children[i].lived_with_name_first
+    show if:
+      variable: children[i].lived_with
+      is: Other
+  - Middle name: children[i].lived_with_name_middle
+    show if:
+      variable: children[i].lived_with
+      is: Other
+  - Last name: children[i].lived_with_name_last
+    show if:
+      variable: children[i].lived_with
+      is: Other
+  - Who should have legal custody of this child?: children[i].legal_custody
+    datatype: radio
+    choices:
+      - ${ users[0] }
+      - ${ users[1] }
+      - Both spouses jointly
+      - Other
+  - First name: children[i].legal_custody_name_first
+    show if:
+      variable: children[i].legal_custody
+      is: Other
+  - Middle name: children[i].legal_custody_name_middle
+    show if:
+      variable: children[i].legal_custody
+      is: Other
+  - Last name: children[i].legal_custody_name_last
+    show if:
+      variable: children[i].legal_custody
+      is: Other
+  - Who should have physical custody of this child?: children[i].physical_custody
+    datatype: radio
+    choices:
+      - ${ users[0] }
+      - ${ users[1] }
+      - Both spouses jointly
+      - Other
+  - First name: children[i].physical_custody_name_first
+    show if:
+      variable: children[i].physical_custody
+      is: Other
+  - Middle name: children[i].physical_custody_name_middle
+    show if:
+      variable: children[i].physical_custody
+      is: Other
+  - Last name: children[i].physical_custody_name_last
+    show if:
+      variable: children[i].physical_custody
+      is: Other
+  - Who are the parents of this child?: children[i].parents
+    datatype: checkboxes
+    choices:
+      - ${ users[0] }
+      - ${ users[1] }
+      - Other
+    none of the above: False
+  - First name: children[i].parents_name_first
+    show if: children[i].parents['Other']
+  - Middle name: children[i].parents_name_middle
+    show if: children[i].parents['Other']
+  - Last name: children[i].parents_name_last
+    show if: children[i].parents['Other']
+  - Who is listed as parents on this child's birth certificate?: children[i].birth_certificate
+    datatype: checkboxes
+    choices:
+      - ${ users[0] }
+      - ${ users[1] }
+      - Other
+    none of the above: False
+  - First name: children[i].birth_certificate_name_first
+    show if: children[i].birth_certificate['Other']
+  - Middle name: children[i].birth_certificate_name_middle
+    show if: children[i].birth_certificate['Other']
+  - Last name: children[i].birth_certificate_name_last
+    show if: children[i].birth_certificate['Other']
+---
+id: Addresses and guardians
+question: Addresses for children
+fields:
+  - code: |
+      other_people[i].name_fields()
+  - code: |
+      other_people[i].address.address_fields()
+    
+---
+id: Additional information about children
+question: Additional information about children
+fields:
+  - Do you know of anyone other than you or your spouse who has physical custody of any of the children or claims to have custody or visitation rights with respect to any of the children?: others_with_physical_custody
+    datatype: yesnoradio
+  - Do you have information about any other custody proceeding concerning any of the children pending in a court of this or any other state?: other_custody_proceeding
+    datatype: yesnoradio
+  - Have you participated in other litigation concerning the custody of any of the children in this or any other state?: other_litigation
+    datatype: yesnoradio
+  - Have any of the children been a victim of abuse or neglect?: abuse_or_neglect
+    datatype: yesnoradio
+  - "Explain, including indicating style of related case/case number/court and whether case is pending or closed": related_case_explanation
+    datatype: area
+    js show if: |
+      val('others_with_physical_custody') || val('other_custody_proceeding') || val('other_litigation') || val('abuse_or_neglect')
+  - Have any orders pertaining to any of the children been entered by the Family Support Division?: family_support_order
+    datatype: yesnoradio
+  - Have any of the children ever received welfare or Medicaid?: received_welfare
+    datatype: yesnoradio
+---
+id: Other Allegations
+question: Other Allegations
+fields:
+  - If there are any other statements you wish to include in your Petition, you should enter them here: other_allegations
+    datatype: area
+---
+id: Assets warning screen
+question: Assets Warning
+subquestion: |
+  It looks like you some pretty significant assets! It is important to know your rights and the best way to divide some of these bigger assets.  You may consider speaking with an attorney if these assets need to be divided.
+continue button field: assets_warning
+---
+question: Service of ${ users[1] }
+fields:
+  - Has ${ spouse } been served?: respondent_served
+    datatype: yesnoradio
+---
+id: Hearing Information Screen
+question: Hearing
+subquestion: |
+  It sounds like you just need some information on how to handle your hearing!
+continue button field: served_information
+---
+id: Type of Service Question
+question: Type of Service
+fields: 
+  - Do you want to serve by publication or in person?: service_type
+    choices:
+      - Serve by publication: publication
+      - Serve in person: in_person
+---
+id: Publication Service Information Screen
+question: Service Information
+continue button field: service_by_publication_information
+---
+id: Personal Service Question
+question: Type of Personal Service
+fields:
+  - Do you want to serve by sheriff or by private process server?: personal_service_type
+    choices:
+      - Serve by sheriff: sheriff
+      - Serve by private process server: private
+---
+id: Personal Service Information Screen
+question:  Service Information
+continue button field: personal_service_information
+---
+id: Filing Pleadings Video Screen
+question: Video on filing pleadings
+continue button field: filing_pleadings_video
+---
+question: Final Page
+subquestion: |
+
+---
+
+################### PREVIEW SCREEN
+id: preview certificate_of_dissolution_of_marri
+question: |
+  Preview your form before you sign it
+subquestion: |
+  Here is a preview of the form you will sign on the next page.   
+  
+  ${ al_court_bundle.as_pdf(key='preview') }
+
+  Click the image to open it in a new tab. Click the "Edit answers" button
+  to edit your answers.
+
+  ${ action_button_html(url_action('review_certificate_of_dissolution_of_marri'), label='Edit answers', color='info') }
+  
+  Remember to come back to this window to continue and sign your form.
+continue button field: certificate_of_dissolution_of_marri_preview_question    
+---
+code: |
+  signature_fields = []
+---
+code: |
+  # This is a placeholder for the addresses that will be searched
+  # for matching address to court. Edit if court venue is based on 
+  # a different address than the user's
+  [user.address.address for user in users.complete_elements()]
+  addresses_to_search = [user.address for user in users.complete_elements()]
+---
+id: certificate of dissolution of marri review screen
+event: review_certificate_of_dissolution_of_marri
+question: |
+  Review your answers
+review:
+  - Edit: users.revisit
+    button: |
+      **Users**
+
+      % for item in users:
+        * ${ item }
+      % endfor
+  - Edit: users1_prior_name
+    button: |
+      **LAST NAME PRIOR TO FIRST MARRIAGE (If different)**:
+      ${ users1_prior_name }
+  - Edit: users1_ssn
+    button: |
+      **SOCIAL SECURITY NO.**:
+      ${ users1_ssn }
+  - Edit: users1_birthplace
+    button: |
+      **BIRTHPLACE (State or Foreign Country)**:
+      ${ users1_birthplace }
+  - Edit: users2_prior_name
+    button: |
+      **LAST NAME PRIOR TO FIRST MARRIAGE (If different)**:
+      ${ users2_prior_name }
+  - Edit: users2_ssn
+    button: |
+      **SOCIAL SECURITY NO.**:
+      ${ users2_ssn }
+  - Edit: users2_birthplace
+    button: |
+      **BIRTHPLACE (State or Foreign Country)**:
+      ${ users2_birthplace }
+  - Edit: marriage_address_city
+    button: |
+      **PLACE OF THIS MARRIAGE - CITY, TOWN, OR LOCATION**:
+      ${ marriage_address_city }
+  - Edit: marriage_address_county
+    button: |
+      **COUNTY**:
+      ${ marriage_address_county }
+  - Edit: marriage_address_state
+    button: |
+      **STATE OR FOREIGN COUNTRY**:
+      ${ marriage_address_state }
+  - Edit: marriage_date
+    button: |
+      **DATE OF THIS MARRIAGE**:
+      ${ marriage_date }
+  - Edit: is_users1_petitioner
+    button: |
+      **Is users1 petitioner**:
+      ${ word(yesno(is_users1_petitioner)) }
+  - Edit: is_users2_petitioner
+    button: |
+      **Is users2 petitioner**:
+      ${ word(yesno(is_users2_petitioner)) }
+  - Edit: is_joint_petitioners
+    button: |
+      **Is joint petitioners**:
+      ${ word(yesno(is_joint_petitioners)) }
+  - Edit: marriage_last_resided_number_children_none
+    button: |
+      **Marriage last resided number children none**:
+      ${ word(yesno(marriage_last_resided_number_children_none)) }
+  - Edit: is_other_petitioner
+    button: |
+      **Is other petitioner**:
+      ${ word(yesno(is_other_petitioner)) }
+  - Edit: marriage_last_resided_number_children
+    button: |
+      **NUMBER OF CHILDREN UNDER 18 IN THIS HOUSEHOLD AS OF THE DATE IN ITEM 23**:
+      ${ marriage_last_resided_number_children }
+  - Edit: is_other_petitioner_description
+    button: |
+      **Is other petitioner description**:
+      ${ is_other_petitioner_description }
+  - Edit: marriage_last_resided_date
+    button: |
+      **DATE COUPLE LAST RESIDED IN SAME HOUSEHOLD (MONTH, DAY, YEAR)**:
+      ${ marriage_last_resided_date }
+  - Edit: petitioner_attorney
+    button: |
+      **NAME OF PETITIONER’S ATTORNEY (Type or Print)**:
+      ${ petitioner_attorney }
+  - Edit: petitioners.revisit
+    button: |
+      **Petitioners**
+
+      % for item in petitioners:
+        * ${ item }
+      % endfor
+  - Edit: marriage_type_dissolution_true
+    button: |
+      **Marriage type dissolution true**:
+      ${ word(yesno(marriage_type_dissolution_true)) }
+  - Edit: marriage_type_separation_true
+    button: |
+      **Marriage type separation true**:
+      ${ word(yesno(marriage_type_separation_true)) }
+  - Edit: marriage_type_annulment_true
+    button: |
+      **Marriage type annulment true**:
+      ${ word(yesno(marriage_type_annulment_true)) }
+  - Edit: marriage_dissolved_date
+    button: |
+      **I CERTIFY THAT THE MARRIAGE OF THE ABOVE-NAMED PERSONS WAS DISSOLVED ON: (Month, Day, Year)**:
+      ${ marriage_dissolved_date }
+  - Edit: marriage_recorded_date
+    button: |
+      **DATE RECORDED (Month, Day, Year)**:
+      ${ marriage_recorded_date }
+  - Edit: marriage_child_support_awarded_to_users1
+    button: |
+      **Marriage child support awarded to users1**:
+      ${ word(yesno(marriage_child_support_awarded_to_users1)) }
+  - Edit: marriage_number_children_awarded_users1
+    button: |
+      **Marriage number children awarded users1**:
+      ${ marriage_number_children_awarded_users1 }
+  - Edit: marriage_number_children_awarded_users2
+    button: |
+      **Marriage number children awarded users2**:
+      ${ marriage_number_children_awarded_users2 }
+  - Edit: marriage_child_support_awarded_to_users2
+    button: |
+      **Marriage child support awarded to users2**:
+      ${ word(yesno(marriage_child_support_awarded_to_users2)) }
+  - Edit: marriage_child_support_awarded_to_other
+    button: |
+      **Marriage child support awarded to other**:
+      ${ word(yesno(marriage_child_support_awarded_to_other)) }
+  - Edit: marriage_number_children_awarded_joint
+    button: |
+      **Marriage number children awarded joint**:
+      ${ marriage_number_children_awarded_joint }
+  - Edit: marriage_number_children_awarded_other
+    button: |
+      **Marriage number children awarded other**:
+      ${ marriage_number_children_awarded_other }
+  - Edit: marriage_number_children_awarded_no_children
+    button: |
+      **Marriage number children awarded no children**:
+      ${ word(yesno(marriage_number_children_awarded_no_children)) }
+  - Edit: marriage_child_support_awarded_to_none
+    button: |
+      **Marriage child support awarded to none**:
+      ${ word(yesno(marriage_child_support_awarded_to_none)) }
+  - Edit: marriage_decree_county
+    button: |
+      **COUNTY OF DECREE**:
+      ${ marriage_decree_county }
+  - Edit: marriage_decree_court
+    button: |
+      **TITLE OF COURT**:
+      > ${ single_paragraph(marriage_decree_court) }
+  - Edit: marriage_decree_certifying_office
+    button: |
+      **TITLE OF CERTIFYING OFFICE**:
+      > ${ single_paragraph(marriage_decree_certifying_office) }
+  - Edit: users1_race_white
+    button: |
+      **Users1 race white**:
+      ${ word(yesno(users1_race_white)) }
+  - Edit: users1_last_marriage_ended_death
+    button: |
+      **Users1 last marriage ended death**:
+      ${ word(yesno(users1_last_marriage_ended_death)) }
+  - Edit: users1_race_black
+    button: |
+      **Users1 race black**:
+      ${ word(yesno(users1_race_black)) }
+  - Edit: users1_last_marriage_ended_divorce
+    button: |
+      **Users1 last marriage ended divorce**:
+      ${ word(yesno(users1_last_marriage_ended_divorce)) }
+  - Edit: users1_race_AmericanIndian
+    button: |
+      **Users1 race americanindian**:
+      ${ word(yesno(users1_race_AmericanIndian)) }
+  - Edit: users1_number_of_marriage
+    button: |
+      **Users1 number of marriage**:
+      ${ users1_number_of_marriage }
+  - Edit: users1_last_marriage_ended_date
+    button: |
+      **Date of users1 last marriage ended**:
+      ${ users1_last_marriage_ended_date }
+  - Edit: users1_race_other
+    button: |
+      **Users1 race other**:
+      ${ word(yesno(users1_race_other)) }
+  - Edit: users1_race_other_description
+    button: |
+      **Users1 race other description**:
+      ${ users1_race_other_description }
+  - Edit: users1_education_elementary
+    button: |
+      **Elementary/Secondary**:
+      ${ users1_education_elementary }
+  - Edit: users1_education_college
+    button: |
+      **College (1-4 or 5+)**:
+      ${ users1_education_college }
+  - Edit: users2_race_white
+    button: |
+      **Users2 race white**:
+      ${ word(yesno(users2_race_white)) }
+  - Edit: users2_last_marriage_ended_death
+    button: |
+      **Users2 last marriage ended death**:
+      ${ word(yesno(users2_last_marriage_ended_death)) }
+  - Edit: users2_race_black
+    button: |
+      **Users2 race black**:
+      ${ word(yesno(users2_race_black)) }
+  - Edit: users2_last_marriage_ended_divorce
+    button: |
+      **Users2 last marriage ended divorce**:
+      ${ word(yesno(users2_last_marriage_ended_divorce)) }
+  - Edit: users2_race_AmericanIndian
+    button: |
+      **Users2 race americanindian**:
+      ${ word(yesno(users2_race_AmericanIndian)) }
+  - Edit: users2_number_of_marriage
+    button: |
+      **Users2 number of marriage**:
+      ${ users2_number_of_marriage }
+  - Edit: users2_race_other
+    button: |
+      **Users2 race other**:
+      ${ word(yesno(users2_race_other)) }
+  - Edit: users2_last_marriage_ended_date
+    button: |
+      **Date of users2 last marriage ended**:
+      ${ users2_last_marriage_ended_date }
+  - Edit: users2_race_other_description
+    button: |
+      **Users2 race other description**:
+      ${ users2_race_other_description }
+  - Edit: users2_education_elementary
+    button: |
+      **Users2 education elementary**:
+      ${ users2_education_elementary }
+  - Edit: users2_education_college
+    button: |
+      **College (1-4 or 5+)**:
+      ${ users2_education_college }
+---
+continue button field: users.revisit
+question: |
+  Edit users
+subquestion: |
+  ${ users.table }
+
+  ${ users.add_action() }
+---
+table: users.table
+rows: users
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.last") else ""
+  - Address: |
+      row_item.address.block() if defined("row_item.address.county") else ""
+  - Birthdate: |
+      row_item.birthdate if defined("row_item.birthdate") else ""
+edit:
+  - name.last
+  - address.county
+  - birthdate
+confirm: True
+
+---
+continue button field: petitioners.revisit
+question: |
+  Edit petitioners
+subquestion: |
+  ${ petitioners.table }
+
+  ${ petitioners.add_action() }
+---
+table: petitioners.table
+rows: petitioners
+columns:
+  - Address: |
+      row_item.address.block() if defined("row_item.address.address") else ""
+edit:
+  - address.address
+confirm: True
+
+---
+id: download mo_divorce_forms
+event: mo_divorce_forms_download
+question: |
+  All done
+subquestion: |
+  Link to specific court website
+  Info on Discovery
+  Info and link on Parenting Class when applicable
+  Photo of Court House
+  Script for hearing
+  Print out of itinerary
+  
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
+
+  ${ action_button_html(url_action('review_certificate_of_dissolution_of_marri'), label='Edit answers', color='info') }
+  
+  
+  ${ al_user_bundle.download_list_html() }
+  
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+
+progress: 100
+---
+# ALDocument objects specify the metadata for each template
+objects:
+  - mo_divorce_forms_Post_interview_instructions: ALDocument.using(title="Instructions", filename="certificate_of_dissolution_of_marri_next_steps.docx", enabled=True, has_addendum=False)
+  - certificate_of_dissolution_attachment: ALDocument.using(title="Certificate of dissolution of marriage", filename="certificate_of_dissolution", enabled=False, has_addendum=False, )
+  - form_17_attachment: ALDocument.using(title="Form 17 - Information Sheet", filename="form_17", enabled=True, has_addendum=False, )
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, certificate_of_dissolution_attachment,form_17_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[certificate_of_dissolution_attachment,form_17_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+---
+# Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
+# used for "preview" and "final" keys, and logic in the template checks the value of 
+# `i` to show or hide the user's signature
+attachment:
+  name: Post-interview-Instructions
+  filename: mo_divorce_forms_next_steps
+  docx template file: mo_divorce_forms_next_steps.docx
+  variable name: mo_divorce_forms_Post_interview_instructions[i]
+  skip undefined: True
+  tagged pdf: True

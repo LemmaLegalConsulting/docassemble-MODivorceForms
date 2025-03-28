@@ -1,0 +1,79 @@
+---
+attachment:
+  name: Form 17 Information Sheet
+  filename: form_17
+  variable name: form_17_attachment[i]
+  skip undefined: True
+  pdf template file: form_17.pdf
+  fields:
+      - "user2_ssn": ${ respondent.ssn } 
+      - "user2_address_mailing": ${ respondent.mailing_address.on_one_line() } 
+      - "check_Uncontested_Track": ${ is_case_contested in ['uncontested'] } 
+      - "user1_employer_name": ${ users[0].employment_description } 
+      - "user2_address": ${ respondent.address.on_one_line() } 
+      - "check_Kansas_City": |
+          ${ case_court = "Kansas City" } 
+      - "Case_Number": ${ case_number } 
+      - "P_name_full": ${ petitioner.name_full() } 
+      - "user1_address_mailing": ${ petitioner.mailing_address.on_one_line() } 
+      - "R_name_full": ${ respondent.name_full() } 
+      - "users2_name_full": ${ respondent.name_full() } 
+      - "users1_name_full": ${ petitioner.name_full() } 
+      - "user2_phone_number": ${ respondent.phone } 
+      - "user1_driver_license_number": ${ petitioner.driver_license_number } 
+      - "user1_address": ${ petitioner.address.on_one_line() } 
+      - "user1_ssn": ${ petitioner.ssn } 
+      - "user1_phone_number": ${ petitioner.phone } 
+      - "check_Contested_Track": |
+          ${ is_case_contested in ['contested', 'unknown'] } 
+      - "check_Independence": |
+          ${ case_court = "Kansas City" } 
+      - "user2_driver_license_number": ${ respondent.driver_license_number } 
+      - "check_child4_reside_P": |
+          ${ petitioner.name_full() in children[3].lived_with } 
+      - "check_children_welfare_medicaid_no": ${ not received_welfare } 
+      - "check_no_related_cases": |
+          ${ not(others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect) } 
+      - "check_child_support": ${  } 
+      - "check_child2_reside_P": |
+          ${ petitioner.name_full() in children[1].lived_with } 
+      - "child4_ssn": ${ children[3].ssn } 
+      - "child1_birthdate": ${ children[0].birthdate } 
+      - "child1_name_full": ${ children[0].name_full() } 
+      - "child3_ssn": ${ children[2] } 
+      - "child3_birthdate2": ${ children[2] } 
+      - "check_child4_reside_R": |
+          ${ respondent.name_full() in children[3].lived_with } 
+      - "child2_name_full": ${ children[1].name_full() } 
+      - "check_child2_reside_R": |
+          ${ respondent.name_full() in children[1].lived_with } 
+      - "related_case_information": ${ related_case_explanation } 
+      - "check_child3_reside_P": |
+          ${ petitioner.name_full() in children[2].lived_with } 
+      - "involved_parties_known_names": |
+          ${ comma_and_list(client.prior_name for client in clients) } 
+      - "child3_name_full": ${ children[2].name_full() } 
+      - "check_children_welfare_medicaid_yes": ${ received_welfare } 
+      - "child4_birthdate": ${ children[3].birthdate } 
+      - "user1_employer_phone": ${ petitioner.employer_phone } 
+      - "child3_birthdate1": ${ children[1].birthdate } 
+      - "user2_employer_phone": ${ respondent.employer_phone } 
+      - "check_child3_reside_R": |
+          ${ respondent.name_full() in children[2].lived_with } 
+      - "user2_employer_name": ${ users[1].employment_description } 
+      - "child2_ssn": ${ children[1].ssn } 
+      - "user2_employer_address": ${ respondent.employer_address.on_one_line() } 
+      - "user1_employer_address": ${ petitioner.employer_address.on_one_line() } 
+      - "check_related_cases": |
+          ${ others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect }
+      - "check_child1_reside_R": |
+          ${ respondent.name_full() in children[0].lived_with } 
+      - "child4_name_full": ${ children[3].name_full() } 
+      - "check_child1_reside_P": |
+          ${ petitioner.name_full() in children[0].lived_with } 
+      - "child1_ssn": ${ children[0] } 
+      - "Date": ${ service_date } 
+
+
+
+
