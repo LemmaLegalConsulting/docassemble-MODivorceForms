@@ -6,29 +6,29 @@ attachment:
   skip undefined: True
   pdf template file: form_17.pdf
   fields:
-      - "user2_ssn": ${ respondent.ssn } 
-      - "user2_address_mailing": ${ respondent.mailing_address.on_one_line() } 
+      - "respondent_ssn": ${ respondent.ssn } 
+      - "respondent_address_mailing": ${ respondent.mailing_address.on_one_line() } 
       - "check_Uncontested_Track": ${ is_case_contested in ['uncontested'] } 
-      - "user1_employer_name": ${ users[0].employment_description } 
-      - "user2_address": ${ respondent.address.on_one_line() } 
+      - "petitioner_employer_name": ${ users[0].employment_description } 
+      - "respondent_address": ${ respondent.address.on_one_line() } 
       - "check_Kansas_City": |
           ${ case_court = "Kansas City" } 
       - "Case_Number": ${ case_number } 
       - "P_name_full": ${ petitioner.name_full() } 
-      - "user1_address_mailing": ${ petitioner.mailing_address.on_one_line() } 
+      - "petitioner_address_mailing": ${ petitioner.mailing_address.on_one_line() } 
       - "R_name_full": ${ respondent.name_full() } 
-      - "users2_name_full": ${ respondent.name_full() } 
-      - "users1_name_full": ${ petitioner.name_full() } 
-      - "user2_phone_number": ${ respondent.phone } 
-      - "user1_driver_license_number": ${ petitioner.driver_license_number } 
-      - "user1_address": ${ petitioner.address.on_one_line() } 
-      - "user1_ssn": ${ petitioner.ssn } 
-      - "user1_phone_number": ${ petitioner.phone } 
+      - "respondent_name_full": ${ respondent.name_full() } 
+      - "petitioner_name_full": ${ petitioner.name_full() } 
+      - "respondent_phone_number": ${ respondent.phone } 
+      - "petitioner_driver_license_number": ${ petitioner.driver_license_number } 
+      - "petitioner_address": ${ petitioner.address.on_one_line() } 
+      - "petitioner_ssn": ${ petitioner.ssn } 
+      - "petitioner_phone_number": ${ petitioner.phone } 
       - "check_Contested_Track": |
           ${ is_case_contested in ['contested', 'unknown'] } 
       - "check_Independence": |
           ${ case_court = "Kansas City" } 
-      - "user2_driver_license_number": ${ respondent.driver_license_number } 
+      - "respondent_driver_license_number": ${ respondent.driver_license_number } 
       - "check_child4_reside_P": |
           ${ petitioner.name_full() in children[3].lived_with } 
       - "check_children_welfare_medicaid_no": ${ not received_welfare } 
