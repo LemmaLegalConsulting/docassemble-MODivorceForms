@@ -46,7 +46,7 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
 setup(name='docassemble.MODivorceForms',
       version='0.1',
       description=(''),
-      long_description='# docassemble.MODivorceForms\n\n\n\n## Author\n\nToby Fey, tobyfey@protonmail.com\n\n',
+      long_description='# docassemble-MODivorceForms',
       long_description_content_type='text/markdown',
       author='Toby Fey',
       author_email='tobyfey@protonmail.com',

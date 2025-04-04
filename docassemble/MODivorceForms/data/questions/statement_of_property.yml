@@ -1,0 +1,1032 @@
+---
+id: ALIncomeList there are any
+generic object: ALIncomeList
+code: |
+  if x.selected_types.any_true():
+    x.move_checks_to_list(selected_terms=x.terms_ordered)
+    x.there_are_any = True
+  else:
+    x.there_are_any = False
+---
+id: generic ordered object for checkboxes
+generic object: ALAssetList
+objects:
+  - x.ordered: DAOrderedDict.using(elements=x.terms_ordered, auto_gather=False, gathered=True)
+---
+id: generic set display name backup
+generic object: ALAssetList
+code: |
+  if defined('x[i].source') and x[i].source != "other":
+    x[i].display_name = x.terms_ordered.get(x[i].source, x[i].source)
+  elif defined('x[i].source') and x[i].source == "other" and defined('x[i].source_other'):
+    x[i].display_name = x[i].source_other
+  else:
+    x[i].display_name = x.other_display
+---
+id: generic there are any
+generic object: ALAssetList
+question: |
+  ${ x.display_name }
+subquestion: |   
+  Do you have any ${ x.display_name }?
+fields:
+  - no label: x.selected_types
+    datatype: checkboxes
+    code: |
+      x.ordered
+---
+generic object: ALAssetList
+code: |
+  x[i].market_value
+  x[i].complete = True
+---
+id: generic review
+generic object: ALAssetList
+question: Do you want to list any other ${ x.display_name }?
+subquestion: |
+  Tap Next if you don't have more to add.
+  
+  ${ x.table }
+  
+  ${ x.add_action() }
+continue button field: x.review_items
+---
+id: generic revisit
+generic object: ALAssetList
+continue button field: x.revisit
+question: |
+  Edit ${ x.display_name }
+subquestion: |
+  ${ x.table }
+
+  ${ x.add_action() }
+---
+id: generic table
+generic object: ALAssetList
+table: x.table
+rows: x
+columns:
+  - Description: |
+      row_item.description
+  - Market value: |
+      currency(row_item.market_value) if defined("row_item.market_value") else ""
+  - Marital property?:  row_item.marital_property
+  - Party with possession?: row_item.has_possession
+  - Property awarded to: row_item.recommended_award
+edit:
+  - source
+  - value
+---
+id: real_estate object
+objects:
+  - real_estate: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: real_estate other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  real_estate.other_display = "other real estate"
+  real_estate.display_name = "real estate"
+---
+id: real_estate terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: real_estate.terms_ordered
+data: !!omap
+  - house: "House"
+  - condominium: "Condominium"
+  - leasehold: "Leasehold"
+  - other: "Other"
+---
+only sets: real_estate[i].market_value
+id: describe real_estate
+reconsider: real_estate[i].display_name
+question: |
+  Tell us about your ${ real_estate[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in real_estate.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in real_estate.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: real_estate[i].source
+    code: |
+      real_estate.ordered
+  - Other (explain): real_estate[i].source_other
+    show if:
+      variable: real_estate[i].source
+      is: other
+  - Address: real_estate[i].address
+    required: False
+  - Legal description: real_estate[i].legal_description
+    required: False
+  - What is its market value? How much would you get if you sold it?: real_estate[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: real_estate[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: real_estate[i].lender
+    required: False 
+    show if: real_estate[i].is_amount_owed
+  - Balance: real_estate[i].balance
+    datatype: currency
+    show if: real_estate[i].is_amount_owed
+    required: False 
+  - Monthly Payment: real_estate[i].monthly_payment
+    datatype: currency
+    show if: real_estate[i].is_amount_owed
+    required: False 
+  - Is this marital or nonmarital property?: real_estate[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Party with possession of this property?: real_estate[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: real_estate[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  if real_estate[i].source != "other":
+    real_estate[i].display_name = real_estate.terms_ordered.get(real_estate[i].source, real_estate[i].source)
+  else:
+    real_estate[i].display_name = real_estate[i].source_other
+  real_estate[i].description = real_estate[i].display_name + " at " + real_estate[i].address + " " + real_estate[i].legal_description
+---
+id: vehicles object
+objects:
+  - vehicles: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: vehicles other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  vehicles.other_display = "other vehicles"
+  vehicles.display_name = "vehicles"
+---
+id: vehicles terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: vehicles.terms_ordered
+data: !!omap
+  - car: "Car"
+  - truck: "Truck"
+  - motorcycle: "Motorcycle"
+  - mobile_home: "Mobile home"
+  - trailer: "Trailer"
+  - boat: "Boat or jetski"
+  - airplane: "Airplane"
+  - other: "Other"
+---
+only sets: vehicles[i].market_value
+id: describe vehicles
+reconsider: vehicles[i].display_name
+question: |
+  Tell us about your ${ vehicles[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in vehicles.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in vehicles.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: vehicles[i].source
+    code: |
+      vehicles_ordered
+  - Other (explain): vehicles[i].source_other
+    show if:
+      variable: vehicles[i].source
+      is: other
+  - Year: vehicles[i].year
+    required: False
+  - Make: vehicles[i].make
+    required: False
+  - Make: vehicles[i].model
+    required: False
+  - Vehicle Identification Number: vehicles[i].vin
+    required: False
+  - What is its market value? How much would you get if you sold it?: vehicles[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: vehicles[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: vehicles[i].lender
+    required: False 
+    show if: vehicles[i].is_amount_owed
+  - Balance: vehicles[i].balance
+    datatype: currency
+    show if: vehicles[i].is_amount_owed
+    required: False 
+  - Monthly Payment: vehicles[i].monthly_payment
+    datatype: currency
+    show if: vehicles[i].is_amount_owed
+    required: False 
+  - Is this marital or nonmarital property?: vehicles[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Party with possession of this property?: vehicles[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: vehicles[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  if vehicles[i].source != "other":
+    vehicles[i].display_name = vehicles.terms_ordered.get(vehicles[i].source, vehicles[i].source)
+  else:
+    vehicles[i].display_name = vehicles[i].source_other
+  vehicles[i].description = vehicles[i].year + " " + vehicles[i].make + " " + vehicles[i].model
+---
+id: bank_assets object
+objects:
+  - bank_assets: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: bank_assets other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  bank_assets.other_display = "other bank assets"
+  bank_assets.display_name = "Bank assets"
+---
+id: bank_assets terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: bank_assets.terms_ordered
+data: !!omap
+  - checking account: "Checking accounts"
+  - savings account: "Savings accounts"
+  - time deposit: "Time deposit"
+  - money market: "Money market accounts"
+  - certificates: "Certificates"
+  - other: "Other"
+---
+only sets: bank_assets[i].market_value
+id: describe bank_assets
+reconsider: bank_assets[i].display_name
+question: |
+  Tell us about your ${ bank_assets[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in bank_assets.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in bank_assets.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: bank_assets[i].source
+    code: |
+      bank_assets.ordered
+  - Other (explain): bank_assets[i].source_other
+    show if:
+      variable: bank_assets[i].source
+      is: other
+  - Bank or Institution: bank_assets[i].institution
+    required: False
+  - Account number: bank_assets[i].account_number
+    required: False
+  - What is its market value? How much would you get if you sold it?: bank_assets[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: bank_assets[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: bank_assets[i].lender
+    required: False 
+    show if: bank_assets[i].is_amount_owed
+  - Balance: bank_assets[i].balance
+    datatype: currency
+    show if: bank_assets[i].is_amount_owed
+    required: False 
+  - Monthly Payment: bank_assets[i].monthly_payment
+    datatype: currency
+    show if: bank_assets[i].is_amount_owed
+    required: False 
+  - Is this marital or nonmarital property?: bank_assets[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Names on the account: bank_assets[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: bank_assets[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  if bank_assets[i].source != "other":
+    bank_assets[i].display_name = bank_assets.terms_ordered.get(bank_assets[i].source, bank_assets[i].source)
+  else:
+    bank_assets[i].display_name = bank_assets[i].source_other
+  bank_assets[i].description = bank_assets[i].institution + " " +bank_assets[i].display_name 
+---
+id: securities object
+objects:
+  - securities: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: securities other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  securities.other_display = "other securities"
+  securities.display_name = "Securities"
+---
+id: securities terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: securities.terms_ordered
+data: !!omap
+  - stocks: "Stocks"
+  - bonds: "Bonds"
+  - notes: "Promissory notes"
+  - mortgages: "Mortgage"
+  - money market: "Money market funds"
+  - other: "Other"
+---
+only sets: securities[i].market_value
+id: describe securities
+reconsider: securities[i].display_name
+question: |
+  Tell us about your ${ securities[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in securities.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in securities.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: securities[i].source
+    code: |
+      securities.ordered
+  - Other (explain): securities[i].source_other
+    show if:
+      variable: securities[i].source
+      is: other
+  - Name: securities[i].name
+    required: False
+  - Account number: securities[i].account_number
+    required: False
+  - What is its market value? How much would you get if you sold it?: securities[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: securities[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: securities[i].lender
+    required: False 
+    show if: securities[i].is_amount_owed
+  - Balance: securities[i].balance
+    datatype: currency
+    show if: securities[i].is_amount_owed
+    required: False 
+  - Monthly Payment: securities[i].monthly_payment
+    datatype: currency
+    show if: securities[i].is_amount_owed
+    required: False 
+  - Is this marital or nonmarital property?: securities[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Names in which securities are held: securities[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: securities[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  if securities[i].source != "other":
+    securities[i].display_name = securities.terms_ordered.get(securities[i].source, securities[i].source)
+  else:
+    securities[i].display_name = securities[i].source_other
+  securities[i].description = securities[i].name + " " +securities[i].display_name 
+---
+id: personal_goods object
+objects:
+  - personal_goods: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: personal_goods other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  personal_goods.other_display = "other personal possessions"
+  personal_goods.display_name = "Personal possessions"
+---
+id: personal_goods terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: personal_goods.terms_ordered
+data: !!omap
+  - jewelry: "Jewelry"
+  - antiques: "Antiques"
+  - artwork: "Artwork"
+  - guns: "Guns"
+  - coins_stamps: "Coins / stamps"
+  - tools: "Tools"
+  - collectibles: "Collectibles"
+  - instruments: "Piano / musical instruments"
+  - china_etc: "China / crystal / silverware"
+  - appliances: "Appliances"
+  - computers: "Computers"
+  - electronics: "Electronics"
+  - furnishings: "Furnishings / furniture"
+  - other: "Other"
+---
+only sets: personal_goods[i].market_value
+id: describe personal_goods
+reconsider: personal_goods[i].display_name
+question: |
+  Tell us about your ${ personal_goods[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in personal_goods.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in personal_goods.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: personal_goods[i].source
+    code: |
+      personal_goods.ordered
+  - Other (explain): personal_goods[i].source_other
+    show if:
+      variable: personal_goods[i].source
+      is: other
+  - What is its market value? How much would you get if you sold it?: personal_goods[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: personal_goods[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: personal_goods[i].lender
+    required: False 
+    show if: personal_goods[i].is_amount_owed
+  - Balance: personal_goods[i].balance
+    datatype: currency
+    show if: personal_goods[i].is_amount_owed
+    required: False 
+  - Monthly Payment: personal_goods[i].monthly_payment
+    datatype: currency
+    show if: personal_goods[i].is_amount_owed
+    required: False 
+  - Is this marital or nonmarital property?: personal_goods[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Who has possession?: personal_goods[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: personal_goods[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  if personal_goods[i].source != "other":
+    personal_goods[i].display_name = personal_goods.terms_ordered.get(personal_goods[i].source, personal_goods[i].source)
+  else:
+    personal_goods[i].display_name = personal_goods[i].source_other
+  personal_goods[i].description = personal_goods[i].display_name
+---
+id: retirement_accounts object
+objects:
+  - retirement_accounts: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: retirement_accounts terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: retirement_accounts.terms_ordered
+data: !!omap
+  - ira: "IRA"
+  - 401k: "401K"
+  - 403b: "403B"
+  - tiaacref: "TIAA/CREF"
+  - keogh: "Keogh"
+  - tdsp: "TDSP"
+  - tsa: "TSA"
+  - profitshare: "Profit sharing"
+  - ssp: "Savings & Security Program"
+  - defcomp: "Deferred compensation"
+  - other: "Other"
+---
+id: retirement accounts other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  retirement_accounts.other_display = "other retirement accounts"
+  retirement_accounts.display_name = "Retirement accounts"
+---
+only sets: retirement_accounts[i].market_value
+id: describe retirement_accounts
+reconsider: retirement_accounts[i].display_name
+question: |
+  Tell us about your ${ retirement_accounts[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in retirement_accounts.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in retirement_accounts.complete_elements()) }.
+  % endif
+fields:
+  - Type of retirement account: retirement_accounts[i].source
+    code: |
+      retirement_accounts.ordered
+  - Other (explain): retirement_accounts[i].source_other
+    show if:
+      variable: retirement_accounts[i].source
+      is: other
+  - Name of company: retirement_accounts[i].name
+    required: False
+  - Total present value: retirement_accounts[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Percentage vested: retirement_accounts[i].percent_vested
+    maxlength: 76
+    datatype: number
+  - Is there an amount owed on this property?: retirement_accounts[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: retirement_accounts[i].lender
+    required: False 
+    show if: retirement_accounts[i].is_amount_owed
+  - Balance: retirement_accounts[i].balance
+    datatype: currency
+    show if: retirement_accounts[i].is_amount_owed
+    required: False 
+  - Monthly Payment: retirement_accounts[i].monthly_payment
+    datatype: currency
+    show if: retirement_accounts[i].is_amount_owed
+    required: False 
+  - Is this marital or nonmarital property?: retirement_accounts[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Person holding the interest: retirement_accounts[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: retirement_accounts[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  if retirement_accounts[i].source != "other":
+    retirement_accounts[i].display_name = retirement_accounts.terms_ordered.get(retirement_accounts[i].source, retirement_accounts[i].source)
+  else:
+    retirement_accounts[i].display_name = retirement_accounts[i].source_other
+  retirement_accounts[i].description = retirement_accounts[i].name + " " +retirement_accounts[i].display_name
+---
+question: Do you have any other assets?
+fields:
+  - Life insurance: life_insurance.there_are_any
+    datatype: yesnoradio
+  - Interests in trust: interests_in_trust.there_are_any
+    datatype: yesnoradio
+  - Interest in contracts made and not performed: interest_in_contract.there_are_any
+    datatype: yesnoradio
+  - Interest in pending litigation: interest_in_litigation.there_are_any
+    datatype: yesnoradio
+  - Interest in farm equipment: farm.there_are_any
+    datatype: yesnoradio
+  - Debts owed to you by others: debts_owed_to_you.there_are_any
+    datatype: yesnoradio
+  - Interests in businesses: businesses.there_are_any
+    datatype: yesnoradio
+  - Other assets: other_assets.there_are_any
+    datatype: yesnoradio
+continue button field: there_are_any_screen
+---
+only sets: x[i].market_value
+generic object: ALAssetList
+id: describe generic
+question: |
+  Tell us about your ${ x.display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.description for asset in x.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.description for asset in x.complete_elements()) }.
+  % endif
+fields:
+  - Description: x[i].description
+  - What is its market value? How much would you get if you sold it?: x[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: x[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: x[i].lender
+    required: False 
+    show if: x[i].is_amount_owed
+  - Balance: x[i].balance
+    datatype: currency
+    show if: x[i].is_amount_owed
+    required: False 
+  - Monthly Payment: x[i].monthly_payment
+    datatype: currency
+    show if: x[i].is_amount_owed
+    required: False 
+  - Is this marital or nonmarital property?: x[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Who has possession?: x[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: x[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+---
+id: life_insurance object
+objects:
+  - life_insurance: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: bank_assets other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  life_insurance.other_display = "other life insurance policies"
+  life_insurance.display_name = "life insurance policies"
+---
+id: describe life_insurance
+question: |
+  Tell us about your ${ ordinal(i) } life insurance policy.
+subquestion: |
+
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.description for asset in life_insurance.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.description  for asset in life_insurance.complete_elements()) }.
+  % endif
+fields:
+  - Type of life insurance: life_insurance[i].type
+    required: False
+  - Name of issuing company: life_insurance[i].name
+    required: False
+  - Policy number: life_insurance[i].account_number
+    required: False
+  - Face value: life_insurance[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Cash value: life_insurance[i].cash_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: life_insurance[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: life_insurance[i].lender
+    required: False 
+    show if: life_insurance[i].is_amount_owed
+  - Balance: life_insurance[i].balance
+    datatype: currency
+    show if: life_insurance[i].is_amount_owed
+    required: False 
+  - Monthly Payment: life_insurance[i].monthly_payment
+    datatype: currency
+    show if: life_insurance[i].is_amount_owed
+    required: False 
+  - Is this marital or nonmarital property?: life_insurance[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Owner of policy: life_insurance[i].owner
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Insured: life_insurance[i].insured
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+      - Other: other
+  - Beneficiaries: life_insurance[i].beneficiaries
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: life_insurance[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  life_insurance[i].description = life_insurance[i].name + " " +life_insurance[i].type
+---
+id: life isurance table
+table: life_insurance.table
+rows: life_insurance
+columns:
+  - Description: |
+      row_item.description
+  - Market value: |
+      currency(row_item.market_value) if defined("row_item.market_value") else ""
+  - Marital property?:  row_item.marital_property
+  - Beneficiaries: row_item.beneficiaries
+  - Property awarded to: row_item.recommended_award
+edit:
+  - market_value
+---
+id: interests_in_trust object
+objects:
+  - interests_in_trust: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: interests_in_trust other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  interests_in_trust.other_display = "other interests in a trust"
+  interests_in_trust.display_name = "interest in a trust"
+---
+id: describe interests_in_trust
+question: |
+  Tell us about your ${ ordinal(i) } interest in a trust
+subquestion: |
+
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.description for asset in interests_in_trust.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.description  for asset in interests_in_trust.complete_elements()) }.
+  % endif
+fields:
+  - Name of trust: interests_in_trust[i].name
+    required: False
+  - Nature of interest: interests_in_trust[i].nature
+    required: False
+  - Market value: interests_in_trust[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: interests_in_trust[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: interests_in_trust[i].lender
+    required: False 
+    show if: interests_in_trust[i].is_amount_owed
+  - Balance: interests_in_trust[i].balance
+    datatype: currency
+    show if: interests_in_trust[i].is_amount_owed
+    required: False 
+  - Monthly Payment: interests_in_trust[i].monthly_payment
+    datatype: currency
+    show if: interests_in_trust[i].is_amount_owed
+    required: False 
+  - Who should pay this debt?: interests_in_trust[i].recommended_debt
+    datatype: currency
+    show if: interests_in_trust[i].is_amount_owed
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    required: False 
+  - Is this marital or nonmarital property?: interests_in_trust[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Trustee: interests_in_trust[i].trustee
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Settlor: interests_in_trust[i].settlor
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Beneficiaries: interests_in_trust[i].beneficiaries
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: interests_in_trust[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Copy of trust instrument: interests_in_trust[i].file
+    datatype: file
+    required: False
+validation code: |
+  interests_in_trust[i].description = interests_in_trust[i].name
+---
+id: interests_in_trust table
+table: interests_in_trust.table
+rows: interests_in_trust
+columns:
+  - Description: |
+      row_item.description
+  - Market value: |
+      currency(row_item.market_value) if defined("row_item.market_value") else ""
+  - Marital property?:  row_item.marital_property
+  - Beneficiaries: row_item.beneficiaries
+  - Property awarded to: row_item.recommended_award
+edit:
+  - market_value
+---
+id: interest_in_contract object
+objects:
+  - interest_in_contract: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: interest_in_contract other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  interest_in_contract.other_display = "other interests in a contract"
+  interest_in_contract.display_name = "interest in a contract"
+---
+id: interest_in_litigation object
+objects:
+  - interest_in_litigation: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: interest_in_litigation other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  interest_in_litigation.other_display = "other lawsuits"
+  interest_in_litigation.display_name = "lawsuits against anyone"
+---
+id: farm object
+objects:
+  - farm: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: farms other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  farm.other_display = "other farm equipment, animal or crops"
+  farm.display_name = "farm equipment, animal or crops"
+---
+id: debts_owed_to_you object
+objects:
+  - debts_owed_to_you: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: interests_in_trust other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  debts_owed_to_you.other_display = "other money owed to you"
+  debts_owed_to_you.display_name = "money owed to you"
+---
+id: businesses object
+objects:
+  - businesses: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: businesses other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  businesses.other_display = "other businesses"
+  businesses.display_name = "businesses"
+---
+id: other_assets object
+objects:
+  - other_assets: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: other_assets other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  other_assets.other_display = "other assets"
+  other_assets.display_name = "other assets"
+---
+objects: 
+  - debts: ALAssetList
+---
+code: |
+  for list in [real_estate,vehicles, bank_assets, securities, personal_goods, retirement_accounts, life_insurance, interests_in_trust, interest_in_contract, interest_in_litigation, farm, debts_owed_to_you, businesses, other_assets]:
+    for item in list:
+      if item.is_amount_owed:
+        debts.append(item)
+        debts[-1].list = list
+        if not defined('debts[-1].source'):
+          debts[-1].source = list
+  if len(debts.complete_elements()) > 0:
+    debts.there_are_any = True
+    debts.there_is_another = False
+  else:
+    debts.there_are_any = False
+---
+id: debts review
+question: Do you want to list any other debts?
+subquestion: |
+  Tap Next if you don't have more to add.
+  
+  ${ debts.table }
+  
+  ${ debts.add_action() }
+continue button field: debts.review_items
+---
+id: debts revisit
+continue button field: debts.revisit
+question: |
+  Edit debts
+subquestion: |
+  ${ debts.table }
+
+  ${ debts.add_action() }
+---
+id: debts table
+table: debts.table
+rows: debts
+columns:
+  - Type: |
+      row_item.source
+  - Lender: |
+      row_item.lender
+  - Balance: |
+      currency(row_item.balance) if defined("row_item.balance") else ""
+  - Monthly payment:
+      currency(row_item.monthly_payment) if defined("row_item.monthly_payment") else ""
+  - Marital property?:  row_item.marital_property
+  - Party with possession?: row_item.has_possession
+  - Debts to be paid by: row_item.recommended_debt if defined("row_item.recommended_debt") else ""
+edit:
+  - lender
+---
+question: Debts 
+fields:
+  - Who is the money owed to?: debts[i].lender
+    required: False 
+  - Balance: debts[i].balance
+    datatype: currency
+    required: False 
+  - Monthly Payment: debts[i].monthly_payment
+    datatype: currency
+    required: False 
+  - Who should pay this debt?: debts[i].recommended_debt
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+---      

@@ -2,6 +2,8 @@
 include:
   - docassemble.AssemblyLine:assembly_line.yml
   - form_17.yml
+  - docassemble.ALToolbox:al_income.yml
+  - statement_of_property.yml
 ---
 metadata:
   title: >-
@@ -127,8 +129,39 @@ code: |
     others_with_physical_custody
   else:
     party_information
-  # if len(assets.matches(source=['house','401k','business'])) > 0:
-  #    asset_warning
+  real_estate.gather()
+  if len(real_estate.matches(source=['house'])) > 0:
+    assets_warning
+  if len(real_estate) > 0:
+    real_estate.review_items
+  if len(vehicles) > 0:
+    vehicles.review_items
+  if len(bank_assets) > 0:
+    bank_assets.review_items 
+  if len(securities) > 0:
+    securities.review_items 
+  if len(personal_goods) > 0:
+    personal_goods.review_items 
+  if len(retirement_accounts) > 0:
+    retirement_accounts.review_items 
+  there_are_any_screen
+  if len(life_insurance) > 0:
+    life_insurance.review_items 
+  if len(interests_in_trust) > 0:
+    interests_in_trust.review_items 
+  if len(interest_in_contract) > 0:
+    interest_in_contract.review_items 
+  if len(interest_in_litigation) > 0:
+    interest_in_litigation.review_items 
+  if len(farm) > 0:
+    farm.review_items 
+  if len(debts_owed_to_you) > 0:
+    debts_owed_to_you.review_items 
+  if len(businesses) > 0:
+    businesses.review_items 
+  if len(other_assets) > 0:
+    other_assets.review_items 
+  debts.review_items
   if case_filed == "user0_filed" and respondent_served:
       served_information
   else:
@@ -208,7 +241,7 @@ fields:
       - Not yet: not_filed
       - I'm not sure: unknown
 validation code: |
-  if  case_filed == "user0_filed":
+  if  case_filed in ["user0_filed","not_filed","jointly_filed","unknown"]:
     petitioner = users[0]
     respondent = users[1]
     previous_petitions = 1
@@ -278,9 +311,12 @@ fields:
     maxlength: 72
     required: False
 ---
+id: Is Divorce Contested
 question: Do you believe your case will be uncontested?
+subquestion: |
+  In other words, do you and your spouse agree on how you will divide APP property, debt, and/or parenting time?
 fields:
-  - In other words, do you and your spouse agree on how you will divide APP property, debt, and/or parenting time?: is_case_contested
+  - Contested: is_case_contested
     datatype: radio
     choices:
       - Uncontested: uncontested
