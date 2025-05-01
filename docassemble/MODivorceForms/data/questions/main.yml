@@ -307,7 +307,7 @@ id: Petitioner s Attorney
 question: |
   Petitioner's Attorney
 fields:
-  - "NAME OF PETITIONER’S ATTORNEY (Type or Print)": petitioner_attorney
+  - "Name Of Petitioner’s Attorney (Type or Print)": petitioner_attorney
     maxlength: 72
     required: False
 ---
@@ -570,7 +570,7 @@ question: |
 fields:
   - code: |
       users[1].name_fields()
-  - "LAST NAME PRIOR TO FIRST MARRIAGE (If different)": users[1].prior_name
+  - "Last name prior to first marriage (If different)": users[1].prior_name
     maxlength: 39
     required: False
   - "Last 4 digits of your social security number": users[1].ssn
@@ -584,7 +584,7 @@ fields:
     required: False
   - Birthdate: users[1].birthdate
     datatype: ThreePartsDate
-  - "BIRTHPLACE (State or Foreign Country)": users1_birthplace
+  - "Birthplace (State or Foreign Country)": users1_birthplace
     maxlength: 40
     required: False
   - "Elementary/Secondary Education": users[1].education_elementary
@@ -677,16 +677,16 @@ id: Marriage questions
 question: |
   Information about Your Marriage
 fields:
-  - "PLACE OF THIS MARRIAGE - CITY, TOWN, OR LOCATION": marriage_address_city
+  - "Place of this Marriage - City, Town, or Location": marriage_address_city
     maxlength: 36
     required: False
-  - "COUNTY": marriage_address_county
+  - "County": marriage_address_county
     maxlength: 24
     required: False
-  - "STATE OR FOREIGN COUNTRY": marriage_address_state
+  - "State or Foreign Country": marriage_address_state
     maxlength: 32
     required: False
-  - "DATE OF THIS MARRIAGE": marriage_date
+  - "Date of this Marriage": marriage_date
     datatype: date
     required: False
 continue button field: marriage_info
@@ -702,13 +702,13 @@ fields:
       - Dissolution
       - Legal Separation
       - Annulment
-  - "DATE OF separation": separation_date
+  - "Date of separation": separation_date
     datatype: date
     required: False
-  - "DATE COUPLE LAST RESIDED IN SAME HOUSEHOLD (MONTH, DAY, YEAR)": marriage_last_resided_date
+  - "Date Couple Last Resided in Same Household (Month, Day, Year)": marriage_last_resided_date
     datatype: date
     required: False
-  - "NUMBER OF CHILDREN UNDER 18 IN THIS HOUSEHOLD AS OF THE DATE IN ITEM 23": marriage_last_resided_number_children
+  - "Number of Children under 18 in this Household as of the Date in ITEM 23": marriage_last_resided_number_children
     maxlength: 8
     required: False
   - Can the marriage be preserved?: marriage_preserved
@@ -717,20 +717,20 @@ fields:
   - Is the marriage irretrievably broken?: marriage_broken
     datatype: yesnoradio
     required: False
-  - "I CERTIFY THAT THE MARRIAGE OF THE ABOVE-NAMED PERSONS WAS DISSOLVED ON: (Month, Day, Year)": marriage_dissolved_date
+  - "I certify that the marriage of the above-named persons was dissolved on: (Month, Day, Year)": marriage_dissolved_date
     datatype: date
     required: False
   - "DATE RECORDED (Month, Day, Year)": decree_recorded_date
     datatype: date
     required: False
-  - "COUNTY OF DECREE": decree_county
+  - "County of Decree": decree_county
     maxlength: 54
     required: False
-  - "TITLE OF COURT": marriage_decree_court
+  - "Title of Court": marriage_decree_court
     input type: area
     maxlength: 105
     required: False
-  - "TITLE OF CERTIFYING OFFICE": marriage_decree_certifying_office
+  - "Title of Certifying Office": marriage_decree_certifying_office
     input type: area
     maxlength: 102
     required: False
@@ -992,43 +992,43 @@ review:
       % endfor
   - Edit: users1_prior_name
     button: |
-      **LAST NAME PRIOR TO FIRST MARRIAGE (If different)**:
+      **Last Name prior to First Marriage (If different)**:
       ${ users1_prior_name }
   - Edit: users1_ssn
     button: |
-      **SOCIAL SECURITY NO.**:
+      **Social Security No.**:
       ${ users1_ssn }
   - Edit: users1_birthplace
     button: |
-      **BIRTHPLACE (State or Foreign Country)**:
+      **Birthplace (State or Foreign Country)**:
       ${ users1_birthplace }
   - Edit: users2_prior_name
     button: |
-      **LAST NAME PRIOR TO FIRST MARRIAGE (If different)**:
+      **Last Name prior to First Marriage (If different)**:
       ${ users2_prior_name }
   - Edit: users2_ssn
     button: |
-      **SOCIAL SECURITY NO.**:
+      **Social Security No.**:
       ${ users2_ssn }
   - Edit: users2_birthplace
     button: |
-      **BIRTHPLACE (State or Foreign Country)**:
+      **Birthplace (State or Foreign Country)**:
       ${ users2_birthplace }
   - Edit: marriage_address_city
     button: |
-      **PLACE OF THIS MARRIAGE - CITY, TOWN, OR LOCATION**:
+      **Place of this Marriage - City, Town, or Location**:
       ${ marriage_address_city }
   - Edit: marriage_address_county
     button: |
-      **COUNTY**:
+      **County**:
       ${ marriage_address_county }
   - Edit: marriage_address_state
     button: |
-      **STATE OR FOREIGN COUNTRY**:
+      **State or Foreign Country**:
       ${ marriage_address_state }
   - Edit: marriage_date
     button: |
-      **DATE OF THIS MARRIAGE**:
+      **Date of this Marriage**:
       ${ marriage_date }
   - Edit: is_users1_petitioner
     button: |
@@ -1052,7 +1052,7 @@ review:
       ${ word(yesno(is_other_petitioner)) }
   - Edit: marriage_last_resided_number_children
     button: |
-      **NUMBER OF CHILDREN UNDER 18 IN THIS HOUSEHOLD AS OF THE DATE IN ITEM 23**:
+      **Name of Children under 18 in this Household as of the Date in ITEM 23**:
       ${ marriage_last_resided_number_children }
   - Edit: is_other_petitioner_description
     button: |
