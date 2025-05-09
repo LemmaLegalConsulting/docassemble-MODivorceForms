@@ -4,6 +4,7 @@ include:
   - form_17.yml
   - docassemble.ALToolbox:al_income.yml
   - statement_of_property.yml
+  - parenting_plan.yml
 ---
 metadata:
   title: >-
@@ -122,13 +123,33 @@ code: |
     if minor_children_before_marriage:
       minor_children_before_marriage_information
     presumption_video
-    legal_custody
-    physical_custody
+    if legal_custody == "Sole":
+      legal_custody_sole_explanation
+    elif legal_custody == "Third Party":
+      legal_custody_other.name.first
+    if physical_custody == "Sole" and visitation:
+      visitation_supervisor.name.first
+    elif physical_custody == "Third Party":
+      physical_custody_other.name.first
+    if communications["third_party"]:
+      communications_other.name.first
+    ask_about_dispute_resolution
     parenting_plan
     family_information
     others_with_physical_custody
   else:
     party_information
+  if maintenance_award == "petitioner":
+    maintenance_to_petitioner_amount
+    maintenance_to_petitioner_modifiable
+    if not maintenance_income_withholding:
+      maintenance_income_withholding_reason
+  elif maintenance_award == "respondent":
+    maintenance_to_respondent_amount
+    maintenance_to_respondent_modifiable
+    if not maintenance_income_withholding:
+      maintenance_income_withholding_reason
+    
   real_estate.gather()
   if len(real_estate.matches(source=['house'])) > 0:
     assets_warning
@@ -161,7 +182,10 @@ code: |
     businesses.review_items 
   if len(other_assets) > 0:
     other_assets.review_items 
-  debts.review_items
+
+  assets_test_screen
+  if len(debts) > 0:
+    debts.review_items
   if case_filed == "user0_filed" and respondent_served:
       served_information
   else:
@@ -174,6 +198,12 @@ code: |
     filing_pleadings_video
 
   interview_order_mo_divorce_forms = True
+---
+continue button field: assets_test_screen
+question: Test assets
+subquestion: |
+  ${ real_estate.filter(recommended_award=petitioner.name.full())[0].description }
+  
 ---
 ###################### Main order ######################
 comment: |
@@ -263,7 +293,7 @@ continue button field: how_to_find_your_case
 id: Case Information
 question: Case Information
 fields:
-  - Case number: case_number
+  - Docket number: case_number
     required: False
   - Case county: case_county
     required: False
@@ -311,7 +341,7 @@ id: Petitioner's Attorney
 question: |
   Petitioner's Attorney
 fields:
-  - "Name Of Petitioner’s Attorney (Type or Print)": petitioner_attorney
+  - Name of Attorney for Petitioner: petitioner_attorney
     maxlength: 72
     required: False
 ---
@@ -1318,11 +1348,12 @@ objects:
   - mo_divorce_forms_Post_interview_instructions: ALDocument.using(title="Instructions", filename="certificate_of_dissolution_of_marri_next_steps.docx", enabled=True, has_addendum=False)
   - certificate_of_dissolution_attachment: ALDocument.using(title="Certificate of dissolution of marriage", filename="certificate_of_dissolution", enabled=False, has_addendum=False, )
   - form_17_attachment: ALDocument.using(title="Form 17 - Information Sheet", filename="form_17", enabled=True, has_addendum=False, )
+  - property_statement_attachment: ALDocument.using(title="Statement of Property and Debt and Proposed Separation Agreement", filename="property_statement", enabled=True, has_addendum=False, )
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, certificate_of_dissolution_attachment,form_17_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[certificate_of_dissolution_attachment,form_17_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, certificate_of_dissolution_attachment,form_17_attachment, property_statement_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[certificate_of_dissolution_attachment,form_17_attachment, property_statement_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---
 # Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
 # used for "preview" and "final" keys, and logic in the template checks the value of 

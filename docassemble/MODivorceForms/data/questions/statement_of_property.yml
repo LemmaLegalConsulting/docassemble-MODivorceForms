@@ -28,7 +28,7 @@ generic object: ALAssetList
 question: |
   ${ x.display_name }
 subquestion: |   
-  Do you have any ${ x.display_name }?
+  Do you or your spouse own any ${ x.display_name }?
 fields:
   - no label: x.selected_types
     datatype: checkboxes
@@ -44,6 +44,7 @@ id: generic review
 generic object: ALAssetList
 question: Do you want to list any other ${ x.display_name }?
 subquestion: |
+
   Tap Next if you don't have more to add.
   
   ${ x.table }
@@ -208,7 +209,7 @@ subquestion: |
 fields:
   - Type of asset: vehicles[i].source
     code: |
-      vehicles_ordered
+      vehicles.ordered
   - Other (explain): vehicles[i].source_other
     show if:
       variable: vehicles[i].source
@@ -313,19 +314,6 @@ fields:
   - What is its market value? How much would you get if you sold it?: bank_assets[i].market_value
     maxlength: 76
     datatype: currency
-  - Is there an amount owed on this property?: bank_assets[i].is_amount_owed
-    datatype: yesnoradio
-  - Who is the money owed to?: bank_assets[i].lender
-    required: False 
-    show if: bank_assets[i].is_amount_owed
-  - Balance: bank_assets[i].balance
-    datatype: currency
-    show if: bank_assets[i].is_amount_owed
-    required: False 
-  - Monthly Payment: bank_assets[i].monthly_payment
-    datatype: currency
-    show if: bank_assets[i].is_amount_owed
-    required: False 
   - Is this marital or nonmarital property?: bank_assets[i].marital_property
     choices:
       - Marital
@@ -964,6 +952,22 @@ code: |
 objects: 
   - debts: ALAssetList
 ---
+generic object: ALIndividual
+objects:
+  - x.assets: ALAssetList
+---
+generic object: ALIndividual
+code: |
+  x.assets.clear()
+  if len(real_estate.filter(recommended_award == x.name.full())) == 1:
+    x.assets.append([asset for asset in real_estate if asset.recommended_award == x.name.full()][0])
+  elif len([asset for asset in real_estate if asset.recommended_award == x.name.full()]) > 1:
+    x.assets.appendObject()
+    x.assets[-1].display_name = real_estate.display_name + " (" + str([asset for asset in real_estate if asset.recommended_award == x.name.full()]) + ")"
+    x.assets[-1].market_value = real_estate.filter(recommended_award == x.name.full()).total()
+  x.assets.gathered = True
+        
+---
 code: |
   for list in [real_estate,vehicles, bank_assets, securities, personal_goods, retirement_accounts, life_insurance, interests_in_trust, interest_in_contract, interest_in_litigation, farm, debts_owed_to_you, businesses, other_assets]:
     for item in list:
@@ -992,6 +996,7 @@ id: debts revisit
 continue button field: debts.revisit
 question: |
   Edit debts
+  
 subquestion: |
   ${ debts.table }
 
@@ -1029,4 +1034,44 @@ fields:
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
----      
+---
+question: Additional provisions
+fields:
+  - no label: additional_provisions
+    datatype: area
+---
+code: |
+  notice_date = today()
+---
+question: Maintenance
+fields:
+  - Who should maintenance be paid to?: maintenance_award
+    choices:
+      - ${ petitioner.name.full() }: petitioner
+      - ${ respondent.name.full() }: respondent
+      - No maintenance: none
+      - The court lacks jurisdiction: no_jurisdiction
+---
+question: Maintenance to ${ petitioner.name.full() }
+fields:
+  - How much?: maintenance_to_petitioner_amount
+    datatype: currency
+  - Should the maintenance be subject to modification?: maintenance_to_petitioner_modifiable
+    datatype: yesnoradio
+---
+question: Maintenance to ${ respondent.name.full() }
+fields:
+  - How much?: maintenance_to_respondent_amount
+    datatype: currency
+  - Should the maintenance be subject to modification?: maintenance_to_respondent_modifiable
+    datatype: yesnoradio
+---
+question: Income Withholding
+fields:
+  - Should income withholding be prepared by the person receiving maintenance?: maintenance_income_withholding
+    datatype: yesnoradio
+  - Reason income withholding shall not issue: maintenance_income_withholding_reason
+    show if:
+      variable: maintenance_income_withholding
+      is: False
+---
