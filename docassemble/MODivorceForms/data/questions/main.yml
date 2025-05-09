@@ -12,7 +12,7 @@ metadata:
   short title: >-
     Divorce Forms
   description: |-
-    This interview helps someone in Missouri prepare forms for a divorce.
+    This interview helps someone in Missouri prepare forms to file for a divorce.
   can_I_use_this_form: |
     If you are a Missouri resident, you can use this interview to prepare forms for a divorce.
   before_you_start: |
@@ -100,7 +100,7 @@ sections:
 #################### Interview order #####################
 comment: |
   Controls order and branching logic for questions specific to this form
-id: interview_order_certificate_of_dissolution_of_marri
+id: interview order certificate of dissolution of marriage
 code: |
   # Set the allowed courts for this interview
   allowed_courts = []
@@ -225,7 +225,7 @@ code: |
   )
   mo_divorce_forms_download
 ---
-id: Certificate_of_dissolution_of_marriage
+id: Certificate of dissolution of marriage
 continue button field: certificate_of_dissolution_of_marri_intro
 question: |
   Certificate of dissolution of marriage
@@ -247,7 +247,8 @@ subquestion: |
 
   Most people take about 10 minutes to complete this interview.
 ---
-question: Welcome
+id: Welcome
+question: Missouri Divorce Forms
 fields:
   - What issue are you looking for help with?:  case_type
     datatype: radio
@@ -260,6 +261,7 @@ question: Child Custody
 subquestion: |
   Unfortunately, this system is unable to address custody issues at this time.  Click the link below to find legal help bettersuited for your situation.
 ---
+id: Your Court Case
 question: Court Case
 fields: 
   - Has your case already been filed?: case_filed
@@ -282,11 +284,13 @@ validation code: |
   else:
     previous_petitions = 0
 ---
+id: Finding your case
 question: How to find your case
 subquestion: |
   Link and info on how to find a case in casenet
 continue button field: how_to_find_your_case
 ---
+id: Case Information
 question: Case Information
 fields:
   - Docket number: case_number
@@ -333,7 +337,7 @@ fields:
     datatype: date
 continue button field: case_information
 ---
-id: Petitioner s Attorney
+id: Petitioner's Attorney
 question: |
   Petitioner's Attorney
 fields:
@@ -344,7 +348,7 @@ fields:
 id: Is Divorce Contested
 question: Do you believe your case will be uncontested?
 subquestion: |
-  In other words, do you and your spouse agree on how you will divide APP property, debt, and/or parenting time?
+  In other words, do you and your spouse agree on how you will divide up property, debt, and/or parenting time?
 fields:
   - Contested: is_case_contested
     datatype: radio
@@ -363,6 +367,7 @@ subquestion: |
   Link to finding a mediator.
 continue button field: mediation_info
 ---
+id: Children
 question: Children
 fields:
   - Do you and your spouse have children currently under the age of 18?: minor_children
@@ -384,28 +389,53 @@ code: |
     children.there_are_any = False
 ---
 event: pregnant_exit
+id: Pregnancy
 question: Pregnancy
 subquestion: |
   Pursuant to RSMo 452.305 & 452.310, the court will not be able to grant a divorce.  Please come back when either yourself or your spouse is no longer pregnant.
 ---
 event: child_outside_marriage_exit
+id: Child Born Outside of Marriage
 question: Children Born Outside of Marriage
 subquestion: |
   Missouri law automatically assumes that the husband is the father of the child unless a separate case is filed establishing paternity of the biological father and non-paternity of the husband, even if the biological father is the one on the birth certificate.  It would be in your best interest to find an attorney.  
   
   Link to finding an attorney
 ---
+id: Children Born Before Marriage
 question: Children Born Before Marriage
 subquestion: |
   Sometimes when a child is born to two people before they get married, the court will require a separate case to establish paternity (even if everybody agrees).  However, most courts will move forward with just the divorce, assuming that paternity is acknowledged through the marriage.  For now, we'll move forward with the understanding that the paternity has been acknowledged.  However, a judge may direct you to file something else or speak to an attorney.
 continue button field: 
   minor_children_before_marriage_information
 ---
+id: Presumption of Custody
 question: Presumption of 50/50 Custody
 subquestion: |
   RSMo 452.375 & 454.1005 Video
 continue button field: presumption_video
 ---
+id: Legal Custody
+question: Legal Custody
+subquestion: |
+  Info on Legal Custody
+fields:
+ - What would you like to ask the court to give you in terms of legal custody?: legal_custody
+   choices:
+     - Joint
+     - Sole
+---
+id: Physical Custody
+question: Physical Custody
+subquestion: |
+  Info on Physical Custody
+fields:
+ - What would you like to ask the court to give you in terms of legal custody?: physical_custody
+   choices:
+     - Joint
+     - Sole
+---
+id: Parenting Plan
 question: Parenting Plan
 subquestion: |
   Calendar Month w/ 5 weekends feature
@@ -582,7 +612,7 @@ question: |
 fields:
   - code: |
       users[1].name_fields()
-  - "LAST NAME PRIOR TO FIRST MARRIAGE (If different)": users[1].prior_name
+  - "Last name prior to first marriage (if different)": users[1].prior_name
     maxlength: 39
     required: False
   - "Last 4 digits of your social security number": users[1].ssn
@@ -596,7 +626,7 @@ fields:
     required: False
   - Birthdate: users[1].birthdate
     datatype: ThreePartsDate
-  - "BIRTHPLACE (State or Foreign Country)": users1_birthplace
+  - "Birthplace (State or Foreign Country)": users1_birthplace
     maxlength: 40
     required: False
   - "Elementary/Secondary Education": users[1].education_elementary
@@ -689,16 +719,16 @@ id: Marriage questions
 question: |
   Information about Your Marriage
 fields:
-  - "PLACE OF THIS MARRIAGE - CITY, TOWN, OR LOCATION": marriage_address_city
+  - "Place of this Marriage - City, Town, or Location": marriage_address_city
     maxlength: 36
     required: False
-  - "COUNTY": marriage_address_county
+  - "County": marriage_address_county
     maxlength: 24
     required: False
-  - "STATE OR FOREIGN COUNTRY": marriage_address_state
+  - "State or Foreign Country": marriage_address_state
     maxlength: 32
     required: False
-  - "DATE OF THIS MARRIAGE": marriage_date
+  - "Date of this Marriage": marriage_date
     datatype: date
     required: False
 continue button field: marriage_info
@@ -714,13 +744,13 @@ fields:
       - Dissolution
       - Legal Separation
       - Annulment
-  - "DATE OF separation": separation_date
+  - "Date of separation": separation_date
     datatype: date
     required: False
-  - "DATE COUPLE LAST RESIDED IN SAME HOUSEHOLD (MONTH, DAY, YEAR)": marriage_last_resided_date
+  - "Date Couple Last Resided in Same Household (Month, Day, Year)": marriage_last_resided_date
     datatype: date
     required: False
-  - "NUMBER OF CHILDREN UNDER 18 IN THIS HOUSEHOLD AS OF THE DATE IN ITEM 23": marriage_last_resided_number_children
+  - "Number of Children under 18 in this Household as of the Date in ITEM 23": marriage_last_resided_number_children
     maxlength: 8
     required: False
   - Can the marriage be preserved?: marriage_preserved
@@ -729,20 +759,20 @@ fields:
   - Is the marriage irretrievably broken?: marriage_broken
     datatype: yesnoradio
     required: False
-  - "I CERTIFY THAT THE MARRIAGE OF THE ABOVE-NAMED PERSONS WAS DISSOLVED ON: (Month, Day, Year)": marriage_dissolved_date
+  - "I certify that the marriage of the above-named persons was dissolved on: (Month, Day, Year)": marriage_dissolved_date
     datatype: date
     required: False
-  - "DATE RECORDED (Month, Day, Year)": decree_recorded_date
+  - "Date Recorded (Month, Day, Year)": decree_recorded_date
     datatype: date
     required: False
-  - "COUNTY OF DECREE": decree_county
+  - "County of Decree": decree_county
     maxlength: 54
     required: False
-  - "TITLE OF COURT": marriage_decree_court
+  - "Title of Court": marriage_decree_court
     input type: area
     maxlength: 105
     required: False
-  - "TITLE OF CERTIFYING OFFICE": marriage_decree_certifying_office
+  - "Title of Certifying Office": marriage_decree_certifying_office
     input type: area
     maxlength: 102
     required: False
@@ -919,6 +949,7 @@ subquestion: |
   It looks like you some pretty significant assets! It is important to know your rights and the best way to divide some of these bigger assets.  You may consider speaking with an attorney if these assets need to be divided.
 continue button field: assets_warning
 ---
+id: Service
 question: Service of ${ users[1] }
 fields:
   - Has ${ spouse } been served?: respondent_served
@@ -958,15 +989,16 @@ id: Filing Pleadings Video Screen
 question: Video on filing pleadings
 continue button field: filing_pleadings_video
 ---
+id: Final Page
 question: Final Page
 subquestion: |
 
 ---
 
 ################### PREVIEW SCREEN
-id: preview certificate_of_dissolution_of_marri
+id: preview certificate of dissolution of marriage
 question: |
-  Preview your form before you sign it
+  Please preview your form before you sign it.
 subquestion: |
   Here is a preview of the form you will sign on the next page.   
   
@@ -990,7 +1022,7 @@ code: |
   [user.address.address for user in users.complete_elements()]
   addresses_to_search = [user.address for user in users.complete_elements()]
 ---
-id: certificate of dissolution of marri review screen
+id: certificate of dissolution of marriage review screen
 event: review_certificate_of_dissolution_of_marri
 question: |
   Review your answers
@@ -1004,43 +1036,43 @@ review:
       % endfor
   - Edit: users1_prior_name
     button: |
-      **LAST NAME PRIOR TO FIRST MARRIAGE (If different)**:
+      **Last Name prior to First Marriage (If different)**:
       ${ users1_prior_name }
   - Edit: users1_ssn
     button: |
-      **SOCIAL SECURITY NO.**:
+      **Social Security No.**:
       ${ users1_ssn }
   - Edit: users1_birthplace
     button: |
-      **BIRTHPLACE (State or Foreign Country)**:
+      **Birthplace (State or Foreign Country)**:
       ${ users1_birthplace }
   - Edit: users2_prior_name
     button: |
-      **LAST NAME PRIOR TO FIRST MARRIAGE (If different)**:
+      **Last Name prior to First Marriage (If different)**:
       ${ users2_prior_name }
   - Edit: users2_ssn
     button: |
-      **SOCIAL SECURITY NO.**:
+      **Social Security No.**:
       ${ users2_ssn }
   - Edit: users2_birthplace
     button: |
-      **BIRTHPLACE (State or Foreign Country)**:
+      **Birthplace (State or Foreign Country)**:
       ${ users2_birthplace }
   - Edit: marriage_address_city
     button: |
-      **PLACE OF THIS MARRIAGE - CITY, TOWN, OR LOCATION**:
+      **Place of this Marriage - City, Town, or Location**:
       ${ marriage_address_city }
   - Edit: marriage_address_county
     button: |
-      **COUNTY**:
+      **County**:
       ${ marriage_address_county }
   - Edit: marriage_address_state
     button: |
-      **STATE OR FOREIGN COUNTRY**:
+      **State or Foreign Country**:
       ${ marriage_address_state }
   - Edit: marriage_date
     button: |
-      **DATE OF THIS MARRIAGE**:
+      **Date of this Marriage**:
       ${ marriage_date }
   - Edit: is_users1_petitioner
     button: |
@@ -1064,7 +1096,7 @@ review:
       ${ word(yesno(is_other_petitioner)) }
   - Edit: marriage_last_resided_number_children
     button: |
-      **NUMBER OF CHILDREN UNDER 18 IN THIS HOUSEHOLD AS OF THE DATE IN ITEM 23**:
+      **Name of Children under 18 in this Household as of the Date in ITEM 23**:
       ${ marriage_last_resided_number_children }
   - Edit: is_other_petitioner_description
     button: |
@@ -1099,11 +1131,11 @@ review:
       ${ word(yesno(marriage_type_annulment_true)) }
   - Edit: marriage_dissolved_date
     button: |
-      **I CERTIFY THAT THE MARRIAGE OF THE ABOVE-NAMED PERSONS WAS DISSOLVED ON: (Month, Day, Year)**:
+      **I certify that the marriage of the above-named persons was dissolved on: (Month, Day, Year)**:
       ${ marriage_dissolved_date }
   - Edit: marriage_recorded_date
     button: |
-      **DATE RECORDED (Month, Day, Year)**:
+      **Date Recorded (Month, Day, Year)**:
       ${ marriage_recorded_date }
   - Edit: marriage_child_support_awarded_to_users1
     button: |
@@ -1143,15 +1175,15 @@ review:
       ${ word(yesno(marriage_child_support_awarded_to_none)) }
   - Edit: marriage_decree_county
     button: |
-      **COUNTY OF DECREE**:
+      **County of Decree**:
       ${ marriage_decree_county }
   - Edit: marriage_decree_court
     button: |
-      **TITLE OF COURT**:
+      **Title of Court**:
       > ${ single_paragraph(marriage_decree_court) }
   - Edit: marriage_decree_certifying_office
     button: |
-      **TITLE OF CERTIFYING OFFICE**:
+      **Title of Certifying Office**:
       > ${ single_paragraph(marriage_decree_certifying_office) }
   - Edit: users1_race_white
     button: |
@@ -1267,6 +1299,7 @@ confirm: True
 
 ---
 continue button field: petitioners.revisit
+id: Petitioners edit
 question: |
   Edit petitioners
 subquestion: |
@@ -1284,7 +1317,7 @@ edit:
 confirm: True
 
 ---
-id: download mo_divorce_forms
+id: download MO divorce forms
 event: mo_divorce_forms_download
 question: |
   All done
