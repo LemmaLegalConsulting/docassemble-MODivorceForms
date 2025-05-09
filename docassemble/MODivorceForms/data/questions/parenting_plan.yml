@@ -1,0 +1,161 @@
+---
+id: legal_custody question
+question: Legal Custody
+subquestion: |
+  Info on Legal Custody
+fields:
+ - What would you like to ask the court to give you in terms of legal custody?: legal_custody
+   datatype: radio
+   choices:
+     - Joint
+     - Sole
+     - Third Party
+---
+id: follow up reason for sole legal custody
+if: legal_custody == "Sole"
+question: Reason for sole custody
+subquestion: |
+  Missouri Law requires a statement of the reasons for a request for no shared decision-making. You must enter a reason on this line.
+fields:
+  - no label: legal_custody_sole_explanation
+    datatype: area
+---
+id: follow up for third party legal custody
+reconsider: people_choices
+sets:
+ - legal_custody_other.name.first
+if: legal_custody == "Third Party"
+question: Sole Legal Custody to Third Party
+fields:
+  - Existing person: legal_custody_other
+    datatype: object
+    choices: people_choices
+    disable others: True
+  - code: |
+      legal_custody_other.name_fields()
+---
+id: legal custody third party object
+objects: 
+  - legal_custody_other: ALIndividual
+---
+id: communications question
+question: Communication between parents
+subquestion: |
+  How should the parents communicate about the children? Check each box that is appropriate.
+fields:
+  - Communication methods:  communications
+    datatype: checkboxes
+    choices:
+      - In person: in_person
+      - Home telephone: home_telephone
+      - Work telephone: work_telephone
+      - Mobile telephone: mobile_telephone
+      - Letter via U.S. Postal Service: letter
+      - E-mail: email
+      - Using a third person: third_party
+---
+id: follow up question for communications through third party
+if: communications["third_party"]
+reconsider: people_choices
+sets:
+ - communications_other.name.first
+question: Communication
+subquestion: |
+  Who should the parties communicate through?
+fields:
+  - Existing person: communications_other
+    datatype: object
+    choices: people_choices
+    disable others: True
+  - code: |
+      communications_other.name_fields()
+---
+id: object for communications third party
+objects: 
+  - communications_other: ALIndividual
+---
+id: physical_custody question
+question: Physical Custody
+subquestion: |
+  Info on Physical Custody
+fields:
+ - What would you like to ask the court to give you in terms of legal custody?: physical_custody
+   datatype: radio
+   choices:
+     - Joint
+     - Sole
+     - Third Party
+---
+if: physical_custody == "Sole"
+id: follow up visitation question for sole physical_custody
+question: Visitation
+fields:
+  - Should visitation with ${ users[1] } be supervised?: visitation
+    datatype: yesnoradio
+---
+id: follow up
+if: visitation
+reconsider: people_choices
+sets:
+ - visitation_supervisor.name.first
+question: Visitation
+subquestion: |
+  Who should supervise the visitation with ${ users[1] }?
+fields:
+  - Existing person: visitation_supervisor
+    datatype: object
+    choices: people_choices
+    disable others: True
+  - code: |
+      visitation_supervisor.name_fields()
+---
+if: physical_custody == "Sole" and visitation
+question: Reason for sole custody
+subquestion: |
+  Missouri Law requires a statement of the reasons for a request for no shared decision-making. You must enter a reason on this line.
+fields:
+  - no label: physical_custody_sole_explanation
+    datatype: area
+---
+id: follow up for third party physical custody
+if: physical_custody == "Third Party"
+reconsider: people_choices
+sets:
+  - physical_custody_other.name.first
+question: Sole physical Custody to Third Party
+fields:
+  - Existing person: physical_custody_other
+    datatype: object
+    choices: people_choices
+    disable others: True
+  - code: |
+      physical_custody_other.name_fields()
+---
+objects: 
+  - physical_custody_other: ALIndividual
+---
+objects: 
+  - visitation_supervisor: ALIndividual
+---
+id: dispute resolution question
+question: Dispute Resolution Procedure
+subquestion: |
+  This is the manner in which the parents will resolve disagreements concerning the children. This includes disagreements on the meaning or interpretation of any provision of this plan. The parents shall present their disagreements to a mediator chosen by them for non-binding mediation. In the event that the parents cannot resolve the dispute by mediation, they may submit the issue to the court through appropriate proceedings.
+fields:
+  - Additional dispute resolution procedures: dispute_resolution
+    datatype: area
+    required: False
+continue button field: ask_about_dispute_resolution
+---
+code: |
+  temp_people_choices = list()
+  if hasattr(legal_custody_other.name,"first"):
+    temp_people_choices.append(legal_custody_other)
+  if hasattr(physical_custody_other.name,"first"):
+    temp_people_choices.append(physical_custody_other)
+  if hasattr(visitation_supervisor.name,"first"):
+    temp_people_choices.append(visitation_supervisor)
+  if hasattr(communications_other.name,"first"):
+    temp_people_choices.append(communications_other)
+  people_choices = temp_people_choices
+---
