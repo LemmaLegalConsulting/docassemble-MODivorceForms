@@ -1,4 +1,53 @@
 ---
+include:
+  - shared.yml
+---
+mandatory: True
+code: |
+    users[0].name.first
+    if users[0].has_prior_name:
+      users[0].prior_name.name.first
+    users[0].address.address
+    users[0].ssn
+    users[0].driver_license_number
+    users[0].phone_number
+    other_parties[0].name.first
+    if other_parties[0].has_prior_name:
+      other_parties[0].prior_name.name.first
+    other_parties[0].address.address
+    other_parties[0].ssn
+    other_parties[0].driver_license_number
+    other_parties[0].phone_number
+    if petitioner.jobs.there_are_any:
+      petitioner.employer.name.text
+    if respondent.jobs.there_are_any:
+      respondent.employer.name.text
+    case.docket_number
+    is_case_contested
+    children.gather()
+    if others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect:
+      related_case_explanation
+    received_welfare
+    relief
+    service.date
+    mo_divorce_forms_download
+---
+code: |
+  children[i].ssn
+  children[i].lived_with
+  children[i].complete = True
+---
+objects:
+  - form_17_attachment: ALDocument.using(title="Family Court Information Sheet", filename="form_17",  has_addendum=False, )
+---
+code: |
+  form_17_attachment.enabled = True
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, form_17_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[form_17_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+---
 attachment:
   name: Form 17 Information Sheet
   filename: form_17
@@ -6,74 +55,63 @@ attachment:
   skip undefined: True
   pdf template file: form_17.pdf
   fields:
-      - "respondent_ssn": ${ respondent.ssn } 
-      - "respondent_address_mailing": ${ respondent.mailing_address.on_one_line() } 
-      - "check_Uncontested_Track": ${ is_case_contested in ['uncontested'] } 
-      - "petitioner_employer_name": ${ users[0].employment_description } 
-      - "respondent_address": ${ respondent.address.on_one_line() } 
-      - "check_Kansas_City": |
-          ${ case_court = "Kansas City" } 
-      - "Case_Number": ${ case_number } 
+      - "check_Kansas_City": ${ case.court == "Kansas City" } 
+      - "check_Independence": ${ case.court == "Independence" } 
+      - "Case_Number": ${ case.docket_number } 
       - "P_name_full": ${ petitioner.name_full() } 
-      - "petitioner_address_mailing": ${ petitioner.mailing_address.on_one_line() } 
+      - "check_Uncontested_Track": ${ is_case_contested == "uncontested" } 
+      - "check_Contested_Track": ${ is_case_contested in ['contested', 'unknown'] } 
       - "R_name_full": ${ respondent.name_full() } 
-      - "respondent_name_full": ${ respondent.name_full() } 
-      - "petitioner_name_full": ${ petitioner.name_full() } 
-      - "respondent_phone_number": ${ respondent.phone } 
-      - "petitioner_driver_license_number": ${ petitioner.driver_license_number } 
-      - "petitioner_address": ${ petitioner.address.on_one_line() } 
-      - "petitioner_ssn": ${ petitioner.ssn } 
-      - "petitioner_phone_number": ${ petitioner.phone } 
-      - "check_Contested_Track": |
-          ${ is_case_contested in ['contested', 'unknown'] } 
-      - "check_Independence": |
-          ${ case_court = "Kansas City" } 
-      - "respondent_driver_license_number": ${ respondent.driver_license_number } 
-      - "check_child4_reside_P": |
-          ${ petitioner.name_full() in children[3].lived_with } 
-      - "check_children_welfare_medicaid_no": ${ not received_welfare } 
-      - "check_no_related_cases": |
-          ${ not(others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect) } 
-      - "check_child_support": ${  } 
-      - "check_child2_reside_P": |
-          ${ petitioner.name_full() in children[1].lived_with } 
-      - "child4_ssn": ${ children[3].ssn } 
-      - "child1_birthdate": ${ children[0].birthdate } 
+      - "users1_name_full": ${ petitioner.name_full() } 
+      - "users2_name_full": ${ respondent.name_full() } 
+      - "user1_address": ${ petitioner.address.on_one_line() } 
+      - "user2_address": ${ respondent.address.on_one_line() } 
+      - "user1_address_mailing": ${ petitioner.mailing_address.on_one_line() } 
+      - "user2_address_mailing": ${ respondent.mailing_address.on_one_line() } 
+      - "user1_ssn": ${ petitioner.ssn } 
+      - "user2_ssn": ${ respondent.ssn } 
+      - "user1_driver_license_number": ${ petitioner.driver_license_number } 
+      - "user2_driver_license_number": ${ respondent.driver_license_number } 
+      - "user1_phone_number": ${ petitioner.phone_number } 
+      - "user2_phone_number": ${ respondent.phone_number } 
+      - "user1_employer_name": ${ petitioner.employer.name.text } 
+      - "user2_employer_name": ${ respondent.employer.name.text } 
+      - "user1_employer_address": ${ petitioner.employer.address.on_one_line() } 
+      - "user2_employer_address": ${ respondent.employer.address.on_one_line() } 
+      - "user1_employer_phone": ${ petitioner.employer.phone_number } 
+      - "user2_employer_phone": ${ respondent.employer.phone_number } 
+      - "check_child1_reside_P": ${ children[0].lived_with == petitioner.name.full() } 
+      - "check_child1_reside_R": ${ children[0].lived_with == respondent.name.full() } 
       - "child1_name_full": ${ children[0].name_full() } 
-      - "child3_ssn": ${ children[2] } 
-      - "child3_birthdate2": ${ children[2] } 
-      - "check_child4_reside_R": |
-          ${ respondent.name_full() in children[3].lived_with } 
+      - "child1_birthdate": ${ format_date(children[0].birthdate, format='M/d/yyyy') } 
+      - "child1_ssn": ${ "{:.0f}".format(children[0].ssn) } 
+      - "check_child2_reside_P": ${ children[1].lived_with == petitioner.name.full() } 
+      - "check_child2_reside_R": ${ children[1].lived_with == respondent.name.full() } 
       - "child2_name_full": ${ children[1].name_full() } 
-      - "check_child2_reside_R": |
-          ${ respondent.name_full() in children[1].lived_with } 
-      - "related_case_information": ${ related_case_explanation } 
-      - "check_child3_reside_P": |
-          ${ petitioner.name_full() in children[2].lived_with } 
-      - "involved_parties_known_names": |
-          ${ comma_and_list(client.prior_name for client in clients) } 
+      - "child3_birthdate1": ${ format_date(children[1].birthdate, format='M/d/yyyy') } 
+      - "child2_ssn": ${ "{:.0f}".format(children[1].ssn) } 
+      - "check_child3_reside_P": ${ children[2].lived_with == petitioner.name.full() } 
+      - "check_child3_reside_R": ${ children[2].lived_with == respondent.name.full() } 
       - "child3_name_full": ${ children[2].name_full() } 
-      - "check_children_welfare_medicaid_yes": ${ received_welfare } 
-      - "child4_birthdate": ${ children[3].birthdate } 
-      - "user1_employer_phone": ${ petitioner.employer_phone } 
-      - "child3_birthdate1": ${ children[1].birthdate } 
-      - "user2_employer_phone": ${ respondent.employer_phone } 
-      - "check_child3_reside_R": |
-          ${ respondent.name_full() in children[2].lived_with } 
-      - "user2_employer_name": ${ users[1].employment_description } 
-      - "child2_ssn": ${ children[1].ssn } 
-      - "user2_employer_address": ${ respondent.employer_address.on_one_line() } 
-      - "user1_employer_address": ${ petitioner.employer_address.on_one_line() } 
-      - "check_related_cases": |
-          ${ others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect }
-      - "check_child1_reside_R": |
-          ${ respondent.name_full() in children[0].lived_with } 
+      - "child3_birthdate2": ${ format_date(children[2].birthdate, format='M/d/yyyy') } 
+      - "child3_ssn": ${ "{:.0f}".format(children[2].ssn) } 
+      - "check_child4_reside_P": ${ children[3].lived_with == petitioner.name.full() } 
+      - "check_child4_reside_R": ${ children[3].lived_with == respondent.name.full() } 
       - "child4_name_full": ${ children[3].name_full() } 
-      - "check_child1_reside_P": |
-          ${ petitioner.name_full() in children[0].lived_with } 
-      - "child1_ssn": ${ children[0] } 
-      - "Date": ${ service_date } 
+      - "child4_birthdate": ${ format_date(children[3].birthdate, format='M/d/yyyy') } 
+      - "child4_ssn": ${ "{:.0f}".format(children[3].ssn) } 
+      - "check_child_support": ${ relief['child_support'] } 
+      - "check_children_welfare_medicaid_yes": ${ received_welfare } 
+      - "check_children_welfare_medicaid_no": ${ not received_welfare } 
+      - "check_no_related_cases": ${ not(others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect) } 
+      - "check_related_cases": ${ others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect } 
+      - "related_case_information": ${ related_case_explanation } 
+      - "involved_parties_known_names": ${ petitioner.prior_name.name_full() if petitioner.has_prior_name else "" } ${ ", " if petitioner.has_prior_name and respondent.has_prior_name else "" } ${ respondent.prior_name.name_full() if respondent.has_prior_name else "" } 
+      - "Date": ${ service.date } 
 
+
+
+---
 
 
 

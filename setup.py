@@ -53,7 +53,7 @@ setup(name='docassemble.MODivorceForms',
       license='',
       url='https://docassemble.org',
       packages=find_namespace_packages(),
-      install_requires=['docassemble.AssemblyLine>=3.2.0'],
+      install_requires=['docassemble.AssemblyLine>=3.4.0'],
       zip_safe=False,
       package_data=find_package_data(where='docassemble/MODivorceForms/', package='docassemble.MODivorceForms'),
      )

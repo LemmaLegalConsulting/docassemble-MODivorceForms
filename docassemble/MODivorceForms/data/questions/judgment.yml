@@ -1,0 +1,393 @@
+---
+include:
+  - shared.yml
+---
+mandatory: True
+code: |
+  users[0].name.first
+  if users[0].has_prior_name:
+    users[0].prior_name.name.first
+  users[0].address.address
+  users[0].ssn
+  users[0].phone_number
+  users[0].attorney_involved
+  users[0].resident_for_90_days
+  other_parties[0].name.first
+  if other_parties[0].has_prior_name:
+    other_parties[0].prior_name.name.first
+  other_parties[0].address.address
+  other_parties[0].ssn
+  other_parties[0].phone_number
+  other_parties[0].attorney_involved
+  other_parties[0].resident_for_90_days
+  marriage.address.county
+  marriage.address.state
+  marriage.separation_date
+  children.gather()
+  case.county
+  if guardian_ad_litem.exists:
+    guardian_ad_litem.name.first
+    guardian_ad_litem.address
+    guardian_ad_litem.phone_number
+ 
+  petitioner.appears
+  respondent.appears
+  respondent.active_duty
+  if guardian_ad_litem.exists:
+    guardian_ad_litem.appears
+  third_party_appears
+  petitioner.submitted_cause
+  if legal_custody == "Sole":
+    legal_custody_sole_explanation
+  elif legal_custody == "Third Party":
+    legal_custody_other.name.first
+  if physical_custody == "Sole" and visitation:
+    visitation_supervisor.name.first
+  elif physical_custody == "Third Party":
+    physical_custody_other.name.first
+  if communications["third_party"]:
+    communications_other.name.first
+  child_custody_jurisdiction
+  child_support_additional_info
+  child_support_jurisdiction
+  legal_custody_jurisdiction_additional_info
+  if maintenance_to_petitioner == "ordered_to_pay":
+    maintenance_to_petitioner_amount
+    maintenance_to_petitioner_modifiable
+  if maintenance_to_respondent == "ordered_to_pay":
+    maintenance_to_respondent_amount
+    maintenance_to_respondent_modifiable
+  if maintenance_to_petitioner or maintenance_to_respondent: 
+    maintenance_income_withholding
+  separation_agreement
+  court_costs
+  other_orders
+  attorney_fees
+  petitioner.name_change
+  respondent.name_change
+  mo_divorce_forms_download
+---
+id: Court Appearance
+question: Court Appearance
+generic object: ALIndividual
+fields:
+  - ${ x } will make an appearance: x.appears
+    datatype: yesnoradio
+  - Will ${ x } appear with an attorney?: x.appears_with_attorney
+    datatype: yesnoradio
+    show if: x.appears
+  - ${ x } submits an affidavit: x.submitted_cause
+    datatype: yesnoradio
+---
+id: guardian ad litem court appearance
+question: Guardian ad litem
+fields:
+  - ${ guardian_ad_litem }, Guardian ad Litem, appears in person: guardian_ad_litem.appears
+    datatype: yesnoradio
+---
+id: third party object
+objects:
+  - third_party: ALIndividual
+---
+id: guardian ad litem court appearance
+question: Third Party
+fields:
+  - Another person will make an appearance: third_party_appears
+    datatype: yesnoradio
+  - Third party first name: third_party.name.first
+    show if: third_party_appears
+  - Third party middle name: third_party.name.middle
+    show if: third_party_appears
+    required: False
+  - Third party last name: third_party.name.last
+    show if: third_party_appears
+  - Third party suffix: third_party.name.suffix
+    show if: third_party_appears
+    required: False
+  - Will this person appear with an attorney?: third_party_appears_with_attorney
+    datatype: yesnoradio
+    show if: third_party_appears
+---
+id: personal_jurisdiction
+question: Personal Juridisdiction
+fields:
+  - Does the court have personal jurisdiction over ${ respondent }?: personal_jurisdiction_over_respondent
+    datatype: yesnoradio
+---
+id: child custody jurisdiction
+question: Jurisdiction over child custody
+fields: 
+  - Does the court have jurisdiction over the custody arrangements?: child_custody_jurisdiction
+    datatype: yesnoradio
+  - Additional information about child custody jurisdiction: legal_custody_jurisdiction_additional_info
+    datatype: area
+    show if: child_custody_jurisdiction
+---
+id: child support jurisdiction
+question: Jurisdiction over child support
+fields:
+  - Does the court have jurisdiction over child support?: child_support_jurisdiction
+    datatype: yesnoradio
+  - Additional information about child support jurisdiction: child_support_additional_info
+    datatype: area
+    show if: child_support_jurisdiction
+---
+id: attorney fees
+question: Attorney's Fees
+fields:
+  - Who should be awarded attorney's fees from the other party?: attorney_fees
+    datatype: radio
+    choices:
+      - Neither party: neither
+      - ${ petitioner }: petitioner
+      - ${ respondent }: respondent
+  - How much should ${ petitioner } pay ${ respondent.attorney if respondent.attorney_involved else respondent }?: attorney_fees_respondent
+    datatype: currency
+    show if:
+      variable: attorney_fees
+      is: respondent
+  - How much should ${ respondent } pay ${ petitioner.attorney if petitioner.attorney_involved else petitioner }?: attorney_fees_petitioner
+    datatype: currency
+    show if:
+      variable: attorney_fees
+      is: petitioner
+---
+id: court costs
+question: Court Costs
+fields:
+  - Should court costs be waived?: court_costs
+    datatype: yesnoradio
+---
+comment: |
+  parenting_plan_A.exhibit_number
+  parenting_plan_B.exhibit_number
+
+
+---
+id: name change
+generic object: ALIndividual
+question: Does ${ x } want to restore their former name?
+fields:
+  - no label: x.name_change
+    datatype: yesnoradio
+---
+id: former name
+generic object: ALIndividual
+question: What is ${ possessify(x,'former name') }?
+fields:
+  - code: |
+      x.prior_name.name_fields()
+---
+id: guardian ad litem object
+objects:
+  - guardian_ad_litem: ALIndividual
+---
+id: additional information about the guardian ad litem
+question: Additional information about the Guardian ad Litem
+fields:
+  - note: |
+      guardian_ad_litem.address_fields()
+  - Phone: guardian_ad_litem.phone
+    datatype: phone
+    required: False
+---
+id: is there a guardian_ad_litem?
+question: Is there a Guardian ad Litem?
+fields:
+  - no label: guardian_ad_litem.exists
+    datatype: yesnoradio
+---
+id: separation_agreement
+question: Separation Agreement
+fields:
+  - Have the parties entered into a separation agreement for marital and non-marital property and debt: separation_agreement
+    datatype: yesnoradio
+---
+id: Judgment and Decree of Dissolution of Marriage object
+objects:
+  - judgment_attachment: ALDocument.using(title="Judgment and Decree of Dissolution of Marriage", filename="judgment", has_addendum=False, )
+---
+id: Judgment and Decree of Dissolution of Marriage enabled
+code: |
+  judgment_attachment.enabled = True
+---
+# Should be only used in interviews run from judgment.yml, in an interview from main, the version from shared.yml will be lower because the block including judgment.yml is above it
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, judgment_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[judgment_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+---
+id: Judgment and Decree of Dissolution of Marriage attachment
+attachment:
+  name: Judgment and Decree of Dissolution of Marriage
+  filename: judgment
+  variable name: judgment_attachment[i]
+  skip undefined: True
+  pdf template file: judgment.pdf
+  fields:
+      - "case_county": ${ case.county } 
+      - "petitioner_name_first": ${ petitioner.address.state } 
+      - "petitioner_name_middle": ${ petitioner.name.first } 
+      - "petitioner_name_last": ${ petitioner.name.middle } 
+      - "petitioner_name_suffix": ${ petitioner.name.last } 
+      - "respondent_name_first": ${ respondent.name.first } 
+      - "respondent_name_middle": ${ respondent.name.middle } 
+      - "respondent_name_last": ${ respondent.name.suffix } 
+      - "respondent_name_suffix": ${ respondent.name.last } 
+      - "petitioner_appears_in_person": ${ petitioner.appears and petitioner.attorney_involved == False } 
+      - "respondent_appears_attorney_no": ${ respondent.appears and respondent.attorney_involved == False } 
+      - "petitioner_appears_attorney_yes": ${ petitioner.appears and petitioner.attorney_involved } 
+      - "respondent_appears_attorney_yes": ${ respondent.appears and respondent.attorney_involved } 
+      - "petitioner_submitted_cause": ${ petitioner.submitted_cause } 
+      - "respondent_submitted_cause": ${ respondent.submitted_cause } 
+      - "guardian_ad_litem_exists": ${ guardian_ad_litem.exists } 
+      - "other_parties_appears1": ${ third_party_appears and not third_party_appears_with_attorney } 
+      - "other_parties1_name_first": ${ third_party.name.first if not third_party_appears_with_attorney else "" } 
+      - "other_parties1_name_last": ${ third_party.name.last if not third_party_appears_with_attorney else "" } 
+      - "other_parties1_name_suffix": ${ third_party.name.suffix if not third_party_appears_with_attorney else "" } 
+      - "other_parties1_name_middle": ${ third_party.name.middle if not third_party_appears_with_attorney else "" } 
+      - "other_parties1_name_attorney_appears": ${ third_party_appears_with_attorney } 
+      - "other_parties1_name_first_attorney": ${ third_party.name.first if third_party_appears_with_attorney else "" } 
+      - "other_parties1_name_middle_attorney": ${ third_party.name.last if third_party_appears_with_attorney else "" } 
+      - "other_parties1_name_last_attorney": ${ third_party.name.suffix if third_party_appears_with_attorney else "" } 
+      - "other_parties1_name_suffix_attorney": ${ third_party.name.middle if third_party_appears_with_attorney else "" } 
+      - "petitioner_ssn": ${ petitioner.ssn } 
+      - "respondent_ssn": ${ respondent.ssn } 
+      - "respondent_active_duty": ${ not respondent.active_duty } 
+      - "respondent_active_duty_no": ${ respondent.active_duty } 
+      - "case_personal_jurisdiction_over_respondent": ${ personal_jurisdiction_over_respondent } 
+      - "case_personal_jurisdiction_over_respondent_no": ${ not personal_jurisdiction_over_respondent } 
+      - "petitioner_resident_for_90 days": ${ petitioner.resident_for_90_days } 
+      - "respondent_resident_for_90 days": ${ respondent.resident_for_90_days } 
+      - "marriage_date": ${ format_date(marriage.recorded_date, format='M/d/yyyy') } 
+      - "marriage_address_county": ${ marriage.address.county } 
+      - "marriage_address_state": ${ marriage.address.state } 
+      - "marriage_date_last_resided": ${ marriage.separation_date } 
+      - "petitioner_pregnant": ${ True } 
+      - "respondent_pregnant": ${ True } 
+      - "children_no": ${ len(children) == 0 } 
+      - "children_yes": ${ len(children) > 0 } 
+      - "children_number": ${ len(children) } 
+      - "children0_name_first": ${ children[0].name.first } 
+      - "children0_name_suffix": ${ children[0].name.suffix } 
+      - "children0_age": ${ date_difference(as_datetime(children[0].birthdate),today()).years } 
+      - "children0_ssn": ${ "{:.0f}".format(children[0].ssn) } 
+      - "children0_name_middle": ${ children[0].name.middle } 
+      - "children0_name_last": ${ children[0].name.last } 
+      - "children1_name_first": ${ children[1].name.first } 
+      - "children1_age": ${ date_difference(as_datetime(children[1].birthdate),today()).years } 
+      - "children1_name_middle": ${ "{:.0f}".format(children[1].ssn) } 
+      - "children1_name_ssn": ${ children[1].name.middle } 
+      - "children1_name_name_last": ${ children[1].name.suffix } 
+      - "children1_name_suffix": ${ children[1].name.last } 
+      - "children2_name_middle": ${ children[2].name.suffix } 
+      - "children2_name_suffix": ${ children[2].name.middle } 
+      - "children2_name_first": ${ date_difference(as_datetime(children[2].birthdate),today()).years } 
+      - "children2_name_last": ${ "{:.0f}".format(children[2].ssn) } 
+      - "children2_name_age": ${ children[2].name.first } 
+      - "children2_ssn": ${ children[2].name.last } 
+      - "children3_name_middle": ${ children[3].name.middle } 
+      - "children3_name_first": ${ children[3].name.suffix } 
+      - "children3_name_last": ${ children[3].name.first } 
+      - "children3_name_suffix": ${ children[3].name.last } 
+      - "children3_age": ${ date_difference(as_datetime(children[3].birthdate),today()).years } 
+      - "children3_ssn": ${ "{:.0f}".format(children[3].ssn) } 
+      - "children4_name_first": ${ date_difference(as_datetime(children[4].birthdate),today()).years } 
+      - "children4_age": ${ "{:.0f}".format(children[4].ssn) } 
+      - "children4_age": ${ children[4].name.suffix } 
+      - "children4_ssn": ${ children[4].name.first } 
+      - "children4_name_middle": ${ children[4].name.middle } 
+      - "children4_name_last": ${ children[4].name.last } 
+      - "children5_name_first": ${ children[5].name.first } 
+      - "children5_name_middle": ${ children[5].name.middle } 
+      - "children5_name_last": ${ children[5].name.last } 
+      - "children5_age": ${ date_difference(as_datetime(children[5].birthdate),today()).years } 
+      - "children5_ssn": ${ "{:.0f}".format(children[5].ssn) } 
+      - "children5_name_suffix": ${ children[5].name.suffix } 
+      - "maintenance_to_petitioner_none": ${ maintenance_to_petitioner == "none" } 
+      - "maintenance_to_petitioner_ordered_to_pay": ${ maintenance_to_petitioner == "ordered_to_pay" } 
+      - "maintenance_to_petitioner_amount": ${ maintenance_to_petitioner_amount } 
+      - "maintenance_to_petitioner_modifiable_yes": ${ maintenance_to_petitioner_modifiable } 
+      - "maintenance_to_petitioner_modifiable_no": ${ not maintenance_to_petitioner_modifiable } 
+      - "maintenance_to_petitioner_no_jurisdiction": ${ maintenance_to_petitioner == "no_jurisdiction" } 
+      - "maintenance_to_respondent_none": ${ maintenance_to_respondent == "none" } 
+      - "maintenance_to_respondent_amount": ${ maintenance_to_respondent_amount } 
+      - "maintenance_to_respondent_ordered_to_pay": ${ maintenance_to_respondent == "ordered_to_pay" } 
+      - "maintenance_to_respondent_modifiable_yes": ${ maintenance_to_respondent_modifiable } 
+      - "maintenance_to_respondent_modifiable_no": ${ not maintenance_to_respondent_modifiable } 
+      - "maintenance_to_respondent_no_jurisdiction": ${ maintenance_to_respondent == "no_jurisdiction" } 
+      - "maintenance_income_withholding_yes": ${ maintenance_income_withholding } 
+      - "maintenance_income_withholding_no": ${ not maintenance_income_withholding } 
+      - "maintenance_income_withholding_reason": ${ maintenance_income_withholding_reason } 
+      - "maintenance_income_withholding_reason2": ${  } 
+      - "child_custody_jurisdiction_yes": ${ child_custody_jurisdiction } 
+      - "child_custody_jurisdiction_no": ${ not child_custody_jurisdiction } 
+      - "parenting_plan_A_exhibit_number": ${ parenting_plan_A.exhibit_number } 
+      - "legal_custody_jurisdiction_additional_info": ${ legal_custody_jurisdiction_additional_info } 
+      - "child_support_jurisdiction_yes": ${ child_support_jurisdiction } 
+      - "parenting_plan_B_exhibit_number": ${ parenting_plan_B.exhibit_number } 
+      - "child_support_jurisdiction_no": ${ not child_support_jurisdiction } 
+      - "child_support_additional_info": ${ child_support_additional_info } 
+      - "separation_agreement_exhibit_number": ${ separation_agreement.exhibit_number } 
+      - "separation_agreement_yes": ${ separation_agreement } 
+      - "separation_agreement_no": ${ not separation_agreement } 
+      - "property_statement_exhibit_number": ${ property_statement.exhibit_number } 
+      - "real_estate": ${ len(real_estate) > 0 } 
+      - "legal_description_exhibit_number": ${ legal_description.exhibit_number } 
+      - "other_orders_exists": ${ other_orders.exists } 
+      - "other_orders_paying_party": ${ other_orders.paying_party } 
+      - "other_orders_receiving_party": ${ other_orders.receiving_party } 
+      - "other_orders_amount": ${ other_orders.amount } 
+      - "other_orders_reason": ${ other_orders.reason } 
+      - "attorney_fees_neither": ${ attorney_fees == "neither" } 
+      - "attorney_fees_petitoner": ${ "{:.2f}".format(attorney_fees_petitoner) } 
+      - "respondent_attorney": ${ respondent.attorney.name_full() if attorney_fees == "petitioner" else "" } 
+      - "attorney_fees_petitioner_pays": ${ attorney_fees == "petitioner" } 
+      - "attorney_fees_respondent": ${ "{:.2f}".format(attorney_fees_respondent) } 
+      - "attorney_fees_respondent_pays": ${ attorney_fees == "respondent" } 
+      - "petitioner_attorney": ${ petitioner.attorney.name_full() if attorney_fees == "respondent" else "" } 
+      - "petitioner_name_change": ${ petitioner.name_change } 
+      - "petitioner_prior_name_first": ${ petitioner.prior_name.middle } 
+      - "petitioner_prior_name_middle": ${ petitioner.prior_name.last } 
+      - "petitioner_prior_name_last": ${ petitioner.prior_name.suffix } 
+      - "petitioner_prior_name_suffix": ${ petitioner.prior_name.first } 
+      - "respondent_name_change": ${ respondent.name_change.name_full() } 
+      - "respondent_prior_name_first": ${ respondent.prior_name.suffix } 
+      - "respondent_prior_name_suffix": ${ respondent.prior_name.first } 
+      - "respondent_prior_name_middle": ${ respondent.prior_name.middle } 
+      - "respondent_prior_name_last": ${ respondent.prior_name.last } 
+      - "other_orders_exhibit_number": ${ other_orders.exhibit_number } 
+      - "other_orders_overflow": ${ other_orders.overflow } 
+      - "court_costs_paid_from_deposit": ${ court_costs } 
+      - "court_costs_waived": ${ not court_costs } 
+      - "petitioner_attorney_full_name": ${ petitioner.attorney.name_full() } 
+      - "petitioner_attorney_served": ${ petitioner.attorney_involved } 
+      - "guardian_ad_litem": ${ guardian_ad_litem.name_full() } 
+      - "guardian_appears": ${ guardian_ad_litem.exists } 
+      - "respondent_attorney_served": ${ respondent.attorney_involved } 
+      - "respondent_attorney_full_name": ${ respondent.attorney.name_full() } 
+      - "petitioner_attorney_address": ${ petitioner.attorney.address.line_one() } 
+      - "respondent_attorney_address": ${ respondent.attorney.address.line_one() } 
+      - "guardian_ad_litem_address": ${ guardian_ad_litem.address.line_one() } 
+      - "petitioner_attorney_address9": ${ petitioner.attorney.address.line_two() } 
+      - "respondent_attorney_address10": ${ respondent.attorney.address.line_two() } 
+      - "guardian_ad_litem_address11": ${ guardian_ad_litem.address.line_two() } 
+      - "petitioner_attorney_phone": ${ petitioner.attorney.phone_number } 
+      - "respondent_attorney_phone": ${ respondent.attorney.phone_number } 
+      - "guardian_ad_litem_phone": ${ guardian_ad_litem.phone_number } 
+      - "petitioner_appears": ${ True } 
+      - "respondent_appears": ${ True } 
+      - "other_parties_appears": ${ third_party_appears } 
+      - "petitioner_full_name": ${ petitioner.name_full() } 
+      - "respondent_full_name": ${ respondent.name_full() } 
+      - "other_parties_full_name": ${ third_party.name_full() } 
+      - "petitioner_address": ${ petitioner.address.line_one() } 
+      - "respondent_address": ${ respondent.address.line_one() } 
+      - "other_parties1_address": ${ third_party.address.line_one() } 
+      - "petitioner_address14": ${ petitioner.address.line_two() } 
+      - "respondent_address15": ${ respondent.address.line_two() } 
+      - "other_parties1_address16": ${ third_party.address.line_two() } 
+      - "petitioner_phone": ${ petitioner.phone_number } 
+      - "respondent_phone": ${ respondent.phone_number } 
+      - "other_parties1_phone": ${ third_party.phone_number } 
+
+---
