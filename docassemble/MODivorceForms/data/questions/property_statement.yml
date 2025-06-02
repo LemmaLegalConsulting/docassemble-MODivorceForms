@@ -1,0 +1,2056 @@
+---
+id: property_statement.yml include
+include:
+  - shared.yml
+---
+id: property_statement.yml interview order
+mandatory: True
+code: |
+  users[0].name.first
+  other_parties[0].name.first
+  petitioner.address.address
+  respondent.address.address
+  case.county
+  notice_date
+  if maintenance_to_petitioner == "ordered_to_pay":
+    maintenance_to_petitioner_amount
+    maintenance_to_petitioner_modifiable
+  if maintenance_to_respondent == "ordered_to_pay":
+    maintenance_to_respondent_amount
+    maintenance_to_respondent_modifiable
+  if maintenance_to_petitioner or maintenance_to_respondent:
+    maintenance_income_withholding
+  if len(real_estate) > 0:
+    real_estate.review_items
+  if len(bank_assets) > 0:
+    bank_assets.review_items
+  if len(vehicles) > 0:
+    vehicles.review_items
+  if len(personal_goods) > 0:
+    personal_goods.review_items
+  if len(securities) > 0:
+    securities.review_items
+  there_are_any_screen
+  businesses.gather()
+  farm.gather()
+  debts_owed_to_you.gather()
+  interest_in_contract.gather()
+  interest_in_litigation.gather()
+  interests_in_trust.gather()
+  life_insurance.gather()
+  retirement_accounts.gather()
+  other_assets.gather()
+  secured_debts.gathered
+  debts.gather()
+  for debt in debts:
+    debt.recommended_debt
+  petitioner.assets.gathered
+  petitioner.review_assets
+  petitioner.debts.gathered
+  respondent.assets.gathered
+  respondent.debts.gathered
+  service
+  mo_divorce_forms_download  
+---
+id: bankrupcty
+generic object: ALIndividual
+question: Bankruptcy
+fields:
+  - Is ${ x } in bankruptcy?: x.in_bankruptcy
+    datatype: yesnoradio
+---
+id: ALIncomeList there are any
+generic object: ALIncomeList
+code: |
+  if x.selected_types.any_true():
+    x.move_checks_to_list(selected_terms=x.terms_ordered)
+    x.there_are_any = True
+  else:
+    x.there_are_any = False
+---
+id: generic ordered object for checkboxes
+generic object: ALAssetList
+objects:
+  - x.ordered: DAOrderedDict.using(elements=x.terms_ordered, auto_gather=False, gathered=True)
+---
+id: generic set display name backup
+generic object: ALAssetList
+code: |
+  if defined('x[i].source') and x[i].source != "other":
+    x[i].display_name = x.terms_ordered.get(x[i].source, x[i].source)
+  elif defined('x[i].source') and x[i].source == "other" and defined('x[i].source_other'):
+    x[i].display_name = x[i].source_other
+  else:
+    x[i].display_name = x.other_display
+---
+id: generic there are any
+generic object: ALAssetList
+question: |
+  ${ x.display_name }
+subquestion: |   
+  Do you or your spouse own any ${ x.display_name }?
+fields:
+  - no label: x.selected_types
+    datatype: checkboxes
+    code: |
+      x.ordered
+---
+generic object: ALAssetList
+code: |
+  x[i].market_value
+  x[i].complete = True
+---
+id: generic review
+generic object: ALAssetList
+question: Do you want to list any other ${ x.display_name }?
+subquestion: |
+
+  Tap Next if you don't have more to add.
+  
+  ${ x.table }
+  
+  ${ x.add_action() }
+continue button field: x.review_items
+---
+id: generic review
+generic object: ALIndividual
+question: Assets of ${ x.name.full() }
+subquestion: |
+
+  Tap Next if you don't have more to add.
+  
+  ${ x.assets_table }
+  
+continue button field: x.review_assets
+---
+id: generic revisit
+generic object: ALAssetList
+continue button field: x.revisit
+question: |
+  Edit ${ x.display_name }
+subquestion: |
+  ${ x.table }
+
+  ${ x.add_action() }
+---
+id: generic table
+generic object: ALAssetList
+table: x.table
+rows: x
+columns:
+  - Description: |
+      row_item.description
+  - Market value: |
+      currency(row_item.market_value) if defined("row_item.market_value") else ""
+  - Marital property?:  row_item.marital_property
+  - Party with possession?: row_item.has_possession
+  - Property awarded to: row_item.recommended_award
+edit:
+  - source
+  - value
+---
+id: generic table
+generic object: ALIndividual
+table: x.assets_table
+rows: x.assets
+columns:
+  - Description: |
+      row_item.description
+  - Market value: |
+      currency(row_item.market_value) if defined("row_item.market_value") else ""
+edit:
+  - source
+  - value
+---
+id: real_estate object
+objects:
+  - real_estate: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: real_estate other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  real_estate.other_display = "other real estate"
+  real_estate.display_name = "real estate"
+---
+id: real_estate terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: real_estate.terms_ordered
+data: !!omap
+  - house: "House"
+  - condominium: "Condominium"
+  - leasehold: "Leasehold"
+  - other: "Other"
+---
+only sets: real_estate[i].market_value
+id: describe real_estate
+reconsider: real_estate[i].display_name
+question: |
+  Tell us about your ${ real_estate[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in real_estate.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in real_estate.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: real_estate[i].source
+    code: |
+      real_estate.ordered
+  - Other (explain): real_estate[i].source_other
+    show if:
+      variable: real_estate[i].source
+      is: other
+  - Address: real_estate[i].address
+    required: False
+  - Legal description: real_estate[i].legal_description
+    required: False
+  - What is its market value? How much would you get if you sold it?: real_estate[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: real_estate[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: real_estate[i].lender
+    required: False 
+    show if: real_estate[i].is_amount_owed
+  - Balance: real_estate[i].balance
+    datatype: currency
+    show if: real_estate[i].is_amount_owed
+    required: False 
+  - Monthly Payment: real_estate[i].monthly_payment
+    datatype: currency
+    show if: real_estate[i].is_amount_owed
+    required: False 
+  - Who should pay this debt?: real_estate[i].recommended_debt
+    datatype: currency
+    show if: real_estate[i].is_amount_owed
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+  - Is this marital or nonmarital property?: real_estate[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Party with possession of this property?: real_estate[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: real_estate[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  if real_estate[i].source != "other":
+    real_estate[i].display_name = real_estate.terms_ordered.get(real_estate[i].source, real_estate[i].source)
+  else:
+    real_estate[i].display_name = real_estate[i].source_other
+  real_estate[i].description = real_estate[i].display_name + " at " + real_estate[i].address + " " + real_estate[i].legal_description
+---
+id: vehicles object
+objects:
+  - vehicles: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: vehicles other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  vehicles.other_display = "other vehicles"
+  vehicles.display_name = "vehicles"
+---
+id: vehicles terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: vehicles.terms_ordered
+data: !!omap
+  - car: "Car"
+  - truck: "Truck"
+  - motorcycle: "Motorcycle"
+  - mobile_home: "Mobile home"
+  - trailer: "Trailer"
+  - boat: "Boat or jetski"
+  - airplane: "Airplane"
+  - other: "Other"
+---
+only sets: vehicles[i].market_value
+id: describe vehicles
+reconsider: vehicles[i].display_name
+question: |
+  Tell us about your ${ vehicles[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in vehicles.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in vehicles.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: vehicles[i].source
+    code: |
+      vehicles.ordered
+  - Other (explain): vehicles[i].source_other
+    show if:
+      variable: vehicles[i].source
+      is: other
+  - Year: vehicles[i].year
+    required: False
+  - Make: vehicles[i].make
+    required: False
+  - Make: vehicles[i].model
+    required: False
+  - Vehicle Identification Number: vehicles[i].vin
+    required: False
+  - What is its market value? How much would you get if you sold it?: vehicles[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: vehicles[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: vehicles[i].lender
+    required: False 
+    show if: vehicles[i].is_amount_owed
+  - Balance: vehicles[i].balance
+    datatype: currency
+    show if: vehicles[i].is_amount_owed
+    required: False 
+  - Monthly Payment: vehicles[i].monthly_payment
+    datatype: currency
+    show if: vehicles[i].is_amount_owed
+    required: False 
+  - Who should pay this debt?: vehicles[i].recommended_debt
+    datatype: currency
+    show if: vehicles[i].is_amount_owed
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+  - Is this marital or nonmarital property?: vehicles[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Party with possession of this property?: vehicles[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: vehicles[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  if vehicles[i].source != "other":
+    vehicles[i].display_name = vehicles.terms_ordered.get(vehicles[i].source, vehicles[i].source)
+  else:
+    vehicles[i].display_name = vehicles[i].source_other
+  vehicles[i].description = vehicles[i].year + " " + vehicles[i].make + " " + vehicles[i].model
+---
+id: bank_assets object
+objects:
+  - bank_assets: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: bank_assets other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  bank_assets.other_display = "other bank assets"
+  bank_assets.display_name = "Bank assets"
+---
+id: bank_assets terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: bank_assets.terms_ordered
+data: !!omap
+  - checking account: "Checking accounts"
+  - savings account: "Savings accounts"
+  - time deposit: "Time deposit"
+  - money market: "Money market accounts"
+  - certificates: "Certificates"
+  - other: "Other"
+---
+only sets: bank_assets[i].market_value
+id: describe bank_assets
+reconsider: bank_assets[i].display_name
+question: |
+  Tell us about your ${ bank_assets[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in bank_assets.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in bank_assets.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: bank_assets[i].source
+    code: |
+      bank_assets.ordered
+  - Other (explain): bank_assets[i].source_other
+    show if:
+      variable: bank_assets[i].source
+      is: other
+  - Bank or Institution: bank_assets[i].institution
+    required: False
+  - Account number: bank_assets[i].account_number
+    required: False
+  - What is its market value? How much would you get if you sold it?: bank_assets[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is this marital or nonmarital property?: bank_assets[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Names on the account: bank_assets[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: bank_assets[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  if bank_assets[i].source != "other":
+    bank_assets[i].display_name = bank_assets.terms_ordered.get(bank_assets[i].source, bank_assets[i].source)
+  else:
+    bank_assets[i].display_name = bank_assets[i].source_other
+  bank_assets[i].description = bank_assets[i].institution + " " +bank_assets[i].display_name 
+---
+code: |
+  users[0].bank_assets = [bank_asset for bank_asset in bank_assets if bank_asset.recommended_award == users[0].name.full()]
+---
+id: securities object
+objects:
+  - securities: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: securities other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  securities.other_display = "other securities"
+  securities.display_name = "Securities"
+---
+id: securities terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: securities.terms_ordered
+data: !!omap
+  - stocks: "Stocks"
+  - bonds: "Bonds"
+  - notes: "Promissory notes"
+  - mortgages: "Mortgage"
+  - money market: "Money market funds"
+  - other: "Other"
+---
+only sets: securities[i].market_value
+id: describe securities
+reconsider: securities[i].display_name
+question: |
+  Tell us about your ${ securities[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in securities.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in securities.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: securities[i].source
+    code: |
+      securities.ordered
+  - Other (explain): securities[i].source_other
+    show if:
+      variable: securities[i].source
+      is: other
+  - Name: securities[i].name
+    required: False
+  - Account number: securities[i].account_number
+    required: False
+  - What is its market value? How much would you get if you sold it?: securities[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: securities[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: securities[i].lender
+    required: False 
+    show if: securities[i].is_amount_owed
+  - Balance: securities[i].balance
+    datatype: currency
+    show if: securities[i].is_amount_owed
+    required: False 
+  - Monthly Payment: securities[i].monthly_payment
+    datatype: currency
+    show if: securities[i].is_amount_owed
+    required: False 
+  - Who should pay this debt?: securities[i].recommended_debt
+    datatype: currency
+    show if: securities[i].is_amount_owed
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+  - Is this marital or nonmarital property?: securities[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Names in which securities are held: securities[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: securities[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  if securities[i].source != "other":
+    securities[i].display_name = securities.terms_ordered.get(securities[i].source, securities[i].source)
+  else:
+    securities[i].display_name = securities[i].source_other
+  securities[i].description = securities[i].name + " " +securities[i].display_name 
+---
+id: personal_goods object
+objects:
+  - personal_goods: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: personal_goods other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  personal_goods.other_display = "other personal possessions"
+  personal_goods.display_name = "Personal possessions"
+---
+id: personal_goods terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: personal_goods.terms_ordered
+data: !!omap
+  - jewelry: "Jewelry"
+  - antiques: "Antiques"
+  - artwork: "Artwork"
+  - guns: "Guns"
+  - coins_stamps: "Coins / stamps"
+  - tools: "Tools"
+  - collectibles: "Collectibles"
+  - instruments: "Piano / musical instruments"
+  - china_etc: "China / crystal / silverware"
+  - appliances: "Appliances"
+  - computers: "Computers"
+  - electronics: "Electronics"
+  - furnishings: "Furnishings / furniture"
+  - other: "Other"
+---
+only sets: personal_goods[i].market_value
+id: describe personal_goods
+reconsider: personal_goods[i].display_name
+question: |
+  Tell us about your ${ personal_goods[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in personal_goods.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in personal_goods.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: personal_goods[i].source
+    code: |
+      personal_goods.ordered
+  - Other (explain): personal_goods[i].source_other
+    show if:
+      variable: personal_goods[i].source
+      is: other
+  - What is its market value? How much would you get if you sold it?: personal_goods[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: personal_goods[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: personal_goods[i].lender
+    required: False 
+    show if: personal_goods[i].is_amount_owed
+  - Balance: personal_goods[i].balance
+    datatype: currency
+    show if: personal_goods[i].is_amount_owed
+    required: False 
+  - Monthly Payment: personal_goods[i].monthly_payment
+    datatype: currency
+    show if: personal_goods[i].is_amount_owed
+    required: False
+  - Who should pay this debt?: personal_goods[i].recommended_debt
+    datatype: currency
+    show if: personal_goods[i].is_amount_owed
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+  - Is this marital or nonmarital property?: personal_goods[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Who has possession?: personal_goods[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: personal_goods[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  if personal_goods[i].source != "other":
+    personal_goods[i].display_name = personal_goods.terms_ordered.get(personal_goods[i].source, personal_goods[i].source)
+  else:
+    personal_goods[i].display_name = personal_goods[i].source_other
+  personal_goods[i].description = personal_goods[i].display_name
+---
+id: retirement_accounts object
+objects:
+  - retirement_accounts: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: retirement_accounts terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: retirement_accounts.terms_ordered
+data: !!omap
+  - ira: "IRA"
+  - 401k: "401K"
+  - 403b: "403B"
+  - tiaacref: "TIAA/CREF"
+  - keogh: "Keogh"
+  - tdsp: "TDSP"
+  - tsa: "TSA"
+  - profitshare: "Profit sharing"
+  - ssp: "Savings & Security Program"
+  - defcomp: "Deferred compensation"
+  - other: "Other"
+---
+id: retirement accounts other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  retirement_accounts.other_display = "other retirement accounts"
+  retirement_accounts.display_name = "Retirement accounts"
+---
+only sets: retirement_accounts[i].market_value
+id: describe retirement_accounts
+reconsider: retirement_accounts[i].display_name
+question: |
+  Tell us about your ${ retirement_accounts[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in retirement_accounts.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in retirement_accounts.complete_elements()) }.
+  % endif
+fields:
+  - Type of retirement account: retirement_accounts[i].source
+    code: |
+      retirement_accounts.ordered
+  - Other (explain): retirement_accounts[i].source_other
+    show if:
+      variable: retirement_accounts[i].source
+      is: other
+  - Name of company: retirement_accounts[i].name
+    required: False
+  - Total present value: retirement_accounts[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Percentage vested: retirement_accounts[i].percent_vested
+    maxlength: 76
+    datatype: number
+  - Is this marital or nonmarital property?: retirement_accounts[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Person holding the interest: retirement_accounts[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: retirement_accounts[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  if retirement_accounts[i].source != "other":
+    retirement_accounts[i].display_name = retirement_accounts.terms_ordered.get(retirement_accounts[i].source, retirement_accounts[i].source)
+  else:
+    retirement_accounts[i].display_name = retirement_accounts[i].source_other
+  retirement_accounts[i].description = retirement_accounts[i].name + " " +retirement_accounts[i].display_name
+---
+question: Do you have any other assets?
+fields:
+  - Life insurance: life_insurance.there_are_any
+    datatype: yesnoradio
+  - Interests in trust: interests_in_trust.there_are_any
+    datatype: yesnoradio
+  - Interest in contracts made and not performed: interest_in_contract.there_are_any
+    datatype: yesnoradio
+  - Interest in pending litigation: interest_in_litigation.there_are_any
+    datatype: yesnoradio
+  - Interest in farm equipment: farm.there_are_any
+    datatype: yesnoradio
+  - Debts owed to you by others: debts_owed_to_you.there_are_any
+    datatype: yesnoradio
+  - Interests in businesses: businesses.there_are_any
+    datatype: yesnoradio
+  - Other assets: other_assets.there_are_any
+    datatype: yesnoradio
+continue button field: there_are_any_screen
+---
+
+only sets: businesses[i].market_value
+generic object: ALAssetList
+id: describe generic
+question: |
+  Tell us about your businesses
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.description for asset in businesses.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.description for asset in businesses.complete_elements()) }.
+  % endif
+fields:
+  - Description: businesses[i].description
+  - What is its market value? How much would you get if you sold it?: businesses[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: businesses[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: businesses[i].lender
+    required: False 
+    show if: businesses[i].is_amount_owed
+  - Balance: businesses[i].balance
+    datatype: currency
+    show if: businesses[i].is_amount_owed
+    required: False 
+  - Monthly Payment: businesses[i].monthly_payment
+    datatype: currency
+    show if: businesses[i].is_amount_owed
+    required: False 
+  - Who should pay this debt?: businesses[i].recommended_debt
+    datatype: currency
+    show if: businesses[i].is_amount_owed
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+  - Is this marital or nonmarital property?: businesses[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Who has possession?: businesses[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: businesses[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+---
+only sets: farm[i].market_value
+generic object: ALAssetList
+id: describe generic
+question: |
+  Tell us about your farm
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.description for asset in farm.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.description for asset in farm.complete_elements()) }.
+  % endif
+fields:
+  - Description: farm[i].description
+  - What is its market value? How much would you get if you sold it?: farm[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: farm[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: farm[i].lender
+    required: False 
+    show if: farm[i].is_amount_owed
+  - Balance: farm[i].balance
+    datatype: currency
+    show if: farm[i].is_amount_owed
+    required: False 
+  - Monthly Payment: farm[i].monthly_payment
+    datatype: currency
+    show if: farm[i].is_amount_owed
+    required: False 
+  - Who should pay this debt?: farm[i].recommended_debt
+    datatype: currency
+    show if: farm[i].is_amount_owed
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+  - Is this marital or nonmarital property?: farm[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Who has possession?: farm[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: farm[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+---
+only sets: other_assets[i].market_value
+generic object: ALAssetList
+id: describe generic
+question: |
+  Tell us about your other_assets
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.description for asset in other_assets.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.description for asset in other_assets.complete_elements()) }.
+  % endif
+fields:
+  - Description: other_assets[i].description
+  - What is its market value? How much would you get if you sold it?: other_assets[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: other_assets[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: other_assets[i].lender
+    required: False 
+    show if: other_assets[i].is_amount_owed
+  - Balance: other_assets[i].balance
+    datatype: currency
+    show if: other_assets[i].is_amount_owed
+    required: False 
+  - Monthly Payment: other_assets[i].monthly_payment
+    datatype: currency
+    show if: other_assets[i].is_amount_owed
+    required: False 
+  - Who should pay this debt?: other_assets[i].recommended_debt
+    datatype: currency
+    show if: other_assets[i].is_amount_owed
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    
+  - Is this marital or nonmarital property?: other_assets[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Who has possession?: other_assets[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: other_assets[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+---
+only sets: x[i].market_value
+generic object: ALAssetList
+id: describe generic
+question: |
+  Tell us about your ${ x.display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.description for asset in x.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.description for asset in x.complete_elements()) }.
+  % endif
+fields:
+  - Description: x[i].description
+  - What is its market value? How much would you get if you sold it?: x[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is this marital or nonmarital property?: x[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Who has possession?: x[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: x[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+---
+id: life_insurance object
+objects:
+  - life_insurance: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: life insurance other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  life_insurance.other_display = "other life insurance policies"
+  life_insurance.display_name = "life insurance policies"
+---
+id: describe life_insurance
+question: |
+  Tell us about your ${ ordinal(i) } life insurance policy.
+subquestion: |
+
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.description for asset in life_insurance.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.description  for asset in life_insurance.complete_elements()) }.
+  % endif
+fields:
+  - Type of life insurance: life_insurance[i].type
+    required: False
+  - Name of issuing company: life_insurance[i].name
+    required: False
+  - Policy number: life_insurance[i].account_number
+    required: False
+  - Face value: life_insurance[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Cash value: life_insurance[i].cash_value
+    maxlength: 76
+    datatype: currency
+  - Is this marital or nonmarital property?: life_insurance[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Owner of policy: life_insurance[i].owner
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Insured: life_insurance[i].insured
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+      - Other: other
+  - Beneficiaries: life_insurance[i].beneficiaries
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: life_insurance[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  life_insurance[i].description = life_insurance[i].name + " " +life_insurance[i].type
+---
+id: life insurance table
+table: life_insurance.table
+rows: life_insurance
+columns:
+  - Description: |
+      row_item.description
+  - Market value: |
+      currency(row_item.market_value) if defined("row_item.market_value") else ""
+  - Marital property?:  row_item.marital_property
+  - Beneficiaries: row_item.beneficiaries
+  - Property awarded to: row_item.recommended_award
+edit:
+  - market_value
+---
+id: interests_in_trust object
+objects:
+  - interests_in_trust: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: interests_in_trust other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  interests_in_trust.other_display = "other interests in a trust"
+  interests_in_trust.display_name = "interest in a trust"
+---
+id: describe interests_in_trust
+question: |
+  Tell us about your ${ ordinal(i) } interest in a trust
+subquestion: |
+
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.description for asset in interests_in_trust.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.description  for asset in interests_in_trust.complete_elements()) }.
+  % endif
+fields:
+  - Name of trust: interests_in_trust[i].name
+    required: False
+  - Nature of interest: interests_in_trust[i].nature
+    required: False
+  - Market value: interests_in_trust[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is this marital or nonmarital property?: interests_in_trust[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Trustee: interests_in_trust[i].trustee
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Settlor: interests_in_trust[i].settlor
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Beneficiaries: interests_in_trust[i].beneficiaries
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: interests_in_trust[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Copy of trust instrument: interests_in_trust[i].file
+    datatype: file
+    required: False
+validation code: |
+  interests_in_trust[i].description = interests_in_trust[i].name
+---
+id: interests_in_trust table
+table: interests_in_trust.table
+rows: interests_in_trust
+columns:
+  - Description: |
+      row_item.description
+  - Market value: |
+      currency(row_item.market_value) if defined("row_item.market_value") else ""
+  - Marital property?:  row_item.marital_property
+  - Beneficiaries: row_item.beneficiaries
+  - Property awarded to: row_item.recommended_award
+edit:
+  - market_value
+---
+id: interest_in_contract object
+objects:
+  - interest_in_contract: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: interest_in_contract other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  interest_in_contract.other_display = "other interests in a contract"
+  interest_in_contract.display_name = "interest in a contract"
+---
+id: interest_in_litigation object
+objects:
+  - interest_in_litigation: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: interest_in_litigation other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  interest_in_litigation.other_display = "other lawsuits"
+  interest_in_litigation.display_name = "lawsuits against anyone"
+---
+id: farm object
+objects:
+  - farm: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: farms other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  farm.other_display = "other farm equipment, animal or crops"
+  farm.display_name = "farm equipment, animal or crops"
+---
+id: debts_owed_to_you object
+objects:
+  - debts_owed_to_you: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: interests_in_trust other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  debts_owed_to_you.other_display = "other money owed to you"
+  debts_owed_to_you.display_name = "money owed to you"
+---
+id: businesses object
+objects:
+  - businesses: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: businesses other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  businesses.other_display = "other businesses"
+  businesses.display_name = "businesses"
+---
+id: other_assets object
+objects:
+  - other_assets: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: other_assets other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  other_assets.other_display = "other assets"
+  other_assets.display_name = "other assets"
+---
+objects: 
+  - debts: ALAssetList.using(there_is_another=False)
+---
+id: debts other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  debts.other_display = "other debts"
+  debts.display_name = "other debts"
+---
+objects: 
+  - secured_debts: ALAssetList.using(auto_gather=False)
+---
+id: debts terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: debts.terms_ordered
+data: !!omap
+  - real_estate: "a mortgage on a house or condominium or land"
+  - vehicles: "vehicle loans"
+  - credit_card_debt: "Credit card debt"
+  - personal_loans: "Money to family or friends"
+  - medical_debt: "Medical or dental bills"
+  - student_loans: "Student loans"
+  - other: "Other"
+---
+code: |
+  debts.display_name = "Debt"
+---
+id: debts there are any
+generic object: ALAssetList
+question: |
+  Other Debts
+subquestion: |   
+  You have already entered information about these debts.  Do you have any other debts to add?
+  
+  % for debt in secured_debts:
+  ${ debt.description }
+
+  % endfor
+
+  
+  Do you have any other debts to add?
+
+fields:
+  - no label: debts.selected_types
+    datatype: checkboxes
+    code: |
+      debts.ordered
+---
+generic object: ALIndividual
+objects:
+  - x.assets: ALAssetList.using(auto_gather=False)
+---
+generic object: ALIndividual
+code: |
+  x.assets.clear()
+  if len([re for re in real_estate if re.recommended_award == x.name.full()]) == 1:
+    x.assets.append([asset for asset in real_estate if asset.recommended_award == x.name.full()][0])
+  elif len([asset for asset in real_estate if asset.recommended_award == x.name.full()]) > 1:
+    x.assets.appendObject()
+    x.assets[-1].display_name = real_estate.display_name + " (" + str([asset for asset in real_estate if asset.recommended_award == x.name.full()]) + ")"
+    x.assets[-1].market_value = real_estate.filter(recommended_award == x.name.full()).total()
+  x.assets.gathered = True
+---
+id: code to determine individual assets based on recommended award
+generic object: ALIndividual
+code: |
+  x.assets.clear()
+  for list in [real_estate,vehicles, bank_assets, securities, personal_goods, retirement_accounts, life_insurance, interests_in_trust, interest_in_contract, interest_in_litigation, farm, debts_owed_to_you, businesses, other_assets]:
+    for item in list:
+      if item.recommended_award == x.name.full():
+        x.assets.append(item)
+        x.assets[-1].list = list
+        if not defined('x.assets[-1].source'):
+          debts[-1].source = list
+  x.assets.gathered = True
+---
+id: populate debt list from debts in assets
+code: |
+  secured_debts.clear()
+  for list in [real_estate,vehicles, securities, personal_goods, farm, businesses, other_assets]:
+    for item in list:
+      if item.is_amount_owed and not item in secured_debts.complete_elements():
+        secured_debts.append(item)
+        item.already_included = True
+        secured_debts[-1].list = list.instanceName
+        if not defined('secured_debts[-1].source'):
+          secured_debts[-1].source = list.instanceName
+  secured_debts.gathered = True
+---
+continue button field: preload_debts_test
+question: Test
+subquestion: |
+  ${ debts.complete_elements() }
+---
+generic object: ALIndividual
+objects:
+  - x.debts: ALAssetList.using(auto_gather=False)
+---
+id: generic ordered object for checkboxes
+objects:
+  - debts_ordered: DAOrderedDict.using(elements=debts_terms_ordered, auto_gather=False, gathered=True)
+---
+id: code to generate separate lists
+generic object: ALIndividual
+code: |
+  x.debts.clear()
+  for debt in secured_debts:
+    if debt.recommended_debt == x.name.full():
+      x.debts.append(debt)
+  for debt in debts:
+    if debt.recommended_debt == x.name.full():
+      x.debts.append(debt)
+  x.debts.gathered = True
+---
+id: debts review
+question: Do you want to list any other debts?
+subquestion: |
+  Tap Next if you don't have more to add.
+  
+  ${ debts.table }
+  
+  ${ debts.add_action() }
+continue button field: debts.review_items
+---
+id: debts revisit
+continue button field: debts.revisit
+question: |
+  Edit debts
+  
+subquestion: |
+  ${ debts.table }
+
+  ${ debts.add_action() }
+---
+id: debts table
+table: debts.table
+rows: debts
+columns:
+  - Type: |
+      row_item.source
+  - Lender: |
+      row_item.lender
+  - Balance: |
+      currency(row_item.balance) if defined("row_item.balance") else ""
+  - Monthly payment:
+      currency(row_item.monthly_payment) if defined("row_item.monthly_payment") else ""
+  - Marital property?:  row_item.marital_property
+  - Party with possession?: row_item.has_possession
+  - Debts to be paid by: row_item.recommended_debt if defined("row_item.recommended_debt") else ""
+edit:
+  - lender
+---
+generic object: ALAsset
+question: Who should pay this debt?
+fields:
+  - Who should pay this debt?: x.recommended_debt
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+---
+question: | 
+
+  Tell us about your ${ debts[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in debts.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in debts.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: debts[i].source
+    code: |
+      debts.ordered
+  - Other (explain): debts[i].source_other
+    show if:
+      variable: debts[i].source
+      is: other
+  - Who is the money owed to?: debts[i].lender
+    required: False 
+  - Balance: debts[i].balance
+    datatype: currency
+    required: False 
+  - Monthly Payment: debts[i].monthly_payment
+    datatype: currency
+    required: False 
+  - Who should pay this debt?: debts[i].recommended_debt
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+---
+question: Additional provisions
+fields:
+  - no label: additional_provisions
+    datatype: area
+---
+code: |
+  notice_date = today()
+---
+# Should be only used in interviews run from property_statement.yml, in an interview from main, the version from shared.yml will be lower because the block including property_statement.yml is above it
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, property_statement_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[property_statement_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+---
+objects:
+  - property_statement_attachment: ALDocument.using(title="Statement of Property and Debt and Proposed Separation Agreement", filename="property_statement", has_addendum=False, )
+---
+code: |
+  property_statement_attachment.enabled = True
+---
+attachment:
+  name: Statement of Property and Debt and Proposed Separation Agreement
+  filename: property_statement
+  variable name: property_statement_attachment[i]
+  skip undefined: True
+  pdf template file: property_statement.pdf
+  fields:
+      - "county_name": ${ case.county } 
+      - "petitioners_first_name": ${ petitioner.name.first } 
+      - "petitioners_middle_name": ${ petitioner.name.middle } 
+      - "petitioners_last_name": ${ petitioner.name.last } 
+      - "petitioners_suffix": ${ petitioner.name.suffix } 
+      - "respondents_middle_name": ${ respondent.name.last } 
+      - "respondents_last_name": ${ respondent.name.middle } 
+      - "respondents_suffix": ${ respondent.name.suffix } 
+      - "respondents_first_name": ${ respondent.name.first } 
+      - "petitioner_own_real_estate_no": ${ len([item for item in real_estate if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_own_real_estate_yes": ${ len([item for item in real_estate if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_own_vehicle_yes": ${ len([item for item in vehicles if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_own_misc_property_no": ${ len([item for item in vehicles if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_own_vehicle_no": ${ len([item for item in vehicles if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_bank_account_yes": ${ len([item for item in vehicles if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_bank_account_no": ${ len([item for item in bank_assets if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_own_misc_property_yes": ${ len([item for item in bank_assets if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_retirement_yes": ${ len([item for item in retirement_accounts if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_retirement_no": ${ len([item for item in retirement_accounts if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_ira_yes": ${ len([item for item in retirement_accounts if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_ira_no": ${ len([item for item in retirement_accounts if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_home_goods_no": ${ len([item for item in personal_goods if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_home_goods_yes": ${ len([item for item in personal_goods if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_personal_goods_yes": ${ len([item for item in personal_goods if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_personal_goods_no": ${ len([item for item in personal_goods if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_business_yes": ${ len([item for item in businesses if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_business_no": ${ len([item for item in businesses if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_bonds_yes": ${ len([item for item in securities if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_bonds_no": ${ len([item for item in securities if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_life_insurance_yes": ${ len([item for item in life_insurance if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_life_insurance_no": ${ len([item for item in life_insurance if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_owe_funds_yes": ${ len([item for item in interest_in_contract if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_owe_funds_no": ${ len([item for item in interest_in_contract if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_lawsuit_yes": ${ len([item for item in interest_in_litigation if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_lawsuit_no": ${ len([item for item in interest_in_litigation if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_farm_yes": ${ len([item for item in farm if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_farm_no": ${ len([item for item in farm if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_trust_yes": ${ len([item for item in interests_in_trust if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_trust_no": ${ len([item for item in interests_in_trust if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_other_asset_no": ${ len([item for item in other_assets if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_other_asset_yes": ${ len([item for item in other_assets if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "respondent_own_real_estate_yes": ${ len([item for item in real_estate if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_own_real_estate_no": ${ len([item for item in real_estate if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_own_vehicle_yes": ${ len([item for item in vehicles if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_own_vehicle_no": ${ len([item for item in vehicles if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_own_misc_property_yes": ${ len([item for item in vehicles if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_own_misc_property_no": ${ len([item for item in vehicles if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_bank_account_yes": ${ len([item for item in bank_assets if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_bank_account_no": ${ len([item for item in bank_assets if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_retirement_yes": ${ len([item for item in retirement_accounts if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_retirement_no": ${ len([item for item in retirement_accounts if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_ira_yes": ${ len([item for item in retirement_accounts if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_ira_no": ${ len([item for item in retirement_accounts if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_home_goods_yes": ${ len([item for item in personal_goods if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_home_goods_no": ${ len([item for item in personal_goods if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_personal_goods_yes": ${ len([item for item in personal_goods if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_personal_goods_no": ${ len([item for item in personal_goods if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_business_yes": ${ len([item for item in businesses if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_business_no": ${ len([item for item in businesses if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_bonds_yes": ${ len([item for item in securities if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_bonds_no": ${ len([item for item in securities if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_life_insurance_yes": ${ len([item for item in life_insurance if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_life_insurance_no": ${ len([item for item in life_insurance if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_owe_funds_no": ${ len([item for item in interest_in_contract if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_owe_funds_yes": ${ len([item for item in interest_in_contract if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_lawsuit_yes": ${ len([item for item in interest_in_litigation if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_lawsuit_no": ${ len([item for item in interest_in_litigation if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_farm_no": ${ len([item for item in farm if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_farm_yes": ${ len([item for item in farm if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_trust_yes": ${ len([item for item in interests_in_trust if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_trust_no": ${ len([item for item in interests_in_trust if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_other_asset_no": ${ len([item for item in other_assets if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_other_asset_yes": ${ len([item for item in other_assets if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "petitioner_property1_marital": ${ petitioner.assets[0].marital_property } 
+      - "petitioner_property1_possession_petitioner": ${ petitioner.assets[0].has_possession } 
+      - "petitioner_amount_owed_property1_yes": ${ petitioner.assets[0].is_amount_owed } 
+      - "petitioner_market_value1": ${ "{:.2f}".format(petitioner.assets[0].market_value) } 
+      - "petitioner_property1_nonmarital": ${ petitioner.assets[0].marital_property } 
+      - "petitioner_property1_possession_respondent": ${ petitioner.assets[0].has_possession } 
+      - "petitioner_amount_owed_property1_no": ${ not petitioner.assets[0].is_amount_owed } 
+      - "petitioner_property1_both": ${ petitioner.assets[0].marital_property } 
+      - "petitioner_property1_possession_other": ${ petitioner.assets[0].has_possession } 
+      - "petitioner_property_item1": ${ petitioner.assets[0].description } 
+      - "petitioner_property2_marital": ${ petitioner.assets[1].marital_property } 
+      - "petitioner_property2_possession_petitioner": ${ petitioner.assets[1].has_possession } 
+      - "petitioner_amount_owed_property2_yes": ${ petitioner.assets[1].is_amount_owed } 
+      - "petitioner_market_value2": ${ "{:.2f}".format(petitioner.assets[1].market_value) } 
+      - "petitioner_property2_nonmarital": ${ petitioner.assets[1].marital_property } 
+      - "petitioner_property2_possession_respondent": ${ petitioner.assets[1].has_possession } 
+      - "petitioner_amount_owed_property2_no": ${ not petitioner.assets[1].is_amount_owed } 
+      - "petitioner_property2_both": ${ petitioner.assets[1].marital_property } 
+      - "petitioner_property2_possession_other": ${ petitioner.assets[1].has_possession } 
+      - "petitioner_property_item2": ${ petitioner.assets[1].description } 
+      - "petitioner_property3_marital": ${ petitioner.assets[2].marital_property } 
+      - "petitioner_property3_possession_petitioner": ${ petitioner.assets[2].has_possession } 
+      - "petitioner_amount_owed_property3_yes": ${ petitioner.assets[2].is_amount_owed } 
+      - "petitioner_market_value3": ${ "{:.2f}".format(petitioner.assets[2].market_value) } 
+      - "petitioner_property3_nonmarital": ${ petitioner.assets[2].marital_property } 
+      - "petitioner_property3_possession_respondent": ${ petitioner.assets[2].has_possession } 
+      - "petitioner_amount_owed_property3_no": ${ not petitioner.assets[2].is_amount_owed } 
+      - "petitioner_property3_both": ${ petitioner.assets[2].marital_property } 
+      - "petitioner_property3_possession_other": ${ petitioner.assets[2].has_possession } 
+      - "petitioner_property_item3": ${ petitioner.assets[2].description } 
+      - "petitioner_property4_marital l": ${ petitioner.assets[3].marital_property } 
+      - "petitioner_property4_possession_petitioner": ${ petitioner.assets[3].has_possession } 
+      - "petitioner_amount_owed_property4_yes": ${ petitioner.assets[3].is_amount_owed } 
+      - "petitioner_market_value4": ${ "{:.2f}".format(petitioner.assets[3].market_value) } 
+      - "petitioner_property4_nonmarital": ${ petitioner.assets[3].marital_property } 
+      - "petitioner_property4_possession_respondent": ${ petitioner.assets[3].has_possession } 
+      - "petitioner_amount_owed_property4_no": ${ not petitioner.assets[3].is_amount_owed } 
+      - "petitioner_property4_both": ${ petitioner.assets[3].marital_property } 
+      - "petitioner_property4_possession_other": ${ petitioner.assets[3].has_possession } 
+      - "petitioner_property_item4": ${ petitioner.assets[3].description } 
+      - "petitioner_property5_marital": ${ petitioner.assets[4].marital_property } 
+      - "petitioner_amount_owed_property5_yes": ${ petitioner.assets[4].is_amount_owed } 
+      - "petitioner_property5_possession_petitioner": ${ petitioner.assets[4].has_possession } 
+      - "petitioner_market_value5": ${ "{:.2f}".format(petitioner.assets[4].market_value) } 
+      - "petitioner_property5_nonmarital": ${ petitioner.assets[4].marital_property } 
+      - "petitioner_property5_possession_respondent": ${ petitioner.assets[4].has_possession } 
+      - "petitioner_amount_owed_property5_no": ${ not petitioner.assets[4].is_amount_owed } 
+      - "petitioner_property5_both": ${ petitioner.assets[4].marital_property } 
+      - "petitioner_property5_possession_other": ${ petitioner.assets[4].has_possession } 
+      - "petitioner_property_item5": ${ petitioner.assets[4].description } 
+      - "petitioner_property6_marital": ${ petitioner.assets[5].marital_property } 
+      - "petitioner_amount_owed_property6_yes": ${ petitioner.assets[5].is_amount_owed } 
+      - "petitioner_property6_possession_petitioner": ${ petitioner.assets[5].has_possession } 
+      - "petitioner_market_value6": ${ "{:.2f}".format(petitioner.assets[5].market_value) } 
+      - "petitioner_property6_nonmarital": ${ petitioner.assets[5].marital_property } 
+      - "petitioner_property6_possession_respondent": ${ petitioner.assets[5].has_possession } 
+      - "petitioner_amount_owed_property6_no": ${ not petitioner.assets[5].is_amount_owed } 
+      - "petitioner_property6_both": ${ petitioner.assets[5].marital_property } 
+      - "petitioner_property6_possession_other": ${ petitioner.assets[5].has_possession } 
+      - "petitioner_property_item6": ${ petitioner.assets[5].description } 
+      - "petitioner_property7_marital": ${ petitioner.assets[6].marital_property } 
+      - "petitioner_amount_owed_property7_yes": ${ petitioner.assets[6].is_amount_owed } 
+      - "petitioner_property7_possession_petitioner": ${ petitioner.assets[6].has_possession } 
+      - "petitioner_market_value7": ${ "{:.2f}".format(petitioner.assets[6].market_value) } 
+      - "petitioner_property7_nonmarital": ${ petitioner.assets[6].marital_property } 
+      - "petitioner_property7_possession_respondent": ${ petitioner.assets[6].has_possession } 
+      - "petitioner_amount_owed_property7_no": ${ not petitioner.assets[6].is_amount_owed } 
+      - "petitioner_property7_both": ${ petitioner.assets[6].marital_property } 
+      - "petitioner_property7_possession_other": ${ petitioner.assets[6].has_possession } 
+      - "petitioner_property_item7": ${ petitioner.assets[6].description } 
+      - "petitioner_property8_marital": ${ petitioner.assets[7].marital_property } 
+      - "petitioner_amount_owed_property8_yes": ${ petitioner.assets[7].is_amount_owed } 
+      - "petitioner_property8_possession_petitioner": ${ petitioner.assets[7].has_possession } 
+      - "petitioner_market_value8": ${ "{:.2f}".format(petitioner.assets[7].market_value) } 
+      - "petitioner_property8_nonmarital": ${ petitioner.assets[7].marital_property } 
+      - "petitioner_property8_possession_respondent": ${ petitioner.assets[7].has_possession } 
+      - "petitioner_amount_owed_property8_no": ${ not petitioner.assets[7].is_amount_owed } 
+      - "petitioner_property8_both": ${ petitioner.assets[7].marital_property } 
+      - "petitioner_property8_possession_other": ${ petitioner.assets[7].has_possession } 
+      - "petitioner_property_item8": ${ petitioner.assets[7].description } 
+      - "petitioner_property9_marital": ${ petitioner.assets[8].marital_property } 
+      - "petitioner_amount_owed_property9_yes": ${ petitioner.assets[8].is_amount_owed } 
+      - "petitioner_property9_possession_petitioner": ${ petitioner.assets[8].has_possession } 
+      - "petitioner_market_value9": ${ "{:.2f}".format(petitioner.assets[8].market_value) } 
+      - "petitioner_property9_nonmarital": ${ petitioner.assets[8].marital_property } 
+      - "petitioner_property9_possession_respondent": ${ petitioner.assets[8].has_possession } 
+      - "petitioner_amount_owed_property9_no": ${ not petitioner.assets[8].is_amount_owed } 
+      - "petitioner_property9_both": ${ petitioner.assets[8].marital_property } 
+      - "petitioner_property9_possession_other": ${ petitioner.assets[8].has_possession } 
+      - "petitioner_property_item9": ${ petitioner.assets[8].description } 
+      - "petitioner_property10_marital": ${ petitioner.assets[9].marital_property } 
+      - "petitioner_amount_owed_property10_yes": ${ petitioner.assets[9].is_amount_owed } 
+      - "petitioner_property10_possession_petitioner": ${ petitioner.assets[9].has_possession } 
+      - "petitioner_market_value10": ${ "{:.2f}".format(petitioner.assets[9].market_value) } 
+      - "petitioner_property10_nonmarital": ${ petitioner.assets[9].marital_property } 
+      - "petitioner_property10_possession_respondent": ${ petitioner.assets[9].has_possession } 
+      - "petitioner_amount_owed_property10_no": ${ not petitioner.assets[9].is_amount_owed } 
+      - "petitioner_property10_both": ${ petitioner.assets[9].marital_property } 
+      - "petitioner_property10_possession_other": ${ petitioner.assets[9].has_possession } 
+      - "petitioner_property_item10": ${ petitioner.assets[9].description } 
+      - "petitioner_property11_marital": ${ petitioner.assets[10].marital_property } 
+      - "petitioner_amount_owed_property11_yes": ${ petitioner.assets[10].is_amount_owed } 
+      - "petitioner_property11_possession_petitioner": ${ petitioner.assets[10].has_possession } 
+      - "petitioner_market_value11": ${ "{:.2f}".format(petitioner.assets[10].market_value) } 
+      - "petitioner_property11_nonmarital": ${ petitioner.assets[10].marital_property } 
+      - "petitioner_property11_possession_respondent": ${ petitioner.assets[10].has_possession } 
+      - "petitioner_amount_owed_property11_no": ${ not petitioner.assets[10].is_amount_owed } 
+      - "petitioner_property11_both": ${ petitioner.assets[10].marital_property } 
+      - "petitioner_property11_possession_other": ${ petitioner.assets[10].has_possession } 
+      - "petitioner_property_item11": ${ petitioner.assets[10].description } 
+      - "petitioner_property12_marital": ${ petitioner.assets[11].marital_property } 
+      - "petitioner_amount_owed_property12_yes": ${ petitioner.assets[11].is_amount_owed } 
+      - "petitioner_property12_possession_petitioner": ${ petitioner.assets[11].has_possession } 
+      - "petitioner_market_value12": ${ "{:.2f}".format(petitioner.assets[11].market_value) } 
+      - "petitioner_property12_nonmarital": ${ petitioner.assets[11].marital_property } 
+      - "petitioner_property12_possession_respondent": ${ petitioner.assets[11].has_possession } 
+      - "petitioner_amount_owed_property12_no": ${ not petitioner.assets[11].is_amount_owed } 
+      - "petitioner_property12_both": ${ petitioner.assets[11].marital_property } 
+      - "petitioner_property12_possession_other": ${ petitioner.assets[11].has_possession } 
+      - "petitioner_property_item12": ${ petitioner.assets[11].description } 
+      - "petitioner_property13_marital": ${ petitioner.assets[12].marital_property } 
+      - "petitioner_amount_owed_property13_yes": ${ petitioner.assets[12].is_amount_owed } 
+      - "petitioner_property13_possession_petitioner": ${ petitioner.assets[12].has_possession } 
+      - "petitioner_market_value13": ${ "{:.2f}".format(petitioner.assets[12].market_value) } 
+      - "petitioner_property13_nonmarital": ${ petitioner.assets[12].marital_property } 
+      - "petitioner_property13_possession_respondent": ${ petitioner.assets[12].has_possession } 
+      - "petitioner_amount_owed_property13_no": ${ not petitioner.assets[12].is_amount_owed } 
+      - "petitioner_property13_both": ${ petitioner.assets[12].marital_property } 
+      - "petitioner_property13_possession_other": ${ petitioner.assets[12].has_possession } 
+      - "petitioner_property_item13": ${ petitioner.assets[12].description } 
+      - "petitioner_property14_marital": ${ petitioner.assets[13].marital_property } 
+      - "petitioner_amount_owed_property14_yes": ${ petitioner.assets[13].is_amount_owed } 
+      - "petitioner_property14_possession_petitioner": ${ petitioner.assets[13].has_possession } 
+      - "petitioner_market_value14": ${ "{:.2f}".format(petitioner.assets[13].market_value) } 
+      - "petitioner_property14_nonmarital": ${ petitioner.assets[13].marital_property } 
+      - "petitioner_property14_possession_respondent": ${ petitioner.assets[13].has_possession } 
+      - "petitioner_amount_owed_property14_no": ${ not petitioner.assets[13].is_amount_owed } 
+      - "petitioner_property14_both": ${ petitioner.assets[13].marital_property } 
+      - "petitioner_property14_possession_other": ${ petitioner.assets[13].has_possession } 
+      - "petitioner_property_item14": ${ petitioner.assets[13].description } 
+      - "petitioner_property15_marital": ${ petitioner.assets[14].marital_property } 
+      - "petitioner_amount_owed_property15_yes": ${ petitioner.assets[14].is_amount_owed } 
+      - "petitioner_property15_possession_petitioner": ${ petitioner.assets[14].has_possession } 
+      - "petitioner_market_value15": ${ "{:.2f}".format(petitioner.assets[14].market_value) } 
+      - "petitioner_property15_nonmarital": ${ petitioner.assets[14].marital_property } 
+      - "petitioner_property15_possession_respondent": ${ petitioner.assets[14].has_possession } 
+      - "petitioner_amount_owed_property15_no": ${ not petitioner.assets[14].is_amount_owed } 
+      - "petitioner_property15_both": ${ petitioner.assets[14].marital_property } 
+      - "petitioner_property15_possession_other": ${ petitioner.assets[14].has_possession } 
+      - "petitioner_property_item15": ${ petitioner.assets[14].description } 
+      - "petitioner_amount_owed_property16_yes": ${ petitioner.assets[15].is_amount_owed } 
+      - "petitioner_property16_marital": ${ petitioner.assets[15].marital_property } 
+      - "petitioner_property16_possession_petitioner": ${ petitioner.assets[15].has_possession } 
+      - "petitioner_market_value16": ${ "{:.2f}".format(petitioner.assets[15].market_value) } 
+      - "petitioner_property16_nonmarital": ${ petitioner.assets[15].marital_property } 
+      - "petitioner_property16_possession_respondent": ${ petitioner.assets[15].has_possession } 
+      - "petitioner_amount_owed_property16_no": ${ not petitioner.assets[15].is_amount_owed } 
+      - "petitioner_property16_both": ${ petitioner.assets[15].marital_property } 
+      - "petitioner_property16_possession_other": ${ petitioner.assets[15].has_possession } 
+      - "petitioner_property_item16": ${ petitioner.assets[15].description } 
+      - "respondent_property1_marital": ${ respondent.assets[0].marital_property } 
+      - "respondent_property1_possession_petitioner": ${ respondent.assets[0].has_possession } 
+      - "respondent_amount_owed_property1_yes": ${ respondent.assets[0].is_amount_owed } 
+      - "respondent_market_value1": ${ "{:.2f}".format(respondent.assets[0].market_value) } 
+      - "respondent_property1_nonmarital": ${ respondent.assets[0].marital_property } 
+      - "respondent_property1_possession_respondent": ${ respondent.assets[0].has_possession } 
+      - "respondent_property1_other": ${ respondent.assets[0].has_possession } 
+      - "respondent_amount_owed_property1_no": ${ not respondent.assets[0].is_amount_owed } 
+      - "respondent_property1_both": ${ respondent.assets[0].marital_property } 
+      - "respondent_property_item1": ${ respondent.assets[0].description } 
+      - "respondent_property2_marital": ${ respondent.assets[1].marital_property } 
+      - "respondent_property2_possession_petitioner": ${ respondent.assets[1].has_possession } 
+      - "respondent_amount_owed_property2_yes": ${ respondent.assets[1].is_amount_owed } 
+      - "respondent_market_value2": ${ "{:.2f}".format(respondent.assets[1].market_value) } 
+      - "respondent_property2_nonmarital": ${ respondent.assets[1].marital_property } 
+      - "respondent_property2_possession_respondent": ${ respondent.assets[1].has_possession } 
+      - "respondent_property2_other": ${ respondent.assets[1].has_possession } 
+      - "respondent_amount_owed_property2_no": ${ not respondent.assets[1].is_amount_owed } 
+      - "respondent_property2_both": ${ respondent.assets[1].marital_property } 
+      - "respondent_property_item2": ${ respondent.assets[1].description } 
+      - "respondent_property3_marital": ${ respondent.assets[2].marital_property } 
+      - "respondent_property3_possession_petitioner": ${ respondent.assets[2].has_possession } 
+      - "respondent_amount_owed_property3_yes": ${ respondent.assets[2].is_amount_owed } 
+      - "respondent_market_value3": ${ "{:.2f}".format(respondent.assets[2].market_value) } 
+      - "respondent_property3_nonmarital": ${ respondent.assets[2].marital_property } 
+      - "respondent_property3_possession_respondent": ${ respondent.assets[2].has_possession } 
+      - "respondent_property3_other": ${ respondent.assets[2].has_possession } 
+      - "respondent_amount_owed_property3_no": ${ not respondent.assets[2].is_amount_owed } 
+      - "respondent_property3_both": ${ respondent.assets[2].marital_property } 
+      - "respondent_property_item3": ${ respondent.assets[2].description } 
+      - "respondent_property4_marital": ${ respondent.assets[3].marital_property } 
+      - "respondent_property4_possession_petitioner": ${ respondent.assets[3].has_possession } 
+      - "respondent_amount_owed_property4_yes": ${ respondent.assets[3].is_amount_owed } 
+      - "respondent_market_value4": ${ "{:.2f}".format(respondent.assets[3].market_value) } 
+      - "respondent_property4_nonmarital": ${ respondent.assets[3].marital_property } 
+      - "respondent_property4_possession_respondent": ${ respondent.assets[3].has_possession } 
+      - "respondent_amount_owed_property4_no": ${ not respondent.assets[3].is_amount_owed } 
+      - "respondent_property4_other": ${ respondent.assets[3].has_possession } 
+      - "respondent_property4_both": ${ respondent.assets[3].marital_property } 
+      - "respondent_property_item4": ${ respondent.assets[3].description } 
+      - "respondent_property5_marital": ${ respondent.assets[4].marital_property } 
+      - "respondent_property5_possession_petitioner": ${ respondent.assets[4].has_possession } 
+      - "respondent_amount_owed_property5_yes": ${ respondent.assets[4].is_amount_owed } 
+      - "respondent_property5_possession_respondent": ${ respondent.assets[4].has_possession } 
+      - "respondent_market_value5": ${ "{:.2f}".format(respondent.assets[4].market_value) } 
+      - "respondent_property5_nonmarital": ${ respondent.assets[4].marital_property } 
+      - "respondent_amount_owed_property5_no": ${ not respondent.assets[4].is_amount_owed } 
+      - "respondent_property5_other": ${ respondent.assets[4].has_possession } 
+      - "respondent_property5_both": ${ respondent.assets[4].marital_property } 
+      - "respondent_property_item5": ${ respondent.assets[4].description } 
+      - "respondent_property6_marital": ${ respondent.assets[5].marital_property } 
+      - "respondent_property6_possession_petitioner": ${ respondent.assets[5].has_possession } 
+      - "respondent_amount_owed_property6_yes": ${ respondent.assets[5].is_amount_owed } 
+      - "respondent_market_value6": ${ "{:.2f}".format(respondent.assets[5].market_value) } 
+      - "respondent_property6_possession_respondent": ${ respondent.assets[5].has_possession } 
+      - "respondent_property6_nonmarital": ${ respondent.assets[5].marital_property } 
+      - "respondent_amount_owed_property6_no": ${ not respondent.assets[5].is_amount_owed } 
+      - "respondent_property6_other": ${ respondent.assets[5].has_possession } 
+      - "respondent_property6_both": ${ respondent.assets[5].marital_property } 
+      - "respondent_property_item6": ${ respondent.assets[5].description } 
+      - "respondent_property7_marital": ${ respondent.assets[6].marital_property } 
+      - "respondent_property7_possession_petitioner": ${ respondent.assets[6].has_possession } 
+      - "respondent_amount_owed_property7_yes": ${ respondent.assets[6].is_amount_owed } 
+      - "respondent_property7_possession_respondent": ${ respondent.assets[6].has_possession } 
+      - "respondent_market_value7": ${ "{:.2f}".format(respondent.assets[6].market_value) } 
+      - "respondent_property7_nonmarital": ${ respondent.assets[6].marital_property } 
+      - "respondent_amount_owed_property7_no": ${ not respondent.assets[6].is_amount_owed } 
+      - "respondent_property7_other": ${ respondent.assets[6].has_possession } 
+      - "respondent_property7_both": ${ respondent.assets[6].marital_property } 
+      - "respondent_property_item7": ${ respondent.assets[6].description } 
+      - "respondent_property8_marital": ${ respondent.assets[7].marital_property } 
+      - "respondent_property8_possession_petitioner": ${ respondent.assets[7].has_possession } 
+      - "respondent_amount_owed_property8_yes": ${ respondent.assets[7].is_amount_owed } 
+      - "respondent_property8_possession_respondent": ${ respondent.assets[7].has_possession } 
+      - "respondent_market_value8": ${ "{:.2f}".format(respondent.assets[7].market_value) } 
+      - "respondent_property8_nonmarital": ${ respondent.assets[7].marital_property } 
+      - "respondent_amount_owed_property8_no": ${ not respondent.assets[7].is_amount_owed } 
+      - "respondent_property8_other": ${ respondent.assets[7].has_possession } 
+      - "respondent_property8_both": ${ respondent.assets[7].marital_property } 
+      - "respondent_property_item8": ${ respondent.assets[7].description } 
+      - "respondent_property9_marital": ${ respondent.assets[8].marital_property } 
+      - "respondent_property9_possession_petitioner": ${ respondent.assets[8].has_possession } 
+      - "respondent_amount_owed_property9_yes": ${ respondent.assets[8].is_amount_owed } 
+      - "respondent_property9_possession_respondent": ${ respondent.assets[8].has_possession } 
+      - "respondent_market_value9": ${ "{:.2f}".format(respondent.assets[8].market_value) } 
+      - "respondent_property9_nonmarital": ${ respondent.assets[8].marital_property } 
+      - "respondent_amount_owed_property9_no": ${ not respondent.assets[8].is_amount_owed } 
+      - "respondent_property9_other": ${ respondent.assets[8].has_possession } 
+      - "respondent_property9_both": ${ respondent.assets[8].marital_property } 
+      - "respondent_property_item9": ${ respondent.assets[8].description } 
+      - "respondent_property10_marital": ${ respondent.assets[9].marital_property } 
+      - "respondent_property10_possession_petitioner": ${ respondent.assets[9].has_possession } 
+      - "respondent_amount_owed_property10_yes": ${ respondent.assets[9].is_amount_owed } 
+      - "respondent_market_value10": ${ "{:.2f}".format(respondent.assets[9].market_value) } 
+      - "respondent_property10_possession_respondent": ${ respondent.assets[9].has_possession } 
+      - "respondent_property10_nonmarital": ${ respondent.assets[9].marital_property } 
+      - "respondent_amount_owed_property10_no": ${ not respondent.assets[9].is_amount_owed } 
+      - "respondent_property10_other": ${ respondent.assets[9].has_possession } 
+      - "respondent_property10_both": ${ respondent.assets[9].marital_property } 
+      - "respondent_property_item10": ${ respondent.assets[9].description } 
+      - "respondent_property11_marital": ${ respondent.assets[10].marital_property } 
+      - "respondent_property11_possession_petitioner": ${ respondent.assets[10].has_possession } 
+      - "respondent_amount_owed_property11_yes": ${ respondent.assets[10].is_amount_owed } 
+      - "respondent_property11_possession_respondent": ${ respondent.assets[10].has_possession } 
+      - "respondent_market_value11": ${ "{:.2f}".format(respondent.assets[10].market_value) } 
+      - "respondent_property11_nonmarital": ${ respondent.assets[10].marital_property } 
+      - "respondent_amount_owed_property11_no": ${ not respondent.assets[10].is_amount_owed } 
+      - "respondent_property11_other": ${ respondent.assets[10].has_possession } 
+      - "respondent_property11_both": ${ respondent.assets[10].marital_property } 
+      - "respondent_property_item11": ${ respondent.assets[10].description } 
+      - "respondent_property12_marital": ${ respondent.assets[11].marital_property } 
+      - "respondent_property12_possession_petitioner": ${ respondent.assets[11].has_possession } 
+      - "respondent_amount_owed_property12_yes": ${ respondent.assets[11].is_amount_owed } 
+      - "respondent_property12_nonmarital": ${ respondent.assets[11].marital_property } 
+      - "respondent_property12_possession_respondent": ${ respondent.assets[11].has_possession } 
+      - "respondent_market_value12": ${ "{:.2f}".format(respondent.assets[11].market_value) } 
+      - "respondent_amount_owed_property12_no": ${ not respondent.assets[11].is_amount_owed } 
+      - "respondent_property12_other": ${ respondent.assets[11].has_possession } 
+      - "respondent_property12_both": ${ respondent.assets[11].marital_property } 
+      - "respondent_property_item12": ${ respondent.assets[11].description } 
+      - "respondent_property13_marital": ${ respondent.assets[12].marital_property } 
+      - "respondent_property13_possession_petitioner": ${ respondent.assets[12].has_possession } 
+      - "respondent_amount_owed_property13_yes": ${ respondent.assets[12].is_amount_owed } 
+      - "respondent_property13_nonmarital": ${ respondent.assets[12].marital_property } 
+      - "respondent_property13_possession_respondent": ${ respondent.assets[12].has_possession } 
+      - "respondent_market_value13": ${ "{:.2f}".format(respondent.assets[12].market_value) } 
+      - "respondent_amount_owed_property13_no": ${ not respondent.assets[12].is_amount_owed } 
+      - "respondent_property13_other": ${ respondent.assets[12].has_possession } 
+      - "respondent_property13_both": ${ respondent.assets[12].marital_property } 
+      - "respondent_property_item13": ${ respondent.assets[12].description } 
+      - "respondent_property14_marital": ${ respondent.assets[13].marital_property } 
+      - "respondent_property14_possession_petitioner": ${ respondent.assets[13].has_possession } 
+      - "respondent_amount_owed_property14_yes": ${ respondent.assets[13].is_amount_owed } 
+      - "respondent_market_value14": ${ "{:.2f}".format(respondent.assets[13].market_value) } 
+      - "respondent_property14_nonmarital": ${ respondent.assets[13].marital_property } 
+      - "respondent_property14_possession_respondent": ${ respondent.assets[13].has_possession } 
+      - "respondent_amount_owed_property14_no": ${ not respondent.assets[13].is_amount_owed } 
+      - "respondent_property14_other": ${ respondent.assets[13].has_possession } 
+      - "respondent_property14_both": ${ respondent.assets[13].marital_property } 
+      - "respondent_property_item14": ${ respondent.assets[13].description } 
+      - "respondent_property15_marital": ${ respondent.assets[14].marital_property } 
+      - "respondent_property15_possession_petitioner": ${ respondent.assets[14].has_possession } 
+      - "respondent_amount_owed_property15_yes": ${ respondent.assets[14].is_amount_owed } 
+      - "respondent_property15_nonmarital": ${ respondent.assets[14].marital_property } 
+      - "respondent_property15_possession_respondent": ${ respondent.assets[14].has_possession } 
+      - "respondent_market_value15": ${ "{:.2f}".format(respondent.assets[14].market_value) } 
+      - "respondent_amount_owed_property15_no": ${ not respondent.assets[14].is_amount_owed } 
+      - "respondent_property15_other": ${ respondent.assets[14].has_possession } 
+      - "respondent_property15_both": ${ respondent.assets[14].marital_property } 
+      - "respondent_property_item15": ${ respondent.assets[14].description } 
+      - "respondent_property16_marital": ${ respondent.assets[15].marital_property } 
+      - "respondent_property16_possession_petitioner": ${ respondent.assets[15].has_possession } 
+      - "respondent_amount_owed_property16_yes": ${ respondent.assets[15].is_amount_owed } 
+      - "respondent_property16_nonmarital": ${ respondent.assets[15].marital_property } 
+      - "respondent_property16_possession_respondent": ${ respondent.assets[15].has_possession } 
+      - "respondent_market_value16": ${ "{:.2f}".format(respondent.assets[15].market_value) } 
+      - "respondent_amount_owed_property16_no": ${ not respondent.assets[15].is_amount_owed } 
+      - "respondent_property16_both": ${ respondent.assets[15].marital_property } 
+      - "respondent_property16_other": ${ respondent.assets[15].has_possession } 
+      - "respondent_property_item16": ${ respondent.assets[15].description } 
+      - "petitioner_bankruptcy_no": ${ not petitioner.in_bankruptcy } 
+      - "petitioner_bankruptcy_yes": ${ petitioner.in_bankruptcy } 
+      - "petitioner_mortgage_yes": ${ len([item for item in debts.matches(source=['mortgages']) if item.recommended_debt ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_mortgage_no": ${ len([item for item in debts.matches(source=['mortgages']) if item.recommended_debt ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_car_payment_yes": ${ len([item for item in debts.matches(source=['vehicle_loans']) if item.recommended_debt ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_car_payment_no": ${ len([item for item in debts.matches(source=['vehicle_loans']) if item.recommended_debt ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_credit_card_payment_yes": ${ len([item for item in debts.matches(source=['credit_card_debt']) if item.recommended_debt ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_credit_card_payment_no": ${ len([item for item in debts.matches(source=['credit_card_debt']) if item.recommended_debt ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_owe_family_friends_yes": ${ len([item for item in debts.matches(source=['personal_loans']) if item.recommended_debt ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_owe_family_friends_no": ${ len([item for item in debts.matches(source=['personal_loans']) if item.recommended_debt ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_owe_medical_dental_no": ${ len([item for item in debts.matches(source=['medical_debt']) if item.recommended_debt ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_owe_medical_dental_yes": ${ len([item for item in debts.matches(source=['medical_debt']) if item.recommended_debt ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_owe_student_loans_no": ${ len([item for item in debts.matches(source=['student_loans']) if item.recommended_debt ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_owe_student_loans_yes": ${ len([item for item in debts.matches(source=['student_loans']) if item.recommended_debt ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_owe_other_debt_no": ${ len([item for item in debts.matches(source=['other_debt']) if item.recommended_debt ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_owe_other_debt_yes": ${ len([item for item in debts.matches(source=['other_debt']) if item.recommended_debt ==  petitioner.name.full()]) > 0 } 
+      - "respondent_bankruptcy_yes": ${ respondent.in_bankruptcy } 
+      - "respondent_bankruptcy_no": ${ not respondent.in_bankruptcy } 
+      - "respondent_mortgage_no": ${ len([item for item in debts.matches(source=['mortgages']) if item.recommended_debt ==  respondent.name.full()]) == 0 } 
+      - "respondent_mortgage_yes": ${ len([item for item in debts.matches(source=['mortgages']) if item.recommended_debt ==  respondent.name.full()]) > 0 } 
+      - "respondent_car_payment_yes": ${ len([item for item in debts.matches(source=['vehicle_loans']) if item.recommended_debt ==  respondent.name.full()]) > 0 } 
+      - "respondent_car_payment_no": ${ len([item for item in debts.matches(source=['vehicle_loans']) if item.recommended_debt ==  respondent.name.full()]) == 0 } 
+      - "respondent_credit_card_payment_yes": ${ len([item for item in debts.matches(source=['credit_card_debt']) if item.recommended_debt ==  respondent.name.full()]) > 0 } 
+      - "respondent_credit_card_payment_no": ${ len([item for item in debts.matches(source=['credit_card_debt']) if item.recommended_debt ==  respondent.name.full()]) == 0 } 
+      - "respondent_owe_family_friends_yes": ${ len([item for item in debts.matches(source=['personal_loans']) if item.recommended_debt ==  respondent.name.full()]) > 0 } 
+      - "respondent_owe_family_friends_no": ${ len([item for item in debts.matches(source=['personal_loans']) if item.recommended_debt ==  respondent.name.full()]) == 0 } 
+      - "respondent_owe_medical_dental_yes": ${ len([item for item in debts.matches(source=['medical_debt']) if item.recommended_debt ==  respondent.name.full()]) > 0 } 
+      - "respondent_owe_medical_dental_no": ${ len([item for item in debts.matches(source=['medical_debt']) if item.recommended_debt ==  respondent.name.full()]) == 0 } 
+      - "respondent_owe_student_loans_no": ${ len([item for item in debts.matches(source=['student_loans']) if item.recommended_debt ==  respondent.name.full()]) == 0 } 
+      - "respondent_owe_student_loans_yes": ${ len([item for item in debts.matches(source=['student_loans']) if item.recommended_debt ==  respondent.name.full()]) > 0 } 
+      - "respondent_owe_other_debt_no": ${ len([item for item in debts.matches(source=['other_debt']) if item.recommended_debt ==  respondent.name.full()]) == 0 } 
+      - "respondent_owe_other_debt_yes": ${ len([item for item in debts.matches(source=['other_debt']) if item.recommended_debt ==  respondent.name.full()]) > 0 } 
+      - "petitioner_debt_marital_1": ${ petitioner.debts[0].marital_property } 
+      - "petitioner_debt_nonmarital_1": ${ petitioner.debts[0].marital_property } 
+      - "petitioner_debt_both_1": ${ petitioner.debts[0].marital_property } 
+      - "petitioner_debt_1": ${ petitioner.debts[0].lender } 
+      - "petitioner_debt_balance_1": ${ petitioner.debts[0].balance } 
+      - "petitioner_monthly_payment_1": ${ petitioner.debts[0].monthly_payment } 
+      - "petitioner_debt_type_1": ${ petitioner.debts[0].display_name } 
+      - "petitioner_debt_marital_2": ${ petitioner.debts[1].marital_property } 
+      - "petitioner_debt_nonmarital_2": ${ petitioner.debts[1].marital_property } 
+      - "petitioner_debt_both_2": ${ petitioner.debts[1].marital_property } 
+      - "petitioner_debt_2": ${ petitioner.debts[1].lender } 
+      - "petitioner_debt_balance_2": ${ petitioner.debts[1].balance } 
+      - "petitioner_monthly_payment_2": ${ petitioner.debts[1].monthly_payment } 
+      - "petitioner_debt_type_2": ${ petitioner.debts[1].display_name } 
+      - "petitioner_debt_marital_3": ${ petitioner.debts[2].marital_property } 
+      - "petitioner_debt_nonmarital_3": ${ petitioner.debts[2].marital_property } 
+      - "petitioner_debt_both_3": ${ petitioner.debts[2].marital_property } 
+      - "petitioner_debt_3": ${ petitioner.debts[2].lender } 
+      - "petitioner_debt_balance_3": ${ petitioner.debts[2].balance } 
+      - "petitioner_monthly_payment_3": ${ petitioner.debts[2].monthly_payment } 
+      - "petitioner_debt_type_3": ${ petitioner.debts[2].display_name } 
+      - "petitioner_debt_marital_4": ${ petitioner.debts[3].marital_property } 
+      - "petitioner_debt_nonmarital_4": ${ petitioner.debts[3].marital_property } 
+      - "petitioner_debt_both_4": ${ petitioner.debts[3].marital_property } 
+      - "petitioner_debt_4": ${ petitioner.debts[3].lender } 
+      - "petitioner_debt_balance_4": ${ petitioner.debts[3].balance } 
+      - "petitioner_monthly_payment_4": ${ petitioner.debts[3].monthly_payment } 
+      - "petitioner_debt_type_4": ${ petitioner.debts[3].display_name } 
+      - "petitioner_debt_marital_5": ${ petitioner.debts[4].marital_property } 
+      - "petitioner_debt_nonmarital_4": ${ petitioner.debts[4].marital_property } 
+      - "petitioner_debt_both_5": ${ petitioner.debts[4].marital_property } 
+      - "petitioner_debt_5": ${ petitioner.debts[4].lender } 
+      - "petitioner_debt_balance_5": ${ petitioner.debts[4].balance } 
+      - "petitioner_monthly_payment_5": ${ petitioner.debts[4].monthly_payment } 
+      - "petitioner_debt_type_5": ${ petitioner.debts[4].display_name } 
+      - "petitioner_debt_marital_6": ${ petitioner.debts[5].marital_property } 
+      - "petitioner_debt_nonmarital_6": ${ petitioner.debts[5].marital_property } 
+      - "petitioner_debt_both_6": ${ petitioner.debts[5].marital_property } 
+      - "petitioner_debt_6": ${ petitioner.debts[5].lender } 
+      - "petitioner_debt_balance_6": ${ petitioner.debts[5].balance } 
+      - "petitioner_monthly_payment_6": ${ petitioner.debts[5].monthly_payment } 
+      - "petitioner_debt_type_6": ${ petitioner.debts[5].display_name } 
+      - "petitioner_debt_marital_7": ${ petitioner.debts[6].marital_property } 
+      - "petitioner_debt_nonmarital_7": ${ petitioner.debts[6].marital_property } 
+      - "petitioner_debt_both_7": ${ petitioner.debts[6].marital_property } 
+      - "petitioner_debt_7": ${ petitioner.debts[6].lender } 
+      - "petitioner_debt_balance_7": ${ petitioner.debts[6].balance } 
+      - "petitioner_monthly_payment_7": ${ petitioner.debts[6].monthly_payment } 
+      - "petitioner_debt_type_7": ${ petitioner.debts[6].display_name } 
+      - "petitioner_debt_marital_8": ${ petitioner.debts[7].marital_property } 
+      - "petitioner_debt_nonmarital_8": ${ petitioner.debts[7].marital_property } 
+      - "petitioner_debt_both_8": ${ petitioner.debts[7].marital_property } 
+      - "petitioner_debt_8": ${ petitioner.debts[7].lender } 
+      - "petitioner_debt_balance_8": ${ petitioner.debts[7].balance } 
+      - "petitioner_monthly_payment_8": ${ petitioner.debts[7].monthly_payment } 
+      - "petitioner_debt_type_8": ${ petitioner.debts[7].display_name } 
+      - "petitioner_debt_marital_9": ${ petitioner.debts[8].marital_property } 
+      - "petitioner_debt_nonmarital_9": ${ petitioner.debts[8].marital_property } 
+      - "petitioner_debt_both_9": ${ petitioner.debts[8].marital_property } 
+      - "petitioner_debt_9": ${ petitioner.debts[8].lender } 
+      - "petitioner_debt_balance_9": ${ petitioner.debts[8].balance } 
+      - "petitioner_monthly_payment_9": ${ petitioner.debts[8].monthly_payment } 
+      - "petitioner_debt_type_9": ${ petitioner.debts[8].display_name } 
+      - "petitioner_debt_marital_10": ${ petitioner.debts[9].marital_property } 
+      - "petitioner_debt_nonmarital_10": ${ petitioner.debts[9].marital_property } 
+      - "petitioner_debt_both_10": ${ petitioner.debts[9].marital_property } 
+      - "petitioner_debt_10": ${ petitioner.debts[9].lender } 
+      - "petitioner_debt_balance_10": ${ petitioner.debts[9].balance } 
+      - "petitioner_monthly_payment_10": ${ petitioner.debts[9].monthly_payment } 
+      - "petitioner_debt_type_10": ${ petitioner.debts[9].display_name } 
+      - "petitioner_debt_marital_11": ${ petitioner.debts[10].marital_property } 
+      - "petitioner_debt_nonmarital_11": ${ petitioner.debts[10].marital_property } 
+      - "petitioner_debt_both_11": ${ petitioner.debts[10].marital_property } 
+      - "petitioner_debt_11": ${ petitioner.debts[10].lender } 
+      - "petitioner_debt_balance_11": ${ petitioner.debts[10].balance } 
+      - "petitioner_monthly_payment_11": ${ petitioner.debts[10].monthly_payment } 
+      - "petitioner_debt_type_11": ${ petitioner.debts[10].display_name } 
+      - "petitioner_debt_marital_12": ${ petitioner.debts[11].marital_property } 
+      - "petitioner_debt_nonmarital_12": ${ petitioner.debts[11].marital_property } 
+      - "petitioner_debt_both_12": ${ petitioner.debts[11].marital_property } 
+      - "petitioner_debt_12": ${ petitioner.debts[11].lender } 
+      - "petitioner_debt_balance_12": ${ petitioner.debts[11].balance } 
+      - "petitioner_monthly_payment_12": ${ petitioner.debts[11].monthly_payment } 
+      - "petitioner_debt_type_12": ${ petitioner.debts[11].display_name } 
+      - "petitioner_debt_marital_13": ${ petitioner.debts[12].marital_property } 
+      - "petitioner_debt_nonmarital_13": ${ petitioner.debts[12].marital_property } 
+      - "petitioner_debt_both_13": ${ petitioner.debts[12].marital_property } 
+      - "petitioner_debt_13": ${ petitioner.debts[12].lender } 
+      - "petitioner_debt_balance_13": ${ petitioner.debts[12].balance } 
+      - "petitioner_monthly_payment_13": ${ petitioner.debts[12].monthly_payment } 
+      - "petitioner_debt_type_13": ${ petitioner.debts[12].display_name } 
+      - "petitioner_debt_marital_14": ${ petitioner.debts[13].marital_property } 
+      - "petitioner_debt_nonmarital_14": ${ petitioner.debts[13].marital_property } 
+      - "petitioner_debt_both_14": ${ petitioner.debts[13].marital_property } 
+      - "petitioner_debt_14": ${ petitioner.debts[13].lender } 
+      - "petitioner_debt_balance_14": ${ petitioner.debts[13].balance } 
+      - "petitioner_monthly_payment_14": ${ petitioner.debts[13].monthly_payment } 
+      - "petitioner_debt_type_14": ${ petitioner.debts[13].display_name } 
+      - "petitioner_debt_marital_15": ${ petitioner.debts[14].marital_property } 
+      - "petitioner_debt_nonmarital_15": ${ petitioner.debts[14].marital_property } 
+      - "petitioner_debt_both_15": ${ petitioner.debts[14].marital_property } 
+      - "petitioner_debt_15": ${ petitioner.debts[14].lender } 
+      - "petitioner_debt_balance_15": ${ petitioner.debts[14].balance } 
+      - "petitioner_monthly_payment_15": ${ petitioner.debts[14].monthly_payment } 
+      - "petitioner_debt_type_15": ${ petitioner.debts[14].display_name } 
+      - "respondent_debt_marital_1": ${ respondent.debts[0].marital_property } 
+      - "respondent_debt_nonmarital_1": ${ respondent.debts[0].marital_property } 
+      - "respondent_debt_both_1": ${ respondent.debts[0].marital_property } 
+      - "respondent_debt_1": ${ respondent.debts[0].lender } 
+      - "respondent_debt_balance_1": ${ respondent.debts[0].balance } 
+      - "respondent_monthly_payment_1": ${ respondent.debts[0].monthly_payment } 
+      - "respondent_debt_type_1": ${ respondent.debts[0].display_name } 
+      - "respondent_debt_marital_2": ${ respondent.debts[1].marital_property } 
+      - "respondent_debt_nonmarital_2": ${ respondent.debts[1].marital_property } 
+      - "respondent_debt_both_2": ${ respondent.debts[1].marital_property } 
+      - "respondent_debt_2": ${ respondent.debts[1].lender } 
+      - "respondent_debt_balance_2": ${ respondent.debts[1].balance } 
+      - "respondent_monthly_payment_2": ${ respondent.debts[1].monthly_payment } 
+      - "respondent_debt_type_2": ${ respondent.debts[1].display_name } 
+      - "respondent_debt_marital_3": ${ respondent.debts[2].marital_property } 
+      - "respondent_debt_nonmarital_3": ${ respondent.debts[2].marital_property } 
+      - "respondent_debt_both_3": ${ respondent.debts[2].marital_property } 
+      - "respondent_debt_3": ${ respondent.debts[2].lender } 
+      - "respondent_debt_balance_3": ${ respondent.debts[2].balance } 
+      - "respondent_monthly_payment_3": ${ respondent.debts[2].monthly_payment } 
+      - "respondent_debt_type_3": ${ respondent.debts[2].display_name } 
+      - "respondent_debt_marital_4": ${ respondent.debts[3].marital_property } 
+      - "respondent_debt_nonmarital_4": ${ respondent.debts[3].marital_property } 
+      - "respondent_debt_both_4": ${ respondent.debts[3].marital_property } 
+      - "respondent_debt_4": ${ respondent.debts[3].lender } 
+      - "respondent_debt_balance_4": ${ respondent.debts[3].balance } 
+      - "respondent_monthly_payment_4": ${ respondent.debts[3].monthly_payment } 
+      - "respondent_debt_type_4": ${ respondent.debts[3].display_name } 
+      - "respondent_debt_marital_5": ${ respondent.debts[4].marital_property } 
+      - "respondent_debt_nonmarital_5": ${ respondent.debts[4].marital_property } 
+      - "respondent_debt_both_5": ${ respondent.debts[4].marital_property } 
+      - "respondent_debt_5": ${ respondent.debts[4].lender } 
+      - "respondent_debt_balance_5": ${ respondent.debts[4].balance } 
+      - "respondent_monthly_payment_5": ${ respondent.debts[4].monthly_payment } 
+      - "respondent_debt_type_5": ${ respondent.debts[4].display_name } 
+      - "respondent_debt_marital_6": ${ respondent.debts[5].marital_property } 
+      - "respondent_debt_nonmarital_6": ${ respondent.debts[5].marital_property } 
+      - "respondent_debt_both_6": ${ respondent.debts[5].marital_property } 
+      - "respondent_debt_6": ${ respondent.debts[5].lender } 
+      - "respondent_debt_balance_6": ${ respondent.debts[5].balance } 
+      - "respondent_monthly_payment_6": ${ respondent.debts[5].monthly_payment } 
+      - "respondent_debt_type_6": ${ respondent.debts[5].display_name } 
+      - "respondent_debt_marital_7": ${ respondent.debts[6].marital_property } 
+      - "respondent_debt_nonmarital_7": ${ respondent.debts[6].marital_property } 
+      - "respondent_debt_both_7": ${ respondent.debts[6].marital_property } 
+      - "respondent_debt_7": ${ respondent.debts[6].lender } 
+      - "respondent_debt_balance_10": ${ respondent.debts[6].balance } 
+      - "respondent_monthly_payment_7": ${ respondent.debts[6].monthly_payment } 
+      - "respondent_debt_type_7": ${ respondent.debts[6].display_name } 
+      - "respondent_debt_marital_8": ${ respondent.debts[7].marital_property } 
+      - "respondent_debt_nonmarital_8": ${ respondent.debts[7].marital_property } 
+      - "respondent_debt_both_8": ${ respondent.debts[7].marital_property } 
+      - "respondent_debt_8": ${ respondent.debts[7].lender } 
+      - "respondent_debt_balance_8": ${ respondent.debts[7].balance } 
+      - "respondent_monthly_payment_8": ${ respondent.debts[7].monthly_payment } 
+      - "respondent_debt_type_8": ${ respondent.debts[7].display_name } 
+      - "respondent_debt_marital_9": ${ respondent.debts[8].marital_property } 
+      - "respondent_debt_nonmarital_9": ${ respondent.debts[8].marital_property } 
+      - "respondent_debt_both_9": ${ respondent.debts[8].marital_property } 
+      - "respondent_debt_9": ${ respondent.debts[8].lender } 
+      - "respondent_debt_balance_9": ${ respondent.debts[8].balance } 
+      - "respondent_monthly_payment_9": ${ respondent.debts[8].monthly_payment } 
+      - "respondent_debt_type_9": ${ respondent.debts[8].display_name } 
+      - "respondent_debt_marital_10": ${ respondent.debts[9].marital_property } 
+      - "respondent_debt_nonmarital_10": ${ respondent.debts[9].marital_property } 
+      - "respondent_debt_both_10": ${ respondent.debts[9].marital_property } 
+      - "respondent_debt_10": ${ respondent.debts[9].lender } 
+      - "respondent_debt_balance_10": ${ respondent.debts[9].balance } 
+      - "respondent_monthly_payment_10": ${ respondent.debts[9].monthly_payment } 
+      - "respondent_debt_type_10": ${ respondent.debts[9].display_name } 
+      - "respondent_debt_marital_11": ${ respondent.debts[10].marital_property } 
+      - "respondent_debt_nonmarital_11": ${ respondent.debts[10].marital_property } 
+      - "respondent_debt_both_11": ${ respondent.debts[10].marital_property } 
+      - "respondent_debt_11": ${ respondent.debts[10].lender } 
+      - "respondent_debt_balance_11": ${ respondent.debts[10].balance } 
+      - "respondent_monthly_payment_11": ${ respondent.debts[10].monthly_payment } 
+      - "respondent_debt_type_11": ${ respondent.debts[10].display_name } 
+      - "respondent_debt_marital_12": ${ respondent.debts[11].marital_property } 
+      - "respondent_debt_nonmarital_12": ${ respondent.debts[11].marital_property } 
+      - "respondent_debt_both_12": ${ respondent.debts[11].marital_property } 
+      - "respondent_debt_12": ${ respondent.debts[11].lender } 
+      - "respondent_debt_balance_12": ${ respondent.debts[11].balance } 
+      - "respondent_monthly_payment_12": ${ respondent.debts[11].monthly_payment } 
+      - "respondent_debt_type_12": ${ respondent.debts[11].display_name } 
+      - "respondent_debt_marital_13": ${ respondent.debts[12].marital_property } 
+      - "respondent_debt_nonmarital_13": ${ respondent.debts[12].marital_property } 
+      - "respondent_debt_both_13": ${ respondent.debts[12].marital_property } 
+      - "respondent_debt_13": ${ respondent.debts[12].lender } 
+      - "respondent_debt_balance_13": ${ respondent.debts[12].balance } 
+      - "respondent_monthly_payment_13": ${ respondent.debts[12].monthly_payment } 
+      - "respondent_debt_type_13": ${ respondent.debts[12].display_name } 
+      - "respondent_debt_marital_14": ${ respondent.debts[13].marital_property } 
+      - "respondent_debt_nonmarital_14": ${ respondent.debts[13].marital_property } 
+      - "respondent_debt_both_14": ${ respondent.debts[13].marital_property } 
+      - "respondent_debt_14": ${ respondent.debts[13].lender } 
+      - "respondent_debt_balance_14": ${ respondent.debts[13].balance } 
+      - "respondent_monthly_payment_14": ${ respondent.debts[13].monthly_payment } 
+      - "respondent_debt_type_14": ${ respondent.debts[13].display_name } 
+      - "respondent_debt_marital_15": ${ respondent.debts[14].marital_property } 
+      - "respondent_debt_nonmarital_15": ${ respondent.debts[14].marital_property } 
+      - "respondent_debt_both_15": ${ respondent.debts[14].marital_property } 
+      - "respondent_debt_15": ${ respondent.debts[14].lender } 
+      - "respondent_debt_balance_15": ${ respondent.debts[14].balance } 
+      - "respondent_monthly_payment_15": ${ respondent.debts[14].monthly_payment } 
+      - "respondent_debt_type_15": ${ respondent.debts[14].display_name } 
+      - "petitioner_lack_jurisdiction": ${ maintenance_to_petitioner == "no_jurisdiction" } 
+      - "no_maintenance_by_respondent": ${ maintenance_to_petitioner == "none" } 
+      - "respondent_maintenance": ${ maintenance_to_petitioner_amount } 
+      - "petitioner_maintenance_sum": ${ maintenance_to_petitioner == "ordered_to_pay" } 
+      - "petitioner_maintenance_modification_allowed": ${ maintenance_to_petitioner_modifiable } 
+      - "petitioner_maintenance_no_modification": ${ not maintenance_to_petitioner_modifiable } 
+      - "respondent_lack_jurisdiction": ${ maintenance_to_respondent == "no_jurisdiction" } 
+      - "no_maintenance_by_petitioner": ${ maintenance_to_respondent == "none" } 
+      - "petitioner_maintenance": ${ maintenance_to_respondent_amount } 
+      - "respondent_maintenance_sum": ${ maintenance_to_respondent == "ordered_to_pay" } 
+      - "respondent_maintenance_modification_allowed": ${ maintenance_to_respondent_modifiable } 
+      - "respondent_maintenance_no_modification": ${ not maintenance_to_respondent_modifiable } 
+      - "withhold_income": ${ maintenance_income_withholding } 
+      - "no_withholding_income": ${ not maintenance_income_withholding } 
+      - "no_withholding_reason_1": ${ maintenance_income_withholding_reason } 
+      - "additional_provision_1": ${ additional_provisions } 
+      - "oath_date": ${ notice_date } 
+      - "party_service_1": ${ other_parties[0].name_full() } 
+      - "party_service_address_1": ${ other_parties[0].address.on_one_line() }
+          ${  other_parties[0].email } ${  other_parties[0].fax } 
+      - "party_service_2": ${ other_parties[1].name_full() } 
+      - "party_service_address_2": ${ other_parties[1].address.on_one_line() }
+          ${  other_parties[1].email } ${  other_parties[1].fax } 
+      - "party_service_3": ${ other_parties[2].name_full() } 
+      - "party_service_address_3": ${ other_parties[2].address.on_one_line() }
+          ${  other_parties[2].email } ${  other_parties[2].fax } 
+      - "party_service_4": ${ other_parties[3].name_full() } 
+      - "party_service_address_4": ${ other_parties[3].address.on_one_line() }
+          ${  other_parties[3].email } ${  other_parties[3].fax } 
+---
+

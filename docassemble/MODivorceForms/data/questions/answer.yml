@@ -1,0 +1,230 @@
+---
+include:
+  - shared.yml
+---
+mandatory: True
+code: |
+  users[0].name.first
+  other_parties[0].name.first
+  respondent.name.first
+  respondent.address.address
+  respondent.attorney.bar_number
+  respondent.email
+  respondent.attorney
+  respondent.phone_number
+  if respondent.has_prior_name:
+    respondent.prior_name.name.first
+  if respondent.active_duty:
+    waive_rights
+  respondent.ssn
+  service.date
+  case.county
+  case.docket_number
+  case.division_number
+  petitioner.name.first
+  petitioner.address.state
+  petitioner.ssn
+  if relief["other"]:
+    relief_other
+  others_with_physical_custody
+  if other_custody_proceeding:
+    other_custody_proceeding_explanation
+  other_litigation
+  previous_petitions
+  agree_with_parenting_plan 
+  for child in children:
+    child.birthdate
+    child.ssn
+  persons_lived_with.gather()
+  people_served.gathered
+  mo_divorce_forms_download
+---
+id: Agree with Parenting Plan
+question: Agree with Parenting Plan
+fields:
+  - Do you agree with the Parenting Plan filed by ${ petitioner }?: agree_with_parenting_plan
+    datatype: yesnoradio
+---
+id: Active Duty and Servicemember Civil Relief Act
+question: Active Duty
+fields:
+  - Do you waive your rights pursuant to the Servicemembers Civil Relief Act of 2003?: waive_rights
+    datatype: yesnoradio
+---
+question: Denials
+subquestion: |
+  Any statement not specifically denied will be deemed admitted and you may not have the opportunity to disagree with this statement when the case is presented to the court.
+fields:
+  - Is there anything in the Petition that you deny?: denials
+    datatype: area
+---
+id: Respondent's Answer to Petition for Dissolution of Marriage object
+objects:
+  - answer_attachment: ALDocument.using(title="Respondent's Answer to Petition for Dissolution of Marriage", filename="answer", has_addendum=False, )
+---
+id: Respondent's Answer to Petition for Dissolution of Marriage enabled
+code: |
+  answer_attachment.enabled = True
+---
+id: Respondent's Answer to Petition for Dissolution of Marriage attachment
+attachment:
+  name: Respondent's Answer to Petition for Dissolution of Marriage
+  filename: answer
+  variable name: answer_attachment[i]
+  skip undefined: True
+  pdf template file: answer.pdf
+--- 
+id: previous petitons
+question: Has ${ petitioner.name.full() } filed any petitions before the one you are answering?
+fields:
+  - no label: previous_petitions
+    choices:
+      - No, I am answering the first petition: 1
+      - Yes, ${ petitioner.name.full() } has filed once before this petition: 2
+      - Yes, ${ petitioner.name.full() } has filed twice before this petition: 3
+---
+objects:
+  - answer_attachment: ALDocument.using(title="Respondent's Answer to Petition for Dissolution of Marriage", filename="answer",  has_addendum=False, )
+---
+code: |
+  answer.enabled = True
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+---
+attachment:
+  - filename: answer
+    variable name: answer_attachment[i]
+    skip undefined: True
+    pdf template file: answer.pdf
+    fields:
+      - "countyList": ${ case.county } 
+      - "petitionersFirstName": ${ petitioner.name.first } 
+      - "petitionersMiddleName": ${ petitioner.name.middle } 
+      - "petitionersLastName": ${ petitioner.name.last } 
+      - "petitionersSuffixJrSrIII": ${ petitioner.address.state } 
+      - "caseNumber": ${ case.docket_number } 
+      - "respondentsFirstName": ${ respondent.name.last } 
+      - "respondentsMiddleName": ${ respondent.name.first } 
+      - "respondentsLastName": ${ respondent.name.middle } 
+      - "respondentsSuffixJrSrIII": ${ respondent.name.suffix } 
+      - "divisionNumber": ${ case.division_number } 
+      - "raHowManyPetitions1": ${ previous_petitions == 1 } 
+      - "raHowManyPetitions2": ${ previous_petitions == 3 } 
+      - "raHowManyPetitions3": ${ previous_petitions == 2 } 
+      - "raDenials1": ${ denials } 
+      - "raRespondentsStreet": ${ respondent.address.address } 
+      - "raRespondentsZip": ${ respondent.address.zip } 
+      - "raRespondentCity": ${ respondent.address.city } 
+      - "raRespondentState": ${ respondent.address.state } 
+      - "raRespondentsPhone": ${ respondent.phone_number } 
+      - "raRespondentsEmail": ${ respondent.email } 
+      - "raRespondentsSsnLastFour": ${ respondent.ssn } 
+      - "raRespondentActiveDutyOrNot1": ${ not respondent.active_duty } 
+      - "raRespondentActiveDutyOrNot2": ${ respondent.active_duty and waive_rights } 
+      - "raRespondentActiveDutyOrNot3": ${ respondent.active_duty and not waive_rights } 
+      - "raPetitionersSsnLastFour": ${ petitioner.ssn } 
+      - "raFirstChildFirstName": ${ children[0].name.first } 
+      - "raFirstChildMiddleName": ${ children[0].name.middle } 
+      - "raFirstChildLastName": ${ children[0].name.last } 
+      - "raFirstChildSuffix": ${ children[0].name.suffix } 
+      - "raFirstChildsAge": ${ date_difference(as_datetime(children[0].birthdate),today()).years } 
+      - "raLastFourSsnFirstChild": ${ children[0].ssn } 
+      - "raSecondChildFirstName": ${ children[1].name.first } 
+      - "raSecondChildMiddleName": ${ children[1].name.middle } 
+      - "raSecondChildAge": ${ date_difference(as_datetime(children[1].birthdate),today()).years } 
+      - "raLastFourSsnSecondChild": ${ children[1].ssn } 
+      - "raSecondChildLastName": ${ children[1].name.last } 
+      - "raSecondChildSuffix": ${ children[1].name.suffix } 
+      - "raThirdChildSuffix": ${ date_difference(as_datetime(children[2].name.suffix),today()).years } 
+      - "raThirdChildAge": ${ children[2].age } 
+      - "raLastFourSsnThirdChild": ${ children[2].ssn } 
+      - "raThirdChildFirstName": ${ children[2].name.first } 
+      - "raThirdChildMiddleName": ${ children[2].name.middle } 
+      - "raThirdChildLastName": ${ children[2].name.last } 
+      - "raFourthChildFirstName": ${ children[3].name.first } 
+      - "raFourthChildMiddleName": ${ children[3].name.middle } 
+      - "raFourthChildLastName": ${ children[3].name.last } 
+      - "raFourthChildSuffix": ${ children[3].name.suffix } 
+      - "raFourthChildAge": ${ date_difference(as_datetime(children[3].birthdate),today()).years } 
+      - "raLastFourSsnFourthChild": ${ children[3].ssn } 
+      - "raFifthChildFirstName": ${ children[4].name.first } 
+      - "raFifthChildSuffix": ${ children[4].name.suffix } 
+      - "raFifthChildAge": ${ date_difference(as_datetime(children[4].birthdate),today()).years } 
+      - "raLastFourSsnFifthChild": ${ children[4].ssn } 
+      - "raFifthChildMiddleName": ${ children[4].name.middle } 
+      - "raFifthChildLastName": ${ children[4].name.last } 
+      - "raSixthChildMiddleName": ${ children[5].name.middle } 
+      - "raSixthChildLastName": ${ children[5].name.last } 
+      - "raSixthChildSuffix": ${ children[5].name.suffix } 
+      - "raSixthChildAge": ${ date_difference(as_datetime(children[5].birthdate),today()).years } 
+      - "raLastFourSsnSixthChild": ${ children[5].ssn } 
+      - "raSixthChildFirstName": ${ children[5].name.first } 
+      - "raPerson1ChildrenLivedWithPast5YearsFirstName": ${ persons_lived_with[0].name.first } 
+      - "raPerson1ChildrenLivedWithPast5YearsMiddleName": ${ persons_lived_with[0].name.middle } 
+      - "raPerson1ChildrenLivedWithPast5YearsLastName": ${ persons_lived_with[0].name.last } 
+      - "raPerson1ChildrenLivedWithPast5YearsSuffix": ${ persons_lived_with[0].name.suffix } 
+      - "raPerson1ChildrenLivedWithPast5YearsStreet": ${ persons_lived_with[0].address.address } 
+      - "raPerson1ChildrenLivedWithPast5YearsCity": ${ persons_lived_with[0].address.city } 
+      - "raPerson1ChildrenLivedWithPast5YearsState": ${ persons_lived_with[0].address.state } 
+      - "raPerson1ChildrenLivedWithPast5YearsZip": ${ persons_lived_with[0].address.zip } 
+      - "raPerson2ChildrenLivedWithPast5YearsFirstName": ${ persons_lived_with[1].name.first } 
+      - "raPerson2ChildrenLivedWithPast5YearsMiddleName": ${ persons_lived_with[1].name.middle } 
+      - "raPerson2ChildrenLivedWithPast5YearsLastName": ${ persons_lived_with[1].name.last } 
+      - "raPerson2ChildrenLivedWithPast5YearsSuffix": ${ persons_lived_with[1].name.suffix } 
+      - "raPerson2ChildrenLivedWithPast5YearsStreet": ${ persons_lived_with[1].address.address } 
+      - "raPerson2ChildrenLivedWithPast5YearsCity": ${ persons_lived_with[1].address.city } 
+      - "raPerson2ChildrenLivedWithPast5YearsState": ${ persons_lived_with[1].address.state } 
+      - "raPerson2ChildrenLivedWithPast5YearsZip": ${ persons_lived_with[1].address.zip } 
+      - "raPerson3ChildrenLivedWithPast5YearsFirstName": ${ persons_lived_with[2].name.first } 
+      - "raPerson3ChildrenLivedWithPast5YearsMiddleName": ${ persons_lived_with[2].name.middle } 
+      - "raPerson3ChildrenLivedWithPast5YearsLastName": ${ persons_lived_with[2].name.last } 
+      - "raPerson3ChildrenLivedWithPast5YearsSuffix": ${ persons_lived_with[2].name.suffix } 
+      - "raPerson3ChildrenLivedWithPast5YearsStreet": ${ persons_lived_with[2].address.address } 
+      - "raPerson3ChildrenLivedWithPast5YearsCity": ${ persons_lived_with[2].address.city } 
+      - "raPerson3ChildrenLivedWithPast5YearsState": ${ persons_lived_with[2].address.state } 
+      - "raPerson3ChildrenLivedWithPast5YearsZip": ${ persons_lived_with[2].address.zip } 
+      - "raDoesAnyoneOtherThanYouOrSpouseHaveCustodyRights1": ${ others_with_physical_custody } 
+      - "raDoesAnyoneOtherThanYouOrSpouseHaveCustodyRights2": ${ not others_with_physical_custody } 
+      - "raOtherCustodyProceedingPending1": ${ other_custody_proceeding } 
+      - "raOtherCustodyProceedingPending2": ${ not other_custody_proceeding } 
+      - "raParticipatedInOtherLitigationCustody1": ${ other_litigation } 
+      - "raParticipatedInOtherLitigationCustody2": ${ not other_litigation } 
+      - "raAgreeWithParentingPlanOrNot1": ${ agree_with_parenting_plan } 
+      - "raAgreeWithParentingPlanOrNot2": ${ not agree_with_parenting_plan } 
+      - "raRequestReliefDissolution": ${ relief['dissolution'] } 
+      - "raRequestReliefCustody": ${ relief['custody'] } 
+      - "raRequestReliefSupportOfTheChildren": ${ relief['child_support'] } 
+      - "raRequestReliefDivideMaritalPropertyAndDebts": ${ relief['divide_property'] } 
+      - "raRequestReliefAwardMaintenanceToMe": ${ relief['maintenance_to_me'] } 
+      - "raRequestReliefAwardMaintenanceToSpouse": ${ relief['maintenance_to_spouse'] } 
+      - "raRequestReliefChangeName": ${ relief['change_name'] } 
+      - "raRequestReliefFormerSuffix": ${ respondent.prior_name.suffix if relief['change_name'] else ""  } 
+      - "raRequestReliefFormerFirstName": ${ respondent.prior_name.first if relief['change_name'] else "" } 
+      - "raRequestReliefFormerMiddleName": ${ respondent.prior_name.last if relief['change_name'] else "" } 
+      - "raRequestReliefFormerLastName": ${ respondent.prior_name.last if relief['change_name'] else ""  } 
+      - "raRequestReliefOther": ${ relief['other'] } 
+      - "raRequestReliefOtherRequests1": ${ relief_other } 
+      - "raDateOfNotice": ${ service.date } 
+      - "raNameRow1": ${ people_served[0].name_full() } 
+      - "raServiceContactInformationRow1": ${ people_served[0].address.on_one_line() } 
+      - "raNameRow2": ${ people_served[1].name_full() } 
+      - "raServiceContactInformationRow2": ${ people_served[1].address.on_one_line() } 
+      - "raNameRow3": ${ people_served[2].name_full() } 
+      - "raServiceContactInformationRow3": ${ people_served[2].address.on_one_line() } 
+      - "raNameRow4": ${ people_served[3].name_full() } 
+      - "raServiceContactInformationRow4": ${ people_served[3].address.on_one_line() } 
+      - "raRespondentsAttorneyCheckbox": ${ respondent.attorney.type_of_assistance == "assistance" } 
+      - "raRespondentsMissouriBarNumber": ${ respondent.attorney.bar_number } 
+      - "raRespondentsAttorneyName": ${ respondent.attorney.name.text } 
+      - "raRespondentsAttorneyStreet": ${ respondent.attorney.address.address } 
+      - "raRespondentsAttorneyCity": ${ respondent.attorney.address.city } 
+      - "raRespondentsAttorneyState": ${ respondent.attorney.address.state } 
+      - "raRespondentsAttorneyZip": ${ respondent.attorney.address.zip } 
+      - "raRespondentsAttorneyPhone": ${ respondent.attorney.phone } 
+      - "raRespondentsAttorneyFax": ${ respondent.attorney.fax } 
+      - "raRespondentsAttorneyEmail": ${ respondent.attorney.email } 
+
+---

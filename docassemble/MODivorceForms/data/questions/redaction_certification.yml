@@ -1,0 +1,48 @@
+---
+include:
+  - shared.yml
+---
+mandatory: True
+code: |
+  users[0].name.first
+  users[0].address.address
+  other_parties[0].name.first
+  petitioner.name.last
+  case.circuit
+  case.county
+  case.docket_number
+  case.matter_type
+  al_court_bundle.get_titles()
+  mo_divorce_forms_download
+---
+continue button field: doc_test
+question: ${ al_court_bundle.get_titles() }
+---
+objects:
+  - redaction_certification_attachment: ALDocument.using(title="Redaction Certification", filename="redaction_certification", has_addendum=False, )
+---
+code: |
+  redaction_certification_attachment.enabled = True
+---
+# Should be only used in interviews run from redaction_certification.yml, in an interview from main, the version from shared.yml will be lower because the block including redaction_certification.yml is above it
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, redaction_certification_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[redaction_certification_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+---
+attachment:
+  name: GN320 Redaction Certification
+  filename: redaction_certification
+  variable name: redaction_certification_attachment[i]
+  skip undefined: True
+  pdf template file: redaction_certification.pdf
+  fields:
+    - "circuit_court": ${ case.circuit } 
+    - "county_name": ${ case.county } 
+    - "user1_name_full": ${ users[0].name_full() } 
+    - "case_number": ${ case.docket_number } 
+    - "case_type": ${ case.matter_type } 
+    - "user1_residential_address": ${ users[0].address.block() } 
+    - "style_of_case": ${ petitioner.name.last } v. ${ respondent.name.last } 
+    - "document_filed": ${ comma_and_list(al_court_bundle.get_titles()) } 
+
+---
