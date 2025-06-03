@@ -49,13 +49,12 @@ validation code: |
 ---
 objects:
   - case: Thing
+
 ---
 id: Case Information
 question: Case Information
 fields:
   - Docket number: case.docket_number
-    required: False
-  - Case county: case.county
     required: False
   - Case court: case.court
     choices:

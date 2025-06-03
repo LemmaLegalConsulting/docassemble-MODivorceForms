@@ -15,14 +15,14 @@ code: |
 ---
 id: what court are you in
 question: |
-  What county do you live in?
+  What county is the court case in?
 subquestion: |
   If you live in the City of St Louis, pick "City of St Louis" as your
   county.
   
   ${ collapse_template(find_county_name_template) }
 fields:
-  - Trial Court County: county_selected
+  - Trial Court County: case.county
     datatype: dropdown
     code: |
       county_list
