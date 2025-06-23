@@ -11,13 +11,28 @@ code: |
     if hasattr(x.normalized_address(), "county") and x.normalized_address().county in county_dictionary:
       x.address.county = x.normalized_address().county
     else:
-      x.address.county = county_selected
+      x.address.county = x.county_selected
+---
+generic object: ALIndividual
+id: what court are you in
+question: |
+  What county does ${ x.name.full() } live in?
+subquestion: |
+  If ${ x.name.full() } lives in the City of St Louis, pick "City of St Louis" as your
+  county.
+  
+  ${ collapse_template(find_county_name_template) }
+fields:
+  - Trial Court County: x.county_selected
+    datatype: dropdown
+    code: |
+      county_list
 ---
 id: what court are you in
 question: |
   What county is the court case in?
 subquestion: |
-  If you live in the City of St Louis, pick "City of St Louis" as your
+  If the court is in the City of St Louis, pick "City of St Louis" as your
   county.
   
   ${ collapse_template(find_county_name_template) }

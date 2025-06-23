@@ -68,11 +68,6 @@ code: |
   else:
     x.there_are_any = False
 ---
-id: generic ordered object for checkboxes
-generic object: ALAssetList
-objects:
-  - x.ordered: DAOrderedDict.using(elements=x.terms_ordered, auto_gather=False, gathered=True)
----
 id: generic set display name backup
 generic object: ALAssetList
 code: |
@@ -529,105 +524,6 @@ validation code: |
   else:
     securities[i].display_name = securities[i].source_other
   securities[i].description = securities[i].name + " " +securities[i].display_name 
----
-id: personal_goods object
-objects:
-  - personal_goods: ALAssetList.using(complete_attribute='complete',there_is_another=False)
----
-id: personal_goods other display
-comment: |
-  This keeps the text that may be changed near the top of the section.
-  Used in:
-  Tell us about your ______
-code: |
-  personal_goods.other_display = "other personal possessions"
-  personal_goods.display_name = "Personal possessions"
----
-id: personal_goods terms_ordered
-# "!!omap" makes these terms ordered
-# their order here will be their same order when shown to users.
-variable name: personal_goods.terms_ordered
-data: !!omap
-  - jewelry: "Jewelry"
-  - antiques: "Antiques"
-  - artwork: "Artwork"
-  - guns: "Guns"
-  - coins_stamps: "Coins / stamps"
-  - tools: "Tools"
-  - collectibles: "Collectibles"
-  - instruments: "Piano / musical instruments"
-  - china_etc: "China / crystal / silverware"
-  - appliances: "Appliances"
-  - computers: "Computers"
-  - electronics: "Electronics"
-  - furnishings: "Furnishings / furniture"
-  - other: "Other"
----
-only sets: personal_goods[i].market_value
-id: describe personal_goods
-reconsider: personal_goods[i].display_name
-question: |
-  Tell us about your ${ personal_goods[i].display_name }
-subquestion: |
-
-  Make your best guess for the market value.
-  
-  % if i > 1:
-  You have already told us about your ${ comma_and_list(asset.display_name for asset in personal_goods.complete_elements()) }.
-  % elif i > 0:
-  You have already told us about your ${ comma_and_list(asset.display_name for asset in personal_goods.complete_elements()) }.
-  % endif
-fields:
-  - Type of asset: personal_goods[i].source
-    code: |
-      personal_goods.ordered
-  - Other (explain): personal_goods[i].source_other
-    show if:
-      variable: personal_goods[i].source
-      is: other
-  - What is its market value? How much would you get if you sold it?: personal_goods[i].market_value
-    maxlength: 76
-    datatype: currency
-  - Is there an amount owed on this property?: personal_goods[i].is_amount_owed
-    datatype: yesnoradio
-  - Who is the money owed to?: personal_goods[i].lender
-    required: False 
-    show if: personal_goods[i].is_amount_owed
-  - Balance: personal_goods[i].balance
-    datatype: currency
-    show if: personal_goods[i].is_amount_owed
-    required: False 
-  - Monthly Payment: personal_goods[i].monthly_payment
-    datatype: currency
-    show if: personal_goods[i].is_amount_owed
-    required: False
-  - Who should pay this debt?: personal_goods[i].recommended_debt
-    datatype: currency
-    show if: personal_goods[i].is_amount_owed
-    choices:
-      - ${ petitioner.name.full() }
-      - ${ respondent.name.full() }
-  - Is this marital or nonmarital property?: personal_goods[i].marital_property
-    choices:
-      - Marital
-      - Nonmarital
-      - Both
-  - Who has possession?: personal_goods[i].has_possession
-    choices:
-      - ${ petitioner.name.full() }
-      - ${ respondent.name.full() }
-      - Other: other
-  - Recommended Award: personal_goods[i].recommended_award
-    choices:
-      - ${ petitioner.name.full() }
-      - ${ respondent.name.full() }
-      - Other: other
-validation code: |
-  if personal_goods[i].source != "other":
-    personal_goods[i].display_name = personal_goods.terms_ordered.get(personal_goods[i].source, personal_goods[i].source)
-  else:
-    personal_goods[i].display_name = personal_goods[i].source_other
-  personal_goods[i].description = personal_goods[i].display_name
 ---
 id: retirement_accounts object
 objects:
@@ -1164,58 +1060,6 @@ comment: |
 code: |
   other_assets.other_display = "other assets"
   other_assets.display_name = "other assets"
----
-objects: 
-  - debts: ALAssetList.using(there_is_another=False)
----
-id: debts other display
-comment: |
-  This keeps the text that may be changed near the top of the section.
-  Used in:
-  Tell us about your ______
-code: |
-  debts.other_display = "other debts"
-  debts.display_name = "other debts"
----
-objects: 
-  - secured_debts: ALAssetList.using(auto_gather=False)
----
-id: debts terms_ordered
-# "!!omap" makes these terms ordered
-# their order here will be their same order when shown to users.
-variable name: debts.terms_ordered
-data: !!omap
-  - real_estate: "a mortgage on a house or condominium or land"
-  - vehicles: "vehicle loans"
-  - credit_card_debt: "Credit card debt"
-  - personal_loans: "Money to family or friends"
-  - medical_debt: "Medical or dental bills"
-  - student_loans: "Student loans"
-  - other: "Other"
----
-code: |
-  debts.display_name = "Debt"
----
-id: debts there are any
-generic object: ALAssetList
-question: |
-  Other Debts
-subquestion: |   
-  You have already entered information about these debts.  Do you have any other debts to add?
-  
-  % for debt in secured_debts:
-  ${ debt.description }
-
-  % endfor
-
-  
-  Do you have any other debts to add?
-
-fields:
-  - no label: debts.selected_types
-    datatype: checkboxes
-    code: |
-      debts.ordered
 ---
 generic object: ALIndividual
 objects:
