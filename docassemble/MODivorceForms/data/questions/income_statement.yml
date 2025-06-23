@@ -1,0 +1,164 @@
+---
+include:
+  - shared.yml
+---
+mandatory: True
+code: |
+  users[0].name.first
+  other_parties[0].name.first
+  petitioner.name.first
+  if petitioner.address.state == "MO":
+    petitioner.address.county
+  respondent.name.first
+  if respondent.address.state == "MO":
+    respondent.address.county
+  petitioner.jobs.gather()
+  petitioner.benefits.gather()
+  petitioner.has_self_employment_income
+  petitioner.other_incomes.gather()
+  petitioner.maintenance_other_received
+  petitioner.other_child_support_received
+  petitioner.other_children
+  petitioner.other_child_support_paid
+  petitioner.maintenance_other_paid
+  petitioner.expenses.gather()
+  petitioner.extraordinary_medical_costs.gather()
+  petitioner.extraordinary_childrearing_costs.gather()
+  petitioner.health_insurance_costs
+  petitioner.work_childcare_expenses
+  maintenance_to_respondent_amount
+  maintenance_to_petitioner_amount
+  respondent.jobs.gather()
+  respondent.benefits.gather()
+  respondent.has_self_employment_income
+  respondent.other_incomes.gather()
+  respondent.maintenance_other_received
+  respondent.other_child_support_received
+  respondent.other_children
+  respondent.other_child_support_paid
+  respondent.maintenance_other_paid
+  respondent.expenses.gather()
+  respondent.extraordinary_medical_costs.gather()
+  respondent.extraordinary_childrearing_costs.gather()
+  respondent.health_insurance_costs
+  respondent.work_childcare_expenses
+  petitioner.jobs.total(times_per_year = 12)
+  respondent.self_employment_income
+  test_screen
+  mo_divorce_forms_download
+---
+question: Test
+subquestion: |
+  ${ "{:.2f}".format(petitioner.other_incomes.total(source=['trust'], times_per_year=12)) } 
+  ${ "{:.2f}".format(petitioner.other_incomes.total(source=['dividends'], times_per_year=12)) } 
+continue button field: test_screen
+---
+id: Statement of Income and Expenses object
+objects:
+  - income_statement_attachment: ALDocument.using(title="Statement of Income and Expenses", filename="income_statement", has_addendum=False, )
+---
+id: Statement of Income and Expenses enabled
+code: |
+  income_statement_attachment.enabled = True
+---
+# Should be only used in interviews run from income_statement.yml, in an interview from main, the version from shared.yml will be lower because the block including income_statement is above it
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[income_statement_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[income_statement_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+---
+id: Statement of Income and Expenses attachment
+attachment:
+  name: Statement of Income and Expenses
+  filename: income_statement
+  variable name: income_statement_attachment[i]
+  skip undefined: True
+  pdf template file: income_statement.pdf
+  editable: False
+  fields:
+      - "countyList": ${ case.county } 
+      - "petitionersSuffixJrSrIII": ${ petitioner.name.suffix } 
+      - "petitionersFirstName": ${ petitioner.name.first } 
+      - "petitionersMiddleName": ${ petitioner.name.middle } 
+      - "petitionersLastName": ${ petitioner.name.last } 
+      - "respondentsFirstName": ${ respondent.name.first } 
+      - "respondentsMiddleName": ${ respondent.name.middle } 
+      - "respondentsLastName": ${ respondent.name.last } 
+      - "respondentsSuffixJrSrIII": ${ respondent.name.suffix } 
+      - "ie1p": ${ "{:.2f}".format(petitioner.jobs.total(times_per_year = 12)) } 
+      - "ie1r": ${ "{:.2f}".format(respondent.jobs.total(times_per_year = 12)) } 
+      - "ie2p": ${ "{:.2f}".format(petitioner.self_employment_income) } 
+      - "ie2r": ${ "{:.2f}".format(respondent.self_employment_income) } 
+      - "ie3r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['social_security'], times_per_year=12)) } 
+      - "ie3p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['social_security'], times_per_year=12)) } 
+      - "ie4p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['retirement'], times_per_year=12)) } 
+      - "ie4r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['retirement'], times_per_year=12)) } 
+      - "ie5p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['pension'], times_per_year=12)) } 
+      - "ie5r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['pension'], times_per_year=12)) } 
+      - "ie6p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['interest'], times_per_year=12)) } 
+      - "ie6r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['interest'], times_per_year=12)) } 
+      - "ie7p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['trust'], times_per_year=12)) } 
+      - "ie7r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['trust'], times_per_year=12)) } 
+      - "ie8p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['dividends'], times_per_year=12)) } 
+      - "ie8r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['dividends'], times_per_year=12)) } 
+      - "ie9p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['unemployment_compensation'], times_per_year=12)) } 
+      - "ie9r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['unemployment_compensation'], times_per_year=12)) } 
+      - "ie10r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['severance_pay'], times_per_year=12)) } 
+      - "ie10p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['severance_pay'], times_per_year=12)) } 
+      - "ie11p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['workers_comp'], times_per_year=12)) } 
+      - "ie11r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['workers_comp'], times_per_year=12)) } 
+      - "ie12p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['disability_insurance'], times_per_year=12)) } 
+      - "ie12r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['disability_insurance'], times_per_year=12)) } 
+      - "ie13r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['veteran_disability'], times_per_year=12)) } 
+      - "ie13p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['veteran_disability'], times_per_year=12)) } 
+      - "ie14p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['military_allowance'], times_per_year=12)) } 
+      - "ie14r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['military_allowance'], times_per_year=12)) } 
+      - "line1p": ${ "{:.2f}".format(float(petitioner.jobs.total(times_per_year=12)) + petitioner.self_employment_income + float(petitioner.other_incomes.total(times_per_year = 12))) } 
+      - "line1r": ${ "{:.2f}".format(float(respondent.jobs.total(times_per_year=12)) + respondent.self_employment_income + float(respondent.other_incomes.total(times_per_year = 12))) } 
+      - "ie16p": ${ "{:.2f}".format(petitioner.benefits.total(source=['ssi'], times_per_year=12)) } 
+      - "ie16r": ${ "{:.2f}".format(respondent.benefits.total(source=['ssi'], times_per_year=12)) } 
+      - "ie17p": ${ "{:.2f}".format(petitioner.benefits.total(source=['tanf'], times_per_year=12)) } 
+      - "ie17r": ${ "{:.2f}".format(respondent.benefits.total(source=['tanf'], times_per_year=12)) } 
+      - "ie18p": ${ "{:.2f}".format(petitioner.benefits.total(source=['medicaid'], times_per_year=12)) } 
+      - "ie18r": ${ "{:.2f}".format(respondent.benefits.total(source=['medicaid'], times_per_year=12)) } 
+      - "ie19p": ${ "{:.2f}".format(petitioner.benefits.total(source=['food_stamps'], times_per_year=12)) } 
+      - "ie19r": ${ "{:.2f}".format(respondent.benefits.total(source=['food_stamps'], times_per_year=12)) } 
+      - "line2c1p": ${ petitioner.other_children } 
+      - "line2c1r": ${ respondent.other_children } 
+      - "line2c3p": ${ "{:.2f}".format(petitioner.other_child_support_received) } 
+      - "line2c3r": ${ "{:.2f}".format(respondent.other_child_support_received) } 
+      - "maintenanceP1": ${ "{:.2f}".format(petitioner.maintenance_received) } 
+      - "maintenanceR1": ${ "{:.2f}".format(respondent.maintenance_received) } 
+      - "maintenanceOtherP": ${ "{:.2f}".format(petitioner.maintenance_other_received) } 
+      - "maintenanceOtherR": ${ "{:.2f}".format(respondent.maintenance_other_received) } 
+      - "line1aP": ${ "{:.2f}".format(petitioner.maintenance_received + petitioner.maintenance_other_received) } 
+      - "line1aR": ${ "{:.2f}".format(respondent.maintenance_received + respondent.maintenance_other_received) } 
+      - "line2aP": ${ "{:.2f}".format(petitioner.other_child_support_paid) } 
+      - "line2aR": ${ "{:.2f}".format(respondent.other_child_support_paid) } 
+      - "maintenanceR2": ${ "{:.2f}".format(respondent.maintenance_paid) } 
+      - "maintenanceP2": ${ "{:.2f}".format(petitioner.maintenance_paid) } 
+      - "maintenanceOtherPaidP": ${ "{:.2f}".format(petitioner.maintenance_other_paid) } 
+      - "maintenanceOtherPaidR": ${ "{:.2f}".format(respondent.maintenance_other_paid) } 
+      - "line2bP": ${ "{:.2f}".format(petitioner.maintenance_paid + petitioner.maintenance_other_paid) } 
+      - "line2bR": ${ "{:.2f}".format(respondent.maintenance_paid + respondent.maintenance_other_paid) } 
+      - "line6abP": ${ "{:.2f}".format(petitioner.work_childcare_expenses) } 
+      - "line6abR": ${ "{:.2f}".format(respondent.work_childcare_expenses) } 
+      - "line6cP": ${ "{:.2f}".format(petitioner.health_insurance_costs) } 
+      - "line6cR": ${ "{:.2f}".format(respondent.health_insurance_costs) } 
+      - "line6dP": ${ "{:.2f}".format(petitioner.extraordinary_medical_costs.total(times_per_year = 12)) } 
+      - "line6dR": ${ "{:.2f}".format(respondent.extraordinary_medical_costs.total(times_per_year = 12)) } 
+      - "line6eP": ${ "{:.2f}".format(petitioner.extraordinary_childrearing_costs.total(times_per_year = 12)) } 
+      - "line6eR": ${ "{:.2f}".format(respondent.extraordinary_childrearing_costs.total(times_per_year = 12)) } 
+      - "ieOtherExpensesP": ${ "{:.2f}".format(petitioner.expenses.total(times_per_year = 12)) } 
+      - "ieOtherExpensesR": ${ "{:.2f}".format(respondent.expenses.total(times_per_year = 12)) } 
+      - "ieTotalMonthlyExpensesR": ${ "{:.2f}".format(respondent.other_child_support_paid + respondent.maintenance_paid + respondent.maintenance_other_paid + respondent.work_childcare_expenses + respondent.health_insurance_costs + float(respondent.extraordinary_medical_costs.total(times_per_year = 12)) + float(respondent.extraordinary_childrearing_costs.total(times_per_year = 12)) + float(respondent.expenses.total(times_per_year = 12))) } 
+      - "ieTotalMonthlyExpensesP": ${ "{:.2f}".format(petitioner.other_child_support_paid + petitioner.maintenance_paid + petitioner.maintenance_other_paid + petitioner.work_childcare_expenses + petitioner.health_insurance_costs + float(petitioner.extraordinary_medical_costs.total(times_per_year = 12)) + float(petitioner.extraordinary_childrearing_costs.total(times_per_year = 12)) + float(petitioner.expenses.total(times_per_year = 12))) } 
+      - "ieDateOfNotice": ${ service.date } 
+      - "ieNameRow1": ${ people_served[0].name_full() } 
+      - "ieServiceContactInformationRow1": ${ people_served[0].address.on_one_line() } 
+      - "ieNameRow2": ${ people_served[1].name_full() } 
+      - "ieServiceContactInformationRow2": ${ people_served[1].address.on_one_line() } 
+      - "ieNameRow3": ${ people_served[2].name_full() } 
+      - "ieServiceContactInformationRow3": ${ people_served[2].address.on_one_line() } 
+      - "ieNameRow4": ${ people_served[3].name_full() } 
+      - "ieServiceContactInformationRow4": ${ people_served[3].address.on_one_line() } 
+---
