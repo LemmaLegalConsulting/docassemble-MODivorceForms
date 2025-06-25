@@ -85,13 +85,15 @@ code: |
   if case_type == "Custody":
     custody_exit
   users.gather()
-  if case_filed == "unknown":
+  other_parties.gather()
+  if case.filed == "unknown":
     how_to_find_your_case
-    reconsider('case_filed')
-  elif case_filed in ['user0_filed','user1_filed']:
+    reconsider('case.filed')
+  elif case.filed in ['user0_filed','user1_filed']:
     case_information
   if is_case_contested in ['contested','unknown']:
     mediation_info
+  children
   if pregnant:
     pregnant_exit
   if child_outside_marriage:
@@ -116,16 +118,14 @@ code: |
     others_with_physical_custody
   else:
     party_information
-  if maintenance_award == "petitioner":
+  if maintenance_to_petitioner == "ordered_to_pay":
     maintenance_to_petitioner_amount
     maintenance_to_petitioner_modifiable
-    if not maintenance_income_withholding:
-      maintenance_income_withholding_reason
-  elif maintenance_award == "respondent":
+  if maintenance_to_respondent == "ordered_to_pay":
     maintenance_to_respondent_amount
     maintenance_to_respondent_modifiable
-    if not maintenance_income_withholding:
-      maintenance_income_withholding_reason
+  if maintenance_to_petitioner or maintenance_to_respondent: 
+    maintenance_income_withholding
     
   real_estate.gather()
   if len(real_estate.matches(source=['house'])) > 0:
@@ -160,13 +160,12 @@ code: |
   if len(other_assets) > 0:
     other_assets.review_items 
 
-  assets_test_screen
   if len(debts) > 0:
     debts.review_items
-  if case_filed == "user0_filed" and respondent_served:
+  if case.filed == "user0_filed" and respondent_served:
       served_information
   else:
-    if case_filed == "user0_field" or case_filed == "not_filed":
+    if case.filed == "user0_field" or case.filed == "not_filed":
       if service_type == "publication":
         service_by_publication_information
       else:
@@ -336,7 +335,7 @@ continue button field: parenting_plan
 id: interview order with children
 code: |
   users[0].name.first
-  users[1].name.first
+  other_parties[0].name.first
   marriage_info
   children.gather()
   family_information = True
@@ -344,7 +343,7 @@ code: |
 id: interview order without children
 code: |
   users[0].name.first
-  users[1].name.first
+  other_parties[0].name.first
   marriage_info
   party_information = True 
 ---

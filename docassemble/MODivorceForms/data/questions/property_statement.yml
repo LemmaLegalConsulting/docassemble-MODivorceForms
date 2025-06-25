@@ -223,7 +223,6 @@ fields:
     show if: real_estate[i].is_amount_owed
     required: False 
   - Who should pay this debt?: real_estate[i].recommended_debt
-    datatype: currency
     show if: real_estate[i].is_amount_owed
     choices:
       - ${ petitioner.name.full() }
@@ -324,7 +323,6 @@ fields:
     show if: vehicles[i].is_amount_owed
     required: False 
   - Who should pay this debt?: vehicles[i].recommended_debt
-    datatype: currency
     show if: vehicles[i].is_amount_owed
     choices:
       - ${ petitioner.name.full() }
@@ -498,7 +496,6 @@ fields:
     show if: securities[i].is_amount_owed
     required: False 
   - Who should pay this debt?: securities[i].recommended_debt
-    datatype: currency
     show if: securities[i].is_amount_owed
     choices:
       - ${ petitioner.name.full() }
@@ -661,7 +658,6 @@ fields:
     show if: businesses[i].is_amount_owed
     required: False 
   - Who should pay this debt?: businesses[i].recommended_debt
-    datatype: currency
     show if: businesses[i].is_amount_owed
     choices:
       - ${ petitioner.name.full() }
@@ -715,7 +711,6 @@ fields:
     show if: farm[i].is_amount_owed
     required: False 
   - Who should pay this debt?: farm[i].recommended_debt
-    datatype: currency
     show if: farm[i].is_amount_owed
     choices:
       - ${ petitioner.name.full() }
@@ -769,7 +764,6 @@ fields:
     show if: other_assets[i].is_amount_owed
     required: False 
   - Who should pay this debt?: other_assets[i].recommended_debt
-    datatype: currency
     show if: other_assets[i].is_amount_owed
     choices:
       - ${ petitioner.name.full() }
@@ -1159,8 +1153,6 @@ columns:
       currency(row_item.balance) if defined("row_item.balance") else ""
   - Monthly payment:
       currency(row_item.monthly_payment) if defined("row_item.monthly_payment") else ""
-  - Marital property?:  row_item.marital_property
-  - Party with possession?: row_item.has_possession
   - Debts to be paid by: row_item.recommended_debt if defined("row_item.recommended_debt") else ""
 edit:
   - lender
