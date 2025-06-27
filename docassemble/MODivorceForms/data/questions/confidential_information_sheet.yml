@@ -1,6 +1,7 @@
 include:
   - shared.yml
 ---
+id: confidential information sheet order
 mandatory: True
 code: |
   users[0].name.first
@@ -13,8 +14,14 @@ code: |
   respondent.party_type_code
   respondent.party_type_description
   respondent.attorney.party_type_code
-  x.employer.email
+  users[0].employer.email
   mo_divorce_forms_download
+---
+generic object: ALIndividual
+question: Email for ${ x.employer.name.text }
+fields:
+  - Email: x.employer.email
+    datatype: email
 ---
 id: party type information
 generic object: ALIndividual
@@ -87,10 +94,10 @@ attachment:
     - "respondent_attorney_party_type_code": ${ respondent.attorney.party_type_code } 
     - "other_parties1_party_type_code": ${ other_parties[1].party_type_code } 
     - "other_parties1_party_type_description": ${ other_parties[1].party_type_description } 
-    - "other_parties1_name_middle": ${ "other_parties[1].name.middle if other_parties[1].person_type == ""person"" else """"" } 
-    - "other_parties1_name_last": ${ "other_parties[1].name.last if other_parties[1].person_type == ""person"" else """"" } 
-    - "other_parties1_name_first": ${ "other_parties[1].name.first if other_parties[1].person_type == ""person"" else """"" } 
-    - "other_parties1_name_text": ${ "other_parties[1].name.text if other_parties[1].person_type == ""business"" else """"" } 
+    - "other_parties1_name_middle": ${ other_parties[1].name.middle if other_parties[1].person_type == "person" else "" } 
+    - "other_parties1_name_last": ${ other_parties[1].name.last if other_parties[1].person_type == "person" else "" } 
+    - "other_parties1_name_first": ${ other_parties[1].name.first if other_parties[1].person_type == "person" else "" } 
+    - "other_parties1_name_text": ${ other_parties[1].name.text if other_parties[1].person_type == "business" else "" } 
     - "other_parties1_address": ${ other_parties[1].address.line_one() } 
     - "other_parties1_address_city": ${ other_parties[1].address.city } 
     - "other_parties1_address_state": ${ other_parties[1].address.state } 
@@ -106,10 +113,10 @@ attachment:
     - "other_parties1_attorney_party_type_code": ${ other_parties[1].attorney.party_type_code } 
     - "other_parties2_party_type_code": ${ other_parties[2].party_type_code } 
     - "other_parties2_party_type_description": ${ other_parties[2].party_type_description } 
-    - "other_parties2_name_last": ${ "other_parties[2].name.last if other_parties[1].person_type == ""person"" else """"" } 
-    - "other_parties2_name_first": ${ "other_parties[2].name.first if other_parties[1].person_type == ""person"" else """"" } 
-    - "other_parties2_name_middle": ${ "other_parties[2].name.middle if other_parties[1].person_type == ""person"" else """"" } 
-    - "other_parties2_name_text": ${ "other_parties[2].name.text if other_parties[1].person_type == ""business"" else """"" } 
+    - "other_parties2_name_last": ${ other_parties[2].name.last if other_parties[1].person_type == "person" else "" } 
+    - "other_parties2_name_first": ${ other_parties[2].name.first if other_parties[1].person_type == "person" else "" } 
+    - "other_parties2_name_middle": ${ other_parties[2].name.middle if other_parties[1].person_type == "person" else "" } 
+    - "other_parties2_name_text": ${ other_parties[2].name.text if other_parties[1].person_type == "business" else "" } 
     - "other_parties2_address": ${ other_parties[2].address.line_one() } 
     - "other_parties2_address_city": ${ other_parties[2].address.city } 
     - "other_parties2_address_state": ${ other_parties[2].address.state } 

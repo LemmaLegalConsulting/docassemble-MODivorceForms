@@ -2,6 +2,7 @@
 include:
   - shared.yml
 ---
+id: income statement order
 mandatory: True
 code: |
   users[0].name.first

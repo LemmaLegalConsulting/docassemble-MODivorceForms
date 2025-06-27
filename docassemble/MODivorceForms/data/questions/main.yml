@@ -72,7 +72,17 @@ code: |
   al_form_type = "starts_case" 
 ---
 sections:
-  - review_certificate_of_dissolution_of_marri: Review your answers
+  - case_information: Information about your case
+  - relief: Requests to the Court
+  - user_info: Information about you
+  - other_party_info: Information about the other party  
+  - children: Children
+  - income: Income
+  - expenses: Expenses
+  - assets: Assets
+  - debts: Debts
+  - service: Service and Filing Documents
+  - review: Review your answers
 ---
 #################### Interview order #####################
 comment: |
@@ -81,31 +91,79 @@ id: interview order certificate of dissolution of marriage
 code: |
   # Set the allowed courts for this interview
   allowed_courts = []
-  nav.set_section("review_certificate_of_dissolution_of_marri")
+  nav.set_section("case_information")
+  ## 1 What issue are you looking for help with
   if case_type == "Custody":
     custody_exit
   users.gather()
+  if users[0].has_prior_name:
+    users[0].prior_name.name.first
   other_parties.gather()
+  if other_parties[0].has_prior_name:
+    other_parties[0].prior_name.name.first
+
+  ## 2 Has your case been filed
   if case.filed == "unknown":
     how_to_find_your_case
     reconsider('case.filed')
   elif case.filed in ['user0_filed','user1_filed']:
+    ## 3 Please enter your case information
+    previous_petitions # answer
     case_information
+    case.county # property_statement, petition, notice_of_hearing, form_17, certificate_of_dissolution
+    case.filing_date # petition
+    case.circuit # form_17
+    case.judge
+    case.division_number # notice_of_hearing
+    case.docket_number # notice_of_hearing, form_17
+    case.matter_type # notice_of_hearing
+    case.judgment_date # certificate_of_dissolution
+    hearing_date
+    hearing_time
+    notice_date # property_statement.yml
+    petitioner.party_type_description # confidential_information_sheet
+    petitioner.attorney.party_type_code
+    if petitioner.attorney_involved: # petition, notice_of_hearing
+      petitioner.attorney.address.address # petition
+      petitioner.attorney.bar_number
+      petitioner.attorney.email
+      petitioner.attorney.fax
+      petitioner.attorney.phone_number
+      petitioner.attorney.party_type_code # confidential_information_sheet
+    respondent.party_type_code # confidential_information_sheet
+    respondent.party_type_description  
+    if respondent.attorney_involved:
+      respondent.attorney.address.address
+      respondent.attorney.bar_number
+      respondent.attorney.email
+      respondent.attorney.fax
+      respondent.attorney.phone_number
+      respondent.attorney.party_type_code
+
+  # 4 Is case contested
   if is_case_contested in ['contested','unknown']:
     mediation_info
+
+  # 5 Children  
   children
   if pregnant:
     pregnant_exit
   if child_outside_marriage:
     child_outside_marriage_exit
+  if minor_children_before_marriage:
+    minor_children_before_marriage_information
+  nav.set_section("relief")
+  relief
+  if relief['other']: # petition, answer
+    relief_other
+
   if minor_children or minor_children_before_marriage:
-    if minor_children_before_marriage:
-      minor_children_before_marriage_information
     presumption_video
     if legal_custody == "Sole":
       legal_custody_sole_explanation
     elif legal_custody == "Third Party":
       legal_custody_other.name.first
+
     if physical_custody == "Sole" and visitation:
       visitation_supervisor.name.first
     elif physical_custody == "Third Party":
@@ -113,11 +171,12 @@ code: |
     if communications["third_party"]:
       communications_other.name.first
     ask_about_dispute_resolution
+    child_support # certificate_of_dissolution
+  
+  if case.filed in ['user0_filed']:
     parenting_plan
-    family_information
-    others_with_physical_custody
-  else:
-    party_information
+  elif case.filed in ['user1_filed']:
+    agree_with_parenting_plan
   if maintenance_to_petitioner == "ordered_to_pay":
     maintenance_to_petitioner_amount
     maintenance_to_petitioner_modifiable
@@ -125,9 +184,140 @@ code: |
     maintenance_to_respondent_amount
     maintenance_to_respondent_modifiable
   if maintenance_to_petitioner or maintenance_to_respondent: 
-    maintenance_income_withholding
-    
-  real_estate.gather()
+    maintenance_income_withholding    
+  
+  nav.set_section("user_information")  
+
+  
+  users[0].address.address # petition
+  if users[0].address.state == "MO":
+    users[0].address.county
+  users[0].address.country
+  users[0].mo_length_of_residence_choice
+
+  users[0].email
+  users[0].driver_license_number
+  users[0].phone_number
+  if users[0].active_duty and case.filed in ['user1_filed']:
+    waive_rights
+  users[0].birthdate
+  users[0].ssn
+  users[0].gender # confidential_information_sheet
+  users[0].race # certificate_of_dissolution
+  users[0].education_elementary
+  users[0].previously_married
+  
+  nav.set_section("other_party_information")  
+  other_parties[0].address.address # petition
+  if other_parties[0].address.state == "MO":
+    other_parties[0].address.county
+  other_parties[0].address.country
+  other_parties[0].mo_length_of_residence_choice
+
+  other_parties[0].email
+  other_parties[0].driver_license_number
+  other_parties[0].phone_number
+  other_parties[0].active_duty
+  other_parties[0].birthdate
+  other_parties[0].ssn
+  other_parties[0].gender # confidential_information_sheet
+  other_parties[0].race # certificate_of_dissolution
+  other_parties[0].education_elementary
+  other_parties[0].previously_married
+  
+  nav.set_section('marriage')
+  marriage_info # certificate_of dissolution
+  marriage.separation_date # certificate_of dissolution
+  marriage.address.county # petition
+  marriage.address.country
+  marriage.address.state
+  marriage.recorded_date
+  marriage.separation_date
+  marriage.can_be_preserved
+  marriage.is_broken
+  if other_parties[0].address.state != "MO":
+    marriage.live_together_in_mo
+  if minor_children or minor_children_before_marriage:
+    if others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect: # form_17
+      related_case_explanation
+    if abuse_or_neglect: # petition
+      abuse_or_neglect_explanation
+    if other_custody_proceeding:
+      other_custody_proceeding_explanation
+    if other_litigation:
+      other_litigation_explanation
+    if others_with_physical_custody:
+      others_with_physical_custody_explanation
+    family_support_order
+  other_allegations # petition
+  
+  if minor_children or minor_children_before_marriage:
+    nav.set_section("children")
+    children.gather()
+    for child in children: # answer
+      child.birthdate
+      child.ssn
+    persons_lived_with_preload # petition
+    persons_lived_with.gather()
+    others_with_physical_custody
+
+  
+  nav.set_section('income')
+  users[0].jobs.gather() # income_statement.yml, fee_waiver, form_17
+  if users[0].jobs.there_are_any: # form_17
+    users[0].employer.name.text
+    users[0].employer.email # confidential information sheet order
+    users[0].employer.address.address
+  users[0].jobs.total(times_per_year = 12)
+  users[0].benefits.gather()
+  received_welfare # form_17
+  if users[0].has_self_employment_income:
+    users[0].self_employment_description
+  users[0].self_employment_income
+  users[0].other_incomes.gather()
+  users[0].maintenance_other_received
+  users[0].other_children
+  users[0].other_child_support_received
+  users[0].monthly_gross_income # property_statement
+  users[0].self_supporting # property_statement
+  other_parties[0].jobs.gather() # income_statement.yml, fee_waiver, form_17
+  if other_parties[0].jobs.there_are_any: # form_17
+    other_parties[0].employer.name.text
+    other_parties[0].employer.email # confidential information sheet order
+    other_parties[0].employer.address.address
+    if case.filed in ["user0_filed"]:   
+      other_parties[0].hours_of_employment
+  other_parties[0].jobs.total(times_per_year = 12)
+  other_parties[0].benefits.gather()
+  received_welfare # form_17
+  if other_parties[0].has_self_employment_income:
+    other_parties[0].self_employment_description
+  other_parties[0].self_employment_income
+  other_parties[0].other_incomes.gather()
+  other_parties[0].maintenance_other_received
+  other_parties[0].other_children
+  other_parties[0].other_child_support_received
+  other_parties[0].monthly_gross_income # property_statement
+  other_parties[0].self_supporting # property_statement  
+  
+  nav.set_section('expenses')
+  users[0].expenses.gather()
+  users[0].maintenance_other_paid
+  users[0].other_child_support_paid
+  users[0].extraordinary_medical_costs.gather()
+  users[0].extraordinary_childrearing_costs.gather()
+  users[0].health_insurance_costs
+  users[0].work_childcare_expenses
+  other_parties[0].expenses.gather()
+  other_parties[0].maintenance_other_paid
+  other_parties[0].other_child_support_paid
+  other_parties[0].extraordinary_medical_costs.gather()
+  other_parties[0].extraordinary_childrearing_costs.gather()
+  other_parties[0].health_insurance_costs
+  other_parties[0].work_childcare_expenses
+  
+  nav.set_section('assets')  
+  real_estate.gather() # property_statement, fee_waiver
   if len(real_estate.matches(source=['house'])) > 0:
     assets_warning
   if len(real_estate) > 0:
@@ -159,9 +349,20 @@ code: |
     businesses.review_items 
   if len(other_assets) > 0:
     other_assets.review_items 
-
+    
+  nav.set_section('debts')
+  secured_debts.gathered
   if len(debts) > 0:
     debts.review_items
+  petitioner.assets.gathered
+  petitioner.review_assets
+  petitioner.debts.gathered
+  respondent.assets.gathered
+  respondent.debts.gathered
+  
+  
+  nav.set_section('service')
+  
   if case.filed == "user0_filed" and respondent_served:
       served_information
   else:
@@ -171,6 +372,10 @@ code: |
       else:
         type_of_personal_service
         personal_service_information
+        service.date # form_17
+        people_served.gathered # notice_of_hearing
+        for people in people_served:
+          people.service_address.address
     filing_pleadings_video
 
   interview_order_mo_divorce_forms = True
@@ -211,6 +416,9 @@ include:
   - notice_of_hearing.yml
   - petition.yml
   - redaction_certification.yml
+  - income_statement.yml
+  - fee_waiver.yml
+  - confidential_information_sheet.yml
   - shared.yml
 ---
 id: Certificate of dissolution of marriage
@@ -460,4 +668,86 @@ edit:
   - address.address
 confirm: True
 
+---
+id: answer enabled block for main interview
+code: |
+  if case.filed == "user1_filed":
+    answer_attachment.enabled = True
+  else:
+    answer_attachment.enabled = False
+---
+id: form_17 enabled block for main interview
+code: |
+  if True:
+    form_17_attachment.enabled = True
+  else:
+    form_17_attachment.enabled = False
+---
+id: notice_of_hearing enabled block for main interview
+code: |
+  if True:
+    notice_of_hearing_attachment.enabled = True
+  else:
+    notice_of_hearing_attachment.enabled = False
+---
+id: certificate_of_dissolution enabled block for main interview
+code: |
+  if True:
+    certificate_of_dissolution_attachment.enabled = True
+  else:
+    certificate_of_dissolution_attachment.enabled = False
+---
+id: fee_waiver enabled block for main interview
+code: |
+  if True:
+    fee_waiver_attachment.enabled = True
+  else:
+    fee_waiver_attachment.enabled = False
+---
+id: judgment enabled block for main interview
+code: |
+  if case.filed == "user0_filed":
+    judgment_attachment.enabled = True
+  else:
+    judgment_attachment.enabled = False
+---
+id: petition enabled block for main interview
+code: |
+  if case.filed == "user0_filed":
+    petition_attachment.enabled = True
+  else:
+    petition_attachment.enabled = False
+---
+id: income_statement enabled block for main interview
+code: |
+  if True:
+    income_statement_attachment.enabled = True
+  else:
+    income_statement_attachment.enabled = False
+---
+id: property_statement enabled block for main interview
+code: |
+  if True:
+    property_statement_attachment.enabled = True
+  else:
+    property_statement_attachment.enabled = False
+---
+id: confidential_information_sheet enabled block for main interview
+code: |
+  if True:
+    confidential_information_sheet_attachment.enabled = True
+  else:
+    confidential_information_sheet_attachment.enabled = False
+---
+id: redaction_certification enabled block for main interview
+code: |
+  if True:
+    redaction_certification_attachment.enabled = True
+  else:
+    redaction_certification_attachment.enabled = False
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, form_17_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, form_17_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---
