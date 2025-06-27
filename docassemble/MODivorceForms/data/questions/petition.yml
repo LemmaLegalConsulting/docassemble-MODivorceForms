@@ -1,0 +1,662 @@
+---
+include:
+  - shared.yml
+---
+mandatory: True
+code: |
+  intro_screen
+  users[0].name.first
+  if users[0].has_prior_name:
+    users[0].prior_name.name.first
+  other_parties[0].name.first
+  if other_parties[0].has_prior_name:
+    other_parties[0].prior_name.name.first
+  petitioner.name.first
+  petitioner.address.address
+  petitioner.address.county
+  petitioner.address.country
+  petitioner.mo_length_of_residence_choice
+  if petitioner.attorney_involved:
+    petitioner.attorney.address.address
+    petitioner.attorney.bar_number
+    petitioner.attorney.email
+    petitioner.attorney.fax
+    petitioner.attorney.phone_number
+  petitioner.email
+  petitioner.phone_number
+  petitioner.active_duty
+  petitioner.birthdate
+  petitioner.ssn
+  petitioner.jobs.gather()
+  if len(petitioner.jobs) > 0:
+    petitioner.employer.name.text
+    petitioner.employer.address.address
+  if petitioner.has_self_employment_income:
+    petitioner.self_employment_description
+    petitioner.employer.address.address
+  petitioner.benefits.gather()
+  petitioner.other_incomes.gather()
+  petitioner.monthly_gross_income
+  petitioner.self_supporting
+  respondent.name.first
+  respondent.address.address
+  respondent.address.county
+  respondent.address.country
+  respondent.mo_length_of_residence_choice
+  if respondent.attorney_involved:
+    respondent.attorney.address.address
+    respondent.attorney.bar_number
+    respondent.attorney.email
+    respondent.attorney.fax
+    respondent.attorney.phone_number
+  respondent.email
+  respondent.phone_number
+  respondent.active_duty
+  respondent.birthdate
+  respondent.ssn
+  if len(respondent.jobs) > 0:
+    respondent.employer.name.text
+    respondent.employer.address.address
+    respondent.hours_of_employment
+  if respondent.has_self_employment_income:
+    respondent.self_employment_description
+  respondent.benefits.gather()
+  respondent.other_incomes.gather()
+  respondent.monthly_gross_income
+  respondent.self_supporting
+  marriage.address.county
+  marriage.address.country
+  marriage.address.state
+  marriage.recorded_date
+  marriage.separation_date
+  marriage.can_be_preserved
+  marriage.is_broken
+  if other_parties[0].address.state != "MO":
+    marriage.live_together_in_mo
+  children.gather()
+  persons_lived_with_preload
+  persons_lived_with.gather()
+  case.county
+  case.filing_date
+  if abuse_or_neglect:
+    abuse_or_neglect_explanation
+  if other_custody_proceeding:
+    other_custody_proceeding_explanation
+  if other_litigation:
+    other_litigation_explanation
+  if others_with_physical_custody:
+    others_with_physical_custody_explanation
+  if relief['other']:
+    relief_other
+  family_support_order
+  other_allegations
+  service_type
+  mo_divorce_forms_download
+---
+id: intro screen for petition
+question: Petition
+continue button field: intro_screen
+
+
+---
+include:
+  - county.yml
+---
+id: additional information about attorney 
+question: Additional attorney about the ${ petitioner.attorney.name_full() }, attorney helping ${ petitioner.name_full() }
+fields:
+  - Email for ${ petitioner.attorney.name_full() }: petitioner.attorney.email
+    required: False
+  - Fax for ${ petitioner.attorney.name_full() }: petitioner.attorney.fax
+    required: False
+  - Phone for ${ petitioner.attorney.name_full() }: petitioner.attorney.phone
+    required: False
+continue button field: additional_attorney_infomation
+---
+## MARRIAGE
+
+id: broken marriage
+question: Status of marriage
+fields:
+  - Is the marriage irretrievable broken?: marriage.is_broken
+    datatype: yesnoradio
+  - Can the marriage be preserved?: marriage.can_be_preserved
+    datatype: yesnoradio
+
+---
+id: Abuse or neglect
+question: Abuse or neglect
+fields:
+  - Have any of the children been a victim of abuse or neglect?: abuse_or_neglect
+    datatype: yesnoradio
+  - Explain: abuse_or_neglect_explanation
+    show if: abuse_or_neglect
+---
+id: Family support order
+question: Order by the Family Support Division
+fields:
+  - Have any orders pertaining to any of the children been entered by the Family Support Division?: family_support_order
+    datatype: yesnoradio
+  - Upload the order to attach to the petition: family_support_order_file
+    datatype: file
+    required: False
+    show if:
+      variable: family_support_order
+      is: True
+---
+id: Other allegations
+question: Other allegations
+fields:
+  - Are there any other allegations: other_allegations
+    datatype: area
+    required: False
+
+---
+id: method of service to respondent
+question: Service to ${ respondent.name_full() }?
+fields:
+  - How will you serve ${ respondent.name_full() }?: respondent.service_type
+    datatype: radio
+    choices:
+      - ${ respondent.name_full() } has signed a verified Respondent’s Answer to Petition for Dissolution of Marriage, which is being filed with the Petition for Dissolution of Marriage. Therefore, do not issue a summons.: none
+      - ${ respondent.name_full() } should be served with a summons at their home: house
+      - ${ respondent.name_full() } should be served with a summons at their place of employment: work
+      - ${ respondent.name_full() } cannot be served in Missouri. Therefore, service by registered mail is requested. A copy of the Affidavit for Service by Mail is attached to this form. See Missouri Supreme Court Rule 54.12(b).: mail
+---
+## CHILDREN  
+---
+code: |
+  children[i].name.first
+  children[i].lived_with.name.first
+  children[i].address.address
+  children[i].active_duty
+  children[i].birthdate
+  children[i].ssn
+  children[i].persons_lived_with.gather()
+  if children[i].legal_custody == "Other":
+    children[i].legal_custody_other.name.first
+  if children[i].physical_custody == "Other":
+    children[i].physical_custody_other.name.first
+  if children[i].parents["Other"]:
+    children[i].other_parent.name.first
+  if children[i].birth_certificate["Other"]:
+    children[i].birth_certificate_other.name.first
+  children[i].adopted
+  children[i].complete = True
+---
+id: adoption question
+question: Is ${ children[i].name.full() } adopted by one or both parents?
+fields:
+  - no label: children[i].adopted
+    datatype: yesnoradio
+---
+objects:
+  - persons_lived_with: ALPeopleList
+---
+code: |
+  persons_lived_with.append(users[0])
+  persons_lived_with_preload = True
+---
+sets: persons_lived_with[i].name.first
+id: who children lived with
+question: Who have the children lived with in the past 5 years?
+subquestion: |
+  You have already said that the children have lived with ${ comma_and_list(persons_lived_with.complete_elements()) }.
+
+fields:
+  - Existing person: persons_lived_with[i]
+    datatype: object
+    choices: people_choices
+    disable others: True
+    exclude:
+     - persons_lived_with.complete_elements()
+  - code: |
+      persons_lived_with[i].name_fields()
+  - code: |
+      persons_lived_with[i].address.address_fields()
+---
+id: children lived with another
+question: Have the children lived with anybody else?
+subquestion: |
+  So far, you have mentioned ${ comma_and_list(persons_lived_with.complete_elements()) }.
+fields:
+  - Have the children lived with anybody else?: persons_lived_with.there_is_another
+    datatype: yesnoradio
+---
+generic object: ALIndividual
+code: |
+  if x.has_self_employment_income:
+    x.monthly_gross_income = float(x.jobs.total(times_per_year=12)) + float(x.benefits.total(times_per_year=12)) + float(x.other_incomes.total(times_per_year=12)) + x.self_employment_income
+  else:
+    x.monthly_gross_income = float(x.jobs.total(times_per_year=12)) + float(x.benefits.total(times_per_year=12)) + float(x.other_incomes.total(times_per_year=12))
+---
+## SERVICE
+sets: x.service_address.address
+id: service address
+generic object: ALIndividual
+question: Service address for ${ x.name_full() }
+fields:
+  - code: |
+      x.service_address.address_fields()
+---
+id: Respondent hours of employment
+question: What are the hours of employment for ${ respondent.name_full() }?
+fields:
+  - no label: respondent.hours_of_employment
+---
+id: Petition for Dissolution of Marriage object
+objects:
+  - petition_attachment: ALDocument.using(title="Petition for Dissolution of Marriage", filename="petition", has_addendum=False, )
+---
+id: Petition for Dissolution of Marriage enabled
+code: |
+  petition_attachment.enabled = True
+---
+# Should be only used in interviews run from judgment.yml, in an interview from main, the version from shared.yml will be lower because the block including judgment.yml is above it
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, petition_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[petition_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+---
+id: Petition for Dissolution of Marriage attachment
+attachment:
+  name: Petition for Dissolution of Marriage
+  filename: petition
+  variable name: petition_attachment[i]
+  skip undefined: True
+  pdf template file: petition.pdf
+  editable: False
+  fields:
+      - "countyList": ${ case.county } 
+      - "petitionersFirstName1": ${ petitioner.name.first } 
+      - "petitionersMiddleName1": ${ petitioner.name.middle } 
+      - "petitionersLastName1": ${ petitioner.name.last } 
+      - "petitionersSuffixJrSrIII1": ${ petitioner.name.suffix } 
+      - "respondentsFirstName1": ${ respondent.name.first } 
+      - "respondentsMiddleName1": ${ respondent.name.middle } 
+      - "respondentsLastName1": ${ respondent.name.last } 
+      - "respondentsSuffixJrSrIII1": ${ respondent.name.suffix } 
+      - "petitionersFirstName2": ${ petitioner.name.first } 
+      - "petitionersMiddleName2": ${ petitioner.name.middle } 
+      - "petitionersLastName2": ${ petitioner.name.last } 
+      - "petitionersSuffixJrSrIII2": ${ petitioner.name.suffix } 
+      - "respondentsFirstName2": ${ respondent.name.first } 
+      - "respondentsMiddleName2": ${ respondent.name.middle } 
+      - "respondentsLastName2": ${ respondent.name.last } 
+      - "respondentsSuffixJrSrIII2": ${ respondent.name.suffix } 
+      - "petitionersFirstName3": ${ petitioner.name.first } 
+      - "petitionersMiddleName3": ${ petitioner.name.middle } 
+      - "petitionersLastName3": ${ petitioner.name.last } 
+      - "petitionersSuffixJrSrIII3": ${ petitioner.name.suffix } 
+      - "howManyPetitions1": ${ previous_petitions == 0 } 
+      - "howManyPetitions2": ${ previous_petitions == 1 } 
+      - "howManyPetitions3": ${ previous_petitions == 2 } 
+      - "petitionersStreet": ${ petitioner.address.address } 
+      - "petitionersCity": ${ petitioner.address.zip } 
+      - "petitionersState": ${ petitioner.address.state } 
+      - "petitonersZip": ${ petitioner.address.city } 
+      - "petitionersPhone": ${ petitioner.phone_number } 
+      - "petitonersEmail": ${ petitioner.email } 
+      - "petitionersSsnLastFour": ${ petitioner.ssn } 
+      - "petitionerOverEighteenOrNot1": ${ petitioner.birthdate.plus(years=18) < today() } 
+      - "petitionerOverEighteenOrNot2": ${ petitioner.birthdate.plus(years=18) >= today()  } 
+      - "petitonersCountryOfResidenceName": ${ petitioner.address.country if petitioner.address.country != "US" else "" } 
+      - "petitionersCountryOfResidence1": ${ petitioner.address.country == "US" } 
+      - "petitionersCountryOfResidence2": ${ petitioner.address.country != "US" } 
+      - "petitionersStateOfResidenceName": ${ state_name(petitioner.address.state) if petitioner.address.state != "MO" else "" } 
+      - "petitionersStateOfResidence1": ${ petitioner.address.state == "MO" } 
+      - "petitionersStateOfResidence2": ${ petitioner.address.state != "MO" } 
+      - "petitionerStateOfResidenceYears": ${ petitioner.mo_length_of_residence_years } 
+      - "petitionerStateOfResidenceMonths": ${ petitioner.mo_length_of_residence_months } 
+      - "petitonerStateOfResidenceDays": ${ petitioner.mo_length_of_residence_days } 
+      - "petitionersCountyOfResidenceName": ${ petitioner.address.county } 
+      - "petitionersCountyOfResidenceYears": ${ petitioner.county_length_of_residence_years } 
+      - "petitionersCountyOfResidenceMonths": ${ petitioner.county_length_of_residence_months } 
+      - "petitionersCountyOfResidenceDays": ${ petitioner.county_length_of_residence_days } 
+      - "petitionersEmploymentStatus1": ${ len(petitioner.jobs) > 0 } 
+      - "petitionersEmploymentStatus2": ${ len(petitioner.jobs) == 0 and not petitioner.has_self_employment_income } 
+      - "petitionersEmploymentStatus3": ${ len(petitioner.jobs) == 0 and petitioner.has_self_employment_income } 
+      - "petitionerEmployedOrSelfEmployed": ${ showifdef('petitioner.employer.name.text', showifdef('petitioner.self_employment_description'))  } 
+      - "petitionersEmploymentStreet": ${ petitioner.employer.address.address } 
+      - "petitionersEmploymentCity": ${ petitioner.employer.address.zip } 
+      - "petitionersEmploymentState": ${ petitioner.employer.address.city } 
+      - "petitionersEmploymentZip": ${ petitioner.employer.address.state } 
+      - "petitionersMonthlyGrossIncome": ${ round(petitioner.monthly_gross_income,2) } 
+      - "petitionerSupportYourself1": ${ petitioner.self_supporting } 
+      - "petitionerSupportYourself2": ${ not petitioner.self_supporting } 
+      - "respondentsFirstName3": ${ respondent.name.first } 
+      - "respondentsLastName3": ${ respondent.name.last } 
+      - "respondentsMiddleName3": ${ respondent.name.middle } 
+      - "respondentsSuffixJrSrIII3": ${ respondent.name.suffix } 
+      - "respondentsStreet": ${ respondent.address.address } 
+      - "respondentsCity": ${ respondent.address.zip } 
+      - "respondentsState": ${ respondent.address.state } 
+      - "respondentsZip": ${ respondent.address.city } 
+      - "respondentsPhone": ${ respondent.email } 
+      - "respondentsEmail": ${ respondent.phone_number } 
+      - "respondentsSsnLast4": ${ respondent.ssn } 
+      - "respondentOverEighteenOrNot1": ${ respondent.birthdate.plus(years=18) < today() } 
+      - "respondentOverEighteenOrNot2": ${ respondent.birthdate.plus(years=18) >= today()  } 
+      - "respondentsCountryOfResidenceName": ${ respondent.address.country if respondent.address.country != "US" else "" } 
+      - "respondentsCountryOfResidence1": ${ respondent.address.country == "US" } 
+      - "respondentsCountryOfResidence2": ${ respondent.address.country != "US" } 
+      - "respondentsStateOfResidenceName": ${ respondent.address.state if respondent.address.state != "MO" else "" } 
+      - "respondentsStateOfResidence1": ${ respondent.address.state == "MO" } 
+      - "respondentsStateOfResidence2": ${ respondent.address.state != "MO" } 
+      - "respondentsStateOfResidenceYears": ${ respondent.mo_length_of_residence_years } 
+      - "respondentsStateOfResidenceMonths": ${ respondent.mo_length_of_residence_months } 
+      - "respondentsStateOfResidenceDays": ${ respondent.mo_length_of_residence_days } 
+      - "respondentsCountyOfResidenceName": ${ respondent.address.county } 
+      - "respondentsCountyOfResidenceYears": ${ respondent.county_length_of_residence_years } 
+      - "respondentsCountyOfResidenceMonths": ${ respondent.county_length_of_residence_months } 
+      - "respondentsCountyOfResidenceDays": ${ respondent.county_length_of_residence_days } 
+      - "didCoupleLiveInMissouri1": ${ marriage.live_together_in_mo } 
+      - "didCoupleLiveInMissouri2": ${ not marriage.live_together_in_mo } 
+      - "didCoupleLiveInMissouri3": ${ other_parties[0].address.state == "MO" } 
+      - "respondentsEmploymentStatus1": ${ len(respondent.jobs) > 0 } 
+      - "respondentsEmploymentStatus2": ${ len(respondent.jobs) == 0 and not respondent.has_self_employment_income } 
+      - "respondentsEmploymentStatus3": ${ len(respondent.jobs) == 0 and respondent.has_self_employment_income } 
+      - "respondentsEmploymentStatus4": ${ respondent.jobs.there_are_any == None and respondent.has_self_employment_income == None } 
+      - "respondentEmployedOrSelfEmployed": ${ showifdef('respondent.employer.name.text', showifdef('respondent.self_employment_description')) } 
+      - "respondentsEmploymentStreet": ${ respondent.employer.address.address } 
+      - "respondentsEmploymentState": ${ respondent.employer.address.zip } 
+      - "respondentsEmploymentCity": ${ respondent.employer.address.city } 
+      - "respondentsEmploymentZip": ${ respondent.employer.address.state } 
+      - "respondentsMonthlyGrossIncome": ${ round(respondent.monthly_gross_income,2) } 
+      - "respondentSupportThemselves1": ${ respondent.self_supporting } 
+      - "respondentSupportThemselves2": ${ not respondent.self_supporting } 
+      - "respondentSupportThemselves3": ${ respondent.self_supporting == None } 
+      - "respondentActiveDuty1": ${ respondent.active_duty } 
+      - "respondentActiveDuty2": ${ not respondent.active_duty } 
+      - "dateOfMarriage": ${ marriage.recorded_date } 
+      - "locationMarriageLicenseState": ${ marriage.address.state } 
+      - "locationMarriageLicenseCounty": ${ marriage.address.county } 
+      - "locationMarriageLicense1": ${ marriage.address.country == "US" } 
+      - "locationMarriageLicense2": ${ marriage.address.country != "US" } 
+      - "locationMarriageLicenseCountry": ${ marriage.address.country if marriage.address.country != "US" else ""  } 
+      - "dateOfSeparation": ${ marriage.separation_date } 
+      - "canMarriageBePreserved1": ${ marriage.can_be_preserved } 
+      - "canMarriageBePreserved2": ${ not marriage.can_be_preserved } 
+      - "isMarriageIrretrievablyBroken1": ${ marriage.is_broken } 
+      - "isMarriageIrretrievablyBroken2": ${ not marriage.is_broken } 
+      - "yesImPregnant": ${ False } 
+      - "yesSpouseIsPregnant": ${ False } 
+      - "noNeitherPregnant": ${ True } 
+      - "numberOfChildrenAfterMarriageDate": ${  len([child for child in children if child.birthdate > marriage.recorded_date]) } 
+      - "numberOfChildrenAdopted": ${ len([child for child in children if child.adopted == True]) } 
+      - "numberOfChildrenTogetherBeforeDateOfMarriage": ${ len([child for child in children if child.birthdate > marriage.recorded_date]) } 
+      - "numberOfChildrenBornToYouAndSomeoneOtherThanSpouseDuringMarriage": ${ 0 } 
+      - "numberOfChildrenBornToSpouseWithSomeoneElseDuringMarriage": ${ 0 } 
+      - "totalNumberOfChildren": ${ len(children) } 
+      - "childOneFirstName": ${ children[0].name.first } 
+      - "childOneMiddleName": ${ children[0].name.middle } 
+      - "childOneLastName": ${ children[0].name.last } 
+      - "childOneSuffixJrSrIII": ${ children[0].name.suffix } 
+      - "childOneSsnLastFour": ${ "{:.0f}".format(children[0].ssn) } 
+      - "childOneStreet": ${ children[0].address.line_one() } 
+      - "childOneCity": ${ children[0].address.city } 
+      - "childOneState": ${ children[0].address.state } 
+      - "childOneZip": ${ children[0].address.zip } 
+      - "childOneAge": ${ "round(date_difference(as_datetime(children[0].birthdate),today()).years,0)" } 
+      - "childOneMarriedOrNot": ${ children[0].special_factors['married'] } 
+      - "childOneActiveDutyOrNot": ${ children[0].special_factors['active_duty'] } 
+      - "childOneSelfSupportingOrNot": ${ children[0].special_factors['self_supporting'] } 
+      - "childOneAttendingHighSchoolOrNot": ${ children[0].special_factors['high_school'] } 
+      - "childOneAttendingCollegeOrVocSchool": ${ children[0].special_factors['college'] } 
+      - "childOneLivedWithFirstName": ${ children[0].lived_with[0].name.first } 
+      - "childOneLivedWithMiddleName": ${ children[0].lived_with[0].name.middle } 
+      - "childOneLivedWithLastName": ${ children[0].lived_with[0].name.last } 
+      - "childOneLivedWithSuffix": ${ children[0].lived_with[0].name.suffix } 
+      - "childOneLegalCustody1": ${ children[0].legal_custody == users[0].name.full() } 
+      - "childOneLegalCustody2": ${ children[0].legal_custody == other_parties[0].name.full() } 
+      - "childOneLegalCustody3": ${ children[0].legal_custody == "Joint" } 
+      - "childOneLegalCustody4": ${ children[0].legal_custody == "Other" } 
+      - "childOneLegalCustodyOtherPersonFirstName": ${ children[0].legal_custody_other[0].name.middle } 
+      - "childOneLegalCustodyOtherPersonMiddleName": ${ children[0].legal_custody_other[0].name.suffix } 
+      - "childOneLegalCustodyOtherPersonLastName": ${ children[0].legal_custody_other[0].name.first } 
+      - "childOneLegalCustodyOtherPersonSuffix": ${ children[0].legal_custody_other[0].name.last } 
+      - "childOnePhysicalCustody1": ${ children[0].physical_custody == users[0].name.full() } 
+      - "childOnePhysicalCustody2": ${ children[0].physical_custody == other_parties[0].name.full() } 
+      - "childOnePhysicalCustody3": ${ children[0].physical_custody == "Joint" } 
+      - "childOnePhysicalCustody4": ${ children[0].physical_custody == "Other" } 
+      - "childOnePhysicalCustodyOtherPersonMiddleName": ${ children[0].physical_custody_other[0].name.middle } 
+      - "childOnePhysicalCustodyOtherPersonLastName": ${ children[0].physical_custody_other[0].name.suffix } 
+      - "childOnePhysicalCustodySuffix": ${ children[0].physical_custody_other[0].name.last } 
+      - "childOnePhysicalCustodyOtherPersonFirstName": ${ children[0].physical_custody_other[0].name.first } 
+      - "childOneParentsMe": ${ children[0].parents[users[0].name.full()] } 
+      - "childOneParentsMySpouse": ${ children[0].parents[other_parties[0].name.full()] } 
+      - "childOneParentsOtherPerson": ${ children[0].parents['Other'] } 
+      - "childOneParentsOtherPersonFirstName": ${ children[0].parent_other[0].name.middle } 
+      - "childOneParentsOtherPersonMiddleName": ${ children[0].parent_other[0].name.suffix } 
+      - "childOneParentsOtherPersonLastName": ${ children[0].parent_other[0].name.first } 
+      - "childOneParentsOtherPersonSuffix": ${ children[0].parent_other[0].name.last } 
+      - "childOneBirthCertMe": ${ children[0].birth_certificate[users[0].name.full()] } 
+      - "childOneBirthCertSpouse": ${ children[0].birth_certificate[other_parties[0].name.full()] } 
+      - "childOneBirthCertOtherPerson": ${ children[0].birth_certificate['Other'] } 
+      - "childOneBirthCertOtherPersonFirstName": ${ children[0].birth_certificate_other[0].name.last } 
+      - "childOneBirthCertOtherPersonMiddleName": ${ children[0].birth_certificate_other[0].name.first } 
+      - "childOneBirthCertOtherPersonLastName": ${ children[0].birth_certificate_other[0].name.middle } 
+      - "childOneBirthCertOtherPersonSuffix": ${ children[0].birth_certificate_other[0].name.suffix } 
+      - "childTwoFirstName": ${ children[1].name.first } 
+      - "childTwoMiddleName": ${ children[1].name.middle } 
+      - "childTwoLastName": ${ children[1].name.last } 
+      - "childTwoSuffixJrSrIII": ${ children[1].name.suffix } 
+      - "childTwoSsnLastFour": ${ "{:.0f}".format(children[1].ssn) } 
+      - "childTwoStreet": ${ children[1].address.line_one() } 
+      - "childTwoCity": ${ children[1].address.city } 
+      - "childTwoState": ${ children[1].address.state } 
+      - "childTwoZip": ${ children[1].address.zip } 
+      - "childTwoAge": ${ "round(date_difference(as_datetime(children[1].birthdate),today()).years,0)" } 
+      - "childTwoMarriedOrNot": ${ children[1].special_factors['married'] } 
+      - "childTwoActiveDutyOrNot": ${ children[1].special_factors['active_duty'] } 
+      - "childTwoSelfSupportingOrNot": ${ children[1].special_factors['self_supporting'] } 
+      - "childTwoAttendingHighSchoolOrNot": ${ children[1].special_factors['high_school'] } 
+      - "childTwoAttendingCollegeOrVocSchool": ${ children[1].special_factors['college'] } 
+      - "childTwoLivedWithFirstName": ${ children[1].lived_with[0].name.first } 
+      - "childTwoLivedWithMiddleName": ${ children[1].lived_with[0].name.middle } 
+      - "childTwoLivedWithLastName": ${ children[1].lived_with[0].name.last } 
+      - "childTwoLivedWithSuffix": ${ children[1].lived_with[0].name.suffix } 
+      - "childTwoLegalCustody1": ${ children[1].legal_custody == users[0].name.full() } 
+      - "childTwoLegalCustody2": ${ children[1].legal_custody == other_parties[0].name.full() } 
+      - "childTwoLegalCustody3": ${ children[1].legal_custody == "Joint" } 
+      - "childTwoLegalCustody4": ${ children[1].legal_custody == "Other" } 
+      - "childTwoLegalCustodyOtherPersonMiddleName": ${ children[1].legal_custody_other[0].name.middle } 
+      - "childTwoLegalCustodyOtherPersonSuffix": ${ children[1].legal_custody_other[0].name.suffix } 
+      - "childTwoLegalCustodyOtherPersonFirstName": ${ children[1].legal_custody_other[0].name.first } 
+      - "childTwoLegalCustodyOtherPersonLastName": ${ children[1].legal_custody_other[0].name.last } 
+      - "childTwoPhysicalCustody1": ${ children[1].physical_custody == users[0].name.full() } 
+      - "childTwoPhysicalCustody2": ${ children[1].physical_custody == other_parties[0].name.full() } 
+      - "childTwoPhysicalCustody3": ${ children[1].physical_custody == "Joint" } 
+      - "childTwoPhysicalCustody4": ${ children[1].physical_custody == "Other" } 
+      - "childTwoPhysicalCustodyOtherPersonFirstName": ${ children[1].physical_custody_other[0].name.middle } 
+      - "childTwoPhysicalCustodyOtherPersonMiddleName": ${ children[1].physical_custody_other[0].name.suffix } 
+      - "childTwoPhysicalCustodyOtherPersonLastName": ${ children[1].physical_custody_other[0].name.last } 
+      - "childTwoPhysicalCustodyOtherPersonSuffix": ${ children[1].physical_custody_other[0].name.first } 
+      - "childTwoParentsMe": ${ children[1].parents[users[0].name.full()] } 
+      - "childTwoParentsMySpouse": ${ children[1].parents[other_parties[0].name.full()] } 
+      - "childTwoParentsOtherPerson": ${ children[1].parents['Other'] } 
+      - "childTwoParentsOtherPersonFirstName": ${ children[1].parent_other[0].name.middle } 
+      - "childTwoParentsOtherPersonMiddleName": ${ children[1].parent_other[0].name.suffix } 
+      - "childTwoParentsOtherPersonLastName": ${ children[1].parent_other[0].name.first } 
+      - "childTwoParentsOtherPersonSuffix": ${ children[1].parent_other[0].name.last } 
+      - "childTwoBirthCertMe": ${ children[1].birth_certificate[users[0].name.full()] } 
+      - "childTwoBirthCertSpouse": ${ children[1].birth_certificate[other_parties[0].name.full()] } 
+      - "childTwoBirthCertOtherPerson": ${ children[1].birth_certificate['Other'] } 
+      - "childTwoBirthCertOtherPersonFirstName": ${ children[1].birth_certificate_other[0].name.last } 
+      - "childTwoBirthCertOtherPersonLastName": ${ children[1].birth_certificate_other[0].name.first } 
+      - "childTwoBirthCertOtherPersonMiddleName": ${ children[1].birth_certificate_other[0].name.middle } 
+      - "childTwoBirthCertOtherPersonSuffix": ${ children[1].birth_certificate_other[0].name.suffix } 
+      - "childThreeFirstName": ${ children[2].name.first } 
+      - "childThreeMiddleName": ${ children[2].name.middle } 
+      - "childThreeLastName": ${ children[2].name.last } 
+      - "childThreeSuffixJrSrIII": ${ children[2].name.suffix } 
+      - "childThreeSsnLastFour": ${ "{:.0f}".format(children[2].ssn) } 
+      - "childThreeStreet": ${ children[2].address.line_one() } 
+      - "childThreeCity": ${ children[2].address.city } 
+      - "childThreeState": ${ children[2].address.state } 
+      - "childThreeZip": ${ children[2].address.zip } 
+      - "childThreeAge": ${ "round(date_difference(as_datetime(children[2].birthdate),today()).years,0)" } 
+      - "childThreeMarriedOrNot": ${ children[2].special_factors['married'] } 
+      - "childThreeActiveDutyOrNot": ${ children[2].special_factors['active_duty'] } 
+      - "childThreeSelfSupportingOrNot": ${ children[2].special_factors['self_supporting'] } 
+      - "childThreeAttendingHighSchoolOrNot": ${ children[2].special_factors['high_school'] } 
+      - "childThreeAttendingCollegeOrVocSchool": ${ children[2].special_factors['college'] } 
+      - "childThreeLivedWithFirstName": ${ children[2].lived_with[0].name.first } 
+      - "childThreeLivedWithMiddleName": ${ children[2].lived_with[0].name.middle } 
+      - "childThreeLivedWithLastName": ${ children[2].lived_with[0].name.last } 
+      - "childThreeLivedWithSuffix": ${ children[2].lived_with[0].name.suffix } 
+      - "childThreeLegalCustody1": ${ children[2].legal_custody == users[0].name.full() } 
+      - "childThreeLegalCustody2": ${ children[2].legal_custody == other_parties[0].name.full() } 
+      - "childThreeLegalCustody3": ${ children[2].legal_custody == "Joint" } 
+      - "childThreeLegalCustody4": ${ children[2].legal_custody == "Other" } 
+      - "childThreeLegalCustodyOtherPersonFirstName": ${ children[2].legal_custody_other[0].name.first } 
+      - "childThreeLegalCustodyOtherPersonMiddleName": ${ children[2].legal_custody_other[0].name.middle } 
+      - "childThreeLegalCustodyOtherPersonLastName": ${ children[2].legal_custody_other[0].name.last } 
+      - "childThreeLegalCustodyOtherPersonSuffix": ${ children[2].legal_custody_other[0].name.suffix } 
+      - "childThreePhysicalCustody1": ${ children[2].physical_custody == users[0].name.full() } 
+      - "childThreePhysicalCustody2": ${ children[2].physical_custody == other_parties[0].name.full() } 
+      - "childThreePhysicalCustody3": ${ children[2].physical_custody == "Joint" } 
+      - "childThreePhysicalCustody4": ${ children[2].physical_custody == "Other" } 
+      - "childThreePhysicalCustodyOtherPersonMiddleName": ${ children[2].physical_custody_other[0].name.middle } 
+      - "childThreePhysicalCustodyOtherPersonLastName": ${ children[2].physical_custody_other[0].name.last } 
+      - "childThreePhysicalCustodyOtherPersonSuffix": ${ children[2].physical_custody_other[0].name.suffix } 
+      - "childThreePhysicalCustodyOtherPersonFirstName": ${ children[2].physical_custody_other[0].name.first } 
+      - "childThreeParentsMe": ${ children[2].parents[users[0].name.full()] } 
+      - "childThreeParentsMySpouse": ${ children[2].parents[other_parties[0].name.full()] } 
+      - "childThreeParentsOtherPerson": ${ children[2].parents['Other'] } 
+      - "childThreeParentsOtherPersonFirstName": ${ children[2].parent_other[0].name.first } 
+      - "childThreeParentsOtherPersonMiddleName": ${ children[2].parent_other[0].name.middle } 
+      - "childThreeParentsOtherPersonLastName": ${ children[2].parent_other[0].name.last } 
+      - "childThreeParentsOtherPersonSuffix": ${ children[2].parent_other[0].name.suffix } 
+      - "childThreeBirthCertMe": ${ children[2].birth_certificate[users[0].name.full()] } 
+      - "childThreeBirthCertSpouse": ${ children[2].birth_certificate[other_parties[0].name.full()] } 
+      - "childThreeBirthCertOtherPerson": ${ children[2].birth_certificate['Other'] } 
+      - "childThreeBirthCertOtherPersonFirstName": ${ children[2].birth_certificate_other[0].name.first } 
+      - "childThreeBirthCertOtherPersonMiddleName": ${ children[2].birth_certificate_other[0].name.middle } 
+      - "childThreeBirthCertOtherPersonLastName": ${ children[2].birth_certificate_other[0].name.last } 
+      - "childThreeBirthCertOtherPersonSuffix": ${ children[2].birth_certificate_other[0].name.suffix } 
+      - "childFourMiddleName": ${ children[3].name.middle } 
+      - "childFourFirstName": ${ children[3].name.first } 
+      - "childFourLastName": ${ children[3].name.last } 
+      - "childFourSuffixJrSrIII": ${ children[3].name.suffix } 
+      - "childFourSsnLastFour": ${ "{:.0f}".format(children[3].ssn) } 
+      - "childFourStreet": ${ children[3].address.line_one() } 
+      - "childFourCity": ${ children[3].address.city } 
+      - "childFourState": ${ children[3].address.state } 
+      - "childFourZip": ${ children[3].address.zip } 
+      - "childFourAge": ${ "round(date_difference(as_datetime(children[3].birthdate),today()).years,0)" } 
+      - "childFourMarriedOrNot": ${ children[3].special_factors['married'] } 
+      - "childFourActiveDutyOrNot": ${ children[3].special_factors['active_duty'] } 
+      - "childFourSelfSupportingOrNot": ${ children[3].special_factors['self_supporting'] } 
+      - "childFourAttendingHighSchoolOrNot": ${ children[3].special_factors['high_school'] } 
+      - "childFourAttendingCollegeOrVocSchool": ${ children[3].special_factors['college'] } 
+      - "childFourLivedWithFirstName": ${ children[3].lived_with[0].name.first } 
+      - "childFourLivedWithMiddleName": ${ children[3].lived_with[0].name.middle } 
+      - "childFourLivedWithLastName": ${ children[3].lived_with[0].name.last } 
+      - "childFourLivedWithSuffix": ${ children[3].lived_with[0].name.suffix } 
+      - "childFourLegalCustody1": ${ children[3].legal_custody == users[0].name.full() } 
+      - "childFourLegalCustody2": ${ children[3].legal_custody == other_parties[0].name.full() } 
+      - "childFourLegalCustody3": ${ children[3].legal_custody == "Joint" } 
+      - "childFourLegalCustody4": ${ children[3].legal_custody == "Other" } 
+      - "childFourLegalCustodyOtherPersonFirstName": ${ children[3].legal_custody_other[0].name.first } 
+      - "childFourLegalCustodyOtherPersonMiddleName": ${ children[3].legal_custody_other[0].name.middle } 
+      - "childFourLegalCustodyOtherPersonLastName": ${ children[3].legal_custody_other[0].name.last } 
+      - "childFourLegalCustodyOtherPersonSuffix": ${ children[3].legal_custody_other[0].name.suffix } 
+      - "childFourPhysicalCustody1": ${ children[3].physical_custody == users[0].name.full() } 
+      - "childFourPhysicalCustody2": ${ children[3].physical_custody == other_parties[0].name.full() } 
+      - "childFourPhysicalCustody3": ${ children[3].physical_custody == "Joint" } 
+      - "childFourPhysicalCustody4": ${ children[3].physical_custody == "Other" } 
+      - "childFourPhysicalCustodyOtherPersonMiddleName": ${ children[3].physical_custody_other[0].name.middle } 
+      - "childFourPhysicalCustodyOtherPersonLastName": ${ children[3].physical_custody_other[0].name.last } 
+      - "childFourPhysicalCustodyOtherPersonSuffix": ${ children[3].physical_custody_other[0].name.suffix } 
+      - "childFourPhysicalCustodyOtherPersonFirstName": ${ children[3].physical_custody_other[0].name.first } 
+      - "childFourParentsMe": ${ children[3].parents[users[0].name.full()] } 
+      - "childFourParentsMySpouse": ${ children[3].parents[other_parties[0].name.full()] } 
+      - "childFourParentsOtherPerson": ${ children[3].parents['Other'] } 
+      - "childFourParentsOtherPersonFirstName": ${ children[3].parent_other[0].name.first } 
+      - "childFourParentsOtherPersonMiddleName": ${ children[3].parent_other[0].name.middle } 
+      - "childFourParentsOtherPersonLastName": ${ children[3].parent_other[0].name.last } 
+      - "childFourParentsOtherPersonSuffix": ${ children[3].parent_other[0].name.suffix } 
+      - "childFourBirthCertMe": ${ children[3].birth_certificate[users[0].name.full()] } 
+      - "childFourBirthCertSpouse": ${ children[3].birth_certificate[other_parties[0].name.full()] } 
+      - "childFourBirthCertOtherPerson": ${ children[3].birth_certificate['Other'] } 
+      - "childFourBirthCertOtherPersonFirstName": ${ children[3].birth_certificate_other[0].name.first } 
+      - "childFourBirthCertOtherPersonMiddleName": ${ children[3].birth_certificate_other[0].name.middle } 
+      - "childFourBirthCertOtherPersonLastName": ${ children[3].birth_certificate_other[0].name.last } 
+      - "childFourBirthCertOtherPersonSuffix": ${ children[3].birth_certificate_other[0].name.suffix } 
+      - "person1ChildrenLivedWithPast5YearsSuffix": ${ persons_lived_with[0].name.suffix } 
+      - "person1ChildrenLivedWithPast5YearsFirstName": ${ persons_lived_with[0].name.first } 
+      - "person1ChildrenLivedWithPast5YearsMiddleName": ${ persons_lived_with[0].name.middle } 
+      - "person1ChildrenLivedWithPast5YearsLastName": ${ persons_lived_with[0].name.last } 
+      - "person1ChildrenLivedWithPast5YearsStreet": ${ persons_lived_with[0].address.line_one() } 
+      - "person1ChildrenLivedWithPast5YearsCity": ${ persons_lived_with[0].address.city } 
+      - "person1ChildrenLivedWithPast5YearsState": ${ persons_lived_with[0].address.state } 
+      - "person1ChildrenLivedWithPast5YearsZip": ${ persons_lived_with[0].address.zip } 
+      - "person2ChildrenLivedWithPast5YearsFirstName": ${ persons_lived_with[1].name.first } 
+      - "person2ChildrenLivedWithPast5YearsMiddleName": ${ persons_lived_with[1].name.middle } 
+      - "person2ChildrenLivedWithPast5YearsLastName": ${ persons_lived_with[1].name.last } 
+      - "person2ChildrenLivedWithPast5YearsSuffix": ${ persons_lived_with[1].name.suffix } 
+      - "person2ChildrenLivedWithPast5YearsStreet": ${ persons_lived_with[1].address.line_one() } 
+      - "person2ChildrenLivedWithPast5YearsCity": ${ persons_lived_with[1].address.city } 
+      - "person2ChildrenLivedWithPast5YearsState": ${ persons_lived_with[1].address.state } 
+      - "person2ChildrenLivedWithPast5YearsZip": ${ persons_lived_with[1].address.zip } 
+      - "person3ChildrenLivedWithPast5YearsFirstName": ${ persons_lived_with[2].name.first } 
+      - "person3ChildrenLivedWithPast5YearsMiddleName": ${ persons_lived_with[2].name.middle } 
+      - "person3ChildrenLivedWithPast5YearsLastName": ${ persons_lived_with[2].name.last } 
+      - "person3ChildrenLivedWithPast5YearsSuffix": ${ persons_lived_with[2].name.suffix } 
+      - "person3ChildrenLivedWithPast5YearsStreet": ${ persons_lived_with[2].address.line_one() } 
+      - "person3ChildrenLivedWithPast5YearsZip": ${ persons_lived_with[2].address.zip } 
+      - "person3ChildrenLivedWithPast5YearsCity": ${ persons_lived_with[2].address.city } 
+      - "person3ChildrenLivedWithPast5YearsState": ${ persons_lived_with[2].address.state } 
+      - "doesAnyoneOtherThanYouOrSpouseHaveCustodyRights1": ${ others_with_physical_custody } 
+      - "doesAnyoneOtherThanYouOrSpouseHaveCustodyRights2": ${ not others_with_physical_custody } 
+      - "otherCustodyProceedingPending1": ${ other_custody_proceeding } 
+      - "otherCustodyProceedingPending2": ${ not other_custody_proceeding } 
+      - "participatedInOtherLitigationCustody1": ${ other_litigation } 
+      - "participatedInOtherLitigationCustody2": ${ not other_litigation } 
+      - "haveChildrenBeenVictimAbuseOrNeglect1": ${ abuse_or_neglect } 
+      - "haveChildrenBeenVictimAbuseOrNeglect2": ${ not abuse_or_neglect } 
+      - "explanationIfAnsweredYesToFortyThroughFortyThree": ${ comma_and_list([others_with_physical_custody_explanation, other_custody_proceeding_explanation, other_litigation_explanation, related_case_explanation, abuse_or_neglect_explanation]) } 
+      - "anyOrdersEnteredByFSD1": ${ family_support_order } 
+      - "anyOrdersEnteredByFSD2": ${ not family_support_order } 
+      - "areYouOrSpouseReceivingTanf1": ${ len(petitioner.benefits.matches(source=['tanf'])) > 0 or len(respondent.benefits.matches(source=['tanf'])) > 0 } 
+      - "areYouOrSpouseReceivingTanf2": ${ len(petitioner.benefits.matches(source=['tanf'])) == 0 and len(respondent.benefits.matches(source=['tanf'])) == 0 } 
+      - "otherAllegations": ${ other_allegations } 
+      - "requestReliefDissolution": ${ relief['dissolution'] } 
+      - "requestReliefCustody": ${ relief['custody'] } 
+      - "requestReliefSupportOfTheChildren": ${ relief['child_support'] } 
+      - "requestReliefDivideMaritalPropertyAndDebts": ${ relief['divide_property'] } 
+      - "requestReliefAwardMaintenanceToMe": ${ relief['maintenance_to_me'] } 
+      - "requestReliefAwardMaintenanceToSpouse": ${ relief['maintenance_to_spouse'] } 
+      - "requestReliefChangeName": ${ relief['change_name'] } 
+      - "requestReliefFormerFirstName": ${ users.prior_name.first } 
+      - "requestReliefFormerMiddleName": ${ users.prior_name.middle } 
+      - "requestReliefFormerLastName": ${ users.prior_name.last } 
+      - "requestReliefFormerSuffix": ${ users.prior_name.suffix } 
+      - "requestReliefOther": ${ relief['Other'] } 
+      - "requestReliefOtherRequests": ${ relief_other } 
+      - "serviceOnSpouse1": ${ service_type == "signed_response" } 
+      - "serviceOnSpouse2": ${ service_type == "at_home" } 
+      - "serviceOnSpouseStreet": ${ respondent.service_address.line_one() } 
+      - "serviceOnSpouseCity": ${ service.services_address.city } 
+      - "serviceOnSpouseZip": ${ service.service_address.zip } 
+      - "serviceOnSpouseState": ${ service.service_address.state } 
+      - "serviceOnSpouse3": ${ service_type == "at_employment" } 
+      - "serviceOnSpouseEmployersName": ${ respondent.employer.name.text } 
+      - "serviceOnSpouseHoursOfEmployment": ${ respondent.hours_of_employment } 
+      - "serviceOnSpouseEmployersStreet": ${ respondent.employer.address.line_one() } 
+      - "serviceOnSpouseEmployersCity": ${ respondent.employer.address.city } 
+      - "serviceOnSpouseEmployersZip": ${ respondent.employer.address.zip } 
+      - "serviceOnSpouseEmployersState": ${ respondent.employer.address.state } 
+      - "serviceOnSpouse4": ${ service_type == "registered_mail" } 
+      - "ifYouOrSpouseReceiveTanf": ${ len(petitioner.benefits.matches(source=['tanf'])) > 0 or len(respondent.benefits.matches(source=['tanf'])) > 0  } 
+      - "petitionersAttorneycCheckbox": ${ petitioner.attorney.assistance } 
+      - "petitionersAttorneysBarNumber": ${ petitioner.attorney.bar_number } 
+      - "petitionersAttorneyPrintName": ${ petitioner.attorney.name_full() } 
+      - "petitionersAttorneyStreet": ${ petitioner.attorney.address.line_one() } 
+      - "petitionersAttorneyCity": ${ petitioner.attorney.address.state } 
+      - "petitionersAttorneyState": ${ petitioner.attorney.address.city } 
+      - "petitionersAttorneyZip": ${ petitioner.attorney.address.zip } 
+      - "petitionersAttorneyPhone": ${ petitioner.attorney.phone_number } 
+      - "petitionersAttorneyFaxNumber": ${ petitioner.attorney.fax } 
+      - "petitionersAttorneyEmail": ${ petitioner.attorney.email } 
+---

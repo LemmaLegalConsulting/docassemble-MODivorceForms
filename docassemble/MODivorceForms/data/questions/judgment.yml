@@ -1,0 +1,285 @@
+---
+include:
+  - shared.yml
+---
+id: judgment order
+mandatory: True
+code: |
+  users[0].name.first
+  other_parties[0].name.first
+  petitioner.name.first
+  respondent.name.first
+  case.county
+  mo_divorce_forms_download
+---
+comment: |
+  Only need to complete caption - rest of 
+  
+  if users[0].has_prior_name:
+    users[0].prior_name.name.first
+  users[0].address.address
+  users[0].ssn
+  users[0].phone_number
+  users[0].attorney_involved
+  users[0].resident_for_90_days
+  other_parties[0].name.first
+  if other_parties[0].has_prior_name:
+    other_parties[0].prior_name.name.first
+  other_parties[0].address.address
+  other_parties[0].ssn
+  other_parties[0].phone_number
+  other_parties[0].attorney_involved
+  other_parties[0].resident_for_90_days
+  marriage.address.county
+  marriage.address.state
+  marriage.separation_date
+  children.gather()
+  case.county
+  if guardian_ad_litem.exists:
+    guardian_ad_litem.name.first
+    guardian_ad_litem.address
+    guardian_ad_litem.phone_number
+ 
+  petitioner.appears
+  respondent.appears
+  respondent.active_duty
+  if guardian_ad_litem.exists:
+    guardian_ad_litem.appears
+  third_party_appears
+  petitioner.submitted_cause
+  if legal_custody == "Sole":
+    legal_custody_sole_explanation
+  elif legal_custody == "Third Party":
+    legal_custody_other.name.first
+  if physical_custody == "Sole" and visitation:
+    visitation_supervisor.name.first
+  elif physical_custody == "Third Party":
+    physical_custody_other.name.first
+  if communications["third_party"]:
+    communications_other.name.first
+  child_custody_jurisdiction
+  child_support_additional_info
+  child_support_jurisdiction
+  legal_custody_jurisdiction_additional_info
+  if maintenance_to_petitioner == "ordered_to_pay":
+    maintenance_to_petitioner_amount
+    maintenance_to_petitioner_modifiable
+  if maintenance_to_respondent == "ordered_to_pay":
+    maintenance_to_respondent_amount
+    maintenance_to_respondent_modifiable
+  if maintenance_to_petitioner or maintenance_to_respondent: 
+    maintenance_income_withholding
+  separation_agreement
+  court_costs
+  other_orders_property.exists
+  other_orders.exists
+  attorney_fees
+  petitioner.name_change
+  respondent.name_change
+---
+id: Court Appearance
+question: Court Appearance
+generic object: ALIndividual
+fields:
+  - ${ x } will make an appearance: x.appears
+    datatype: yesnoradio
+  - Will ${ x } appear with an attorney?: x.appears_with_attorney
+    datatype: yesnoradio
+    show if: x.appears
+  - ${ x } submits an affidavit: x.submitted_cause
+    datatype: yesnoradio
+---
+id: guardian ad litem court appearance
+question: Guardian ad litem
+fields:
+  - ${ guardian_ad_litem }, Guardian ad Litem, appears in person: guardian_ad_litem.appears
+    datatype: yesnoradio
+---
+id: third party object
+objects:
+  - third_party: ALIndividual
+---
+id: guardian ad litem court appearance
+question: Third Party
+fields:
+  - Another person will make an appearance: third_party_appears
+    datatype: yesnoradio
+  - Third party first name: third_party.name.first
+    show if: third_party_appears
+  - Third party middle name: third_party.name.middle
+    show if: third_party_appears
+    required: False
+  - Third party last name: third_party.name.last
+    show if: third_party_appears
+  - Third party suffix: third_party.name.suffix
+    show if: third_party_appears
+    required: False
+  - Will this person appear with an attorney?: third_party_appears_with_attorney
+    datatype: yesnoradio
+    show if: third_party_appears
+---
+id: personal_jurisdiction
+question: Personal Juridisdiction
+fields:
+  - Does the court have personal jurisdiction over ${ respondent }?: personal_jurisdiction_over_respondent
+    datatype: yesnoradio
+---
+id: child custody jurisdiction
+question: Jurisdiction over child custody
+fields: 
+  - Does the court have jurisdiction over the custody arrangements?: child_custody_jurisdiction
+    datatype: yesnoradio
+  - Additional information about child custody jurisdiction: legal_custody_jurisdiction_additional_info
+    datatype: area
+    show if: child_custody_jurisdiction
+---
+id: child support jurisdiction
+question: Jurisdiction over child support
+fields:
+  - Does the court have jurisdiction over child support?: child_support_jurisdiction
+    datatype: yesnoradio
+  - Additional information about child support jurisdiction: child_support_additional_info
+    datatype: area
+    show if: child_support_jurisdiction
+---
+id: attorney fees
+question: Attorney's Fees
+fields:
+  - Who should be awarded attorney's fees from the other party?: attorney_fees
+    datatype: radio
+    choices:
+      - Neither party: neither
+      - ${ petitioner }: petitioner
+      - ${ respondent }: respondent
+  - How much should ${ petitioner } pay ${ respondent.attorney if respondent.attorney_involved else respondent }?: attorney_fees_respondent
+    datatype: currency
+    show if:
+      variable: attorney_fees
+      is: respondent
+  - How much should ${ respondent } pay ${ petitioner.attorney if petitioner.attorney_involved else petitioner }?: attorney_fees_petitioner
+    datatype: currency
+    show if:
+      variable: attorney_fees
+      is: petitioner
+---
+id: court costs
+question: Court Costs
+fields:
+  - Should court costs be waived?: court_costs
+    datatype: yesnoradio
+---
+comment: |
+  parenting_plan_A.exhibit_number
+  parenting_plan_B.exhibit_number
+
+
+---
+id: name change
+generic object: ALIndividual
+question: Does ${ x } want to restore their former name?
+fields:
+  - no label: x.name_change
+    datatype: yesnoradio
+---
+id: former name
+generic object: ALIndividual
+question: What is ${ possessify(x,'former name') }?
+fields:
+  - code: |
+      x.prior_name.name_fields()
+---
+id: guardian ad litem object
+objects:
+  - guardian_ad_litem: ALIndividual
+---
+id: additional information about the guardian ad litem
+question: Additional information about the Guardian ad Litem
+fields:
+  - note: |
+      guardian_ad_litem.address_fields()
+  - Phone: guardian_ad_litem.phone
+    datatype: phone
+    required: False
+---
+id: is there a guardian_ad_litem?
+question: Is there a Guardian ad Litem?
+fields:
+  - no label: guardian_ad_litem.exists
+    datatype: yesnoradio
+---
+id: separation_agreement
+question: Separation Agreement
+fields:
+  - Have the parties entered into a separation agreement for marital and non-marital property and debt: separation_agreement
+    datatype: yesnoradio
+---
+id: other orders property object
+objects:
+  - other_orders_property: Thing
+---
+question: Other orders concerning property and debt
+fields:
+  - Do other orders exist?: other_orders_property.exists
+    datatype: yesnoradio
+  - Which party should be ordered to pay the other party?: other_orders_property.paying_party
+    show if:
+      variable: other_orders_property.exists
+      is: True
+    choices:
+      - ${ users[0].name.full() }
+      - ${ other_parties[0].name.full() }
+  - Amount: other_orders_property.amount
+    datatype: currency
+    show if:
+      variable: other_orders_property.exists
+      is: True
+  - Reason: other_orders_property.reason
+    show if:
+      variable: other_orders_property.exists
+      is: True
+validation code: |
+  if other_orders_property.paying_party == users[0].name.full():
+    other_orders_property.receiving_party = other_parties[0].name.full()
+  else:
+    other_orders_property.receiving_party = users[0].name.full()
+---
+id: other orders object
+objects:
+  - other_orders: Thing
+---
+question: Other orders
+fields:
+  - Do other orders exist?: other_orders.exists
+    datatype: yesnoradio
+---
+id: Judgment and Decree of Dissolution of Marriage object
+objects:
+  - judgment_attachment: ALDocument.using(title="Judgment and Decree of Dissolution of Marriage", filename="judgment", has_addendum=False, )
+---
+id: Judgment and Decree of Dissolution of Marriage enabled
+code: |
+  judgment_attachment.enabled = True
+---
+# Should be only used in interviews run from judgment.yml, in an interview from main, the version from shared.yml will be lower because the block including judgment.yml is above it
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, judgment_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[judgment_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+---
+id: Judgment and Decree of Dissolution of Marriage attachment
+attachment:
+  name: Judgment and Decree of Dissolution of Marriage
+  filename: judgment
+  variable name: judgment_attachment[i]
+  skip undefined: True
+  pdf template file: judgment.pdf
+  fields:
+      - "case_county": ${ case.county } 
+      - "petitioner_name_first": ${ petitioner.name.first } 
+      - "petitioner_name_middle": ${ petitioner.name.middle } 
+      - "petitioner_name_last": ${ petitioner.name.last } 
+      - "petitioner_name_suffix": ${ petitioner.name.suffix } 
+      - "respondent_name_first": ${ respondent.name.first } 
+      - "respondent_name_middle": ${ respondent.name.middle } 
+      - "respondent_name_last": ${ respondent.name.last } 
+      - "respondent_name_suffix": ${ respondent.name.suffix } 
+---

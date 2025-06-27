@@ -44,7 +44,7 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
     return out
 
 setup(name='docassemble.MODivorceForms',
-      version='0.1',
+      version='0.2',
       description=(''),
       long_description='# docassemble-MODivorceForms',
       long_description_content_type='text/markdown',
@@ -53,7 +53,7 @@ setup(name='docassemble.MODivorceForms',
       license='',
       url='https://docassemble.org',
       packages=find_namespace_packages(),
-      install_requires=['docassemble.AssemblyLine>=3.2.0'],
+      install_requires=['docassemble.AssemblyLine>=3.4.0'],
       zip_safe=False,
       package_data=find_package_data(where='docassemble/MODivorceForms/', package='docassemble.MODivorceForms'),
      )

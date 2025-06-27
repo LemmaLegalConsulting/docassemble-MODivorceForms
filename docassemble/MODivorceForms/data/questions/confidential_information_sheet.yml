@@ -1,0 +1,246 @@
+include:
+  - shared.yml
+---
+id: confidential information sheet order
+mandatory: True
+code: |
+  users[0].name.first
+  other_parties[0].name.first
+  petitioner.party_type_description
+  petitioner.attorney.party_type_code
+  petitioner.gender
+  petitioner.party_type_code
+  respondent.gender
+  respondent.party_type_code
+  respondent.party_type_description
+  respondent.attorney.party_type_code
+  users[0].employer.email
+  mo_divorce_forms_download
+---
+generic object: ALIndividual
+question: Email for ${ x.employer.name.text }
+fields:
+  - Email: x.employer.email
+    datatype: email
+---
+id: party type information
+generic object: ALIndividual
+question: Party information about ${ x.name_full() }
+fields:
+  - Party type code: x.party_type_code
+    required: False
+  - Party type description: x.party_type_description
+    required: False
+---
+objects:
+  - confidential_information_sheet_attachment: ALDocument.using(title="Confidential Case Filing Information Sheet - Domestic Relations Cases", filename="confidential_information_sheet",  has_addendum=False, )
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, confidential_information_sheet_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[confidential_information_sheet_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+---
+code: |
+  confidential_information_sheet_attachment.enabled = True
+---
+attachment:
+  name: Confidential Case Filing Information Sheet - Domestic Relations Cases
+  filename: confidential_information_sheet
+  variable name: confidential_information_sheet_attachment[i]
+  skip undefined: True
+  pdf template file: confidential_information_sheet.pdf
+  fields:
+    - "case_filing_date": ${ case.filing_date } 
+    - "case_county": ${ case.county } 
+    - "case_unredacted_doc_attached": ${ case.unredacted_doc_attached } 
+    - "case_case_name": ${ case.case_name } 
+    - "case_type_code": ${ case.type_code } 
+    - "case_type_description": ${ case.type_description } 
+    - "petitioner_party_type_code": ${ petitioner.party_type_code } 
+    - "petitioner_party_type_description": ${ petitioner.party_type_description } 
+    - "petitioner_name_first": ${ petitioner.name.first } 
+    - "petitioner_name_last": ${ petitioner.name.last } 
+    - "petitioner_name_middle": ${ petitioner.name.middle } 
+    - "petitioner_address_on_one_line()": ${ petitioner.address.on_one_line() } 
+    - "petitioner_address_city": ${ petitioner.address.city } 
+    - "petitioner_address_state": ${ petitioner.address.state } 
+    - "petitioner_address_zip": ${ petitioner.address.zip } 
+    - "petitioner_phone": ${ petitioner.phone } 
+    - "petitioner_email": ${ petitioner.email } 
+    - "petitioner_gender_female": ${ petitioner.gender == "female" } 
+    - "petitioner_gender_male": ${ petitioner.gender == "male" } 
+    - "petitioner_birthdate": ${ petitioner.birthdate } 
+    - "petitioner_ssn": ${ petitioner.ssn } 
+    - "petitioner_attorney": ${ petitioner.attorney } 
+    - "petitioner_attorney_bar_number": ${ petitioner.attorney.bar_number } 
+    - "petitioner_attorney_party_type_code": ${ petitioner.attorney.party_type_code } 
+    - "respondent_party_type_code": ${ respondent.party_type_code } 
+    - "respondent_party_type_description": ${ respondent.party_type_description } 
+    - "respondent_name_last": ${ respondent.name.last } 
+    - "respondent_name_first": ${ respondent.name.first } 
+    - "respondent_name_middle": ${ respondent.name.middle } 
+    - "respondent_address_address": ${ respondent.address.address } 
+    - "respondent_address_zip": ${ respondent.address.zip } 
+    - "respondent_phone": ${ respondent.phone } 
+    - "respondent_address_state": ${ respondent.address.state } 
+    - "respondent_address_city": ${ respondent.address.city } 
+    - "respondent_email": ${ respondent.email } 
+    - "respondent_gender_male": ${ respondent.gender == "male" } 
+    - "respondent_gender_female": ${ respondent.gender == "female" } 
+    - "respondent_birthdate": ${ respondent.birthdate } 
+    - "respondent_ssn": ${ respondent.ssn } 
+    - "respondent_attorney_bar_number": ${ respondent.attorney.bar_number } 
+    - "respondent_attorney": ${ respondent.attorney } 
+    - "respondent_attorney_party_type_code": ${ respondent.attorney.party_type_code } 
+    - "other_parties1_party_type_code": ${ other_parties[1].party_type_code } 
+    - "other_parties1_party_type_description": ${ other_parties[1].party_type_description } 
+    - "other_parties1_name_middle": ${ other_parties[1].name.middle if other_parties[1].person_type == "person" else "" } 
+    - "other_parties1_name_last": ${ other_parties[1].name.last if other_parties[1].person_type == "person" else "" } 
+    - "other_parties1_name_first": ${ other_parties[1].name.first if other_parties[1].person_type == "person" else "" } 
+    - "other_parties1_name_text": ${ other_parties[1].name.text if other_parties[1].person_type == "business" else "" } 
+    - "other_parties1_address": ${ other_parties[1].address.line_one() } 
+    - "other_parties1_address_city": ${ other_parties[1].address.city } 
+    - "other_parties1_address_state": ${ other_parties[1].address.state } 
+    - "other_parties1_address_zip": ${ other_parties[1].address.zip } 
+    - "other_parties1_phone": ${ other_parties[1].phone } 
+    - "other_parties1_email": ${ other_parties[1].email } 
+    - "other_parties1_gender_male": ${ other_parties[1].gender == "male" } 
+    - "other_parties1_gender_female": ${ other_parties[1].gender == "female" } 
+    - "other_parties1_birthdate": ${ other_parties[1].birthdate } 
+    - "other_parties1_ssn": ${ other_parties[1].ssn } 
+    - "other_parties1_attorney": ${ other_parties[1].attorney } 
+    - "other_parties1_attorney_bar_number": ${ other_parties[1].attorney.bar_number } 
+    - "other_parties1_attorney_party_type_code": ${ other_parties[1].attorney.party_type_code } 
+    - "other_parties2_party_type_code": ${ other_parties[2].party_type_code } 
+    - "other_parties2_party_type_description": ${ other_parties[2].party_type_description } 
+    - "other_parties2_name_last": ${ other_parties[2].name.last if other_parties[1].person_type == "person" else "" } 
+    - "other_parties2_name_first": ${ other_parties[2].name.first if other_parties[1].person_type == "person" else "" } 
+    - "other_parties2_name_middle": ${ other_parties[2].name.middle if other_parties[1].person_type == "person" else "" } 
+    - "other_parties2_name_text": ${ other_parties[2].name.text if other_parties[1].person_type == "business" else "" } 
+    - "other_parties2_address": ${ other_parties[2].address.line_one() } 
+    - "other_parties2_address_city": ${ other_parties[2].address.city } 
+    - "other_parties2_address_state": ${ other_parties[2].address.state } 
+    - "other_parties2_address_zip": ${ other_parties[2].address.zip } 
+    - "other_parties2_phone": ${ other_parties[2].phone } 
+    - "other_parties2_email": ${ other_parties[2].email } 
+    - "other_parties2_gender_female": ${ other_parties[2].gender == "female" } 
+    - "other_parties2_gender_male": ${ other_parties[2].gender == "male" } 
+    - "other_parties2_birthdate": ${ other_parties[2].birthdate } 
+    - "other_parties2_ssn": ${ other_parties[2].ssn } 
+    - "other_parties2_attorney": ${ other_parties[2].attorney } 
+    - "other_parties2_attorney_bar_number": ${ other_parties[2].attorney.bar_number } 
+    - "other_parties2_attorney_party_type_code": ${ other_parties[2].attorney.party_type_code } 
+    - "petitioner_employersj_name_text": ${ petitioner.employers[j].name.text } 
+    - "petitioner_employersj_address_address": ${ petitioner.employers[j].address.address } 
+    - "petitioner_employersj_address_city": ${ petitioner.employers[j].address.city } 
+    - "petitioner_employersj_address_state": ${ petitioner.employers[j].address.state } 
+    - "petitioner_employersj_address_zip": ${ petitioner.employers[j].address.zip } 
+    - "petitioner_employersj_phone_number": ${ petitioner.employers[j].phone_number } 
+    - "petitioner_employersj_email": ${ petitioner.employers[j].email } 
+    - "respondent_employersj_name_text": ${ respondent.employers[j].name.text } 
+    - "respondent_employersj_address_address": ${ respondent.employers[j].address.address } 
+    - "respondent_employersj_address_city": ${ respondent.employers[j].address.city } 
+    - "respondent_employersj_address_state": ${ respondent.employers[j].address.state } 
+    - "respondent_employersj_address_zip": ${ respondent.employers[j].address.zip } 
+    - "respondent_employersj_phone_number": ${ respondent.employers[j].phone_number } 
+    - "respondent_employersj_email": ${ respondent.employers[j].email } 
+    - "children0": ${ children[0].name_full() } 
+    - "children0_ssn": ${ children[0].ssn } 
+    - "children0_birthdate": ${ children[0].birthdate } 
+    - "children0_gender_female": ${ children[0].gender } 
+    - "children0_gender_male": ${ children[0].gender } 
+    - "children1": ${ children[1].name_full() } 
+    - "children1_ssn": ${ children[1].ssn } 
+    - "children1_birthdate": ${ children[1].birthdate } 
+    - "children1_gender_male": ${ children[1].gender } 
+    - "children1_gender_female": ${ children[1].gender } 
+    - "children2": ${ children[2].name_full() } 
+    - "children2_ssn": ${ children[2].ssn } 
+    - "children2_birthdate": ${ children[2].birthdate } 
+    - "children2_gender_female": ${ children[2].gender } 
+    - "children2_gender_male": ${ children[2].gender } 
+    - "children3": ${ children[3].name_full() } 
+    - "children3_ssn": ${ children[3].ssn } 
+    - "children3_birthdate": ${ children[3].birthdate } 
+    - "children3_gender_male": ${ children[3].gender } 
+    - "children3_gender_female": ${ children[3].gender } 
+    - "children4": ${ children[4].name_full() } 
+    - "children4_ssn": ${ children[4].ssn } 
+    - "children4_birthdate": ${ children[4].birthdate } 
+    - "children4_gender_male": ${ children[4].gender } 
+    - "children4_gender_female": ${ children[4].gender } 
+    - "children5": ${ children[5].name_full() } 
+    - "children5_ssn": ${ children[5].ssn } 
+    - "children5_birthdate": ${ children[5].birthdate } 
+    - "children5_gender_male": ${ children[5].gender } 
+    - "children5_gender_female": ${ children[5].gender } 
+    - "children6": ${ children[6].name_full() } 
+    - "children6_ssn": ${ children[6].ssn } 
+    - "children6_birthdate": ${ children[6].birthdate } 
+    - "children6_gender_male": ${ children[6].gender } 
+    - "children6_gender_female": ${ children[6].gender } 
+    - "children7": ${ children[7].name_full() } 
+    - "children7_ssn": ${ children[7].ssn } 
+    - "children7_birthdate": ${ children[7].birthdate } 
+    - "children7_gender_male": ${ children[7].gender } 
+    - "children7_gender_female": ${ children[7].gender } 
+    - "children8": ${ children[8].name_full() } 
+    - "children8_ssn": ${ children[8].ssn } 
+    - "children8_birthdate": ${ children[8].birthdate } 
+    - "children8_gender_male": ${ children[8].gender } 
+    - "children8_gender_female": ${ children[8].gender } 
+    - "children9": ${ children[9].name_full() } 
+    - "children9_ssn": ${ children[9].ssn } 
+    - "children9_birthdate": ${ children[9].birthdate } 
+    - "children9_gender_male": ${ children[9].gender } 
+    - "children9_gender_female": ${ children[9].gender } 
+    - "children": ${ children } 
+    - "redacted_information0_identifier": ${ redacted_information[0].identifier } 
+    - "redacted_information0_text": ${ redacted_information[0].text } 
+    - "redacted_information1_text": ${ redacted_information[1].text } 
+    - "redacted_information1_identifier": ${ redacted_information[1].identifier } 
+    - "redacted_information2_identifier": ${ redacted_information[2].identifier } 
+    - "redacted_information2_text": ${ redacted_information[2].text } 
+    - "redacted_information3_identifier": ${ redacted_information[3].identifier } 
+    - "redacted_information3_text": ${ redacted_information[3].text } 
+    - "redacted_information4_identifier": ${ redacted_information[4].identifier } 
+    - "redacted_information4_text": ${ redacted_information[4].text } 
+    - "redacted_information5_identifier": ${ redacted_information[5].identifier } 
+    - "redacted_information5_text": ${ redacted_information[5].text } 
+    - "redacted_information6_identifier": ${ redacted_information[6].identifier } 
+    - "redacted_information6_text": ${ redacted_information[6].text } 
+    - "redacted_information7_identifier": ${ redacted_information[7].identifier } 
+    - "redacted_information7_text": ${ redacted_information[7].text } 
+    - "redacted_information8_identifier": ${ redacted_information[8].identifier } 
+    - "redacted_information8_text": ${ redacted_information[8].text } 
+    - "redacted_information9_identifier": ${ redacted_information[9].identifier } 
+    - "redacted_information9_text": ${ redacted_information[9].text } 
+    - "redacted_information10_identifier": ${ redacted_information[10].identifier } 
+    - "redacted_information10_text": ${ redacted_information[10].text } 
+    - "redacted_information11_identifier": ${ redacted_information[11].identifier } 
+    - "redacted_information11_text": ${ redacted_information[11].text } 
+    - "redacted_information12_identifier": ${ redacted_information[12].identifier } 
+    - "redacted_information12_text": ${ redacted_information[12].text } 
+    - "redacted_information13_identifier": ${ redacted_information[13].identifier } 
+    - "redacted_information13_text": ${ redacted_information[13].text } 
+    - "redacted_information14_identifier": ${ redacted_information[14].identifier } 
+    - "redacted_information14_text": ${ redacted_information[14].text } 
+    - "redacted_information15_identifier": ${ redacted_information[15].identifier } 
+    - "redacted_information15_text": ${ redacted_information[15].text } 
+    - "redacted_information16_identifier": ${ redacted_information[16].identifier } 
+    - "redacted_information16_text": ${ redacted_information[16].text } 
+    - "redacted_information17_text": ${ redacted_information[17].text } 
+    - "redacted_information17_identifier": ${ redacted_information[17].identifier } 
+    - "redacted_information18_identifier": ${ redacted_information[18].identifier } 
+    - "redacted_information18_text": ${ redacted_information[18].text } 
+    - "redacted_information19_text": ${ redacted_information[19].text } 
+    - "redacted_information19_identifier": ${ redacted_information[19].identifier } 
+    - "submitted_by": ${ submitted_by.name_full() } 
+    - "submitted_by_bar_number": ${ submitted_by.bar_number } 
+    - "submitted_by_address": ${ submitted_by.address } 
+    - "submitted_by_address_state": ${ submitted_by.address.state } 
+    - "submitted_by_address_city": ${ submitted_by.address.city } 
+    - "submitted_by_address_zip": ${ submitted_by.address.zip } 
+    - "submitted_by_phone": ${ submitted_by.phone } 
+    - "submitted_by_email": ${ submitted_by.email } 
+

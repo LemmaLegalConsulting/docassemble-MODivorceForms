@@ -1,0 +1,95 @@
+include:
+  - shared.yml
+---
+id: notice of hearing order
+mandatory: True
+code: |
+  users[0].name.first
+  users[0].address.address
+  users[0].phone_number
+  other_parties[0].name.first
+  other_parties[0].service_address.address
+  other_parties[0].attorney_involved
+  petitioner.name.first
+  respondent.name.first
+  case.county
+  case.division_number
+  case.docket_number
+  hearing_date
+  hearing_time
+  case.matter_type
+  service.date
+  people_served.gathered
+  mo_divorce_forms_download
+---
+id: people served object
+objects:
+  - people_served: ALPeopleList.using(auto_gather=False)
+---
+id: people served code
+code: |
+  people_served.clear()
+  if other_parties[0].attorney_involved:
+    people_served.append(other_parties[0].attorney)
+  if defined('guardian_ad_litem') and guardian_ad_litem.exists:
+    people_served.append(other_parties[0].attorney)
+  if defined('third_party_appears') and third_party_appears:
+    people_served.append(third_party)
+  people_served.gathered = True
+  
+---
+objects:
+  - notice_of_hearing_attachment: ALDocument.using(title="Notice of Hearing", filename="notice_of_hearing", has_addendum=False, )
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, notice_of_hearing_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[notice_of_hearing_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+---
+code: |
+  notice_of_hearing_attachment.enabled = True
+---
+attachment:
+  name: Notice of Hearing
+  filename: notice_of_hearing
+  variable name: notice_of_hearing_attachment[i]
+  skip undefined: True
+  pdf template file: notice_of_hearing.pdf
+  fields:
+      - "case_county": ${ case.county } 
+      - "petitioner_name_first": ${ petitioner.name.first } 
+      - "petitioner_name_suffix": ${ petitioner.name.suffix } 
+      - "petitioner_name_middle": ${ petitioner.name.middle } 
+      - "petitioner_name_last": ${ petitioner.name.last } 
+      - "case_docket_number": ${ case.docket_number } 
+      - "respondent_name_suffix": ${ respondent.name.suffix } 
+      - "respondent_name_last": ${ case.division_number } 
+      - "respondent_name_first": ${ respondent.name.first } 
+      - "respondent_name_middle": ${ respondent.name.middle } 
+      - "case_division_number": ${ respondent.name.last } 
+      - "case_matter_type": ${ case.matter_type } 
+      - "case_hearing_date": ${ format_date(hearing_date, format='mm/dd/yyyy') } 
+      - "case_hearing_time_am": ${ format_time(hearing_time,"a") == "AM" } 
+      - "case_hearing_time_pm": ${ format_time(hearing_time,"a") == "PM" } 
+      - "case_hearing_time": ${ format_time(hearing_time,"h:mm") } 
+      - "users0_name_suffix": ${ users[0].name.suffix } 
+      - "users0_name_last": ${ users[0].name.last } 
+      - "users0_name_middle": ${ users[0].name.middle } 
+      - "users0_name_first": ${ users[0].name.first } 
+      - "users0_address_address": ${ users[0].address.address } 
+      - "users0_address_zip": ${ users[0].address.zip } 
+      - "users0_address_state": ${ users[0].address.state } 
+      - "users0_address_city": ${ users[0].address.city } 
+      - "users0_phone": ${ users[0].fax_number } 
+      - "users0_fax_number": ${ users[0].phone_number } 
+      - "users0_email": ${ users[0].email } 
+      - "case_notice_date": ${ service.date } 
+      - "other_parties0": ${ other_parties[0].name_full() } 
+      - "other_parties0_service_address": ${ other_parties[0].service_address } 
+      - "other_parties1": ${ people_served[0].name_full() } 
+      - "other_parties1_service_address": ${ people_served[0].service_address } 
+      - "other_parties2": ${ people_served[1].name_full() } 
+      - "other_parties2_service_address": ${ people_served[1].service_address } 
+      - "other_parties3": ${ people_served[2].name_full() } 
+      - "other_parties3_service_address": ${ people_served[2].service_address } 
+---

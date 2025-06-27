@@ -1,0 +1,177 @@
+---
+include:
+  - shared.yml
+---
+id: certificate of dissolution order
+mandatory: True
+code: |
+  users[0].name.first
+  if users[0].has_prior_name:
+    users[0].prior_name.name.first
+  users[0].address.address
+  users[0].ssn
+  users[0].birthdate
+  users[0].race
+  users[0].education_elementary
+  users[0].previously_married
+  other_parties[0].name.first
+  if other_parties[0].has_prior_name:
+    other_parties[0].prior_name.name.first
+  other_parties[0].address.address
+  other_parties[0].ssn
+  other_parties[0].birthdate
+  other_parties[0].race
+  other_parties[0].education_elementary
+  other_parties[0].previously_married
+  marriage_info
+  marriage.separation_date
+  petitioner.attorney_involved
+  case.judgment_date
+  case.county
+  child_support
+  children.gather()
+  
+  
+  mo_divorce_forms_download
+---
+code: |
+  children[i].physical_custody
+  children[i].under_18_in_household
+  children[i].complete = True
+---
+id: Type of Dissolution
+question: |
+  Type of Dissolution
+fields:
+  - "Marriage type dissolution true": marriage.dissolution_type
+    datatype: radio
+    required: False
+    choices: 
+      - Dissolution
+      - Legal Separation
+      - Annulment
+  - "Date Couple Last Resided in same Household (Month, Day, Year)": marriage.separation_date
+    datatype: date
+    required: False
+  - "Did the couple live together in Missouri?": marriage.live_together_in_mo
+    datatype: yesnoradio
+---
+id: children in household at separation
+question: Children in household at separation
+fields:
+  - Number of Children under 18 in this Household as of ${ marriage.separation_date }: marriage_last_resided_number_children
+    maxlength: 8
+    required: False
+---
+id: case information for certificate of dissolution
+question: Additional case information
+fields:
+  - "Date marriage dissolved (same as judgment date?)": case.judgment_date
+    datatype: date
+    required: False
+  - "Date Judgment Recorded": case.recorded_date
+    datatype: date
+    required: False
+  - "Title of Certifying Office": case.certifying_office
+    input type: area
+    maxlength: 102
+    required: False
+---
+id: Certificate of dissolution of marriage object
+objects:
+  - certificate_of_dissolution_attachment: ALDocument.using(title="Certificate of dissolution of marriage", filename="certificate_of_dissolution", has_addendum=False, )
+---
+id: Certificate of dissolution of marriage enabled
+code: |
+  certificate_of_dissolution_attachment.enabled = True
+---
+# Should be only used in interviews run from certificate_of_dissolution.yml, in an interview from main, the version from shared.yml will be lower because the block including certificate_of_dissolution.yml is above it
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, certificate_of_dissolution_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[certificate_of_dissolution_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+---
+id: Certificate of dissolution of marriage attachment
+attachment:
+  name: Certificate of dissolution of marriage
+  filename: certificate_of_dissolution
+  variable name: certificate_of_dissolution_attachment[i]
+  skip undefined: True
+  pdf template file: certificate_of_dissolution.pdf
+  fields:
+      - "users1_name_first": ${ users[0].name.first } 
+      - "users1_name_middle": ${ users[0].name.middle } 
+      - "users1_name_last": ${ users[0].name.last } 
+      - "users1_prior_name": ${ users[0].prior_name } 
+      - "users1_ssn": ${ users[0].ssn } 
+      - "users1_address_city": ${ users[0].address.city } 
+      - "users1_address_state": ${ users[0].address.state } 
+      - "users1_address_zip": ${ users[0].address.zip } 
+      - "users1_address_county": ${ users[0].address.county } 
+      - "users1_birthdate": ${ format_date(users[0].birthdate, format='M/d/yyyy') } 
+      - "users1_birthplace": ${ users[0].birthplace } 
+      - "users2_name_first": ${ other_parties[0].name.first } 
+      - "users2_name_middle": ${ other_parties[0].name.middle } 
+      - "users2_name_last": ${ other_parties[0].name.last } 
+      - "users2_prior_name": ${ other_parties[0].prior_name } 
+      - "users2_ssn": ${ other_parties[0].ssn } 
+      - "users2_address_city": ${ other_parties[0].address.city } 
+      - "users2_address_state": ${ other_parties[0].address.state } 
+      - "users2_address_zip": ${ other_parties[0].address.zip } 
+      - "users2_address_county": ${ other_parties[0].address.county } 
+      - "users2_birthdate": ${ format_date(other_parties[0].birthdate, format='M/d/yyyy') } 
+      - "users2_birthplace": ${ other_parties[0].birthplace } 
+      - "marriage_address_city": ${ marriage.address.city } 
+      - "marriage_address_county": ${ marriage.address.county } 
+      - "marriage_address_state": ${ marriage.address.state } 
+      - "marriage_date": ${ format_date(marriage.recorded_date, format='M/d/yyyy') } 
+      - "is_users1_petitioner": ${ case.filed == "user0_filed" } 
+      - "is_users2_petitioner": ${ case.filed == "other_parties0_filed" } 
+      - "is_joint_petitioners": ${ case.filed == "joint" } 
+      - "marriage_last_resided_number_children_none": ${ len([item for item in children if item.under_18_in_household == True]) == 0 } 
+      - "is_other_petitioner": ${ case.filed } 
+      - "marriage_last_resided_number_children": ${ len([item for item in children if item.under_18_in_household == True]) } 
+      - "is_other_petitioner_description": ${ case.filed_other } 
+      - "marriage_last_resided_date": ${ format_date(marriage.separation_date, format='M/d/yyyy') } 
+      - "petitioner_attorney": ${ petitioner.attorney.name.text } 
+      - "petitioner_address_on_one_line": ${ petitioner.address.on_one_line() } 
+      - "marriage_type_dissolution_true": ${ marriage.dissolution_type == "Dissolution" } 
+      - "marriage_type_separation_true": ${ marriage.dissolution_type == "Separation" } 
+      - "marriage_type_annulment_true": ${ marriage.dissolution_type == "Annulment" } 
+      - "marriage_dissolved_date": ${ format_date(case.judgment_date, format='M/d/yyyy') } 
+      - "marriage_recorded_date": ${ format_date(case.recorded_date, format='M/d/yyyy') } 
+      - "marriage_child_support_awarded_to_users1": ${ child_support == users[0].name.full() } 
+      - "marriage_number_children_awarded_users1": ${ len([item for item in children if item.physical_custody ==  users[0].name.full()]) } 
+      - "marriage_number_children_awarded_users2": ${ len([item for item in children if item.physical_custody ==  other_parties[0].name.full()]) } 
+      - "marriage_child_support_awarded_to_users2": ${ child_support == other_parties[0].name.full() } 
+      - "marriage_child_support_awarded_to_other": ${ child_support == "other" } 
+      - "marriage_number_children_awarded_joint": ${ len([item for item in children if item.physical_custody ==  "joint"]) } 
+      - "marriage_number_children_awarded_other": ${ len([item for item in children if item.physical_custody ==  "other"]) } 
+      - "marriage_number_children_awarded_no_children": ${ len(children) == 0 } 
+      - "marriage_child_support_awarded_to_none": ${ child_support == "none" } 
+      - "marriage_decree_county": ${ case.county } 
+      - "marriage_decree_court": ${ case.court } 
+      - "marriage_decree_certifying_office": ${ case.certifying_office } 
+      - "users1_race_white": ${ users[0].race == "White" } 
+      - "users1_last_marriage_ended_death": ${ users[0].last_marriage_end == "Death" } 
+      - "users1_race_black": ${ users[0].race == "Black" } 
+      - "users1_last_marriage_ended_divorce": ${ users[0].last_marriage_end == "Divorce" } 
+      - "users1_race_AmericanIndian": ${ users[0].race == "American Indian" } 
+      - "users1_number_of_marriage": ${ ordinal(users[0].number_of_marriages) } 
+      - "users1_last_marriage_ended_date": ${ format_date(users[0].last_marriage_end_date, format='M/d/yyyy') } 
+      - "users1_race_other": ${ users[0].race == "other" } 
+      - "users1_race_other_description": ${ users[0].race_other } 
+      - "users1_education_elementary": ${ users[0].education_elementary } 
+      - "users1_education_college": ${ users[0].education_college } 
+      - "users2_race_white": ${ other_parties[0].race == "White" } 
+      - "users2_last_marriage_ended_death": ${ other_parties[0].last_marriage_end == "Death" } 
+      - "users2_race_black": ${ other_parties[0].race == "Black" } 
+      - "users2_last_marriage_ended_divorce": ${ other_parties[0].last_marriage_end == "Divorce" } 
+      - "users2_race_AmericanIndian": ${ other_parties[0].race == "American Indian" } 
+      - "users2_number_of_marriage": ${ ordinal(other_parties[0].number_of_marriages) } 
+      - "users2_race_other": ${ other_parties[0].race == "other" } 
+      - "users2_last_marriage_ended_date": ${ format_date(other_parties[0].last_marriage_end_date, format='M/d/yyyy') } 
+      - "users2_race_other_description": ${ other_parties[0].race } 
+      - "users2_education_elementary": ${ other_parties[0].education_elementary } 
+      - "users2_education_college": ${ other_parties[0].education_college } 
+
+---

@@ -1,0 +1,2720 @@
+include:
+  - docassemble.AssemblyLine:assembly_line.yml
+  - docassemble.ALToolbox:al_income.yml
+  - county.yml
+---
+id: list of previously entered people
+code: |
+  temp_people_choices = list()
+  temp_people_choices.append(users[0])
+  temp_people_choices.append(other_parties[0])
+  if defined('legal_custody_other') and hasattr(legal_custody_other.name,"first"):
+    temp_people_choices.append(legal_custody_other)
+  if defined('physical_custody_other') and hasattr(physical_custody_other.name,"first"):
+    temp_people_choices.append(physical_custody_other)
+  if defined('visitation_supervisor') and hasattr(visitation_supervisor.name,"first"):
+    temp_people_choices.append(visitation_supervisor)
+  if defined('communications_other') and hasattr(communications_other.name,"first"):
+    temp_people_choices.append(communications_other)
+  people_choices = temp_people_choices
+---
+
+## CASE ##
+---
+id: Your Court Case
+question: Court Case
+fields: 
+  - Has your case already been filed?: case.filed
+    datatype: radio
+    choices:
+      - Yes, I filed myself: user0_filed
+      - Yes, my spouse filed: user1_filed
+      - Filed jointly: jointly_filed
+      - Not yet: not_filed
+      - I'm not sure: unknown
+validation code: |
+  if  case.filed in ["user0_filed","not_filed","jointly_filed","unknown"]:
+    petitioner = users[0]
+    respondent = other_parties[0]
+    previous_petitions = 1
+    user_started_case = True
+  elif case.filed == "user1_filed":
+    petitioner = other_parties[0]
+    respondent = users[0]
+    previous_petitions = 1
+    user_started_case = False
+  else:
+    previous_petitions = 0
+    user_started_case = True
+---
+objects:
+  - case: Thing
+
+---
+id: Case Information
+question: Case Information
+fields:
+  - Docket number: case.docket_number
+    required: False
+  - Case court: case.court
+    choices:
+      - Kansas City
+      - Independence
+
+  - Case circuit: case.circuit
+    required: False
+  - Case division number: case.division_number
+    required: False
+  - Matter type: case.matter_type
+    required: False
+  - Type code: case.type_code
+    required: False
+  - Case type description: case.type_description
+    required: False
+---
+id: Case filing date
+question: Case filing date
+fields:
+  - Filing date: case.filing_date
+    datatype: date
+    required: False
+continue button field: case_information
+---
+id: Hearing date and time
+question: Hearing date and time
+fields:
+  - Hearing date: hearing_date
+    required: False
+    datatype: date
+  - Hearing date: hearing_time
+    required: False
+    datatype: time
+---
+id: Is Divorce Contested
+question: Do you believe your case will be uncontested?
+subquestion: |
+  In other words, do you and your spouse agree on how you will divide up property, debt, and/or parenting time?
+fields:
+  - Contested: is_case_contested
+    datatype: radio
+    choices:
+      - Uncontested: uncontested
+      - Contested: contested
+      - I don't know: unknown
+---
+
+## PARTIES ##
+
+
+
+---
+objects:
+  - users: ALPeopleList.using(ask_number=True,target_number=1,complete_attribute='complete')
+---
+objects:
+  - other_parties: ALPeopleList.using(ask_number=True,target_number=1,complete_attribute='complete')
+---
+objects:
+  - users[i].employment_address: Address
+---
+code: |
+  users[i].complete = True
+---
+code: |
+  other_parties[i].complete = True
+---
+sets:
+ - users[0].name.first
+id: user name
+question: |
+  Your name
+fields:
+  - code: |
+      users[0].name_fields()
+  - Do you have a prior name?: users[0].has_prior_name
+    datatype: yesnoradio
+---
+sets:
+ - other_parties[0].name.first
+id: other party name
+question: |
+  The other party's name
+fields:
+  - code: |
+      other_parties[0].name_fields()
+  - Does the other party have a prior name?: other_parties[0].has_prior_name
+    datatype: yesnoradio
+---
+sets:
+ - x.prior_name.name.first
+id: prior name
+generic object: ALIndividual
+question: Prior name for ${ x.name_full() }
+fields:
+  - code: |
+      x.prior_name.name_fields()
+---
+id: prior name object
+generic object: ALIndividual
+objects:
+  - x.prior_name: ALIndividual
+---
+id: Party social security number
+generic object: ALIndividual
+question: Social security number for ${ x.name_full() }
+fields:    
+  - Last 4 digits of your social security number: x.ssn
+    maxlength: 4
+    required: False
+---
+id: Driver license number
+generic object: ALIndividual
+question: Driver's license numberfor ${ x.name_full() }
+fields:
+  - no label: x.driver_license_number
+    required: False
+---
+sets: x.address.address
+id: Address
+generic object: ALIndividual
+question: Address for ${ x.name_full() }
+fields:
+  - code: |
+      x.address.address_fields()
+  - Phone: x.phone_number
+    required: False
+  - Email: x.email
+    required: False
+---
+id: Address
+generic object: ALIndividual
+question: Fax for ${ x.name_full() }
+fields:
+  - Fax: x.fax
+    required: False
+---
+sets: users[0].address.address
+id: Address
+question: Your address
+fields:
+  - code: |
+      users[0].address.address_fields()
+  - Phone: users[0].phone_number
+    required: False
+  - Email: users[0].email
+    required: False
+    datatype: email
+---
+sets: 
+  - other_parties[0].address.address
+  - other_parties[0].address.state
+id: Address
+question: Address for ${ other_parties[0].name_full() }
+fields:
+  - code: |
+      other_parties[0].address.address_fields()
+  - Phone: other_parties[0].phone_number
+    required: False
+  - Email: other_parties[0].email
+    required: False
+    datatype: email
+---
+id: Birth info
+generic object: ALIndividual
+question: Birthdate for ${ x.name_full() }
+fields:    
+  - Birthdate: x.birthdate
+    datatype: ThreePartsDate
+  - "BIRTHPLACE (State or Foreign Country)": x.birthplace
+    maxlength: 40
+    required: False
+---
+id: education info
+generic object: ALIndividual
+question: Educational info for ${ x.name_full() }
+fields:  
+  - "Elementary/Secondary Education": x.education_elementary
+    input type: dropdown
+    choices:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 11
+      - 12
+    required: False
+  - "College (1-4 or 5+)": x.education_college
+    input type: dropdown
+    choices:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5+
+    required: False
+  - Active duty military?: x.active_duty
+    datatype: yesnoradio
+---
+id: race
+generic object: ALIndividual
+question: ${ x.name_full() }'s race
+fields:  
+  - Race: x.race
+    input type: dropdown
+    choices:
+      - White
+      - Black
+      - American Indian
+      - Other
+    required: False
+  - Other description: x.race_other
+    show if:
+      variable: x.race
+      is: Other
+    required: False
+---
+id: Previous marriages info
+generic object: ALIndividual
+question: Previous marriages for ${ x.name_full() }
+fields:  
+  - Previously married?: x.previously_married
+    datatype: yesnoradio
+  - Number of previous marriages: x.number_of_marriages
+    datatype: number
+    show if: x.previously_married
+  - Date Last Marriage Ended: x.last_marriage_end_date
+    datatype: date
+    show if: x.previously_married
+  - How Last Marriage Ended: x.last_marriage_end
+    datatype: dropdown
+    choices:
+      - Death
+      - Divorce
+    show if: x.previously_married
+validation code: |
+  if x.previously_married == False:
+    x.number_of_marriages = 0
+---
+id: Residency info
+generic object: ALIndividual
+question: Residency for ${ x.name_full() }
+fields:
+  - How long has ${ x.name_full() } lived in Missouri?: x.mo_length_of_residence_choice
+    datatype: radio
+    choices:
+      - Less than 4 months: less_than_4
+      - More than 4 months but less than a year: more_than_4
+      - A year or more: year
+  - How many days?: x.mo_length_of_residence_days
+    datatype: integer
+    show if:
+      variable: x.mo_length_of_residence_choice
+      is: less_than_4
+  - How many months?: x.mo_length_of_residence_months
+    datatype: integer
+    show if:
+      variable: x.mo_length_of_residence_choice
+      is: more_than_4
+  - How many years?: x.mo_length_of_residence_years
+    datatype: integer
+    show if:
+      variable: x.mo_length_of_residence_choice
+      is: year
+  - How long has ${ x.name_full() } lived in ${ x.address.county }?: x.county_length_of_residence_choice
+    datatype: radio
+    choices:
+      - Less than 4 months: less_than_4
+      - More than 4 months but less than a year: more_than_4
+      - A year or more: year
+  - How many days?: x.county_length_of_residence_days
+    datatype: integer
+    show if:
+      variable: x.county_length_of_residence_choice
+      is: less_than_4
+  - How many months?: x.county_length_of_residence_months
+    datatype: integer
+    show if:
+      variable: x.county_length_of_residence_choice
+      is: more_than_4
+  - How many years?: x.county_length_of_residence_years
+    datatype: integer
+    show if:
+      variable: x.county_length_of_residence_choice
+      is: year
+validation code: |
+  if x.county_length_of_residence_choice == "less_than_4" and x.county_length_of_residence_days < 90:
+    x.resident_for_90_days = True
+  else:
+    x.resident_for_90_days = False
+---
+id: other children number
+generic object: ALIndividual
+question: Other children for ${ x.name_full() }
+fields:
+  - "How many other children does ${ x.name_full() } have?": x.other_children
+    datatype: integer
+    min: 0    
+---
+generic object: ALIndividual
+objects:
+  - x.attorney: ALIndividual
+---
+sets:
+  - x.attorney.name.first
+id: attorney information
+generic object: ALIndividual
+question: Attorney for ${ x }
+fields:
+  - Is an attorney helping ${ x }?:  x.attorney_involved
+    datatype: yesnoradio
+    required: False
+  - Is the attorney representing ${ x }: x.type_of_assistance
+    datatype: radio
+    choices:
+      - Yes, the attorney is representing ${ x }: representation
+      - No, the attorney is only providing assistance preparing documents.: assistance
+    show if:
+      variable: x.attorney_involved
+      is: True
+  - First name: x.attorney.name.first
+    show if:
+      variable: x.attorney_involved
+      is: True
+  - Middle name: x.attorney.name.middle
+    show if:
+      variable: x.attorney_involved
+      is: True
+    required: False
+  - Last name: x.attorney.name.last
+    show if:
+      variable: x.attorney_involved
+      is: True
+  - Suffix: x.attorney.name.suffix
+    show if:
+      variable: x.attorney_involved
+      is: True
+    required: False
+  - Bar number: x.attorney.bar_number
+    required: False
+    show if:
+      variable: x.attorney_involved
+      is: True
+  - Address of attorney for ${ x }: x.attorney.address.address
+    address autocomplete: True
+    required: False
+    show if:
+      variable: x.attorney_involved
+      is: True
+  - City: x.attorney.address.city
+    required: False
+    show if:
+      variable: x.attorney_involved
+      is: True
+  - State: x.attorney.address.state
+    required: False
+    show if:
+      variable: x.attorney_involved
+      is: True
+  - Zip code: x.attorney.address.zip
+    required: False
+    show if:
+      variable: x.attorney_involved
+      is: True
+---
+## CHILDREN ##
+objects:
+  - children: ALPeopleList.using(complete_attribute='complete')
+---
+id: are there children
+question: Children of the Marriage
+subquestion: |
+  Are there living children who were 
+  
+    (a) born after the date of your marriage; 
+  
+    (b) adopted including children born to you or your spouse and later adopted by the other spouse, or adopted by both parties; 
+  
+    (c) born to you and your spouse before this marriage as a result of sexual intercourse, or artificial insemination; or 
+  
+    (d) children born to you (if you are female) or your spouse (if they are female) after the date of marriage as a result of sexual intercourse or artificial insemination with someone outside the marriage.
+fields:
+  - no label: children.there_are_any
+    datatype: yesnoradio
+---
+id: children complete
+code: |
+  children[i].ssn
+  children[i].birthdate
+  children[i].complete = True
+---
+sets:
+  - children[i].name.first
+id: Children question
+question: ${ ordinal(i) } child
+subquestion: |
+  % if i > 0:
+  So far you have added:
+
+  % for child in children.complete_elements():
+   - ${ child.name_full() }
+  % endfor
+  
+  % endif
+fields:
+  - code: |
+      children[i].name_fields()
+---
+sets: children[i].address.address
+id: sets child's address to lived with address
+code: |
+  if children[i].lived_with == users[0]:
+    children[i].address = users[0].address
+  elif children[i].lived_with == other_parties[0]:
+    children[i].address = other_parties[0].address
+---
+id: additional child information
+question: Additional information about ${ children[i].name_full() }
+fields:
+  - Last four digits of Social Security Number: children[i].ssn
+    datatype: number
+    required: False
+  - Birthdate: children[i].birthdate
+    datatype: ThreePartsDate
+  - Check all of the following that apply: children[i].special_factors
+    datatype: checkboxes
+    choices:
+      - This child is married: married
+      - This child is on active duty in the military: active_duty
+      - This child is self-supporting: self_supporting
+      - This child is attending high school: high_school
+      - This child is attending college or vocational school: college
+---
+sets: children[i].lived_with.name.first
+id: who child lived with
+question: Who ${ children[i].name_full() } lived with?
+fields:
+  - Who has ${ children[i].name_full() } lived with in the previous 60 days?: children[i].lived_with
+    datatype: object
+    choices: people_choices
+    disable others: True
+  - code: |
+      children[i].lived_with.name_fields()
+  - code: |
+      children[i].lived_with.address_fields()
+---
+objects:
+  children[i].lived_with: ALIndividual
+---
+id: did child live with parents at separation?
+question: Residence at separation
+fields:
+  - Did ${ children[i].name_full() } live with ${ users[0].name_full() } and ${ other_parties[0].name_full() } on ${ marriage.separation_date }?: children[i].under_18_in_household
+    datatype: yesnoradio
+---
+id: lived with other object
+objects: 
+  - persons_lived_with: ALPeopleList.using(there_are_any=True)
+---
+id: lived with other
+reconsider:
+  - people_choices
+
+sets:
+  - persons_lived_with[i].name.first
+  - persons_lived_with[i].name.last
+  - persons_lived_with[i].name.middle
+  - persons_lived_with[i].name.suffix
+
+question: |
+  Who have the children lived with for the last 5 years?
+
+fields:
+  - Existing person: persons_lived_with[i]
+    datatype: object
+    choices: people_choices
+    disable others: True
+  - code: |
+      persons_lived_with[i].name_fields()
+  - code: |
+      persons_lived_with[i].address_fields()
+---
+id: persons lived with another
+question: Did the children live with anybody else during the last five years?
+subquestion: |
+  You have already mentioned:
+  % for person in persons_lived_with.complete_elements():
+
+   - ${ person.name_full() }, ${ person.address.on_one_line() }
+  % endfor
+fields:
+  - no label: persons_lived_with.there_is_another
+    datatype: yesnoradio
+---
+id: lived with other object
+objects: 
+  - children[i].persons_lived_with: ALPeopleList.using(ask_number=True,target_number=1)
+---
+id: lived with other
+reconsider:
+  - people_choices
+
+sets:
+  - children[i].persons_lived_with[j].name.first
+  - children[i].persons_lived_with[j].name.last
+  - children[i].persons_lived_with[j].name.middle
+  - children[i].persons_lived_with[j].name.suffix
+
+question: |
+  Who has ${ children[i].name_full() } lived with for the last 60 days?
+
+fields:
+  - Existing person: children[i].persons_lived_with[j]
+    datatype: object
+    choices: people_choices
+    disable others: True
+  - code: |
+      children[i].persons_lived_with[j].name_fields()
+---
+id: legal custody of child
+question: Legal custody of ${ children[i].name_full() }
+fields:
+  - Who should have legal custody of ${ children[i].name_full() }?: children[i].legal_custody
+    datatype: radio
+    choices:
+      - ${ users[0] }
+      - ${ other_parties[0] }
+      - Both spouses jointly: Joint
+      - Other     
+---
+id: other legal custody
+reconsider:
+  - people_choices
+generic object: ALPeopleList
+
+sets:
+  - children[i].legal_custody_other.name.first
+  - children[i].legal_custody_other.name.last
+  - children[i].legal_custody_other.name.middle
+  - children[i].legal_custody_other.name.suffix
+
+question: |
+  What other person should have legal custody of ${ children[i].name_full() }?
+
+fields:
+  - Existing person: children[i].legal_custody_other
+    datatype: object
+    choices: people_choices
+    disable others: True
+    exclude:
+     - users[0]
+     - other_parties[0]
+  - code: |
+      children[i].legal_custody_other.name_fields()
+---
+id: legal custody other object
+objects: 
+  - children[i].legal_custody_other: ALIndividual
+---
+id: physical custody of child
+question: Physical custody of ${ children[i].name_full() } 
+fields:
+  - Who should have physical custody of ${ children[i].name_full() }?: children[i].physical_custody
+    datatype: radio
+    choices:
+      - ${ users[0] }
+      - ${ other_parties[0] }
+      - Both spouses jointly
+      - Other
+---
+id: other physical custody
+reconsider:
+  - people_choices
+
+sets:
+  - children[i].physical_custody_other.name.first
+  - children[i].physical_custody_other.name.last
+  - children[i].physical_custody_other.name.middle
+  - children[i].physical_custody_other.name.suffix
+
+question: |
+  What other person should have physical custody of ${ children[i].name_full() }?
+
+fields:
+  - Existing person: children[i].physical_custody_other
+    datatype: object
+    choices: people_choices
+    disable others: True
+    exclude:
+     - users[0]
+     - other_parties[0]
+  - code: |
+      children[i].physical_custody_other.name_fields()
+---
+id: physical custody other object
+objects: 
+  - children[i].physical_custody_other: ALIndividual
+---
+id: parents of child
+question: Parents of ${ children[i].name_full() }
+fields:
+  - Who are the parents of this child?: children[i].parents
+    datatype: checkboxes
+    choices:
+      - ${ users[0] }
+      - ${ other_parties[0] }
+      - Other
+    none of the above: False
+---
+id: other parent
+reconsider:
+  - people_choices
+generic object: ALPeopleList
+
+sets:
+  - children[i].other_parent.name.first
+  - children[i].other_parent.name.last
+  - children[i].other_parent.name.middle
+  - children[i].other_parent.name.suffix
+
+question: |
+  Other parent for ${ children[i].name_full() }
+
+fields:
+  - Existing person: children[i].other_parent
+    datatype: object
+    choices: people_choices
+    disable others: True
+    exclude:
+     - users[0]
+     - other_parties[0]
+  - code: |
+      children[i].other_parent.name_fields()
+
+---
+id: other parent object
+objects: 
+  - children[i].other_parent: ALIndividual
+---
+id: Birth certificate of child
+question: Birth certificate of ${ children[i].name_full() }
+fields:
+  - Who is listed as parents on ${ children[i].possessive('birth certificate') }?: children[i].birth_certificate
+    datatype: checkboxes
+    choices:
+      - ${ users[0] }
+      - ${ other_parties[0] }
+      - Other
+    none of the above: False
+---
+id: other birth certificate
+reconsider:
+  - people_choices
+generic object: ALPeopleList
+
+sets:
+  - children[i].birth_certificate_other.name.first
+  - children[i].birth_certificate_other.name.last
+  - children[i].birth_certificate_other.name.middle
+  - children[i].birth_certificate_other.name.suffix
+
+question: |
+  Other person on birth certificate for ${ children[i].name_full() }
+
+fields:
+  - Existing person: children[i].birth_certificate_other
+    datatype: object
+    choices: people_choices
+    disable others: True
+    exclude:
+     - users[0]
+     - other_parties[0]
+  - code: |
+      children[i].birth_certificate_other.name_fields()
+
+---
+id: birth certificate other object
+objects: 
+  - children[i].birth_certificate_other: ALIndividual
+---
+id: Additional information about children
+question: Additional information about children
+fields:
+  - Do you know of anyone other than you or your spouse who has physical custody of any of the children or claims to have custody or visitation rights with respect to any of the children?: others_with_physical_custody
+    datatype: yesnoradio
+  - Do you have information about any other custody proceeding concerning any of the children pending in a court of this or any other state?: other_custody_proceeding
+    datatype: yesnoradio
+  - Have you participated in other litigation concerning the custody of any of the children in this or any other state?: other_litigation
+    datatype: yesnoradio
+  - Have any of the children been a victim of abuse or neglect?: abuse_or_neglect
+    datatype: yesnoradio
+  - "Explain, including indicating style of related case/case number/court and whether case is pending or closed": related_case_explanation
+    datatype: area
+    js show if: |
+      val('others_with_physical_custody') || val('other_custody_proceeding') || val('other_litigation') || val('abuse_or_neglect')
+  - Have any orders pertaining to any of the children been entered by the Family Support Division?: family_support_order
+    datatype: yesnoradio
+  - Have any of the children ever received welfare or Medicaid?: received_welfare
+    datatype: yesnoradio
+---
+
+---
+## MARRIAGE ##
+id: Marriage questions
+question: |
+  Information about Your Marriage
+fields:
+  - "Place of this Marriage - City, Town, or Location": marriage.address.city
+    maxlength: 36
+    required: False
+  - "County": marriage.address.county
+    maxlength: 24
+    required: False
+  - "State": marriage.address.state
+    maxlength: 32
+    required: False
+  - "Country": marriage.address.country
+  - "Date of this Marriage": marriage.recorded_date
+    datatype: date
+    required: False
+continue button field: marriage_info
+---
+id: marriage object
+objects:
+  - marriage: Thing
+  - marriage.address: ALAddress
+---
+id: marriage separation date
+question: When did your marriage end?
+fields:
+  - "What date did you separate and stop residing together?": marriage.separation_date
+    datatype: date
+---
+id: marriage in missouri
+question: Did you live together as a couple in Missouri?
+fields:
+  - no label: marriage.live_together_in_mo
+    datatype: yesnoradio
+---
+id: Others with physical custody
+question: Others with physical custody
+fields:
+  - "Do you know of anyone other than you or your spouse who has physical custody of any of the children or claims to have custody or visitation rights with respect to any of the children?": others_with_physical_custody
+    datatype: yesnoradio
+  - Explain: others_with_physical_custody_explanation
+    show if: others_with_physical_custody
+---
+id: Other custody proceeding
+question: Other custody proceeding?
+fields:
+  - Do you have information about any other custody proceeding concerning any of the children pending in a court of this or any other state?: other_custody_proceeding
+    datatype: yesnoradio
+  - Explain: other_custody_proceeding_explanation
+    show if: other_custody_proceeding
+---
+id: Other litigation
+question: Other litigation
+fields:
+  - Have you participated in other litigation concerning the custody of any of the children in this or any other state?: other_litigation
+    datatype: yesnoradio
+  - Explain: other_litigation_explanation
+    show if: other_litigation
+---
+## ASSETS ##
+
+id: cash
+question: Cash on Hand
+fields:
+  - How much cash do you have on hand?: users[0].cash
+    datatype: currency
+
+---
+
+## INCOME ##
+
+
+---
+id: user self employment income
+question: Self Employment Income 
+fields: 
+  - Does you have any self employment income?: users[0].has_self_employment_income
+    datatype: yesnoradio
+  - Monthly self employment income: users[0].self_employment_income
+    datatype: currency
+    show if: users[0].has_self_employment_income
+  - Description of your self employment: users[0].self_employment_description
+    show if: users[0].has_self_employment_income
+validation code: |
+  if not users[0].has_self_employment_income:
+    users[0].self_employment_income = 0
+    users[0].self_employment_description = None
+---
+id: other party self employment income
+question: Self Employment Income 
+fields: 
+  - Does ${ other_parties[0].name_full() } have any self employment income?: other_parties[0].has_self_employment_income
+    datatype: yesnomaybe
+  - Monthly self employment income: other_parties[0].self_employment_income
+    datatype: currency
+    show if: other_parties[0].has_self_employment_income
+  - Description of your self employment: other_parties[0].self_employment_description
+    show if: other_parties[0].has_self_employment_income
+validation code: |
+  if not other_parties[0].has_self_employment_income:
+    other_parties[0].self_employment_income = 0
+    other_parties[0].self_employment_description = None
+---
+id: jobs object
+generic object: ALIndividual
+objects:
+  - x.jobs: ALItemizedJobList.using(complete_attribute='complete')
+---
+code: |
+  users[0].jobs[i].is_hourly = False
+---
+code: |
+  other_parties[0].jobs[i].is_hourly = False
+---
+id: user jobs
+question: Jobs
+fields:
+  - Do you have a job?: users[0].jobs.there_are_any
+    datatype: yesnoradio
+---
+id: other parties jobs
+question: Jobs
+fields:
+  - Does ${ other_parties[0].name_full() } have a job?: other_parties[0].jobs.there_are_any
+    datatype: yesnomaybe
+---
+generic object: ALIndividual
+id: other parties jobs
+question: Jobs
+fields:
+  - Does ${ x.name_full() } have another job?: x.jobs.there_is_another
+    datatype: yesnomaybe
+---
+id: employer object
+generic object: ALIndividual
+objects: 
+  - x.employer: Person
+---
+id: employer info
+generic object: ALIndividual
+question: |
+  % if x == users[0]:
+  Tell us about your main employer
+  % else:
+  Tell us about the main employer for ${ other_parties[0].name_full() }.
+  % endif
+fields:
+  - Employer's name: x.employer.name.text
+  - note: |
+      ---
+
+      Employer's address
+  - Street address: x.employer.address.address 
+    address autocomplete: True
+  - Unit: x.employer.address.unit
+    required: False
+  - City: x.employer.address.city
+  - State: x.employer.address.state
+  - Zip or postal code: x.employer.address.zip
+  - Phone: x.employer.phone_number
+
+---
+sets:
+  - x.employer.name.first
+id: employer
+generic object: ALItemizedJob
+question: |
+  Tell us who is ${ "your main employer" if x == "users[0]" else possessify(other_parties[0],'main employer') }.
+fields:
+  - Employer's name: x.employer.name.text
+  - note: |
+      ---
+
+      Employer's address
+  - Street address: x.employer.address.address 
+    address autocomplete: True
+  - Unit: x.employer.address.unit
+    required: False
+  - City: x.employer.address.city
+  - State: x.employer.address.state
+  - Zip or postal code: x.employer.address.zip
+  - Phone: x.employer.phone_number
+
+---
+id: job complete
+generic object: ALItemizedJob
+code: |
+  x.to_add.gather()   
+  x.complete = True
+---
+id: job at least one wage
+generic object: ALItemizedJob
+code: |
+  x.to_add.there_are_any = True
+---
+if: not x.to_add.complete_elements()
+id: job at least one wage
+generic object: ALItemizedJob
+code: |
+  x.to_add.new_item_name = "wages"
+  
+---
+if: j in ["wages"]
+id: itemized job period pt and ft wages
+generic object: ALItemizedJob
+question: |
+  Details about job
+fields:
+  - Paid hourly or salary?: jobs[i].to_add[j].is_hourly
+    input type: radio
+    choices:
+      - Hourly: True
+      - Salary: False
+  - label: |
+      What is your hourly pay for this job?
+    field: jobs[i].to_add[j].value
+    datatype: currency
+    show if: 
+      variable: jobs[i].to_add[j].is_hourly
+      is: True
+  - label: |
+      What do you get for wages during each pay period?
+    field: jobs[i].to_add[j].value
+    datatype: currency
+    show if: 
+      variable: jobs[i].to_add[j].is_hourly
+      is: False
+  - How often are you paid?: jobs[i].to_add[j].times_per_year
+    input type: radio
+    code: |
+      times_per_year_list
+    datatype: integer
+  - How many hours are worked during that time?: jobs[i].to_add[j].hours_per_period
+    datatype: number
+    show if: 
+      variable: jobs[i].to_add[j].is_hourly
+      is: True
+    validation messages:
+      number: |
+        Enter a number, like 40. If you don't know, enter your best guess.
+  - Does the job have other incomes, like tips, commissions, royalties or bonuses?: jobs[i].to_add.there_is_another
+    datatype: yesnoradio 
+---
+if: j not in ["wages"]
+id: itemized job period non-pt-or-ft wages
+generic object: ALItemizedJob
+question: |
+  Details about ${ j.lower() } you get at your ${ jobs[i].source } job
+fields:
+  - label: |
+      Amount
+    field: jobs[i].to_add[j].value
+    datatype: currency
+  - How often are you paid this?: jobs[i].to_add[j].times_per_year
+    input type: radio
+    code: |
+      times_per_year_list
+    datatype: integer
+  - Does the job have any more incomes, like tips, commissions, royalties or bonuses?: jobs[i].to_add.there_is_another
+    datatype: yesnoradio
+---
+id: are there more non-wage income
+question: Are there more types of non-wage income for your job  as a ${ x.source }?
+subquestion: |
+  You have already mentioned:
+  ${ x.to_add.true_values() }
+fields:
+  - Does the job have other incomes, like tips, commissions or bonuses?: x.to_add.there_is_another
+    datatype: yesnoradio
+---
+id: jobs details about tips commissions bonuses
+generic object: ALItemizedJob
+question: |
+  Other incomes from your job as a ${ x.source }
+subquestion: |
+  You have already told us about your income from **${comma_and_list( [job_items_names.get(key, key).lower() for key in x.to_add.complete_elements().keys()] )}**.
+fields:
+  - What kind of additional income do you get from this job? We will collect these one at a time.: x.to_add.new_item_name
+    datatype: radio
+    choices:
+      - Tips
+      - Commissions
+      - Bonuses
+      - Royalties
+  - Specify: x.to_add.new_item_name
+    show if:
+      variable: x.to_add.new_item_name
+      is: "Other"
+validation code: |
+  if x.to_add.new_item_name in x.to_add.complete_elements().keys():
+    validation_error(f'You already told us about your <strong>{job_items_names.get(x.to_add.new_item_name, x.to_add.new_item_name) }</strong> that pays { currency( x.to_add[ x.to_add.new_item_name ].value )}. Pick a different name.')
+---
+if: not x.to_add.complete_elements()
+generic object: ALItemizedJob
+code: |
+  x.to_add.new_item_name = 'wages'
+---
+id: edit wages and other incomes from a job
+generic object: ALIndividual
+continue button field: x.jobs[i].to_add.revisit
+question: |
+  Edit incomes from ${ ordinal(i) } job
+subquestion: |
+  ${ x.to_add.table }
+
+  ${ x.to_add.add_action() }
+---
+id: itemized value to add table
+generic object: ALItemizedValueDict
+table: x.to_add.table
+rows: x
+columns:
+  - Type: |
+      str(row_index).replace("_", " ").lower().capitalize()
+  - Amount per hour or other time period: |
+      currency(row_item.value)
+  
+edit:
+  - is_hourly
+  - times_per_year
+  - value
+---
+id: itemized value table
+generic object: ALItemizedValueDict
+table: x.table
+rows: x
+columns:
+  - Type: |
+      str(row_index).replace("_", " ").lower().capitalize()
+  - Amount: |
+      currency(row_item.value)
+edit:
+  - is_part_time
+  - is_hourly
+  - times_per_year
+  - value
+---
+id: job review
+question: |
+  Review your jobs
+subquestion: |
+
+  % if is_self_employed:
+  **Self-employment**
+
+  You said that you were self-employed with a net income of
+  % if has_schedule_c:
+  ${ currency(self_employed_net_income/12) } each month. (You can update this later if needed.)
+  % else:
+  ${ currency(str(self_employed_net_income_monthly_amount)) } each month. (You can update this later if needed.)
+  % endif
+  % endif
+
+  **Jobs**
+
+  % if is_self_employed:
+  Here is what you've told us about your other jobs. You can add more or continue
+  to the next question.
+  % else:
+  Here is what you've told us about your jobs. You can add more or continue
+  to the next question.
+  % endif
+  ${ jobs_table } 
+  
+  ${ jobs.add_action() }  
+
+
+
+continue button field: review_jobs
+---
+id: jobs_table
+table: jobs_table
+rows: jobs
+columns:
+  - Job: |
+      row_item.source
+  - Employer: |
+      row_item.employer.name.text if defined("row_item.employer.name.text") else ""
+  - Monthly gross income: |
+      currency(row_item.gross_total(times_per_year=12)) 
+
+edit:
+  - employer.name.first
+  - to_add.revisit
+
+confirm: True
+---
+id: wages table
+generic object: ALItemizedValueDict
+table: x.table
+rows: x
+columns:
+  - Type of pay: |
+      str(row_index).replace("_", " ").lower().capitalize()
+  - Amount: |
+      currency(row_item.value)
+  - How often paid: |
+      times_per_year(times_per_year_list, row_item.times_per_year)
+      
+  
+edit:
+  - times_per_year
+  - value
+---
+id: self supporting
+generic object: ALIndividual
+question: Income for ${ x.name_full() }
+fields:
+  - Is ${ x.name_full() } able to support themselves on their monthly income?: x.self_supporting
+    datatype: yesnoradio
+---
+variable name: job_items_names
+data:
+  wages: wages
+  tips: Tips
+  insurance: Insurance
+  federal_taxes: Federal taxes
+  state_taxes: State taxes
+  social_security: Social security
+  medicare: Medicare
+---
+################################# PUBLIC BENEFITS ##############################
+comment: |
+  --Notes on how a list is gathered, using public_benefits as an example--
+  
+  Interview calls public_benefits.gather
+
+  Gather looks for .there_are_any
+
+  there_any_any asks for x.selected_types
+
+  if any selected types,
+   move_check_to_lists
+     This creates a number of elements in the list, and deletes 'source' if other, (which may set 'source' to the default, like 'vehicle')
+     also sets .moved for the list
+     
+  there_are_any is set to true
+
+  will then look for complete
+
+  check_for_others will set source
+
+  complete calls for attribute (value for public_benefits) for information question
+  
+  information question calls display name (with reconsider to keep it fresh)
+  
+  answering the question sets display_name fresh with new source_other with validation code
+
+  complete sets display  
+---
+id: x.benefits terms_ordered
+generic object: ALIndividual
+variable name: x.benefits.terms_ordered
+data: !!omap
+  - food_stamps: "Food stamps"
+  - medicaid: "Medicaid"
+  - ssi: "SSI (Supplemental Security Income)" 
+  - tanf: "Temporary Assistance to Needy Families"
+---
+id: x.benefits other display
+generic object: ALIndividual
+comment: |
+  This keeps the text that may be changed near the top of the public benefits section.
+  Used in:
+  Tell us about ______
+code: |
+  x.benefits_other_display = "another benefit that provides you income"
+---
+id: x.benefits object
+generic object: ALIndividual
+objects:
+  - x.benefits: ALIncomeList.using(complete_attribute='complete',there_is_another=False)
+---
+id: x.benefits ordered object for checkboxes
+generic object: ALIndividual
+objects:
+  - x.benefits_ordered: DAOrderedDict.using(elements=x.benefits.terms_ordered, auto_gather=False, gathered=True)
+---
+id: selected types sets there_are_any
+generic object: ALIncomeList
+code: |
+  if x.selected_types.any_true():
+    x.move_checks_to_list(selected_terms=x.terms_ordered)
+    x.there_are_any = True
+  else:
+    x.there_are_any = False
+---
+id: are there public benefits
+generic object: ALIndividual
+question: |
+  Do you get public assistance?
+subquestion: |
+  Do you get any of these benefits?
+  
+  Check any that apply to you.
+fields:
+  - no label: x.benefits.selected_types
+    datatype: checkboxes
+    code: |
+      x.benefits_ordered
+  - note: |
+      If you get SSDI, we will ask about that income later.
+---
+id: ALIncome complete
+generic object: ALIncome
+code: |
+  x.value
+  x.complete = True
+---
+id: public benefits info for list
+generic object: ALIndividual
+reconsider: x.benefits[i].display_name
+question: |
+  Tell us about ${ x.benefits[i].display_name }
+subquestion: |
+  % if i > 1:
+  You have already told us about your benefits from ${ comma_and_list(public_benefit.display_name for public_benefit in x.benefits.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your benefits from ${ comma_and_list(public_benefit.display_name for public_benefit in x.benefits.complete_elements()) }.
+  % endif
+fields:
+  - Source of income: x.benefits[i].source
+    input type: dropdown
+    code: |
+      x.benefits_ordered
+  - What type of income?: x.benefits[i].source_other
+    maxlength: 14
+    show if:
+      variable: x.benefits[i].source
+      is: other
+  - Times per year you receive this income: x.benefits[i].times_per_year
+    input type: radio
+    default: 12
+    code: |
+      times_per_year_list
+  - Amount of income: x.benefits[i].value
+    datatype: currency
+validation code: |
+  if x.benefits[i].source != "other":
+    x.benefits[i].display_name = x.benefits.terms_ordered.get(x.benefits[i].source, x.benefits[i].source)
+  else:
+    x.benefits[i].display_name = x.benefits[i].source_other
+
+---
+id: x.benefits set display name
+generic object: ALIndividual
+code: |
+  if defined('x.benefits[i].source') and x.benefits[i].source != "other":
+    x.benefits[i].display_name = x.benefits.terms_ordered.get(x.benefits[i].source, x.benefits[i].source)
+  elif defined('x.benefits[i].source') and x.benefits[i].source == "other" and defined('x.benefits[i].source_other'):
+    x.benefits[i].display_name = x.benefits[i].source_other
+  else:
+    x.benefits[i].display_name = x.benefits_other_display
+---
+id: want to add more public benefits
+generic object: ALIndividual
+question: Do you want to list any more public assistance?
+subquestion: |
+  Tap Next if you don't have more to add.
+  
+  ${ x.benefits_table }
+  
+  ${ x.benefits.add_action() }
+continue button field: x.benefits.review_items
+---
+id: x.benefits revisit
+generic object: ALIndividual
+continue button field: x.benefits.revisit
+question: |
+  Edit public assistance
+subquestion: |
+  ${ x.benefits_table }
+
+  ${ x.benefits.add_action() }
+---
+id: x.benefits table
+generic object: ALIndividual
+table: x.benefits_table
+rows: benefits
+columns:
+  - Source: |
+      row_item.display_name if defined("row_item.source") else ""
+  - Public assistance per month: |
+      currency(row_item.total(times_per_year=12))
+edit:
+  - source
+  - value
+---
+################################# OTHER INCOMES ##############################
+---
+id: other_incomes.terms_ordered
+generic object: ALIndividual
+variable name: x.other_incomes.terms_ordered
+data: !!omap
+  - social security: "Social security benefits not including Supplemental Security Income (SSI)"
+  - retirement: "Retirement benefits"
+  - pension: "Pension"
+  - interest: "Interest income"
+  - trust: "Trust or annuity income"
+  - dividends: " Income from dividends and partnership distributions"
+  - unemployment income: "Unemployment compensation benefits"
+  - severance: "Severance pay"
+  - worker comp: "Workers compensation"
+  - veteran: "Veteran's disabilty benefits"
+  - military: "Military allowances for subsistence and quarters"
+  - other: "Other"
+---
+variable name: help_text
+data: !!omap
+  - unemployment income help: "Enter gross amount of unemployment income — before taxes were taken out."
+  - default: " "
+---
+id: x.other_incomes set display name
+generic object: ALIndividual
+code: |
+  if defined('x.other_incomes[i].source') and x.other_incomes[i].source != "other":
+    x.other_incomes[i].display_name = x.other_incomes.terms_ordered.get(x.other_incomes[i].source, x.benefits[i].source)
+  elif defined('x.other_incomes[i].source') and x.other_incomes[i].source == "other" and defined('x.other_incomes[i].source_other'):
+    x.other_incomes[i].display_name = x.other_incomes[i].source_other
+  else:
+    x.other_incomes[i].display_name = x.other_incomes_other_display
+---
+id: other income display default
+generic object: ALIndividual
+## This keeps the text that may be changed near the top of the public benefits section.
+code: |
+  x.other_incomes_other_display = "other source of income"
+---
+id: other_incomes
+generic object: ALIndividual
+objects:
+  - x.other_incomes: ALIncomeList.using(complete_attribute='complete',there_is_another=False)
+---
+id: other_incomes_ordered
+generic object: ALIndividual
+objects:
+  - x.other_incomes_ordered: DAOrderedDict.using(elements=x.other_incomes.terms_ordered, auto_gather=False, gathered=True)
+---
+comment: |
+  will use id: ALIncomeList there are any to set other_incomes.there_are_any
+---
+generic object: ALIndividual
+id: are there other incomes
+#other_incomes
+question: |
+  Do you have other sources of income?
+subquestion: |
+  Check any that apply to you.
+  
+  Do not include employment income.
+fields:
+  - no label: x.other_incomes.selected_types
+    datatype: checkboxes
+    code: |
+      x.other_incomes_ordered
+---
+comment: |
+  will use id: ALIncome complete to set other_incomes[i].complete
+---
+generic object: ALIndividual
+id: other income info for list
+#generic object: ALIncomeList
+reconsider: x.other_incomes[i].display_name
+question: |
+  Tell us about your ${ x.other_incomes[i].display_name.lower() }
+subquestion: |
+  % if i > 1:
+  You have already told us about your incomes from ${ comma_and_list(other_income.display_name for other_income in x.other_incomes.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your income from ${ comma_and_list(other_income.display_name for other_income in x.other_incomes.complete_elements()) }.
+  % endif
+
+fields:
+  - Source of income: x.other_incomes[i].source
+    input type: dropdown
+    code: |
+      x.other_incomes_ordered
+  - What type of income?: x.other_incomes[i].source_other
+    show if:
+      variable: x.other_incomes[i].source
+      is: other
+  - Specify Type: x.other_incomes[i].source_other
+    show if:
+      variable: x.other_incomes[i].source
+      is: social security
+  - Times per year you receive this income: x.other_incomes[i].times_per_year
+    input type: radio
+    code: |
+      times_per_year_list
+    default: 12
+  - Amount of income: x.other_incomes[i].value
+    datatype: currency
+  - note: |
+      ${ help_text['unemployment income help'] }
+    show if:
+      variable: x.other_incomes[i].source
+      is: unemployment income
+validation code: |
+  if x.other_incomes[i].source != "other":
+    x.other_incomes[i].display_name = x.other_incomes.terms_ordered.get(x.other_incomes[i].source, x.other_incomes[i].source)
+  else:
+    x.other_incomes[i].display_name = x.other_incomes[i].source_other
+
+---
+id: x.other_incomes set display name
+generic object: ALIndividual
+code: |
+  if defined('x.other_incomes[i].source') and x.other_incomes[i].source != "other":
+    x.other_incomes[i].display_name = x.other_incomes.terms_ordered.get(x.other_incomes[i].source, x.benefits[i].source)
+  elif defined('x.other_incomes[i].source') and x.other_incomes[i].source == "other" and defined('x.other_incomes[i].source_other'):
+    x.other_incomes[i].display_name = x.other_incomes[i].source_other
+  else:
+    x.other_incomes[i].display_name = x.other_incomes_other_display
+---
+id: child support received for other children
+generic object: ALIndividual
+question: Child support received for other children
+fields:
+  - How much does ${ x.name_full() } receive monthly in child support for unemancipated children who are not subject of this proceeding?: x.other_child_support_received
+    datatype: currency
+---
+id: maintenance received for other cases
+generic object: ALIndividual
+question: Maintenance paid to ${ x.name_full() } in other cases
+fields:
+  - How much does ${ x.name_full() } receive monthly in maintenance in other cases?: x.maintenance_other_received
+    datatype: currency
+---
+############################# EXPENSES #############################
+---
+id: expenses intro screen
+continue button field: expenses_intro_screen
+question: |
+  Expenses
+subquestion: |
+  Now we'll review your expenses — the things you pay for.
+  
+  We will have screens for:
+  
+
+  - household expenses
+  
+  - vehicle expenses
+  
+  - insurance expenses
+  
+  - personal expenses
+    
+  Tap the Next button.
+comment: |
+  --Notes on how an expenses list is gathered, which may have expenses set as default from other lists, using household_expensess as an example--
+  
+  Interview has already asked about primary_residence_loans (which will be used as a default for the household_expenses['rent']
+
+  Interview order calls household_expenses and household_expenses.review_items - id: interview_order_VT_813
+
+  Gather looks for .there_are_any - id: selected types sets there_are_any
+
+  there_any_any asks for household_expenses.selected_types - id: household expenses types
+  
+  default code sets household_expenses.selected_types['rent'] to true if there are primary_residence_loans that the user pays
+
+  if any selected types,
+   move_check_to_lists function from al_income_move
+   This creates a number of elements in the list. The version in al_income_move does not delete 'source' if other, (original may set 'source' to the default, like 'vehicle')
+   also sets .moved for the list
+   there_are_any is set to true (  check_for_others will set source? CHECK)
+   will then look for complete - id: ALExpense complete
+
+  complete calls for attribute (value for household_expenses) for information question
+  if household_expenses[i].source is "rent", then code sets the value. for editing purposes, it also sets primary_residence_loans_househould_expenses_list_number to the index of household_expenses wi id: code setting loans as default for rent
+
+  information question calls display name (with reconsider to keep it fresh)
+  
+  answering the question sets display_name fresh with new source_other with validation code
+
+  complete sets display  
+  
+  household_expenses.review_items shows a table, which will include the mortgage expense calculated by the code block
+---
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+id: x.expenses.terms_ordered
+variable name: x.expenses.terms_ordered
+generic object: ALIndividual
+data: !!omap
+  - rent: "Rent"
+  - utilities: "Utilities"
+  - food: "Food"
+  - medical: "Medical expenses"
+  - laundry: "Laundry/dry cleaning"
+  - repairs: "Maintenance/repairs"
+--- 
+id:  expenses other display
+code: |
+  x.expenses_other_display = "another household expense"
+
+---
+id: expenses object
+generic object: ALIndividual
+objects:
+  - x.expenses: ALExpenseList.using(complete_attribute='complete',there_is_another=False)
+---
+id: expenses_ordered object
+generic object: ALIndividual
+objects:
+  - x.expenses_ordered: DAOrderedDict.using(elements=x.expenses.terms_ordered, auto_gather=False, gathered=True)
+---
+#expenses
+id: expenses types
+generic object: ALIndividual
+question: |
+  What kind of expenses does ${ x.name_full() } have?
+subquestion: |
+  You can look back 12 months for these expenses. That will give an accurate picture of how much the expenses really are.
+  
+fields:
+  - no label: x.expenses.selected_types
+    datatype: checkboxes
+    code: |
+      x.expenses_ordered
+
+---
+id: ALExpense complete
+generic object: ALExpense
+code: |
+  x.value
+  x.complete = True
+---
+id: expense information
+generic object: ALIndividual
+reconsider: x.expenses[i].display_name
+question: |
+  Tell us about your ${ x.expenses[i].display_name.lower() }
+subquestion: |
+  **Tip**: You can look back 12 months for this expense. That will give an accurate picture of how much the expense really is.
+fields: 
+  - Type of expense: x.expenses[i].source
+    code: |
+      x.expenses_ordered
+  - Other (explain): x.expenses[i].source_other
+    show if:
+      variable: x.expenses[i].source
+      is: other
+  - Amount: x.expenses[i].value
+    datatype: currency
+  - How often do you pay this amount?: x.expenses[i].times_per_year
+    input type: radio
+    default: 12
+    code: |
+      times_per_year_for_expenses
+  - Description: x.expenses[i].description
+    show if:
+      variable: x.expenses[i].source
+      is: medical
+
+validation code: |
+  if x.expenses[i].source != "other":
+    x.expenses[i].display_name = x.expenses.terms_ordered.get(x.expenses[i].source, x.expenses[i].source)
+  else:
+    x.expenses[i].display_name = x.expenses[i].source_other
+
+
+---
+id: sets display name for expense
+generic object: ALIndividual
+code: |
+  if defined('x.expenses[i].source') and x.expenses[i].source != "other":
+    x.expenses[i].display_name = x.expenses.terms_ordered.get(x.expenses[i].source, x.expenses[i].source)
+  elif defined('x.expenses[i].source') and x.expenses[i].source == "other" and defined('x.expenses[i].source_other'):
+    x.expenses[i].display_name = x.expenses[i].source_other
+  else:
+    x.expenses[i].display_name = x.expenses_other_display
+---
+
+id: extraordinary medical cost object
+generic object: ALIndividual
+objects:
+  - x.extraordinary_medical_costs: ALExpenseList.using(complete_attribute='value',there_is_another=False)
+---
+id: extraordinary medical costs
+generic object: ALIndividual
+question: Extraordinary Medical Costs to be paid by ${ x.name_full() }
+fields:
+  - Are there any extraordinary medical costs to be paid by ${ x.name_full() }?: x.extraordinary_medical_costs.there_are_any
+    datatype: yesnoradio
+---
+id: extraordinary medical cost information
+generic object: ALIndividual
+question: What is the ${ ordinal(i) } extraordinary medical cost to be paid by ${ x.name_full() }?
+fields:
+  - Description: x.extraordinary_medical_costs[i].description
+  - Amount of extraordinary medical cost: x.extraordinary_medical_costs[i].value
+    datatype: currency
+  - Times per year pays this cost: x.extraordinary_medical_costs[i].times_per_year
+    input type: radio
+    default: 12
+    code: |
+      times_per_year_list
+---
+id: extraordinary medical costs
+generic object: ALIndividual
+question: Extraordinary Medical Costs to be paid by ${ x.name_full() }
+fields:
+  - Are there any more extraordinary medical costs to be paid by ${ x.name_full() }?: x.extraordinary_medical_costs.there_is_another
+    datatype: yesnoradio
+---
+id: extraordinary child rearing cost object
+generic object: ALIndividual
+objects:
+  - x.extraordinary_childrearing_costs: ALExpenseList.using(complete_attribute='value',there_is_another=False)
+---
+id: extraordinary childrearing costs
+generic object: ALIndividual
+question: Extraordinary childrearing Costs to be paid by ${ x.name_full() }
+fields:
+  - Are there any extraordinary childrearing costs to be paid by ${ x.name_full() }?: x.extraordinary_childrearing_costs.there_are_any
+    datatype: yesnoradio
+---
+id: extraordinary childrearing cost information
+generic object: ALIndividual
+question: What is the ${ ordinal(i) } extraordinary childrearing cost to be paid by ${ x.name_full() }?
+fields:
+  - Description: x.extraordinary_childrearing_costs[i].description
+  - Should this cost be included in Form 14?: x.extraordinary_childrearing_costs[i].included_in_form_14
+    datatype: yesnoradio
+  - Amount of extraordinary medical cost: x.extraordinary_childrearing_costs[i].value
+    datatype: currency
+    show if: x.extraordinary_childrearing_costs[i].included_in_form_14
+  - Times per year pays this cost: x.extraordinary_childrearing_costs[i].times_per_year
+    input type: radio
+    default: 12
+    code: |
+      times_per_year_list
+    show if: x.extraordinary_childrearing_costs[i].included_in_form_14
+  - What percentage of this cost should the other parent reimburse to ${ x.name_full() }?: x.extraordinary_childrearing_costs[i].percentage
+    datatype: integer
+    min: 0
+    max: 100
+---
+id: extraordinary childrearing costs is there another
+generic object: ALIndividual
+question: Extraordinary Childrearing Costs to be paid by ${ x.name_full() }
+fields:
+  - Are there any more extraordinary childrearing costs to be paid by ${ x.name_full() }?: x.extraordinary_childrearing_costs.there_is_another
+    datatype: yesnoradio
+---
+id: child support for other children
+generic object: ALIndividual
+question: Child support paid for other children
+fields:
+  - How much does ${ x.name_full() } pay monthly in child support for unemancipated children who are not subject of this proceeding?: x.other_child_support_paid
+    datatype: currency
+---
+id: maintenance paid for other cases
+generic object: ALIndividual
+question: Maintenance ${ x.name_full() } pays in other cases
+fields:
+  - How much does ${ x.name_full() } pay monthly in maintenance in other cases?: x.maintenance_other_paid
+    datatype: currency
+---
+id: Work related childcare costs
+generic object: ALIndividual
+question: Work-Related Child Care Costs for ${ x.name_full() }
+fields:
+  - What are the monthly work-related child care expenses for ${ x.name_full() }?: x.work_childcare_expenses
+    datatype: currency
+---
+id: health insurance costs
+generic object: ALIndividual
+question: Children Health Insurance Costs for ${ x.name_full() }
+fields:
+  - What are the monthly health insurance costs for ${ x.name_full() } for the children who are subjects of this proceeding?: x.health_insurance_costs
+    datatype: currency
+---
+## ASSETS
+id: ALIncomeList there are any
+generic object: ALIncomeList
+code: |
+  if x.selected_types.any_true():
+    x.move_checks_to_list(selected_terms=x.terms_ordered)
+    x.there_are_any = True
+  else:
+    x.there_are_any = False
+---
+id: generic set display name backup
+generic object: ALAssetList
+code: |
+  if defined('x[i].source') and x[i].source != "other":
+    x[i].display_name = x.terms_ordered.get(x[i].source, x[i].source)
+  elif defined('x[i].source') and x[i].source == "other" and defined('x[i].source_other'):
+    x[i].display_name = x[i].source_other
+  else:
+    x[i].display_name = x.other_display
+---
+id: generic there are any
+generic object: ALAssetList
+question: |
+  ${ x.display_name }
+subquestion: |   
+  Do you or your spouse own any ${ x.display_name }?
+fields:
+  - no label: x.selected_types
+    datatype: checkboxes
+    code: |
+      x.ordered
+---
+generic object: ALAssetList
+code: |
+  x[i].market_value
+  x[i].complete = True
+---
+id: generic review
+generic object: ALAssetList
+question: Do you want to list any other ${ x.display_name }?
+subquestion: |
+
+  Tap Next if you don't have more to add.
+  
+  ${ x.table }
+  
+  ${ x.add_action() }
+continue button field: x.review_items
+---
+id: generic review
+generic object: ALIndividual
+question: Assets of ${ x.name.full() }
+subquestion: |
+
+  Tap Next if you don't have more to add.
+  
+  ${ x.assets_table }
+  
+continue button field: x.review_assets
+---
+id: generic revisit
+generic object: ALAssetList
+continue button field: x.revisit
+question: |
+  Edit ${ x.display_name }
+subquestion: |
+  ${ x.table }
+
+  ${ x.add_action() }
+---
+id: generic table
+generic object: ALAssetList
+table: x.table
+rows: x
+columns:
+  - Description: |
+      row_item.description
+  - Market value: |
+      currency(row_item.market_value) if defined("row_item.market_value") else ""
+  - Marital property?:  row_item.marital_property
+  - Party with possession?: row_item.has_possession
+  - Property awarded to: row_item.recommended_award
+edit:
+  - source
+  - value
+---
+id: generic table
+generic object: ALIndividual
+table: x.assets_table
+rows: x.assets
+columns:
+  - Description: |
+      row_item.description
+  - Market value: |
+      currency(row_item.market_value) if defined("row_item.market_value") else ""
+edit:
+  - source
+  - value
+---
+generic object: ALIndividual
+objects:
+  - x.assets: ALAssetList.using(auto_gather=False)
+---
+generic object: ALIndividual
+code: |
+  x.assets.clear()
+  if len([re for re in real_estate if re.recommended_award == x.name.full()]) == 1:
+    x.assets.append([asset for asset in real_estate if asset.recommended_award == x.name.full()][0])
+  elif len([asset for asset in real_estate if asset.recommended_award == x.name.full()]) > 1:
+    x.assets.appendObject()
+    x.assets[-1].display_name = real_estate.display_name + " (" + str([asset for asset in real_estate if asset.recommended_award == x.name.full()]) + ")"
+    x.assets[-1].market_value = real_estate.filter(recommended_award = x.name.full()).total()
+  x.assets.gathered = True
+---
+id: real_estate object
+objects:
+  - real_estate: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: real_estate other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  real_estate.other_display = "other real estate"
+  real_estate.display_name = "real estate"
+---
+id: real_estate terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: real_estate.terms_ordered
+data: !!omap
+  - house: "House"
+  - condominium: "Condominium"
+  - leasehold: "Leasehold"
+  - other: "Other"
+---
+only sets: real_estate[i].market_value
+id: describe real_estate
+reconsider: real_estate[i].display_name
+question: |
+  Tell us about your ${ real_estate[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in real_estate.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in real_estate.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: real_estate[i].source
+    code: |
+      real_estate.ordered
+  - Other (explain): real_estate[i].source_other
+    show if:
+      variable: real_estate[i].source
+      is: other
+  - Address: real_estate[i].address
+    required: False
+  - Legal description: real_estate[i].legal_description
+    required: False
+  - What is its market value? How much would you get if you sold it?: real_estate[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: real_estate[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: real_estate[i].lender
+    required: False 
+    show if: real_estate[i].is_amount_owed
+  - Balance: real_estate[i].balance
+    datatype: currency
+    show if: real_estate[i].is_amount_owed
+    required: False 
+  - Monthly Payment: real_estate[i].monthly_payment
+    datatype: currency
+    show if: real_estate[i].is_amount_owed
+    required: False 
+  - Who should pay this debt?: real_estate[i].recommended_debt
+    show if: real_estate[i].is_amount_owed
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+  - Is this marital or nonmarital property?: real_estate[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Party with possession of this property?: real_estate[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: real_estate[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  if real_estate[i].source != "other":
+    real_estate[i].display_name = real_estate.terms_ordered.get(real_estate[i].source, real_estate[i].source)
+  else:
+    real_estate[i].display_name = real_estate[i].source_other
+  real_estate[i].description = real_estate[i].display_name + " at " + real_estate[i].address + " " + real_estate[i].legal_description
+---
+id: vehicles object
+objects:
+  - vehicles: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: vehicles other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  vehicles.other_display = "other vehicles"
+  vehicles.display_name = "vehicles"
+---
+id: vehicles terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: vehicles.terms_ordered
+data: !!omap
+  - car: "Car"
+  - truck: "Truck"
+  - motorcycle: "Motorcycle"
+  - mobile_home: "Mobile home"
+  - trailer: "Trailer"
+  - boat: "Boat or jetski"
+  - airplane: "Airplane"
+  - other: "Other"
+---
+only sets: vehicles[i].market_value
+id: describe vehicles
+reconsider: vehicles[i].display_name
+question: |
+  Tell us about your ${ vehicles[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in vehicles.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in vehicles.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: vehicles[i].source
+    code: |
+      vehicles.ordered
+  - Other (explain): vehicles[i].source_other
+    show if:
+      variable: vehicles[i].source
+      is: other
+  - Year: vehicles[i].year
+    required: False
+  - Make: vehicles[i].make
+    required: False
+  - Make: vehicles[i].model
+    required: False
+  - Vehicle Identification Number: vehicles[i].vin
+    required: False
+  - What is its market value? How much would you get if you sold it?: vehicles[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: vehicles[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: vehicles[i].lender
+    required: False 
+    show if: vehicles[i].is_amount_owed
+  - Balance: vehicles[i].balance
+    datatype: currency
+    show if: vehicles[i].is_amount_owed
+    required: False 
+  - Monthly Payment: vehicles[i].monthly_payment
+    datatype: currency
+    show if: vehicles[i].is_amount_owed
+    required: False 
+  - Who should pay this debt?: vehicles[i].recommended_debt
+    show if: vehicles[i].is_amount_owed
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+  - Is this marital or nonmarital property?: vehicles[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Party with possession of this property?: vehicles[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: vehicles[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  if vehicles[i].source != "other":
+    vehicles[i].display_name = vehicles.terms_ordered.get(vehicles[i].source, vehicles[i].source)
+  else:
+    vehicles[i].display_name = vehicles[i].source_other
+  vehicles[i].description = vehicles[i].year + " " + vehicles[i].make + " " + vehicles[i].model
+---
+id: bank_assets object
+objects:
+  - bank_assets: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: bank_assets other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  bank_assets.other_display = "other bank assets"
+  bank_assets.display_name = "Bank assets"
+---
+id: bank_assets terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: bank_assets.terms_ordered
+data: !!omap
+  - checking account: "Checking accounts"
+  - savings account: "Savings accounts"
+  - time deposit: "Time deposit"
+  - money market: "Money market accounts"
+  - certificates: "Certificates"
+  - other: "Other"
+---
+only sets: bank_assets[i].market_value
+id: describe bank_assets
+reconsider: bank_assets[i].display_name
+question: |
+  Tell us about your ${ bank_assets[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in bank_assets.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in bank_assets.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: bank_assets[i].source
+    code: |
+      bank_assets.ordered
+  - Other (explain): bank_assets[i].source_other
+    show if:
+      variable: bank_assets[i].source
+      is: other
+  - Bank or Institution: bank_assets[i].institution
+    required: False
+  - Account number: bank_assets[i].account_number
+    required: False
+  - What is its market value? How much would you get if you sold it?: bank_assets[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is this marital or nonmarital property?: bank_assets[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Names on the account: bank_assets[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: bank_assets[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  if bank_assets[i].source != "other":
+    bank_assets[i].display_name = bank_assets.terms_ordered.get(bank_assets[i].source, bank_assets[i].source)
+  else:
+    bank_assets[i].display_name = bank_assets[i].source_other
+  bank_assets[i].description = bank_assets[i].institution + " " +bank_assets[i].display_name 
+---
+code: |
+  users[0].bank_assets = [bank_asset for bank_asset in bank_assets if bank_asset.recommended_award == users[0].name.full()]
+---
+id: personal_goods object
+objects:
+  - personal_goods: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: personal_goods other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  personal_goods.other_display = "other personal possessions"
+  personal_goods.display_name = "Personal possessions"
+---
+id: personal_goods terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: personal_goods.terms_ordered
+data: !!omap
+  - jewelry: "Jewelry"
+  - antiques: "Antiques"
+  - artwork: "Artwork"
+  - guns: "Guns"
+  - coins_stamps: "Coins / stamps"
+  - tools: "Tools"
+  - collectibles: "Collectibles"
+  - instruments: "Piano / musical instruments"
+  - china_etc: "China / crystal / silverware"
+  - appliances: "Appliances"
+  - computers: "Computers"
+  - electronics: "Electronics"
+  - furnishings: "Furnishings / furniture"
+  - other: "Other"
+---
+only sets: personal_goods[i].market_value
+id: describe personal_goods
+reconsider: personal_goods[i].display_name
+question: |
+  Tell us about your ${ personal_goods[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in personal_goods.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in personal_goods.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: personal_goods[i].source
+    code: |
+      personal_goods.ordered
+  - Other (explain): personal_goods[i].source_other
+    show if:
+      variable: personal_goods[i].source
+      is: other
+  - What is its market value? How much would you get if you sold it?: personal_goods[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: personal_goods[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: personal_goods[i].lender
+    required: False 
+    show if: personal_goods[i].is_amount_owed
+  - Balance: personal_goods[i].balance
+    datatype: currency
+    show if: personal_goods[i].is_amount_owed
+    required: False 
+  - Monthly Payment: personal_goods[i].monthly_payment
+    datatype: currency
+    show if: personal_goods[i].is_amount_owed
+    required: False
+  - Who should pay this debt?: personal_goods[i].recommended_debt
+    show if: personal_goods[i].is_amount_owed
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+  - Is this marital or nonmarital property?: personal_goods[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Who has possession?: personal_goods[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: personal_goods[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code: |
+  if personal_goods[i].source != "other":
+    personal_goods[i].display_name = personal_goods.terms_ordered.get(personal_goods[i].source, personal_goods[i].source)
+  else:
+    personal_goods[i].display_name = personal_goods[i].source_other
+  personal_goods[i].description = personal_goods[i].display_name
+---
+### DEBTS
+objects: 
+  - debts: ALAssetList.using(there_is_another=False,complete_attribute='complete')
+---
+generic object: ALIndividual
+objects:
+  - x.debts: ALAssetList.using(auto_gather=False)
+---
+id: populate debt list from debts in assets
+code: |
+  secured_debts.clear()
+  for list in [showifdef('real_estate'), showifdef('vehicles'), showifdef('securities'), showifdef('personal_goods'), showifdef('farm'), showifdef('businesses'), showifdef('other_assets')]:
+    for item in list:
+      if item.is_amount_owed and not item in secured_debts.complete_elements():
+        secured_debts.append(item)
+        item.already_included = True
+        secured_debts[-1].list = list.instanceName
+        if not defined('secured_debts[-1].source'):
+          secured_debts[-1].source = list.instanceName
+  secured_debts.gathered = True
+---
+id: code to generate separate lists
+generic object: ALIndividual
+code: |
+  x.debts.clear()
+  for debt in secured_debts:
+    if debt.recommended_debt == x.name.full():
+      x.debts.append(debt)
+  for debt in debts:
+    if debt.recommended_debt == x.name.full():
+      x.debts.append(debt)
+  x.debts.gathered = True
+---
+generic object: ALAssetList
+code: |
+  x[i].market_value
+  x[i].complete = True
+---
+id: generic ordered object for checkboxes
+generic object: ALAssetList
+objects:
+  - x.ordered: DAOrderedDict.using(elements=x.terms_ordered, auto_gather=False, gathered=True)
+---
+id: debts other display
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  debts.other_display = "other debts"
+  debts.display_name = "other debts"
+---
+objects: 
+  - secured_debts: ALAssetList.using(auto_gather=False)
+---
+id: debts terms_ordered
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: debts.terms_ordered
+data: !!omap
+  - real_estate: "a mortgage on a house or condominium or land"
+  - vehicles: "vehicle loans"
+  - credit_card_debt: "Credit card debt"
+  - personal_loans: "Money to family or friends"
+  - medical_debt: "Medical or dental bills"
+  - student_loans: "Student loans"
+  - other: "Other"
+---
+code: |
+  debts.display_name = "Debt"
+---
+id: debts there are any
+generic object: ALAssetList
+question: |
+  Other Debts
+subquestion: |   
+  You have already entered information about these debts.  Do you have any other debts to add?
+  
+  % for debt in debts:
+  ${ debt.description }
+
+  % endfor
+
+  
+  Do you have any other debts to add?
+
+fields:
+  - no label: debts.selected_types
+    datatype: checkboxes
+    code: |
+      debts.ordered
+---
+code: |
+  debts[i].balance
+  debts[i].complete = True
+---
+question: | 
+  Tell us about your ${ debts[i].display_name }
+subquestion: |
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in debts.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in debts.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: debts[i].source
+    code: |
+      debts.ordered
+  - "Other (explain)": debts[i].source_other
+    show if:
+      variable: debts[i].source
+      is: other
+  - Who is the money owed to?: debts[i].lender
+    required: False 
+  - Balance: debts[i].balance
+    datatype: currency
+  - Monthly Payment: debts[i].monthly_payment
+    datatype: currency
+    required: False 
+  - Who should pay this debt?: debts[i].recommended_debt
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+---
+generic object: ALAsset
+question: Who should pay this debt?
+fields:
+  - Who should pay this debt?: x.recommended_debt
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+---
+id: debts review
+question: Do you want to list any other debts?
+subquestion: |
+  Tap Next if you don't have more to add.
+  
+  ${ debts.table }
+  
+  ${ debts.add_action() }
+continue button field: debts.review_items
+---
+id: debts revisit
+continue button field: debts.revisit
+question: |
+  Edit debts
+  
+subquestion: |
+  ${ debts.table }
+
+  ${ debts.add_action() }
+---
+id: debts table
+table: debts.table
+rows: debts
+columns:
+  - Type: |
+      row_item.source
+  - Lender: |
+      row_item.lender
+  - Balance: |
+      currency(row_item.balance) if defined("row_item.balance") else ""
+  - Monthly payment:
+      currency(row_item.monthly_payment) if defined("row_item.monthly_payment") else ""
+  - Marital property?:  row_item.marital_property
+  - Party with possession?: row_item.has_possession
+  - Debts to be paid by: row_item.recommended_debt if defined("row_item.recommended_debt") else ""
+edit:
+  - lender
+---
+## DECREE
+id: legal_custody question
+question: Legal Custody
+subquestion: |
+  Info on Legal Custody
+fields:
+ - What would you like to ask the court to give you in terms of legal custody?: legal_custody
+   datatype: radio
+   choices:
+     - Joint
+     - Sole
+     - Third Party
+---
+id: follow up reason for sole legal custody
+if: legal_custody == "Sole"
+question: Reason for sole custody
+subquestion: |
+  Missouri Law requires a statement of the reasons for a request for no shared decision-making. You must enter a reason on this line.
+fields:
+  - no label: legal_custody_sole_explanation
+    datatype: area
+---
+id: follow up for third party legal custody
+reconsider: people_choices
+sets:
+ - legal_custody_other.name.first
+if: legal_custody == "Third Party"
+question: Sole Legal Custody to Third Party
+fields:
+  - Existing person: legal_custody_other
+    datatype: object
+    choices: people_choices
+    disable others: True
+  - code: |
+      legal_custody_other.name_fields()
+---
+id: legal custody third party object
+objects: 
+  - legal_custody_other: ALIndividual
+---
+id: communications question
+question: Communication between parents
+subquestion: |
+  How should the parents communicate about the children? Check each box that is appropriate.
+fields:
+  - Communication methods:  communications
+    datatype: checkboxes
+    choices:
+      - In person: in_person
+      - Home telephone: home_telephone
+      - Work telephone: work_telephone
+      - Mobile telephone: mobile_telephone
+      - Letter via U.S. Postal Service: letter
+      - E-mail: email
+      - Using a third person: third_party
+---
+id: follow up question for communications through third party
+if: communications["third_party"]
+reconsider: people_choices
+sets:
+ - communications_other.name.first
+question: Communication
+subquestion: |
+  Who should the parties communicate through?
+fields:
+  - Existing person: communications_other
+    datatype: object
+    choices: people_choices
+    disable others: True
+  - code: |
+      communications_other.name_fields()
+---
+id: object for communications third party
+objects: 
+  - communications_other: ALIndividual
+---
+id: physical_custody question
+question: Physical Custody
+subquestion: |
+  Info on Physical Custody
+fields:
+ - What would you like to ask the court to give you in terms of legal custody?: physical_custody
+   datatype: radio
+   choices:
+     - Joint
+     - Sole
+     - Third Party
+---
+if: physical_custody == "Sole"
+id: follow up visitation question for sole physical_custody
+question: Visitation
+fields:
+  - Should visitation with ${ other_parties[0] } be supervised?: visitation
+    datatype: yesnoradio
+---
+id: follow up
+if: visitation
+reconsider: people_choices
+sets:
+ - visitation_supervisor.name.first
+question: Visitation
+subquestion: |
+  Who should supervise the visitation with ${ other_parties[0] }?
+fields:
+  - Existing person: visitation_supervisor
+    datatype: object
+    choices: people_choices
+    disable others: True
+  - code: |
+      visitation_supervisor.name_fields()
+---
+if: physical_custody == "Sole" and visitation
+question: Reason for sole custody
+subquestion: |
+  Describe why
+fields:
+  - no label: physical_custody_sole_explanation
+    datatype: area
+---
+id: follow up for third party physical custody
+if: physical_custody == "Third Party"
+reconsider: people_choices
+sets:
+  - physical_custody_other.name.first
+question: Sole physical Custody to Third Party
+fields:
+  - Existing person: physical_custody_other
+    datatype: object
+    choices: people_choices
+    disable others: True
+  - code: |
+      physical_custody_other.name_fields()
+---
+objects: 
+  - physical_custody_other: ALIndividual
+---
+objects: 
+  - visitation_supervisor: ALIndividual
+---
+## MAINTENANCE ##
+id: maintenance to petitioner
+question: Maintenance to ${ petitioner.name.full() }
+fields:
+  - Should ${ respondent.name.full() } pay maintenance to ${ petitioner.name.full() }?: maintenance_to_petitioner
+    input type: radio                                                                       
+    choices:
+      - The court lacks jurisdiction to enter any orders with respect to maintenance of ${ petitioner.name.full() }.: no_jurisdiction
+      - No maintenance is to be paid to ${ petitioner.name.full() } by ${ respondent.name.full() }. This agreement is not subject to modification.: none
+      - ${ respondent.name.full() } shall pay maintenance to ${ petitioner.name.full() }.: ordered_to_pay
+---
+id: maintenance to respondent
+question: Maintenance to ${ respondent.name.full() }
+fields:
+  - Should ${ petitioner.name.full() } pay maintenance to ${ respondent.name.full() }?: maintenance_to_respondent
+    choices:
+      - The court lacks jurisdiction to enter any orders with respect to maintenance of ${ respondent.name.full() }.: no_jurisdiction
+      - No maintenance is to be paid to ${ respondent.name.full() } by ${ petitioner.name.full() }. This agreement is not subject to modification.: none
+      - ${ petitioner.name.full() } shall pay maintenance to ${ respondent.name.full() }.: ordered_to_pay
+---
+sets:
+  - petitioner.maintenance_paid
+question: Maintenance to ${ respondent.name.full() }
+fields:
+  - How much?: maintenance_to_respondent_amount
+    datatype: currency
+  - Should the maintenance be subject to modification?: maintenance_to_respondent_modifiable
+    datatype: yesnoradio
+validation code: |
+  respondent.maintenance_received = maintenance_to_respondent_amount
+  petitioner.maintenance_paid = maintenance_to_respondent_amount
+---
+id: maintenance to petitioner amount
+question: Maintenance to ${ petitioner.name.full() }
+fields:
+  - How much?: maintenance_to_petitioner_amount
+    datatype: currency
+  - Should the maintenance be subject to modification?: maintenance_to_petitioner_modifiable
+    datatype: yesnoradio
+validation code: |
+  petitioner.maintenance_received = maintenance_to_petitioner_amount
+  respondent.maintenance_paid = maintenance_to_petitioner_amount
+---
+question: Income Withholding
+fields:
+  - Should income withholding be prepared by the person receiving maintenance?: maintenance_income_withholding
+    datatype: yesnoradio
+  - Reason income withholding shall not issue: maintenance_income_withholding_reason
+    show if:
+      variable: maintenance_income_withholding
+      is: False
+---
+## CHILD SUPPORT ##
+id: Child Support Award
+question: |
+  Child Support Award
+fields:
+  - Who is awarded child support?: child_support
+    datatype: radio
+    choices:
+      - ${ petitioner.name_full() }
+      - ${ respondent.name_full() }
+      - No child support awarded: none
+validation code: |
+  if child_support in ["petitioner", "none"]:
+    support_recipient = petitioner
+    support_payer = respondent
+  else:
+    support_recipient = respondent
+    support_payer = petitioner  
+---
+
+## RELIEF ##
+id: Relief Requested
+question: Request for Relief
+fields:
+  - What do you want the court to do?: relief
+    datatype: checkboxes
+    choices: 
+      - Grant a dissolution of my marriage: dissolution
+      - Grant custody of the children.noun_plural: custody
+      - Enter appropriate orders whith respect to the support of the children: child_support
+      - Divide the marital property and debts: divide_property
+      - Award maintenance to me: maintenance_to_me
+      - Award maintenance to my spouse: maintenance_to_spouse
+      - Change my name to my former name: change_name
+      - Other: other
+  - Explain: relief_other
+    show if: relief['other']
+---
+## SERVICE ##
+objects:
+  - service: Thing
+---
+id: service date
+question: Date of Service
+fields:
+  - What date will the documents be served?: service.date
+    datatype: date
+---
+id: Type of Service Question
+question: Type of Service
+fields: 
+  - Do you want to serve by publication or in person?: service_type
+    choices:
+      - Serve by publication: publication
+      - Serve in person: in_person
+---
+id: Personal Service Question
+question: Type of Personal Service
+fields:
+  - Do you want to serve by sheriff or by private process server?: personal_service_type
+    choices:
+      - Serve by sheriff: sheriff
+      - Serve by private process server: private
+
+---
+id: people_served object
+objects: 
+  - people_served: ALPeopleList.using(auto_gather=False)
+---
+id: people_served code
+code: |
+  people_served.clear()
+  if users[0] == petitioner:
+    if respondent.attorney_involved:
+      people_served.append(respondent.attorney)
+    else:
+      people_served.append(respondent)
+  elif users[0] == respondent:
+    if petitioner.attorney_involved:
+      people_served.append(petitioner.attorney)
+    else:
+      people_served.append(petitioner)
+  people_served.gathered = True
+---
+id: download MO divorce forms
+event: mo_divorce_forms_download
+question: |
+  All done
+subquestion: |
+  Link to specific court website
+  Info on Discovery
+  Info and link on Parenting Class when applicable
+  Photo of Court House
+  Script for hearing
+  Print out of itinerary
+  
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
+
+  ${ action_button_html(url_action('review_certificate_of_dissolution_of_marri'), label='Edit answers', color='info') }
+  
+  
+  ${ al_user_bundle.download_list_html() }
+  
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+
+progress: 100
+---
+# ALDocument objects specify the metadata for each template
+objects:
+  - mo_divorce_forms_Post_interview_instructions: ALDocument.using(title="Instructions", filename="certificate_of_dissolution_of_marri_next_steps.docx", enabled=True, has_addendum=False)
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, form_17_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, form_17_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+---
+# Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
+# used for "preview" and "final" keys, and logic in the template checks the value of 
+# `i` to show or hide the user's signature
+attachment:
+  name: Post-interview-Instructions
+  filename: mo_divorce_forms_next_steps
+  docx template file: mo_divorce_forms_next_steps.docx
+  variable name: mo_divorce_forms_Post_interview_instructions[i]
+  skip undefined: True
+  tagged pdf: True
+
