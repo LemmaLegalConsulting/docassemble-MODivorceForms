@@ -1379,16 +1379,6 @@ data: !!omap
   - unemployment income help: "Enter gross amount of unemployment income — before taxes were taken out."
   - default: " "
 ---
-id: x.other_incomes set display name
-generic object: ALIndividual
-code: |
-  if defined('x.other_incomes[i].source') and x.other_incomes[i].source != "other":
-    x.other_incomes[i].display_name = x.other_incomes.terms_ordered.get(x.other_incomes[i].source, x.benefits[i].source)
-  elif defined('x.other_incomes[i].source') and x.other_incomes[i].source == "other" and defined('x.other_incomes[i].source_other'):
-    x.other_incomes[i].display_name = x.other_incomes[i].source_other
-  else:
-    x.other_incomes[i].display_name = x.other_incomes_other_display
----
 id: other income display default
 generic object: ALIndividual
 ## This keeps the text that may be changed near the top of the public benefits section.
@@ -1475,7 +1465,7 @@ id: x.other_incomes set display name
 generic object: ALIndividual
 code: |
   if defined('x.other_incomes[i].source') and x.other_incomes[i].source != "other":
-    x.other_incomes[i].display_name = x.other_incomes.terms_ordered.get(x.other_incomes[i].source, x.benefits[i].source)
+    x.other_incomes[i].display_name = x.other_incomes.terms_ordered.get(x.other_incomes[i].source, x.other_incomes[i].source)
   elif defined('x.other_incomes[i].source') and x.other_incomes[i].source == "other" and defined('x.other_incomes[i].source_other'):
     x.other_incomes[i].display_name = x.other_incomes[i].source_other
   else:
@@ -1654,6 +1644,11 @@ fields:
   - Are there any extraordinary medical costs to be paid by ${ x.name_full() }?: x.extraordinary_medical_costs.there_are_any
     datatype: yesnoradio
 ---
+if: len(children) == 0
+generic object: ALIndividual
+code: |
+  x.extraordinary_medical_costs.there_are_any = False
+---
 id: extraordinary medical cost information
 generic object: ALIndividual
 question: What is the ${ ordinal(i) } extraordinary medical cost to be paid by ${ x.name_full() }?
@@ -1685,6 +1680,11 @@ question: Extraordinary childrearing Costs to be paid by ${ x.name_full() }
 fields:
   - Are there any extraordinary childrearing costs to be paid by ${ x.name_full() }?: x.extraordinary_childrearing_costs.there_are_any
     datatype: yesnoradio
+---
+if: len(children) == 0
+generic object: ALIndividual
+code: |
+  x.extraordinary_childrearing_costs.there_are_any = False
 ---
 id: extraordinary childrearing cost information
 generic object: ALIndividual
@@ -1735,12 +1735,22 @@ fields:
   - What are the monthly work-related child care expenses for ${ x.name_full() }?: x.work_childcare_expenses
     datatype: currency
 ---
+if: len(children) == 0
+generic object: ALIndividual
+code: |
+  x.work_childcare_expenses = 0
+---
 id: health insurance costs
 generic object: ALIndividual
 question: Children Health Insurance Costs for ${ x.name_full() }
 fields:
   - What are the monthly health insurance costs for ${ x.name_full() } for the children who are subjects of this proceeding?: x.health_insurance_costs
     datatype: currency
+---
+if: len(children) == 0
+generic object: ALIndividual
+code: |
+  x.health_insurance_costs = 0
 ---
 ## ASSETS
 id: ALIncomeList there are any
