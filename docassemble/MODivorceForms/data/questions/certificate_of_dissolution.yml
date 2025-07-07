@@ -43,18 +43,14 @@ id: Type of Dissolution
 question: |
   Type of Dissolution
 fields:
-  - "Marriage type dissolution true": marriage.dissolution_type
-    datatype: radio
-    required: False
-    choices: 
-      - Dissolution
-      - Legal Separation
-      - Annulment
   - "Date Couple Last Resided in same Household (Month, Day, Year)": marriage.separation_date
     datatype: date
     required: False
   - "Did the couple live together in Missouri?": marriage.live_together_in_mo
     datatype: yesnoradio
+---
+code: |
+  marriage.dissolution_type = "Dissolution"
 ---
 id: children in household at separation
 question: Children in household at separation

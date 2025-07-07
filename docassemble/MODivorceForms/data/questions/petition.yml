@@ -120,8 +120,10 @@ question: Status of marriage
 fields:
   - Is the marriage irretrievable broken?: marriage.is_broken
     datatype: yesnoradio
+    default: True
   - Can the marriage be preserved?: marriage.can_be_preserved
     datatype: yesnoradio
+    default: False
 
 ---
 id: Abuse or neglect

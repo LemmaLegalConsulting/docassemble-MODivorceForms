@@ -71,19 +71,6 @@ code: |
 code: |
   al_form_type = "starts_case" 
 ---
-sections:
-  - case_information: Information about your case
-  - relief: Requests to the Court
-  - user_info: Information about you
-  - other_party_info: Information about the other party  
-  - children: Children
-  - income: Income
-  - expenses: Expenses
-  - assets: Assets
-  - debts: Debts
-  - service: Service and Filing Documents
-  - review: Review your answers
----
 #################### Interview order #####################
 comment: |
   Controls order and branching logic for questions specific to this form
@@ -418,6 +405,8 @@ comment: |
   Delete mandatory: True to include in another interview
 mandatory: True
 code: |
+  enable_al_nav_sections
+  nav.set_section('case_information')
   al_intro_screen
   # mo_divorce_forms_intro
   interview_order_mo_divorce_forms
@@ -446,6 +435,25 @@ include:
   - fee_waiver.yml
   - confidential_information_sheet.yml
   - shared.yml
+---
+code: |
+  enable_al_nav_sections = True
+---
+variable name: al_nav_sections
+data:
+  - case_information: Is this the right tool for you?
+  - relief: Help provided
+  - provide_details: Answer questions
+    subsections:
+      - user_info: Information about you
+      - other_party_info: Information about the other party  
+      - children: Children
+      - income: Income
+      - expenses: Expenses
+      - assets: Assets
+      - debts: Debts
+  - service: Service and Filing Documents
+  - review: Review your answers
 ---
 
 id: basic questions intro screen
@@ -668,7 +676,7 @@ continue button field: assets_warning
 id: Service
 question: Service of ${ other_parties[0].name_full() }
 fields:
-  - Has ${ other_parties[0].name_full() }been served?: respondent_served
+  - Has ${ other_parties[0].name_full() } been served?: respondent_served
     datatype: yesnoradio
 ---
 id: Hearing Information Screen
