@@ -199,20 +199,13 @@ code: |
     ask_about_dispute_resolution
     child_support # certificate_of_dissolution
   
-  if case.filed in ['user0_filed']:
-    parenting_plan
-  elif case.filed in ['user1_filed']:
-    agree_with_parenting_plan
-  if maintenance_to_petitioner == "ordered_to_pay":
-    maintenance_to_petitioner_amount
-    maintenance_to_petitioner_modifiable
-  if maintenance_to_respondent == "ordered_to_pay":
-    maintenance_to_respondent_amount
-    maintenance_to_respondent_modifiable
-  if maintenance_to_petitioner or maintenance_to_respondent: 
-    maintenance_income_withholding    
+    if case.filed in ['user0_filed']:
+      parenting_plan
+    elif case.filed in ['user1_filed']:
+      agree_with_parenting_plan
+  is_maintenance_award
   
-  nav.set_section("user_information")  
+  nav.set_section("user_info")  
 
   
   users[0].address.address # petition
@@ -235,7 +228,7 @@ code: |
     users[0].education_elementary
     users[0].previously_married
   
-  nav.set_section("other_party_information")  
+  nav.set_section("other_party_info")  
   other_parties[0].address.address # petition
   if other_parties[0].address.state == "MO":
     other_parties[0].address.county

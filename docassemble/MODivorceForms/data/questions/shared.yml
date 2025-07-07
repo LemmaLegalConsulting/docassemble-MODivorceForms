@@ -1478,6 +1478,13 @@ fields:
   - How much does ${ x.name_full() } receive monthly in child support for unemancipated children who are not subject of this proceeding?: x.other_child_support_received
     datatype: currency
 ---
+id: set child support to 0
+generic object: ALIndividual
+if: x.other_children == 0
+code: |
+  x.other_child_support_received = 0
+  x.other_child_support_paid = 0
+---
 id: maintenance received for other cases
 generic object: ALIndividual
 question: Maintenance paid to ${ x.name_full() } in other cases
@@ -1721,12 +1728,26 @@ fields:
   - How much does ${ x.name_full() } pay monthly in child support for unemancipated children who are not subject of this proceeding?: x.other_child_support_paid
     datatype: currency
 ---
+id: set child support to 0 if no children
+generic object: ALIndividual
+if: x.other_children == 0
+code: |
+  x.other_child_support_received = 0
+  x.other_child_support_paid = 0
+---
 id: maintenance paid for other cases
 generic object: ALIndividual
 question: Maintenance ${ x.name_full() } pays in other cases
 fields:
   - How much does ${ x.name_full() } pay monthly in maintenance in other cases?: x.maintenance_other_paid
     datatype: currency
+---
+id: set child support to 0 if no children
+generic object: ALIndividual
+if: not x.previously_married
+code: |
+  x.maintenance_other_received = 0
+  x.maintenance_other_paid = 0
 ---
 id: Work related childcare costs
 generic object: ALIndividual
@@ -2597,6 +2618,47 @@ fields:
     show if:
       variable: maintenance_income_withholding
       is: False
+---
+id: one maintenance question
+question: Maintanance award
+fields:
+  - Should the court award maintenance to ${ petitioner.name_full() } or ${ respondent.name_full() }?: is_maintenance_award
+    datatype: yesnoradio
+  - Who should be awarded maintenance?: maintenance_awarded_to
+    js show if: |
+      val("is_maintenance_award")
+    choices:
+      - ${ petitioner.name_full() } should be paid maintenance by ${ respondent.name_full() }: petitioner
+      - ${ respondent.name_full() } should be paid maintenance by ${ petitioner.name_full() }
+    datatype: radio
+  - How much per month?: maintenance_amount
+    datatype: currency
+    js show if: |
+      val('maintenance_awarded_to') === "petitioner" || val('maintenance_awarded_to') === "respondent"
+  - Should income withholding be prepared by the person receiving maintenance?: maintenance_income_withholding
+    datatype: yesnoradio
+    js show if: |
+      val('maintenance_amount') != null
+  - Reason income withholding shall not issue: maintenance_income_withholding_reason
+    js show if: |
+      val('maintenance_income_withholding') === false
+validation code: |
+  if is_maintenance_award:
+    if maintenance_awarded_to == "petitioner":
+      petitioner.maintenance_received = maintenance_amount
+      petitioner.maintenance_paid = 0
+      respondent.maintenance_received = 0
+      respondent.maintenance_paid = maintenance_amount
+    if maintenance_awarded_to == "respondent":
+      petitioner.maintenance_received = 0
+      petitioner.maintenance_paid = maintenance_amount
+      respondent.maintenance_received = maintenance_amount
+      respondent.maintenance_paid = 0
+  else:
+    petitioner.maintenance_received = 0
+    petitioner.maintenance_paid = 0
+    respondent.maintenance_received = 0
+    respondent.maintenance_paid = 0
 ---
 ## CHILD SUPPORT ##
 id: Child Support Award
