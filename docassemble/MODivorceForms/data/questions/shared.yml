@@ -259,6 +259,11 @@ fields:
       - 4
       - 5+
     required: False
+---
+id: active duty info
+generic object: ALIndividual
+question: Military info for ${ x.name_full() }
+fields:  
   - Active duty military?: x.active_duty
     datatype: yesnoradio
 ---
@@ -900,6 +905,21 @@ fields:
 id: other itemized job income value
 generic object: ALItemizedJob
 question: |
+  How much do you get paid in ${ job_items_names.get(i, i) } in your job as a ${ x.source }?
+fields:
+  - Amount: x.to_add[i].value
+    datatype: currency
+  - How often do you get paid this amount?: x.to_add[i].times_per_year
+    input type: radio
+    code: |
+      times_per_year_list
+    datatype: integer
+  - Do you get any other compensation from this job??: x.to_add.there_is_another
+    datatype: yesnoradio
+---
+id: other itemized job income value for other party
+generic object: ALItemizedJob
+question: |
   How much does ${ other_parties[0] } get paid in ${ job_items_names.get(j, j) } as a ${ other_parties[0].jobs[i].source }?
 fields:
   - Amount: other_parties[0].jobs[i].to_add[j].value
@@ -918,12 +938,17 @@ fields:
   - Does ${ other_parties[0].name_full() } have a job?: other_parties[0].jobs.there_are_any
     datatype: yesnomaybe
 ---
-generic object: ALIndividual
 id: other parties jobs
 question: Jobs
 fields:
-  - Does ${ x.name_full() } have another job?: x.jobs.there_is_another
+  - Does ${ other_parties[0].name_full() } have another job?: other_parties[0].jobs.there_is_another
     datatype: yesnomaybe
+---
+id: users jobs
+question: Jobs
+fields:
+  - Do you have another job?: users[0].jobs.there_is_another
+    datatype: yesnoradio
 ---
 id: employer object
 generic object: ALIndividual
@@ -1111,6 +1136,10 @@ if: not x.to_add.complete_elements()
 generic object: ALItemizedJob
 code: |
   x.to_add.new_item_name = 'wages'
+---
+if: not other_parties[0].jobs[i].to_add.complete_elements()
+code: |
+  other_parties[0].jobs[i].to_add.new_item_name = 'wages'
 ---
 id: edit wages and other incomes from a job
 generic object: ALIndividual
@@ -2513,8 +2542,8 @@ question: |
 subquestion: |   
   You have already entered information about these debts.  Do you have any other debts to add?
   
-  % for debt in debts:
-  ${ debt.description }
+  % for debt in secured_debts:
+  * ${ debt.description }
 
   % endfor
 

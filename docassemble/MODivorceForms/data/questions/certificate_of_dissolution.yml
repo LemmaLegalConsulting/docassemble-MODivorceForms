@@ -39,9 +39,9 @@ code: |
   children[i].under_18_in_household
   children[i].complete = True
 ---
-id: Type of Dissolution
+id: separation date
 question: |
-  Type of Dissolution
+  Residence of Marriage
 fields:
   - "Date Couple Last Resided in same Household (Month, Day, Year)": marriage.separation_date
     datatype: date
