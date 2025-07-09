@@ -120,8 +120,10 @@ question: Status of marriage
 fields:
   - Is the marriage irretrievable broken?: marriage.is_broken
     datatype: yesnoradio
+    default: True
   - Can the marriage be preserved?: marriage.can_be_preserved
     datatype: yesnoradio
+    default: False
 
 ---
 id: Abuse or neglect
@@ -147,9 +149,12 @@ fields:
 id: Other allegations
 question: Other allegations
 fields:
+  - Do you want to make any other allegations?: other_allegations_exist
+    datatype: yesnoradio
   - Are there any other allegations: other_allegations
     datatype: area
     required: False
+    show if: other_allegations_exist
 
 ---
 id: method of service to respondent
@@ -240,9 +245,10 @@ fields:
       x.service_address.address_fields()
 ---
 id: Respondent hours of employment
-question: What are the hours of employment for ${ respondent.name_full() }?
+generic object: ALIndividual
+question: What are the hours of employment for ${ x.name_full() }?
 fields:
-  - no label: respondent.hours_of_employment
+  - no label: x.hours_of_employment
 ---
 id: Petition for Dissolution of Marriage object
 objects:

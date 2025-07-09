@@ -169,7 +169,7 @@ fields:
 ---
 id: Driver license number
 generic object: ALIndividual
-question: Driver's license numberfor ${ x.name_full() }
+question: Driver's license number for ${ x.name_full() }
 fields:
   - no label: x.driver_license_number
     required: False
@@ -259,6 +259,11 @@ fields:
       - 4
       - 5+
     required: False
+---
+id: active duty info
+generic object: ALIndividual
+question: Military info for ${ x.name_full() }
+fields:  
   - Active duty military?: x.active_duty
     datatype: yesnoradio
 ---
@@ -863,7 +868,7 @@ fields:
   - Monthly self employment income: other_parties[0].self_employment_income
     datatype: currency
     show if: other_parties[0].has_self_employment_income
-  - Description of your self employment: other_parties[0].self_employment_description
+  - Description of ${ other_parties[0].pronoun_possessive("self employment")} : other_parties[0].self_employment_description
     show if: other_parties[0].has_self_employment_income
 validation code: |
   if not other_parties[0].has_self_employment_income:
@@ -887,18 +892,63 @@ fields:
   - Do you have a job?: users[0].jobs.there_are_any
     datatype: yesnoradio
 ---
+id: name of one itemized job in list
+question: |
+  What is the job title for the ${ordinal(i)} job for ${ other_parties[0] }?
+subquestion: |
+  % if len(other_parties[0].jobs.complete_elements()) > 0:
+  You've already told us about ${ other_parties[0] } being a ${ comma_and_list([job.source for job in other_parties[0].jobs.complete_elements()]) }.
+  % endif
+fields:
+  - Job title: other_parties[0].jobs[i].source
+---
+id: other itemized job income value
+generic object: ALItemizedJob
+question: |
+  How much do you get paid in ${ job_items_names.get(i, i) } in your job as a ${ x.source }?
+fields:
+  - Amount: x.to_add[i].value
+    datatype: currency
+  - How often do you get paid this amount?: x.to_add[i].times_per_year
+    input type: radio
+    code: |
+      times_per_year_list
+    datatype: integer
+  - Do you get any other compensation from this job??: x.to_add.there_is_another
+    datatype: yesnoradio
+---
+id: other itemized job income value for other party
+generic object: ALItemizedJob
+question: |
+  How much does ${ other_parties[0] } get paid in ${ job_items_names.get(j, j) } as a ${ other_parties[0].jobs[i].source }?
+fields:
+  - Amount: other_parties[0].jobs[i].to_add[j].value
+    datatype: currency
+  - How often does ${ other_parties[0] } get paid this amount?: other_parties[0].jobs[i].to_add[j].times_per_year
+    input type: radio
+    code: |
+      times_per_year_list
+    datatype: integer
+  - Does ${ other_parties[0] } get any other compensation from this job?: other_parties[0].jobs[i].to_add.there_is_another
+    datatype: yesnoradio
+---
 id: other parties jobs
 question: Jobs
 fields:
   - Does ${ other_parties[0].name_full() } have a job?: other_parties[0].jobs.there_are_any
     datatype: yesnomaybe
 ---
-generic object: ALIndividual
 id: other parties jobs
 question: Jobs
 fields:
-  - Does ${ x.name_full() } have another job?: x.jobs.there_is_another
+  - Does ${ other_parties[0].name_full() } have another job?: other_parties[0].jobs.there_is_another
     datatype: yesnomaybe
+---
+id: users jobs
+question: Jobs
+fields:
+  - Do you have another job?: users[0].jobs.there_is_another
+    datatype: yesnoradio
 ---
 id: employer object
 generic object: ALIndividual
@@ -1059,10 +1109,37 @@ validation code: |
   if x.to_add.new_item_name in x.to_add.complete_elements().keys():
     validation_error(f'You already told us about your <strong>{job_items_names.get(x.to_add.new_item_name, x.to_add.new_item_name) }</strong> that pays { currency( x.to_add[ x.to_add.new_item_name ].value )}. Pick a different name.')
 ---
+id: jobs details about tips commissions bonuses
+generic object: ALItemizedJob
+question: |
+  Other incomes from your job as a ${ other_parties[0].jobs[i].source }
+subquestion: |
+  You have already told us about your income from **${comma_and_list( [job_items_names.get(key, key).lower() for key in other_parties[0].jobs[i].to_add.complete_elements().keys()] )}**.
+fields:
+  - What kind of additional income do you get from this job? We will collect these one at a time.: other_parties[0].jobs[i].to_add.new_item_name
+    datatype: radio
+    choices:
+      - Tips
+      - Commissions
+      - Bonuses
+      - Royalties
+      - Other
+  - Specify: other_parties[0].jobs[i].to_add.new_item_name
+    show if:
+      variable: other_parties[0].jobs[i].to_add.new_item_name
+      is: "Other"
+validation code: |
+  if other_parties[0].jobs[i].to_add.new_item_name in other_parties[0].jobs[i].to_add.complete_elements().keys():
+    validation_error(f'You already told us about your <strong>{job_items_names.get(other_parties[0].jobs[i].to_add.new_item_name, other_parties[0].jobs[i].to_add.new_item_name) }</strong> that pays { currency( other_parties[0].jobs[i].to_add[ other_parties[0].jobs[i].to_add.new_item_name ].value )}. Pick a different name.')
+---
 if: not x.to_add.complete_elements()
 generic object: ALItemizedJob
 code: |
   x.to_add.new_item_name = 'wages'
+---
+if: not other_parties[0].jobs[i].to_add.complete_elements()
+code: |
+  other_parties[0].jobs[i].to_add.new_item_name = 'wages'
 ---
 id: edit wages and other incomes from a job
 generic object: ALIndividual
@@ -1270,6 +1347,22 @@ fields:
   - note: |
       If you get SSDI, we will ask about that income later.
 ---
+id: are there public benefits for other_party
+generic object: ALIndividual
+question: |
+  Does ${ other_parties[0] } get public assistance?
+subquestion: |
+  Do you know if ${ other_parties[0] } gets any of these benefits?
+  
+  Check any that apply to ${ other_parties[0] }.
+fields:
+  - no label: other_parties[0].benefits.selected_types
+    datatype: checkboxes
+    code: |
+      other_parties[0].benefits_ordered
+  - note: |
+      If ${ other_parties[0] } get SSDI, we will ask about that income later.
+---
 id: ALIncome complete
 generic object: ALIncome
 code: |
@@ -1283,9 +1376,9 @@ question: |
   Tell us about ${ x.benefits[i].display_name }
 subquestion: |
   % if i > 1:
-  You have already told us about your benefits from ${ comma_and_list(public_benefit.display_name for public_benefit in x.benefits.complete_elements()) }.
+  You have already told us about ${ comma_and_list(public_benefit.display_name for public_benefit in x.benefits.complete_elements()) }.
   % elif i > 0:
-  You have already told us about your benefits from ${ comma_and_list(public_benefit.display_name for public_benefit in x.benefits.complete_elements()) }.
+  You have already told us about ${ comma_and_list(public_benefit.display_name for public_benefit in x.benefits.complete_elements()) }.
   % endif
 fields:
   - Source of income: x.benefits[i].source
@@ -1297,7 +1390,7 @@ fields:
     show if:
       variable: x.benefits[i].source
       is: other
-  - Times per year you receive this income: x.benefits[i].times_per_year
+  - Times per year ${ 'you receive' if x == users[0] else other_parties[0].name_full() + " receives" } this income: x.benefits[i].times_per_year
     input type: radio
     default: 12
     code: |
@@ -1379,16 +1472,6 @@ data: !!omap
   - unemployment income help: "Enter gross amount of unemployment income — before taxes were taken out."
   - default: " "
 ---
-id: x.other_incomes set display name
-generic object: ALIndividual
-code: |
-  if defined('x.other_incomes[i].source') and x.other_incomes[i].source != "other":
-    x.other_incomes[i].display_name = x.other_incomes.terms_ordered.get(x.other_incomes[i].source, x.benefits[i].source)
-  elif defined('x.other_incomes[i].source') and x.other_incomes[i].source == "other" and defined('x.other_incomes[i].source_other'):
-    x.other_incomes[i].display_name = x.other_incomes[i].source_other
-  else:
-    x.other_incomes[i].display_name = x.other_incomes_other_display
----
 id: other income display default
 generic object: ALIndividual
 ## This keeps the text that may be changed near the top of the public benefits section.
@@ -1422,6 +1505,21 @@ fields:
     datatype: checkboxes
     code: |
       x.other_incomes_ordered
+---
+generic object: ALIndividual
+id: are there other incomes for other party
+#other_incomes
+question: |
+  Does ${other_parties[0]} have other sources of income?
+subquestion: |
+  Check any that you may know about.
+  
+  Do not include employment income.
+fields:
+  - no label: other_parties[0].other_incomes.selected_types
+    datatype: checkboxes
+    code: |
+      other_parties[0].other_incomes_ordered
 ---
 comment: |
   will use id: ALIncome complete to set other_incomes[i].complete
@@ -1471,15 +1569,70 @@ validation code: |
     x.other_incomes[i].display_name = x.other_incomes[i].source_other
 
 ---
+generic object: ALIndividual
+id: other income info for list
+#generic object: ALIncomeList
+reconsider: other_parties[0].other_incomes[i].display_name
+question: |
+  Tell us about ${ other_parties[0].other_incomes[i].display_name.lower() } for ${ other_parties[0] }
+subquestion: |
+  % if i > 1:
+  You have already told us about ${ comma_and_list(other_income.display_name for other_income in other_parties[0].other_incomes.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about ${ comma_and_list(other_income.display_name for other_income in other_parties[0].other_incomes.complete_elements()) }.
+  % endif
+
+fields:
+  - Source of income: other_parties[0].other_incomes[i].source
+    input type: dropdown
+    code: |
+      other_parties[0].other_incomes_ordered
+  - What type of income?: other_parties[0].other_incomes[i].source_other
+    show if:
+      variable: other_parties[0].other_incomes[i].source
+      is: other
+  - Specify Type: other_parties[0].other_incomes[i].source_other
+    show if:
+      variable: other_parties[0].other_incomes[i].source
+      is: social security
+  - Times per year ${ other_parties[0] } receives this income: other_parties[0].other_incomes[i].times_per_year
+    input type: radio
+    code: |
+      times_per_year_list
+    default: 12
+  - Amount of income: other_parties[0].other_incomes[i].value
+    datatype: currency
+  - note: |
+      ${ help_text['unemployment income help'] }
+    show if:
+      variable: other_parties[0].other_incomes[i].source
+      is: unemployment income
+validation code: |
+  if other_parties[0].other_incomes[i].source != "other":
+    other_parties[0].other_incomes[i].display_name = other_parties[0].other_incomes.terms_ordered.get(other_parties[0].other_incomes[i].source, other_parties[0].other_incomes[i].source)
+  else:
+    other_parties[0].other_incomes[i].display_name = other_parties[0].other_incomes[i].source_other
+
+---
 id: x.other_incomes set display name
 generic object: ALIndividual
 code: |
   if defined('x.other_incomes[i].source') and x.other_incomes[i].source != "other":
-    x.other_incomes[i].display_name = x.other_incomes.terms_ordered.get(x.other_incomes[i].source, x.benefits[i].source)
+    x.other_incomes[i].display_name = x.other_incomes.terms_ordered.get(x.other_incomes[i].source, x.other_incomes[i].source)
   elif defined('x.other_incomes[i].source') and x.other_incomes[i].source == "other" and defined('x.other_incomes[i].source_other'):
     x.other_incomes[i].display_name = x.other_incomes[i].source_other
   else:
     x.other_incomes[i].display_name = x.other_incomes_other_display
+---
+id: other_parties[0].other_incomes set display name
+generic object: ALIndividual
+code: |
+  if defined('other_parties[0].other_incomes[i].source') and other_parties[0].other_incomes[i].source != "other":
+    other_parties[0].other_incomes[i].display_name = other_parties[0].other_incomes.terms_ordered.get(other_parties[0].other_incomes[i].source, other_parties[0].other_incomes[i].source)
+  elif defined('other_parties[0].other_incomes[i].source') and other_parties[0].other_incomes[i].source == "other" and defined('other_parties[0].other_incomes[i].source_other'):
+    other_parties[0].other_incomes[i].display_name = other_parties[0].other_incomes[i].source_other
+  else:
+    other_parties[0].other_incomes[i].display_name = other_parties[0].other_incomes_other_display
 ---
 id: child support received for other children
 generic object: ALIndividual
@@ -1487,6 +1640,13 @@ question: Child support received for other children
 fields:
   - How much does ${ x.name_full() } receive monthly in child support for unemancipated children who are not subject of this proceeding?: x.other_child_support_received
     datatype: currency
+---
+id: set child support to 0
+generic object: ALIndividual
+if: x.other_children == 0
+code: |
+  x.other_child_support_received = 0
+  x.other_child_support_paid = 0
 ---
 id: maintenance received for other cases
 generic object: ALIndividual
@@ -1641,6 +1801,51 @@ code: |
   else:
     x.expenses[i].display_name = x.expenses_other_display
 ---
+id: expense information for other party
+generic object: ALIndividual
+reconsider: other_parties[0].expenses[i].display_name
+question: |
+  Tell us about ${ other_parties[0].expenses[i].display_name.lower() } for ${ other_parties[0] }
+subquestion: |
+  **Tip**: You can look back 12 months for this expense. That will give an accurate picture of how much the expense really is.
+fields: 
+  - Type of expense: other_parties[0].expenses[i].source
+    code: |
+      other_parties[0].expenses_ordered
+  - Other (explain): other_parties[0].expenses[i].source_other
+    show if:
+      variable: other_parties[0].expenses[i].source
+      is: other
+  - Amount: other_parties[0].expenses[i].value
+    datatype: currency
+  - How often does ${ other_parties[0] } pay this amount?: other_parties[0].expenses[i].times_per_year
+    input type: radio
+    default: 12
+    code: |
+      times_per_year_for_expenses
+  - Description: other_parties[0].expenses[i].description
+    show if:
+      variable: other_parties[0].expenses[i].source
+      is: medical
+
+validation code: |
+  if other_parties[0].expenses[i].source != "other":
+    other_parties[0].expenses[i].display_name = other_parties[0].expenses.terms_ordered.get(other_parties[0].expenses[i].source, other_parties[0].expenses[i].source)
+  else:
+    other_parties[0].expenses[i].display_name = other_parties[0].expenses[i].source_other
+
+
+---
+id: sets display name for expense for other party
+generic object: ALIndividual
+code: |
+  if defined('other_parties[0].expenses[i].source') and other_parties[0].expenses[i].source != "other":
+    other_parties[0].expenses[i].display_name = other_parties[0].expenses.terms_ordered.get(other_parties[0].expenses[i].source, other_parties[0].expenses[i].source)
+  elif defined('other_parties[0].expenses[i].source') and other_parties[0].expenses[i].source == "other" and defined('other_parties[0].expenses[i].source_other'):
+    other_parties[0].expenses[i].display_name = other_parties[0].expenses[i].source_other
+  else:
+    other_parties[0].expenses[i].display_name = other_parties[0].expenses_other_display
+---
 
 id: extraordinary medical cost object
 generic object: ALIndividual
@@ -1653,6 +1858,11 @@ question: Extraordinary Medical Costs to be paid by ${ x.name_full() }
 fields:
   - Are there any extraordinary medical costs to be paid by ${ x.name_full() }?: x.extraordinary_medical_costs.there_are_any
     datatype: yesnoradio
+---
+if: len(children) == 0
+generic object: ALIndividual
+code: |
+  x.extraordinary_medical_costs.there_are_any = False
 ---
 id: extraordinary medical cost information
 generic object: ALIndividual
@@ -1685,6 +1895,11 @@ question: Extraordinary childrearing Costs to be paid by ${ x.name_full() }
 fields:
   - Are there any extraordinary childrearing costs to be paid by ${ x.name_full() }?: x.extraordinary_childrearing_costs.there_are_any
     datatype: yesnoradio
+---
+if: len(children) == 0
+generic object: ALIndividual
+code: |
+  x.extraordinary_childrearing_costs.there_are_any = False
 ---
 id: extraordinary childrearing cost information
 generic object: ALIndividual
@@ -1721,12 +1936,26 @@ fields:
   - How much does ${ x.name_full() } pay monthly in child support for unemancipated children who are not subject of this proceeding?: x.other_child_support_paid
     datatype: currency
 ---
+id: set child support to 0 if no children
+generic object: ALIndividual
+if: x.other_children == 0
+code: |
+  x.other_child_support_received = 0
+  x.other_child_support_paid = 0
+---
 id: maintenance paid for other cases
 generic object: ALIndividual
 question: Maintenance ${ x.name_full() } pays in other cases
 fields:
   - How much does ${ x.name_full() } pay monthly in maintenance in other cases?: x.maintenance_other_paid
     datatype: currency
+---
+id: set child support to 0 if no children
+generic object: ALIndividual
+if: not x.previously_married
+code: |
+  x.maintenance_other_received = 0
+  x.maintenance_other_paid = 0
 ---
 id: Work related childcare costs
 generic object: ALIndividual
@@ -1735,12 +1964,22 @@ fields:
   - What are the monthly work-related child care expenses for ${ x.name_full() }?: x.work_childcare_expenses
     datatype: currency
 ---
+if: len(children) == 0
+generic object: ALIndividual
+code: |
+  x.work_childcare_expenses = 0
+---
 id: health insurance costs
 generic object: ALIndividual
 question: Children Health Insurance Costs for ${ x.name_full() }
 fields:
   - What are the monthly health insurance costs for ${ x.name_full() } for the children who are subjects of this proceeding?: x.health_insurance_costs
     datatype: currency
+---
+if: len(children) == 0
+generic object: ALIndividual
+code: |
+  x.health_insurance_costs = 0
 ---
 ## ASSETS
 id: ALIncomeList there are any
@@ -2303,8 +2542,8 @@ question: |
 subquestion: |   
   You have already entered information about these debts.  Do you have any other debts to add?
   
-  % for debt in debts:
-  ${ debt.description }
+  % for debt in secured_debts:
+  * ${ debt.description }
 
   % endfor
 
@@ -2587,6 +2826,47 @@ fields:
     show if:
       variable: maintenance_income_withholding
       is: False
+---
+id: one maintenance question
+question: Maintanance award
+fields:
+  - Should the court award maintenance to ${ petitioner.name_full() } or ${ respondent.name_full() }?: is_maintenance_award
+    datatype: yesnoradio
+  - Who should be awarded maintenance?: maintenance_awarded_to
+    js show if: |
+      val("is_maintenance_award")
+    choices:
+      - ${ petitioner.name_full() } should be paid maintenance by ${ respondent.name_full() }: petitioner
+      - ${ respondent.name_full() } should be paid maintenance by ${ petitioner.name_full() }
+    datatype: radio
+  - How much per month?: maintenance_amount
+    datatype: currency
+    js show if: |
+      val('maintenance_awarded_to') === "petitioner" || val('maintenance_awarded_to') === "respondent"
+  - Should income withholding be prepared by the person receiving maintenance?: maintenance_income_withholding
+    datatype: yesnoradio
+    js show if: |
+      val('maintenance_amount') != null
+  - Reason income withholding shall not issue: maintenance_income_withholding_reason
+    js show if: |
+      val('maintenance_income_withholding') === false
+validation code: |
+  if is_maintenance_award:
+    if maintenance_awarded_to == "petitioner":
+      petitioner.maintenance_received = maintenance_amount
+      petitioner.maintenance_paid = 0
+      respondent.maintenance_received = 0
+      respondent.maintenance_paid = maintenance_amount
+    if maintenance_awarded_to == "respondent":
+      petitioner.maintenance_received = 0
+      petitioner.maintenance_paid = maintenance_amount
+      respondent.maintenance_received = maintenance_amount
+      respondent.maintenance_paid = 0
+  else:
+    petitioner.maintenance_received = 0
+    petitioner.maintenance_paid = 0
+    respondent.maintenance_received = 0
+    respondent.maintenance_paid = 0
 ---
 ## CHILD SUPPORT ##
 id: Child Support Award

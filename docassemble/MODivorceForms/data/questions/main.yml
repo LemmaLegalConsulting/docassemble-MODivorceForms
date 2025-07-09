@@ -71,19 +71,6 @@ code: |
 code: |
   al_form_type = "starts_case" 
 ---
-sections:
-  - case_information: Information about your case
-  - relief: Requests to the Court
-  - user_info: Information about you
-  - other_party_info: Information about the other party  
-  - children: Children
-  - income: Income
-  - expenses: Expenses
-  - assets: Assets
-  - debts: Debts
-  - service: Service and Filing Documents
-  - review: Review your answers
----
 #################### Interview order #####################
 comment: |
   Controls order and branching logic for questions specific to this form
@@ -132,7 +119,8 @@ code: |
     how_to_find_your_case
     reconsider('case.filed')
     ## 3 Please enter your case information
-    previous_petitions # answer
+    if 'answer_attachment' in doc_list_selected.true_values():
+      previous_petitions # answer
     case_information
     case.county # property_statement, petition, notice_of_hearing, form_17, certificate_of_dissolution
     case.filing_date # petition
@@ -176,6 +164,7 @@ code: |
     child_outside_marriage_exit
   if minor_children_before_marriage:
     minor_children_before_marriage_information
+  doc_list_selected
   nav.set_section("relief")
   relief
   if relief['other']: # petition, answer
@@ -197,20 +186,13 @@ code: |
     ask_about_dispute_resolution
     child_support # certificate_of_dissolution
   
-  if case.filed in ['user0_filed']:
-    parenting_plan
-  elif case.filed in ['user1_filed']:
-    agree_with_parenting_plan
-  if maintenance_to_petitioner == "ordered_to_pay":
-    maintenance_to_petitioner_amount
-    maintenance_to_petitioner_modifiable
-  if maintenance_to_respondent == "ordered_to_pay":
-    maintenance_to_respondent_amount
-    maintenance_to_respondent_modifiable
-  if maintenance_to_petitioner or maintenance_to_respondent: 
-    maintenance_income_withholding    
+    if case.filed in ['user0_filed']:
+      parenting_plan
+    elif case.filed in ['user1_filed']:
+      agree_with_parenting_plan
+  is_maintenance_award
   
-  nav.set_section("user_information")  
+  nav.set_section("user_info")  
 
   
   users[0].address.address # petition
@@ -222,20 +204,23 @@ code: |
   users[0].email
   users[0].driver_license_number
   users[0].phone_number
-  if users[0].active_duty and case.filed in ['user1_filed']:
-    waive_rights
   users[0].birthdate
   users[0].ssn
-  users[0].gender # confidential_information_sheet
-  users[0].race # certificate_of_dissolution
-  users[0].education_elementary
-  users[0].previously_married
+  if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
+    users[0].gender # confidential_information_sheet
+  if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
+    users[0].race # certificate_of_dissolution
+    users[0].education_elementary
+    users[0].previously_married
+    users[0].active_duty
+  if 'answer_attachment' in doc_list_selected.true_values() and users[0].active_duty:
+    waive_rights
   
-  nav.set_section("other_party_information")  
+  nav.set_section("other_party_info")  
   other_parties[0].address.address # petition
   if other_parties[0].address.state == "MO":
     other_parties[0].address.county
-  other_parties[0].address.country
+  # other_parties[0].address.country
   other_parties[0].mo_length_of_residence_choice
 
   other_parties[0].email
@@ -244,15 +229,21 @@ code: |
   other_parties[0].active_duty
   other_parties[0].birthdate
   other_parties[0].ssn
-  other_parties[0].gender # confidential_information_sheet
-  other_parties[0].race # certificate_of_dissolution
-  other_parties[0].education_elementary
-  other_parties[0].previously_married
+  if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
+    other_parties[0].gender # confidential_information_sheet
+  if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
+    other_parties[0].race # certificate_of_dissolution
+    other_parties[0].education_elementary
+    other_parties[0].previously_married
+  other_parties[0].active_duty
+    
   
   nav.set_section('marriage')
   marriage_info # certificate_of dissolution
-  marriage.separation_date # certificate_of dissolution
-  marriage.address.county # petition
+  if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
+    marriage.separation_date # certificate_of dissolution
+  if 'petition_attachment' in doc_list_selected.true_values():
+    marriage.address.county # petition
   marriage.address.country
   marriage.address.state
   marriage.recorded_date
@@ -273,7 +264,10 @@ code: |
     if others_with_physical_custody:
       others_with_physical_custody_explanation
     family_support_order
-  other_allegations # petition
+    received_welfare # form_17
+  if 'petition_attachment' in doc_list_selected.true_values():
+    if other_allegations_exist:
+      other_allegations # petition
   
   if minor_children or minor_children_before_marriage:
     nav.set_section("children")
@@ -294,7 +288,6 @@ code: |
     users[0].employer.address.address
   users[0].jobs.total(times_per_year = 12)
   users[0].benefits.gather()
-  received_welfare # form_17
   if users[0].has_self_employment_income:
     users[0].self_employment_description
   users[0].self_employment_income
@@ -313,7 +306,6 @@ code: |
       other_parties[0].hours_of_employment
   other_parties[0].jobs.total(times_per_year = 12)
   other_parties[0].benefits.gather()
-  received_welfare # form_17
   if other_parties[0].has_self_employment_income:
     other_parties[0].self_employment_description
   other_parties[0].self_employment_income
@@ -416,6 +408,8 @@ comment: |
   Delete mandatory: True to include in another interview
 mandatory: True
 code: |
+  enable_al_nav_sections
+  nav.set_section('case_information')
   al_intro_screen
   # mo_divorce_forms_intro
   interview_order_mo_divorce_forms
@@ -445,27 +439,69 @@ include:
   - confidential_information_sheet.yml
   - shared.yml
 ---
-id: Certificate of dissolution of marriage
-continue button field: certificate_of_dissolution_of_marri_intro
+code: |
+  enable_al_nav_sections = True
+---
+variable name: al_nav_sections
+data:
+  - case_information: Is this the right tool for you?
+  - relief: Help provided
+  - provide_details: Answer questions
+    subsections:
+      - user_info: Information about you
+      - other_party_info: Information about the other party  
+      - children: Children
+      - income: Income
+      - expenses: Expenses
+      - assets: Assets
+      - debts: Debts
+  - service: Service and Filing Documents
+  - review: Review your answers
+---
+
+id: basic questions intro screen
 question: |
-  Certificate of dissolution of marriage
+  MO Divorce Help
 subquestion: |
-  This interview will help you ask the court for a Certificate of dissolution of marriage.
+  % if form_approved_for_email_filing:
+  MO Divorce Help can help you complete and file court forms in 3 steps:
+  % else:
+  MO Divorce Help can help you complete and download forms in 3 steps:
+  % endif
   
-  Before you get started, please gather:
+  Step 1. Answer questions to determine if this is the right tool for you.<br>
+  Step 2. Pick the forms and information you need.<br>
+  % if form_approved_for_email_filing:
+  Step 3. Email the form to the court using this secure website and save copies
+  for yourself for later reference.  
+  % elif al_form_type in ['starts_case','existing_case','appeal']:
+  Step 3. Download and print the final forms. You will need to deliver the forms
+  to the court on your own.
+  % else:
+  Step 3. Download and print the final form. You will need to deliver it 
+  on your own.
+  % endif
   
-  1. 
-  1. 
-  1. 
+  This site is not a lawyer. If you would like a lawyer, find [your local
+  legal aid provider](https://www.lsc.gov/what-legal-aid/find-legal-aid).
   
-  When you are finished, you will need to:
+  Tap the {green words} in any screen for a definition or more information.
   
-  1. 
-  1.
-
-  If you are a _____________, you can use this interview to ____________.
-
-  Most people take about 10 minutes to complete this interview.
+  % if chat_partners_available().help:
+  Live help is currently available in this interview. Click the speech bubble
+  (:comment-alt:) in the navigation bar to connect to a live advocate for help.
+  % endif
+fields:
+  - note: |
+      ${ display_template(al_terms_of_use, scrollable=True) }
+      To continue, you must accept our terms of use
+  - I accept the terms of use: acknowledged_information_use
+    datatype: yesnowide
+    grid: 8
+continue button field: al_intro_screen
+validation code: |
+  if not acknowledged_information_use:
+    validation_error("You must accept the terms of use to continue.", field="acknowledged_information_use")
 ---
 id: Welcome
 question: Missouri Divorce Forms
@@ -519,15 +555,60 @@ fields:
     datatype: yesnoradio
   - Do you or your spouse have any children born before the marriage?: minor_children_before_marriage
     datatype: yesnoradio
+    js show if:   |
+      val("minor_children") === true || val("minor_children") === false
+  - note: |
+       Sometimes when a child is born to two people before they get married, the court will require a separate case to establish paternity (even if everybody agrees).  However, most courts will move forward with just the divorce, assuming that paternity is acknowledged through the marriage.  For now, we'll move forward with the understanding that the paternity has been acknowledged.  However, a judge may direct you to file something else or speak to an attorney.
+    js show if:   |
+      val("minor_children_before_marriage") === true
   - Have you or your spouse physically gave birth during the marriage with a third party?: child_outside_marriage
     datatype: yesnoradio
+    js show if:   |
+      val("minor_children_before_marriage") === true || val("minor_children_before_marriage") === false
+  - note: |
+      Missouri law automatically assumes that the husband is the father of the child unless a separate case is filed establishing paternity of the biological father and non-paternity of the husband, even if the biological father is the one on the birth certificate.  It would be in your best interest to find an attorney.  
+    js show if:   |
+      val("child_outside_marriage") === true
   - Are you or your spouse currently pregnant?: pregnant
     datatype: yesnoradio
+    js show if:   |
+      val("child_outside_marriage") === true || val("child_outside_marriage") === false
+  - note: |
+      Pursuant to RSMo 452.305 & 452.310, the court will not be able to grant a divorce.  Please come back when either yourself or your spouse is no longer pregnant.
+    js show if:   |
+      val("pregnant") === true 
 validation code: |
   if minor_children or minor_children_before_marriage:
     children.there_are_any = True
   else:
     children.there_are_any = False
+---
+code: |
+  temp_doc_list_options = list()
+  if  case.filed in ["user0_filed","not_filed","jointly_filed","unknown"]:
+    temp_doc_list_options.append({'petition_attachment':'Petition','default':True}) 
+  elif case.filed == "user1_filed":
+    temp_doc_list_options.append({'value':'answer_attachment','label':'Answer','default':True})   
+  temp_doc_list_options.append({'value':'form_17_attachment','label':'Form 17','default':True})
+  temp_doc_list_options.append({'value':'notice_of_hearing_attachment','label':'Notice of hearing','default':True})   
+  temp_doc_list_options.append({'value':'certificate_of_dissolution_attachment','label':'Certificate of Dissolution','default':True})   
+  temp_doc_list_options.append({'value':'judgment_attachment','label':'Judgment','default':True})   
+  temp_doc_list_options.append({'value':'property_statement_attachment','label':'Property statement','default':True})     
+  temp_doc_list_options.append({'value':'income_statement_attachment','label':'Income statement','default':True})    
+  if  case.filed in ["user0_filed","not_filed","jointly_filed","unknown"]:
+    temp_doc_list_options.append({'value':'fee_waiver_attachment','label':'Fee waiver','default':True})
+  temp_doc_list_options.append({'value':'confidential_information_sheet_attachment','label':'Confidential information sheet','default':True})   
+  temp_doc_list_options.append({'value':'redaction_certification_attachment','label':'Redaction certification','default':True})   
+  doc_list_options = temp_doc_list_options
+---
+id: document choice
+question: MO Divorce Help can help you!
+subquestion: |
+fields:
+  - What documents do you want?: doc_list_selected
+    datatype: checkboxes
+    code: |
+      doc_list_options
 ---
 id: set pregnant to false since kick out if pregnant
 generic object: ALIndividual
@@ -598,7 +679,7 @@ continue button field: assets_warning
 id: Service
 question: Service of ${ other_parties[0].name_full() }
 fields:
-  - Has ${ other_parties[0].name_full() }been served?: respondent_served
+  - Has ${ other_parties[0].name_full() } been served?: respondent_served
     datatype: yesnoradio
 ---
 id: Hearing Information Screen

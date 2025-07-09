@@ -81,7 +81,7 @@ code: |
 id: generic there are any
 generic object: ALAssetList
 question: |
-  ${ x.display_name }
+  ${ capitalize(x.display_name) }
 subquestion: |   
   Do you or your spouse own any ${ x.display_name }?
 fields:
