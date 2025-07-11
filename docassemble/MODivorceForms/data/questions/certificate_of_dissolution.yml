@@ -39,16 +39,6 @@ code: |
   children[i].under_18_in_household
   children[i].complete = True
 ---
-id: separation date
-question: |
-  Residence of Marriage
-fields:
-  - "Date Couple Last Resided in same Household (Month, Day, Year)": marriage.separation_date
-    datatype: date
-    required: False
-  - "Did the couple live together in Missouri?": marriage.live_together_in_mo
-    datatype: yesnoradio
----
 code: |
   marriage.dissolution_type = "Dissolution"
 ---
@@ -59,6 +49,8 @@ fields:
     maxlength: 8
     required: False
 ---
+comment: |
+  This block should not be used because this information will be completed by the court
 id: case information for certificate of dissolution
 question: Additional case information
 fields:
@@ -92,6 +84,7 @@ attachment:
   filename: certificate_of_dissolution
   variable name: certificate_of_dissolution_attachment[i]
   skip undefined: True
+  editable: False
   pdf template file: certificate_of_dissolution.pdf
   fields:
       - "users1_name_first": ${ users[0].name.first } 

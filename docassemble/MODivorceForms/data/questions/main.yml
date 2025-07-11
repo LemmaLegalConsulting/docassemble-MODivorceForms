@@ -105,58 +105,11 @@ code: |
   # Set the allowed courts for this interview
   allowed_courts = []
   nav.set_section("case_information")
-  ## 1 What issue are you looking for help with
+  ## 1 Is this the appropriate tool?
   if case_type == "Custody":
     custody_exit
-  users.gather()
-  if users[0].has_prior_name:
-    users[0].prior_name.name.first
-  other_parties.gather()
-  if other_parties[0].has_prior_name:
-    other_parties[0].prior_name.name.first
-  ## 2 Has your case been filed
-  if case.filed == "unknown":
-    how_to_find_your_case
-    reconsider('case.filed')
-    ## 3 Please enter your case information
-    if 'answer_attachment' in doc_list_selected.true_values():
-      previous_petitions # answer
-    case_information
-    case.county # property_statement, petition, notice_of_hearing, form_17, certificate_of_dissolution
-    case.filing_date # petition
-    case.circuit # form_17
-    case.judge
-    case.division_number # notice_of_hearing
-    case.docket_number # notice_of_hearing, form_17
-    case.matter_type # notice_of_hearing
-    case.judgment_date # certificate_of_dissolution
-    hearing_date
-    hearing_time
-    notice_date # property_statement.yml
-    petitioner.party_type_description # confidential_information_sheet
-    petitioner.attorney.party_type_code
-    if petitioner.attorney_involved: # petition, notice_of_hearing
-      petitioner.attorney.address.address # petition
-      petitioner.attorney.bar_number
-      petitioner.attorney.email
-      petitioner.attorney.fax
-      petitioner.attorney.phone_number
-      petitioner.attorney.party_type_code # confidential_information_sheet
-    respondent.party_type_code # confidential_information_sheet
-    respondent.party_type_description  
-    if respondent.attorney_involved:
-      respondent.attorney.address.address
-      respondent.attorney.bar_number
-      respondent.attorney.email
-      respondent.attorney.fax
-      respondent.attorney.phone_number
-      respondent.attorney.party_type_code
-
-  # 4 Is case contested
-  if is_case_contested in ['contested','unknown']:
-    mediation_info
-
-  # 5 Children  
+  if marriage.can_be_preserved or not marriage.is_broken:
+    legal_separation_exit
   children
   if pregnant:
     pregnant_exit
@@ -164,11 +117,64 @@ code: |
     child_outside_marriage_exit
   if minor_children_before_marriage:
     minor_children_before_marriage_information
-  doc_list_selected
-  nav.set_section("relief")
+
+  if case.filed == "unknown":
+    how_to_find_your_case
+    reconsider('case.filed')
+  elif case.filed in ["user0_filed","not_filed"]:
+    if petitioner.lives_in_missouri and (petitioner.mo_length_of_residence_choice != "less_than_4" or petitioner.mo_length_of_residence_days >= 90):
+      if not respondent.lives_in_missouri and not marriage.live_together_in_mo:
+        personal_jurisdiction_warning
+    elif not (respondent.lives_in_missouri and (respondent.mo_length_of_residence_choice != "less_than_4" or respondent.mo_length_of_residence_days >= 90)):
+      jurisdiction_kickout
+  if is_case_contested in ['contested','unknown']:
+    mediation_info
+
+    
+  
+  users.gather()
+  if users[0].has_prior_name:
+    users[0].prior_name.name.first
   relief
-  if relief['other']: # petition, answer
-    relief_other
+  doc_list_selected
+  
+  other_parties.gather()
+  if other_parties[0].has_prior_name:
+    other_parties[0].prior_name.name.first
+
+  
+  ## 3 Please enter your case information
+  nav.set_section("case_information")   
+  if case.filed in ["user0_filed", "user1_filed"]:
+    if 'answer_attachment' in doc_list_selected.true_values():
+      previous_petitions # answer
+    case_information
+  case.county # property_statement, petition, notice_of_hearing, form_17, certificate_of_dissolution
+  if case.filed in ["user0_filed", "user1_filed"]:
+    case.filing_date # petition
+    case.circuit # form_17
+    case.judge
+    case.division_number # notice_of_hearing
+    case.docket_number # notice_of_hearing, form_17
+    case.matter_type # notice_of_hearing
+    notice_date # property_statement.yml
+    if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
+      petitioner.party_type_description # confidential_information_sheet
+  if petitioner.attorney_involved: # petition, notice_of_hearing
+    petitioner.attorney.name.first # petition
+    if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
+      petitioner.attorney.party_type_code # confidential_information_sheet
+  if case.filed in ["user0_filed", "user1_filed"]:
+    if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
+      respondent.party_type_code # confidential_information_sheet
+      respondent.party_type_description  
+    if respondent.attorney_involved:
+      respondent.attorney.name.first
+      if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
+        respondent.attorney.party_type_code
+
+
+  nav.set_section("relief")
 
   if minor_children or minor_children_before_marriage:
     presumption_video
@@ -208,6 +214,7 @@ code: |
   users[0].ssn
   if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
     users[0].gender # confidential_information_sheet
+  users[0].pronouns
   if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
     users[0].race # certificate_of_dissolution
     users[0].education_elementary
@@ -222,15 +229,15 @@ code: |
     other_parties[0].address.county
   # other_parties[0].address.country
   other_parties[0].mo_length_of_residence_choice
-
+  if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
+    other_parties[0].gender # confidential_information_sheet
+  other_parties[0].pronouns
   other_parties[0].email
   other_parties[0].driver_license_number
   other_parties[0].phone_number
   other_parties[0].active_duty
   other_parties[0].birthdate
   other_parties[0].ssn
-  if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
-    other_parties[0].gender # confidential_information_sheet
   if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
     other_parties[0].race # certificate_of_dissolution
     other_parties[0].education_elementary
@@ -248,10 +255,7 @@ code: |
   marriage.address.state
   marriage.recorded_date
   marriage.separation_date
-  marriage.can_be_preserved
-  marriage.is_broken
-  if other_parties[0].address.state != "MO":
-    marriage.live_together_in_mo
+
   if minor_children or minor_children_before_marriage:
     if others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect: # form_17
       related_case_explanation
@@ -365,16 +369,19 @@ code: |
     businesses.review_items 
   if len(other_assets) > 0:
     other_assets.review_items 
+  users[0].assets.gathered
+  users[0].review_assets
+  other_parties[0].assets.gathered
+  other_parties[0].review_assets
     
   nav.set_section('debts')
   secured_debts.gathered
   if len(debts) > 0:
     debts.review_items
-  petitioner.assets.gathered
-  petitioner.review_assets
-  petitioner.debts.gathered
-  respondent.assets.gathered
-  respondent.debts.gathered
+  users[0].debts.gathered
+  users[0].review_debts
+  other_parties[0].debts.gathered
+  other_parties[0].review_debts
   
   
   nav.set_section('service')
@@ -382,13 +389,13 @@ code: |
   if case.filed == "user0_filed" and respondent_served:
       served_information
   else:
-    if case.filed == "user0_field" or case.filed == "not_filed":
+    if case.filed == "user0_filed" or case.filed == "not_filed":
       if service_type == "publication":
         service_by_publication_information
       else:
-        type_of_personal_service
+        personal_service_type
         personal_service_information
-        service.date # form_17
+        fill_in_service_date # form_17
         people_served.gathered # notice_of_hearing
         for people in people_served:
           people.service_address.address
@@ -511,11 +518,46 @@ fields:
     choices:
       - Divorce
       - Custody
+  - note: |
+      This tool can help with a dissolution.  A dissolution in Missouri requires that a marriage is irretrievably broken and a marriage cannot be preserved.
+    show if: 
+      variable: case_type
+      is: Divorce
+  - Is your marriage irretrievably broken?: marriage.is_broken
+    datatype: yesnoradio
+    default: True
+    show if: 
+      variable: case_type
+      is: Divorce
+  - Can your marriage be preserved?: marriage.can_be_preserved
+    datatype: yesnoradio
+    default: False
+    show if: 
+      variable: case_type
+      is: Divorce
 ---
 event: custody_exit
 question: Child Custody
 subquestion: |
   Unfortunately, this system is unable to address custody issues at this time.  Click the link below to find legal help bettersuited for your situation.
+---
+event: legal_separation_exit
+question: Legal Separation
+subquestion: |
+  If your marriage can be preserved or is not irretrievably broken, then a legal separation is more appropriate than a dissolution.  Unfortunately, this tool helps only with a dissolution.
+---
+id: personal_jurisdiction_warning
+question: No personal jurisdiction
+subquestion: |
+  If your spouse does not live in Missouri currently, and you did not live together in Missouri, then the court will not have personal jurisdiction over your spouse.  This means the court can not make your spouse pay maintenance or child support.  
+  
+  You may want to consider filing for divorce in the state where your spouse lives.
+continue button field: personal_jurisdiction_warning
+---
+event: jurisdiction_kickout
+question: No jurisdiction
+subquestion: |
+  Missouri law requires that at least one party in the divorce live in Missouri for at least 90 days before filing divorce.  Since neither you nor your spouse has lived in Missouri for 90 days, this tool is not appropriate for you.
 ---
 id: Finding your case
 question: How to find your case
@@ -583,16 +625,29 @@ validation code: |
   else:
     children.there_are_any = False
 ---
+id: separation date
+question: |
+  Residence of Marriage
+fields:
+  - "Did you and your spouse live together in Missouri?": marriage.live_together_in_mo
+    datatype: yesnoradio
+---
 code: |
   temp_doc_list_options = list()
-  if  case.filed in ["user0_filed","not_filed","jointly_filed","unknown"]:
+  temp_doc_list_info = list()
+  if  case.filed in ["user0_filed","not_filed","unknown"]:
     temp_doc_list_options.append({'petition_attachment':'Petition','default':True}) 
+    
   elif case.filed == "user1_filed":
     temp_doc_list_options.append({'value':'answer_attachment','label':'Answer','default':True})   
-  temp_doc_list_options.append({'value':'form_17_attachment','label':'Form 17','default':True})
+  
+  if  case.filed in ["not_filed","unknown"]:
+    temp_doc_list_options.append({'value':'form_17_attachment','label':'Form 17','default':True})
   temp_doc_list_options.append({'value':'notice_of_hearing_attachment','label':'Notice of hearing','default':True})   
-  temp_doc_list_options.append({'value':'certificate_of_dissolution_attachment','label':'Certificate of Dissolution','default':True})   
-  temp_doc_list_options.append({'value':'judgment_attachment','label':'Judgment','default':True})   
+  if  case.filed in ["user0_filed","not_filed","unknown"]:
+    temp_doc_list_options.append({'value':'certificate_of_dissolution_attachment','label':'Certificate of Dissolution','default':True})   
+  if  case.filed in ["user0_filed","not_filed","unknown"]:
+    temp_doc_list_options.append({'value':'judgment_attachment','label':'Judgment','default':True})   
   temp_doc_list_options.append({'value':'property_statement_attachment','label':'Property statement','default':True})     
   temp_doc_list_options.append({'value':'income_statement_attachment','label':'Income statement','default':True})    
   if  case.filed in ["user0_filed","not_filed","jointly_filed","unknown"]:
@@ -602,7 +657,7 @@ code: |
   doc_list_options = temp_doc_list_options
 ---
 id: document choice
-question: MO Divorce Help can help you!
+question: Documents you need
 subquestion: |
 fields:
   - What documents do you want?: doc_list_selected

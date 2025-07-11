@@ -272,6 +272,7 @@ attachment:
   variable name: judgment_attachment[i]
   skip undefined: True
   pdf template file: judgment.pdf
+  editable: False
   fields:
       - "case_county": ${ case.county } 
       - "petitioner_name_first": ${ petitioner.name.first } 

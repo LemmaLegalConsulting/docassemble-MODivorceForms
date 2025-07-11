@@ -117,6 +117,10 @@ continue button field: additional_attorney_infomation
 
 id: broken marriage
 question: Status of marriage
+subquestion: |
+  This interview is only designed to help with dissolutions. The court will only grant a dissolution if
+  - the marriage is irretrievably broken, and
+  - the marriage can not be preserved.
 fields:
   - Is the marriage irretrievable broken?: marriage.is_broken
     datatype: yesnoradio

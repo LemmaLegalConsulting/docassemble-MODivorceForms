@@ -9,7 +9,8 @@ code: |
   other_parties[0].name.first
   respondent.name.first
   respondent.address.address
-  respondent.attorney.bar_number
+  if respondent.attorney_involved:
+    respondent.attorney.bar_number
   respondent.email
   respondent.attorney
   respondent.phone_number
@@ -105,11 +106,11 @@ attachment:
       - "petitionersFirstName": ${ petitioner.name.first } 
       - "petitionersMiddleName": ${ petitioner.name.middle } 
       - "petitionersLastName": ${ petitioner.name.last } 
-      - "petitionersSuffixJrSrIII": ${ petitioner.address.state } 
+      - "petitionersSuffixJrSrIII": ${ petitioner.name.suffix } 
       - "caseNumber": ${ case.docket_number } 
-      - "respondentsFirstName": ${ respondent.name.last } 
-      - "respondentsMiddleName": ${ respondent.name.first } 
-      - "respondentsLastName": ${ respondent.name.middle } 
+      - "respondentsFirstName": ${ respondent.name.first } 
+      - "respondentsMiddleName": ${ respondent.name.middle } 
+      - "respondentsLastName": ${ respondent.name.last } 
       - "respondentsSuffixJrSrIII": ${ respondent.name.suffix } 
       - "divisionNumber": ${ case.division_number } 
       - "raHowManyPetitions1": ${ previous_petitions == 1 } 
