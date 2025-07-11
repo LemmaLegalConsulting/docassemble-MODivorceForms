@@ -153,9 +153,6 @@ columns:
       row_item.description
   - Market value: |
       currency(row_item.market_value) if defined("row_item.market_value") else ""
-edit:
-  - source
-  - value
 ---
 id: real_estate object
 objects:
@@ -1089,17 +1086,6 @@ generic object: ALIndividual
 objects:
   - x.assets: ALAssetList.using(auto_gather=False)
 ---
-generic object: ALIndividual
-code: |
-  x.assets.clear()
-  if len([re for re in real_estate if re.recommended_award == x.name.full()]) == 1:
-    x.assets.append([asset for asset in real_estate if asset.recommended_award == x.name.full()][0])
-  elif len([asset for asset in real_estate if asset.recommended_award == x.name.full()]) > 1:
-    x.assets.appendObject()
-    x.assets[-1].display_name = real_estate.display_name + " (" + str([asset for asset in real_estate if asset.recommended_award == x.name.full()]) + ")"
-    x.assets[-1].market_value = real_estate.filter(recommended_award == x.name.full()).total()
-  x.assets.gathered = True
----
 id: code to determine individual assets based on recommended award
 generic object: ALIndividual
 code: |
@@ -1185,9 +1171,6 @@ columns:
       currency(row_item.balance) if defined("row_item.balance") else ""
   - Monthly payment:
       currency(row_item.monthly_payment) if defined("row_item.monthly_payment") else ""
-edit:
-  - source
-  - balance
 ---
 id: debts revisit
 continue button field: debts.revisit
