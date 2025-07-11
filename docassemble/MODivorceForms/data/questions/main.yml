@@ -389,13 +389,13 @@ code: |
   if case.filed == "user0_filed" and respondent_served:
       served_information
   else:
-    if case.filed == "user0_field" or case.filed == "not_filed":
+    if case.filed == "user0_filed" or case.filed == "not_filed":
       if service_type == "publication":
         service_by_publication_information
       else:
-        type_of_personal_service
+        personal_service_type
         personal_service_information
-        service.date # form_17
+        fill_in_service_date # form_17
         people_served.gathered # notice_of_hearing
         for people in people_served:
           people.service_address.address

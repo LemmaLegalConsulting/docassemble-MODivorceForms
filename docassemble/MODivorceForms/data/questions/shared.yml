@@ -72,10 +72,13 @@ fields:
 id: Case filing date
 question: Case filing date
 fields:
-  - Filing date: case.filing_date
+  - What date was the case filed?: case.filing_date
     datatype: date
     required: False
 continue button field: case_information
+validation code: |
+  if as_datetime(case.filing_date) > today() or as_datetime(case.filing_date) < as_datetime("1/1/1900"):
+    validation_error("Please enter a realistic date in the past.")
 ---
 id: Hearing date and time
 question: Hearing date and time
@@ -316,6 +319,8 @@ fields:
 validation code: |
   if x.previously_married == False:
     x.number_of_marriages = 0
+  if x.previously_married and (as_datetime(x.last_marriage_end_date) > today() or as_datetime(x.last_marriage_end_date) < as_datetime(users[0].birthdate)):
+    validation_error("Please enter a date in the past that isn't before the date you were born.")
 ---
 id: Residency info for user
 question: Your residency in Missouri
@@ -865,6 +870,9 @@ fields:
   - "Date of this Marriage": marriage.recorded_date
     datatype: date
 continue button field: marriage_info
+validation code: |
+  if as_datetime(marriage.recorded_date) > today() or as_datetime(marriage.recorded_date) < users[0].birthdate:
+    validation_error("Please enter a date in the past that isn't before the date you were born.")
 ---
 id: marriage object
 objects:
@@ -876,6 +884,9 @@ question: When did your marriage end?
 fields:
   - "What date did you separate and stop residing together?": marriage.separation_date
     datatype: date
+validation code: |
+  if as_datetime(marriage.separation_date) > today() or as_datetime(marriage.separation_date) < users[0].birthdate:
+    validation_error("Please enter a date in the past that isn't before the date you were born.")
 ---
 id: marriage in missouri
 question: Did you live together as a couple in Missouri?
@@ -3008,8 +3019,19 @@ objects:
 id: service date
 question: Date of Service
 fields:
+  - Do you know when the documents will be filed?: fill_in_service_date
+    datatype: radio
+    choices:
+      - "Yes, and I'd like to fill it in now": yes
+      - "No, leave it blank and I will fill it in later": no 
   - What date will the documents be served?: service.date
     datatype: date
+    show if:
+      variable: fill_in_service_date
+      is: yes
+validation code: |
+  if as_datetime(service.date) < today():
+    validation_error("Please enter today's date or a date in the future.")
 ---
 id: Type of Service Question
 question: Type of Service

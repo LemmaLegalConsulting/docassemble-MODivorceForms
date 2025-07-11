@@ -1094,9 +1094,9 @@ code: |
     for item in list:
       if item.recommended_award == x.name.full():
         x.assets.append(item)
-        x.assets[-1].list = list
+        x.assets[-1].list = list.display_name
         if not defined('x.assets[-1].source'):
-          x.assets[-1].source = list
+          x.assets[-1].source = list.display_name
   x.assets.gathered = True
 ---
 id: populate debt list from debts in assets
@@ -1277,20 +1277,20 @@ attachment:
       - "respondents_first_name": ${ respondent.name.first } 
       - "petitioner_own_real_estate_no": ${ len([item for item in real_estate if item.recommended_award ==  petitioner.name.full()]) == 0 } 
       - "petitioner_own_real_estate_yes": ${ len([item for item in real_estate if item.recommended_award ==  petitioner.name.full()]) > 0 } 
-      - "petitioner_own_vehicle_yes": ${ len([item for item in vehicles if item.recommended_award ==  petitioner.name.full()]) == 0 } 
-      - "petitioner_own_misc_property_no": ${ len([item for item in vehicles if item.recommended_award ==  petitioner.name.full()]) > 0 } 
-      - "petitioner_own_vehicle_no": ${ len([item for item in vehicles if item.recommended_award ==  petitioner.name.full()]) == 0 } 
-      - "petitioner_bank_account_yes": ${ len([item for item in vehicles if item.recommended_award ==  petitioner.name.full()]) > 0 } 
-      - "petitioner_bank_account_no": ${ len([item for item in bank_assets if item.recommended_award ==  petitioner.name.full()]) > 0 } 
-      - "petitioner_own_misc_property_yes": ${ len([item for item in bank_assets if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_own_vehicle_yes": ${ len([item for item in vehicles.matches(source=['car','truck','motorcycle']) if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_own_misc_property_no": ${ len([item for item in vehicles.matches(source=['car','truck','motorcycle']) if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_own_vehicle_no": ${ len([item for item in vehicles.matches(source=['mobile_home','trailer','boat','airplane','other']) if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_bank_account_yes": ${ len([item for item in vehicles.matches(source=['mobile_home','trailer','boat','airplane','other']) if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_bank_account_no": ${ len([item for item in bank_assets if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_own_misc_property_yes": ${ len([item for item in bank_assets if item.recommended_award ==  petitioner.name.full()]) > 0 } 
       - "petitioner_retirement_yes": ${ len([item for item in retirement_accounts if item.recommended_award ==  petitioner.name.full()]) > 0 } 
       - "petitioner_retirement_no": ${ len([item for item in retirement_accounts if item.recommended_award ==  petitioner.name.full()]) == 0 } 
       - "petitioner_ira_yes": ${ len([item for item in retirement_accounts if item.recommended_award ==  petitioner.name.full()]) > 0 } 
       - "petitioner_ira_no": ${ len([item for item in retirement_accounts if item.recommended_award ==  petitioner.name.full()]) == 0 } 
-      - "petitioner_home_goods_no": ${ len([item for item in personal_goods if item.recommended_award ==  petitioner.name.full()]) == 0 } 
-      - "petitioner_home_goods_yes": ${ len([item for item in personal_goods if item.recommended_award ==  petitioner.name.full()]) > 0 } 
-      - "petitioner_personal_goods_yes": ${ len([item for item in personal_goods if item.recommended_award ==  petitioner.name.full()]) > 0 } 
-      - "petitioner_personal_goods_no": ${ len([item for item in personal_goods if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_home_goods_no": ${ len([item for item in personal_goods.matches(source=["appliances", "computers", "electronics", "furnishings", "other"]) if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_home_goods_yes": ${ len([item for item in personal_goods.matches(source=["appliances", "computers", "electronics", "furnishings", "other"]) if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_personal_goods_yes": ${ len([item for item in personal_goods.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc"]) if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_personal_goods_no": ${ len([item for item in personal_goods.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc"]) if item.recommended_award ==  petitioner.name.full()]) == 0 } 
       - "petitioner_business_yes": ${ len([item for item in businesses if item.recommended_award ==  petitioner.name.full()]) > 0 } 
       - "petitioner_business_no": ${ len([item for item in businesses if item.recommended_award ==  petitioner.name.full()]) == 0 } 
       - "petitioner_bonds_yes": ${ len([item for item in securities if item.recommended_award ==  petitioner.name.full()]) > 0 } 
@@ -1305,30 +1305,30 @@ attachment:
       - "petitioner_farm_no": ${ len([item for item in farm if item.recommended_award ==  petitioner.name.full()]) == 0 } 
       - "petitioner_trust_yes": ${ len([item for item in interests_in_trust if item.recommended_award ==  petitioner.name.full()]) > 0 } 
       - "petitioner_trust_no": ${ len([item for item in interests_in_trust if item.recommended_award ==  petitioner.name.full()]) == 0 } 
-      - "petitioner_other_asset_no": ${ len([item for item in other_assets if item.recommended_award ==  petitioner.name.full()]) > 0 } 
-      - "petitioner_other_asset_yes": ${ len([item for item in other_assets if item.recommended_award ==  petitioner.name.full()]) == 0 } 
-      - "respondent_own_real_estate_yes": ${ len([item for item in real_estate if item.recommended_award ==  respondent.name.full()]) == 0 } 
-      - "respondent_own_real_estate_no": ${ len([item for item in real_estate if item.recommended_award ==  respondent.name.full()]) > 0 } 
-      - "respondent_own_vehicle_yes": ${ len([item for item in vehicles if item.recommended_award ==  respondent.name.full()]) > 0 } 
-      - "respondent_own_vehicle_no": ${ len([item for item in vehicles if item.recommended_award ==  respondent.name.full()]) == 0 } 
-      - "respondent_own_misc_property_yes": ${ len([item for item in vehicles if item.recommended_award ==  respondent.name.full()]) == 0 } 
-      - "respondent_own_misc_property_no": ${ len([item for item in vehicles if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "petitioner_other_asset_no": ${ len([item for item in other_assets if item.recommended_award ==  petitioner.name.full()]) == 0 } 
+      - "petitioner_other_asset_yes": ${ len([item for item in other_assets if item.recommended_award ==  petitioner.name.full()]) > 0 } 
+      - "respondent_own_real_estate_yes": ${ len([item for item in real_estate if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_own_real_estate_no": ${ len([item for item in real_estate if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_own_vehicle_yes": ${ len([item for item in vehicles.matches(source=['car','truck','motorcycle'])  if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_own_vehicle_no": ${ len([item for item in vehicles.matches(source=['car','truck','motorcycle'])  if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_own_misc_property_yes": ${ len([item for item in vehicles.matches(source=['mobile_home','trailer','boat','airplane','other']) if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_own_misc_property_no": ${ len([item for item in vehicles.matches(source=['mobile_home','trailer','boat','airplane','other']) if item.recommended_award ==  respondent.name.full()]) > 0 } 
       - "respondent_bank_account_yes": ${ len([item for item in bank_assets if item.recommended_award ==  respondent.name.full()]) > 0 } 
       - "respondent_bank_account_no": ${ len([item for item in bank_assets if item.recommended_award ==  respondent.name.full()]) == 0 } 
       - "respondent_retirement_yes": ${ len([item for item in retirement_accounts if item.recommended_award ==  respondent.name.full()]) > 0 } 
       - "respondent_retirement_no": ${ len([item for item in retirement_accounts if item.recommended_award ==  respondent.name.full()]) == 0 } 
       - "respondent_ira_yes": ${ len([item for item in retirement_accounts if item.recommended_award ==  respondent.name.full()]) > 0 } 
       - "respondent_ira_no": ${ len([item for item in retirement_accounts if item.recommended_award ==  respondent.name.full()]) == 0 } 
-      - "respondent_home_goods_yes": ${ len([item for item in personal_goods if item.recommended_award ==  respondent.name.full()]) == 0 } 
-      - "respondent_home_goods_no": ${ len([item for item in personal_goods if item.recommended_award ==  respondent.name.full()]) > 0 } 
-      - "respondent_personal_goods_yes": ${ len([item for item in personal_goods if item.recommended_award ==  respondent.name.full()]) > 0 } 
-      - "respondent_personal_goods_no": ${ len([item for item in personal_goods if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_home_goods_yes": ${ len([item for item in personal_goods.matches(source=["appliances", "computers", "electronics", "furnishings", "other"]) if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_home_goods_no": ${ len([item for item in personal_goods.matches(source=["appliances", "computers", "electronics", "furnishings", "other"]) if item.recommended_award ==  respondent.name.full()]) == 0 } 
+      - "respondent_personal_goods_yes": ${ len([item for item in personal_goods.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc"]) if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_personal_goods_no": ${ len([item for item in personal_goods.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc"]) if item.recommended_award ==  respondent.name.full()]) == 0 } 
       - "respondent_business_yes": ${ len([item for item in businesses if item.recommended_award ==  respondent.name.full()]) > 0 } 
       - "respondent_business_no": ${ len([item for item in businesses if item.recommended_award ==  respondent.name.full()]) == 0 } 
       - "respondent_bonds_yes": ${ len([item for item in securities if item.recommended_award ==  respondent.name.full()]) > 0 } 
       - "respondent_bonds_no": ${ len([item for item in securities if item.recommended_award ==  respondent.name.full()]) == 0 } 
-      - "respondent_life_insurance_yes": ${ len([item for item in life_insurance if item.recommended_award ==  respondent.name.full()]) == 0 } 
-      - "respondent_life_insurance_no": ${ len([item for item in life_insurance if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_life_insurance_yes": ${ len([item for item in life_insurance if item.recommended_award ==  respondent.name.full()]) > 0 } 
+      - "respondent_life_insurance_no": ${ len([item for item in life_insurance if item.recommended_award ==  respondent.name.full()]) == 0 } 
       - "respondent_owe_funds_no": ${ len([item for item in interest_in_contract if item.recommended_award ==  respondent.name.full()]) == 0 } 
       - "respondent_owe_funds_yes": ${ len([item for item in interest_in_contract if item.recommended_award ==  respondent.name.full()]) > 0 } 
       - "respondent_lawsuit_yes": ${ len([item for item in interest_in_litigation if item.recommended_award ==  respondent.name.full()]) > 0 } 
