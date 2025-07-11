@@ -55,6 +55,7 @@ attachment:
   variable name: form_17_attachment[i]
   skip undefined: True
   pdf template file: form_17.pdf
+  editable: False
   fields:
       - "check_Kansas_City": ${ case.court == "Kansas City" } 
       - "check_Independence": ${ case.court == "Independence" } 

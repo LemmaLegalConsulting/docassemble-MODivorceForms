@@ -35,6 +35,7 @@ attachment:
   variable name: redaction_certification_attachment[i]
   skip undefined: True
   pdf template file: redaction_certification.pdf
+  editable: False
   fields:
     - "circuit_court": ${ case.circuit } 
     - "county_name": ${ case.county } 

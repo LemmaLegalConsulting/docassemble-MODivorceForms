@@ -29,19 +29,19 @@ fields:
     choices:
       - Yes, I filed myself: user0_filed
       - Yes, my spouse filed: user1_filed
-      - Filed jointly: jointly_filed
       - Not yet: not_filed
       - I'm not sure: unknown
-validation code: |
-  if  case.filed in ["user0_filed","not_filed","jointly_filed","unknown"]:
+---
+code: |
+  if case.filed in ["user0_filed","not_filed"]:
     petitioner = users[0]
     respondent = other_parties[0]
-    previous_petitions = 1
     user_started_case = True
+    if case.filed in ["not_filed"]:
+      previous_petitions = 0
   elif case.filed == "user1_filed":
     petitioner = other_parties[0]
     respondent = users[0]
-    previous_petitions = 1
     user_started_case = False
   else:
     previous_petitions = 0
@@ -53,14 +53,11 @@ objects:
 ---
 id: Case Information
 question: Case Information
+subquestion: |
+  Here is an example where you can find this info on Case.net.
 fields:
-  - Docket number: case.docket_number
+  - Case number: case.docket_number
     required: False
-  - Case court: case.court
-    choices:
-      - Kansas City
-      - Independence
-
   - Case circuit: case.circuit
     required: False
   - Case division number: case.division_number
@@ -127,7 +124,11 @@ sets:
  - users[0].name.first
 id: user name
 question: |
-  Your name
+  We can help!
+subquestion: |
+  Based on the information provided, this tool will be able to help you file the documents you need to file in your case!
+
+  Since we will be working together, it's time for introductions.  What is your name?
 fields:
   - code: |
       users[0].name_fields()
@@ -138,7 +139,7 @@ sets:
  - other_parties[0].name.first
 id: other party name
 question: |
-  The other party's name
+  What is your current spouse's name?
 fields:
   - code: |
       other_parties[0].name_fields()
@@ -163,7 +164,7 @@ id: Party social security number
 generic object: ALIndividual
 question: Social security number for ${ x.name_full() }
 fields:    
-  - Last 4 digits of your social security number: x.ssn
+  - Last 4 digits of ${ "your social security number." if x.instanceName == "users[0]" else x.pronoun_possessive("social security number.") }: x.ssn
     maxlength: 4
     required: False
 ---
@@ -175,7 +176,7 @@ fields:
     required: False
 ---
 sets: x.address.address
-id: Address
+id: Address generic
 generic object: ALIndividual
 question: Address for ${ x.name_full() }
 fields:
@@ -186,7 +187,16 @@ fields:
   - Email: x.email
     required: False
 ---
-id: Address
+id: Phone and email generic
+generic object: ALIndividual
+question: Phone and email for ${ x.name_full() }
+fields:
+  - Phone: x.phone_number
+    required: False
+  - Email: x.email
+    required: False
+---
+id: Fax number
 generic object: ALIndividual
 question: Fax for ${ x.name_full() }
 fields:
@@ -194,7 +204,7 @@ fields:
     required: False
 ---
 sets: users[0].address.address
-id: Address
+id: Users address
 question: Your address
 fields:
   - code: |
@@ -306,6 +316,63 @@ fields:
 validation code: |
   if x.previously_married == False:
     x.number_of_marriages = 0
+---
+id: Residency info for user
+question: Your residency in Missouri
+fields:
+  - Do you live in Missouri?: users[0].lives_in_missouri
+    datatype: yesnoradio
+  - How long have you lived in Missouri?: users[0].mo_length_of_residence_choice
+    datatype: radio
+    show if: users[0].lives_in_missouri
+    choices:
+      - Less than 4 months: less_than_4
+      - More than 4 months but less than a year: more_than_4
+      - A year or more: year
+  - How many days?: users[0].mo_length_of_residence_days
+    datatype: integer
+    show if:
+      variable: users[0].mo_length_of_residence_choice
+      is: less_than_4
+  - How many months?: users[0].mo_length_of_residence_months
+    datatype: integer
+    show if:
+      variable: users[0].mo_length_of_residence_choice
+      is: more_than_4
+  - How many years?: users[0].mo_length_of_residence_years
+    datatype: integer
+    show if:
+      variable: users[0].mo_length_of_residence_choice
+      is: year    
+---
+
+id: Residency info for user
+question: Your spouse's residency in Missouri
+fields:
+  - Does your spouse live in Missouri?: other_parties[0].lives_in_missouri
+    datatype: yesnoradio
+  - How long has your spouse lived in Missouri?: other_parties[0].mo_length_of_residence_choice
+    datatype: radio
+    show if: other_parties[0].lives_in_missouri
+    choices:
+      - Less than 4 months: less_than_4
+      - More than 4 months but less than a year: more_than_4
+      - A year or more: year
+  - How many days?: other_parties[0].mo_length_of_residence_days
+    datatype: integer
+    show if:
+      variable: other_parties[0].mo_length_of_residence_choice
+      is: less_than_4
+  - How many months?: other_parties[0].mo_length_of_residence_months
+    datatype: integer
+    show if:
+      variable: other_parties[0].mo_length_of_residence_choice
+      is: more_than_4
+  - How many years?: other_parties[0].mo_length_of_residence_years
+    datatype: integer
+    show if:
+      variable: other_parties[0].mo_length_of_residence_choice
+      is: year    
 ---
 id: Residency info
 generic object: ALIndividual
@@ -428,6 +495,17 @@ fields:
       variable: x.attorney_involved
       is: True
   - Zip code: x.attorney.address.zip
+    required: False
+    show if:
+      variable: x.attorney_involved
+      is: True
+  - Phone: x.attorney.phone_number
+    required: False
+    show if:
+      variable: x.attorney_involved
+      is: True
+  - Email: x.attorney.email
+    datatype: email
     required: False
     show if:
       variable: x.attorney_involved
@@ -777,17 +855,15 @@ question: |
 fields:
   - "Place of this Marriage - City, Town, or Location": marriage.address.city
     maxlength: 36
-    required: False
   - "County": marriage.address.county
     maxlength: 24
-    required: False
   - "State": marriage.address.state
     maxlength: 32
-    required: False
   - "Country": marriage.address.country
+  - note: |
+      Please spell out the full name of the state or country, instead of using abbreviations.
   - "Date of this Marriage": marriage.recorded_date
     datatype: date
-    required: False
 continue button field: marriage_info
 ---
 id: marriage object
@@ -2155,11 +2231,9 @@ fields:
   - Balance: real_estate[i].balance
     datatype: currency
     show if: real_estate[i].is_amount_owed
-    required: False 
   - Monthly Payment: real_estate[i].monthly_payment
     datatype: currency
     show if: real_estate[i].is_amount_owed
-    required: False 
   - Who should pay this debt?: real_estate[i].recommended_debt
     show if: real_estate[i].is_amount_owed
     choices:
@@ -2170,6 +2244,8 @@ fields:
       - Marital
       - Nonmarital
       - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
   - Party with possession of this property?: real_estate[i].has_possession
     choices:
       - ${ petitioner.name.full() }
@@ -2255,11 +2331,9 @@ fields:
   - Balance: vehicles[i].balance
     datatype: currency
     show if: vehicles[i].is_amount_owed
-    required: False 
   - Monthly Payment: vehicles[i].monthly_payment
     datatype: currency
     show if: vehicles[i].is_amount_owed
-    required: False 
   - Who should pay this debt?: vehicles[i].recommended_debt
     show if: vehicles[i].is_amount_owed
     choices:
@@ -2270,6 +2344,8 @@ fields:
       - Marital
       - Nonmarital
       - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
   - Party with possession of this property?: vehicles[i].has_possession
     choices:
       - ${ petitioner.name.full() }
@@ -2346,6 +2422,8 @@ fields:
       - Marital
       - Nonmarital
       - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
   - Names on the account: bank_assets[i].has_possession
     choices:
       - ${ petitioner.name.full() }
@@ -2432,11 +2510,9 @@ fields:
   - Balance: personal_goods[i].balance
     datatype: currency
     show if: personal_goods[i].is_amount_owed
-    required: False 
   - Monthly Payment: personal_goods[i].monthly_payment
     datatype: currency
     show if: personal_goods[i].is_amount_owed
-    required: False
   - Who should pay this debt?: personal_goods[i].recommended_debt
     show if: personal_goods[i].is_amount_owed
     choices:
@@ -2447,6 +2523,8 @@ fields:
       - Marital
       - Nonmarital
       - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
   - Who has possession?: personal_goods[i].has_possession
     choices:
       - ${ petitioner.name.full() }
@@ -2868,6 +2946,14 @@ validation code: |
     respondent.maintenance_received = 0
     respondent.maintenance_paid = 0
 ---
+if: not relief['maintenance']
+code: |
+  is_maintenance_award = False
+  petitioner.maintenance_received = 0
+  petitioner.maintenance_paid = 0
+  respondent.maintenance_received = 0
+  respondent.maintenance_paid = 0
+---
 ## CHILD SUPPORT ##
 id: Child Support Award
 question: |
@@ -2891,20 +2977,29 @@ validation code: |
 ## RELIEF ##
 id: Relief Requested
 question: Request for Relief
+subquestion:
+  In a divorce, the court can do different things in addition to dissolving the marriage.
 fields:
   - What do you want the court to do?: relief
     datatype: checkboxes
     choices: 
-      - Grant a dissolution of my marriage: dissolution
-      - Grant custody of the children.noun_plural: custody
-      - Enter appropriate orders whith respect to the support of the children: child_support
-      - Divide the marital property and debts: divide_property
-      - Award maintenance to me: maintenance_to_me
-      - Award maintenance to my spouse: maintenance_to_spouse
-      - Change my name to my former name: change_name
-      - Other: other
+      code: relief_options
   - Explain: relief_other
     show if: relief['other']
+---
+code: |
+  temp_relief_options = list()
+  if minor_children:
+    temp_relief_options.append({"custody":"Grant custody of the children"})
+    if case.filed == "user1_filed" or other_parties[0].lives_in_missouri or marriage.live_together_in_mo:
+      temp_relief_options.append({"child_support":"Enter appropriate orders whith respect to the support of the children"})
+  temp_relief_options.append({"divide_property":"Divide the marital property and debts"})
+  if case.filed == "user1_filed" or other_parties[0].lives_in_missouri or marriage.live_together_in_mo:
+    temp_relief_options.append({"maintenance":"Award maintenance"})
+  if users[0].has_prior_name:
+    temp_relief_options.append({"change_name":"Change my name to my former name"})
+  temp_relief_options.append({"other":"Other"})
+  relief_options = temp_relief_options
 ---
 ## SERVICE ##
 objects:

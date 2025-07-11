@@ -217,11 +217,9 @@ fields:
   - Balance: real_estate[i].balance
     datatype: currency
     show if: real_estate[i].is_amount_owed
-    required: False 
   - Monthly Payment: real_estate[i].monthly_payment
     datatype: currency
     show if: real_estate[i].is_amount_owed
-    required: False 
   - Who should pay this debt?: real_estate[i].recommended_debt
     show if: real_estate[i].is_amount_owed
     choices:
@@ -232,6 +230,8 @@ fields:
       - Marital
       - Nonmarital
       - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
   - Party with possession of this property?: real_estate[i].has_possession
     choices:
       - ${ petitioner.name.full() }
@@ -248,6 +248,13 @@ validation code: |
   else:
     real_estate[i].display_name = real_estate[i].source_other
   real_estate[i].description = real_estate[i].display_name + " at " + real_estate[i].address + " " + real_estate[i].legal_description
+---
+id: marital_property_template
+template: marital_property_template
+subject: |
+  What is marital and nonmarital property?
+content: |
+  Marital property is property acquired throughout the marriage together.  Nonmarital property is property acquired before the marriage or separately.
 ---
 id: vehicles object
 objects:
@@ -317,11 +324,9 @@ fields:
   - Balance: vehicles[i].balance
     datatype: currency
     show if: vehicles[i].is_amount_owed
-    required: False 
   - Monthly Payment: vehicles[i].monthly_payment
     datatype: currency
     show if: vehicles[i].is_amount_owed
-    required: False 
   - Who should pay this debt?: vehicles[i].recommended_debt
     show if: vehicles[i].is_amount_owed
     choices:
@@ -332,6 +337,8 @@ fields:
       - Marital
       - Nonmarital
       - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
   - Party with possession of this property?: vehicles[i].has_possession
     choices:
       - ${ petitioner.name.full() }
@@ -408,6 +415,8 @@ fields:
       - Marital
       - Nonmarital
       - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
   - Names on the account: bank_assets[i].has_possession
     choices:
       - ${ petitioner.name.full() }
@@ -490,11 +499,9 @@ fields:
   - Balance: securities[i].balance
     datatype: currency
     show if: securities[i].is_amount_owed
-    required: False 
   - Monthly Payment: securities[i].monthly_payment
     datatype: currency
     show if: securities[i].is_amount_owed
-    required: False 
   - Who should pay this debt?: securities[i].recommended_debt
     show if: securities[i].is_amount_owed
     choices:
@@ -505,6 +512,8 @@ fields:
       - Marital
       - Nonmarital
       - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
   - Names in which securities are held: securities[i].has_possession
     choices:
       - ${ petitioner.name.full() }
@@ -587,6 +596,8 @@ fields:
       - Marital
       - Nonmarital
       - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
   - Person holding the interest: retirement_accounts[i].has_possession
     choices:
       - ${ petitioner.name.full() }
@@ -604,24 +615,39 @@ validation code: |
     retirement_accounts[i].display_name = retirement_accounts[i].source_other
   retirement_accounts[i].description = retirement_accounts[i].name + " " +retirement_accounts[i].display_name
 ---
+id: multiple assets question
 question: Do you have any other assets?
 fields:
   - Life insurance: life_insurance.there_are_any
     datatype: yesnoradio
   - Interests in trust: interests_in_trust.there_are_any
     datatype: yesnoradio
+    js show if:   |
+      val("life_insurance.there_are_any") === true || val("life_insurance.there_are_any") === false
   - Interest in contracts made and not performed: interest_in_contract.there_are_any
     datatype: yesnoradio
+    js show if:   |
+      val("interests_in_trust.there_are_any") === true || val("interests_in_trust.there_are_any") === false
   - Interest in pending litigation: interest_in_litigation.there_are_any
     datatype: yesnoradio
+    js show if:   |
+      val("interest_in_contract.there_are_any") === true || val("interest_in_contract.there_are_any") === false
   - Interest in farm equipment: farm.there_are_any
     datatype: yesnoradio
+    js show if:   |
+      val("interest_in_litigation.there_are_any") === true || val("interest_in_litigation.there_are_any") === false
   - Debts owed to you by others: debts_owed_to_you.there_are_any
     datatype: yesnoradio
+    js show if:   |
+      val("farm.there_are_any") === true || val("farm.there_are_any") === false
   - Interests in businesses: businesses.there_are_any
     datatype: yesnoradio
+    js show if:   |
+      val("debts_owed_to_you.there_are_any") === true || val("debts_owed_to_you.there_are_any") === false
   - Other assets: other_assets.there_are_any
     datatype: yesnoradio
+    js show if:   |
+      val("businesses.there_are_any") === true || val("businesses.there_are_any") === false
 continue button field: there_are_any_screen
 ---
 
@@ -652,11 +678,9 @@ fields:
   - Balance: businesses[i].balance
     datatype: currency
     show if: businesses[i].is_amount_owed
-    required: False 
   - Monthly Payment: businesses[i].monthly_payment
     datatype: currency
     show if: businesses[i].is_amount_owed
-    required: False 
   - Who should pay this debt?: businesses[i].recommended_debt
     show if: businesses[i].is_amount_owed
     choices:
@@ -667,6 +691,8 @@ fields:
       - Marital
       - Nonmarital
       - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
   - Who has possession?: businesses[i].has_possession
     choices:
       - ${ petitioner.name.full() }
@@ -705,11 +731,9 @@ fields:
   - Balance: farm[i].balance
     datatype: currency
     show if: farm[i].is_amount_owed
-    required: False 
   - Monthly Payment: farm[i].monthly_payment
     datatype: currency
     show if: farm[i].is_amount_owed
-    required: False 
   - Who should pay this debt?: farm[i].recommended_debt
     show if: farm[i].is_amount_owed
     choices:
@@ -720,6 +744,8 @@ fields:
       - Marital
       - Nonmarital
       - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
   - Who has possession?: farm[i].has_possession
     choices:
       - ${ petitioner.name.full() }
@@ -735,7 +761,7 @@ only sets: other_assets[i].market_value
 generic object: ALAssetList
 id: describe generic
 question: |
-  Tell us about your other_assets
+  Tell us about your other assets
 subquestion: |
 
   Make your best guess for the market value.
@@ -758,22 +784,21 @@ fields:
   - Balance: other_assets[i].balance
     datatype: currency
     show if: other_assets[i].is_amount_owed
-    required: False 
   - Monthly Payment: other_assets[i].monthly_payment
     datatype: currency
     show if: other_assets[i].is_amount_owed
-    required: False 
   - Who should pay this debt?: other_assets[i].recommended_debt
     show if: other_assets[i].is_amount_owed
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
-    
   - Is this marital or nonmarital property?: other_assets[i].marital_property
     choices:
       - Marital
       - Nonmarital
       - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
   - Who has possession?: other_assets[i].has_possession
     choices:
       - ${ petitioner.name.full() }
@@ -809,6 +834,8 @@ fields:
       - Marital
       - Nonmarital
       - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
   - Who has possession?: x[i].has_possession
     choices:
       - ${ petitioner.name.full() }
@@ -862,6 +889,8 @@ fields:
       - Marital
       - Nonmarital
       - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
   - Owner of policy: life_insurance[i].owner
     choices:
       - ${ petitioner.name.full() }
@@ -871,7 +900,6 @@ fields:
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
-      - Other: other
       - Other: other
   - Beneficiaries: life_insurance[i].beneficiaries
     choices:
@@ -937,6 +965,8 @@ fields:
       - Marital
       - Nonmarital
       - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
   - Trustee: interests_in_trust[i].trustee
     choices:
       - ${ petitioner.name.full() }
@@ -1080,7 +1110,7 @@ code: |
         x.assets.append(item)
         x.assets[-1].list = list
         if not defined('x.assets[-1].source'):
-          debts[-1].source = list
+          x.assets[-1].source = list
   x.assets.gathered = True
 ---
 id: populate debt list from debts in assets
@@ -1130,6 +1160,34 @@ subquestion: |
   
   ${ debts.add_action() }
 continue button field: debts.review_items
+---
+id: generic review
+generic object: ALIndividual
+question: Debts of ${ x.name.full() }
+subquestion: |
+
+  Tap Next if you don't have more to add.
+  
+  ${ x.debts_table }
+  
+continue button field: x.review_debts
+---
+id: generic table
+generic object: ALIndividual
+table: x.debts_table
+rows: x.debts
+columns:
+  - Type: |
+      row_item.source
+  - Lender: |
+      row_item.lender
+  - Balance: |
+      currency(row_item.balance) if defined("row_item.balance") else ""
+  - Monthly payment:
+      currency(row_item.monthly_payment) if defined("row_item.monthly_payment") else ""
+edit:
+  - source
+  - balance
 ---
 id: debts revisit
 continue button field: debts.revisit
@@ -1223,6 +1281,7 @@ attachment:
   variable name: property_statement_attachment[i]
   skip undefined: True
   pdf template file: property_statement.pdf
+  editable: False
   fields:
       - "county_name": ${ case.county } 
       - "petitioners_first_name": ${ petitioner.name.first } 

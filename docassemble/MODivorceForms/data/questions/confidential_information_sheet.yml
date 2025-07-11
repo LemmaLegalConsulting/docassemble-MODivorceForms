@@ -49,6 +49,7 @@ attachment:
   variable name: confidential_information_sheet_attachment[i]
   skip undefined: True
   pdf template file: confidential_information_sheet.pdf
+  editable: False
   fields:
     - "case_filing_date": ${ case.filing_date } 
     - "case_county": ${ case.county } 
