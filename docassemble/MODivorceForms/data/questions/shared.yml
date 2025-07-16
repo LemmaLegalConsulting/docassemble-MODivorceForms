@@ -350,7 +350,32 @@ fields:
       variable: users[0].mo_length_of_residence_choice
       is: year    
 ---
-
+if: not users[0].lives_in_missouri
+id: Residency info for user
+question: Your residency in Missouri
+fields:
+  - How long have you lived in ${ state_name(users[0].address.state) }?: users[0].mo_length_of_residence_choice
+    datatype: radio
+    choices:
+      - Less than 4 months: less_than_4
+      - More than 4 months but less than a year: more_than_4
+      - A year or more: year
+  - How many days?: users[0].mo_length_of_residence_days
+    datatype: integer
+    show if:
+      variable: users[0].mo_length_of_residence_choice
+      is: less_than_4
+  - How many months?: users[0].mo_length_of_residence_months
+    datatype: integer
+    show if:
+      variable: users[0].mo_length_of_residence_choice
+      is: more_than_4
+  - How many years?: users[0].mo_length_of_residence_years
+    datatype: integer
+    show if:
+      variable: users[0].mo_length_of_residence_choice
+      is: year    
+---
 id: Residency info for user
 question: Your spouse's residency in Missouri
 fields:
@@ -359,6 +384,32 @@ fields:
   - How long has your spouse lived in Missouri?: other_parties[0].mo_length_of_residence_choice
     datatype: radio
     show if: other_parties[0].lives_in_missouri
+    choices:
+      - Less than 4 months: less_than_4
+      - More than 4 months but less than a year: more_than_4
+      - A year or more: year
+  - How many days?: other_parties[0].mo_length_of_residence_days
+    datatype: integer
+    show if:
+      variable: other_parties[0].mo_length_of_residence_choice
+      is: less_than_4
+  - How many months?: other_parties[0].mo_length_of_residence_months
+    datatype: integer
+    show if:
+      variable: other_parties[0].mo_length_of_residence_choice
+      is: more_than_4
+  - How many years?: other_parties[0].mo_length_of_residence_years
+    datatype: integer
+    show if:
+      variable: other_parties[0].mo_length_of_residence_choice
+      is: year    
+---
+if: other_parties[0].lives_in_missouri == False
+id: Residency info for user
+question: Your spouse's residency in ${ state_name(other_parties[0].address.state) }
+fields:
+  - How long has ${ other_parties[0].name_full() } lived in ${ state_name(other_parties[0].address.state) }?: other_parties[0].mo_length_of_residence_choice
+    datatype: radio
     choices:
       - Less than 4 months: less_than_4
       - More than 4 months but less than a year: more_than_4
@@ -404,6 +455,10 @@ fields:
     show if:
       variable: x.mo_length_of_residence_choice
       is: year
+---
+generic object: ALIndividual
+question: Residence in ${ x.address.county }
+fields:
   - How long has ${ x.name_full() } lived in ${ x.address.county }?: x.county_length_of_residence_choice
     datatype: radio
     choices:
@@ -1001,7 +1056,7 @@ fields:
     code: |
       times_per_year_list
     datatype: integer
-  - Do you get any other compensation from this job??: x.to_add.there_is_another
+  - Do you get any other compensation from this job?: x.to_add.there_is_another
     datatype: yesnoradio
 ---
 id: other itemized job income value for other party
@@ -2613,8 +2668,6 @@ id: debts terms_ordered
 # their order here will be their same order when shown to users.
 variable name: debts.terms_ordered
 data: !!omap
-  - real_estate: "a mortgage on a house or condominium or land"
-  - vehicles: "vehicle loans"
   - credit_card_debt: "Credit card debt"
   - personal_loans: "Money to family or friends"
   - medical_debt: "Medical or dental bills"
@@ -2926,7 +2979,7 @@ fields:
       val("is_maintenance_award")
     choices:
       - ${ petitioner.name_full() } should be paid maintenance by ${ respondent.name_full() }: petitioner
-      - ${ respondent.name_full() } should be paid maintenance by ${ petitioner.name_full() }
+      - ${ respondent.name_full() } should be paid maintenance by ${ petitioner.name_full() }: respondent
     datatype: radio
   - How much per month?: maintenance_amount
     datatype: currency
