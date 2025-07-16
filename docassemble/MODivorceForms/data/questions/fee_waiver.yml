@@ -84,7 +84,7 @@ attachment:
       - "Petitioners AddressTelephone": ${ petitioner.phone_number } 
       - "Respondent Name": ${ respondent.name_full() } 
       - "Respondents AddressTelephone": ${ respondent.phone_number } 
-      - "Marital Status": ${ users[0].marital_status } 
+      - "Marital Status": "Married"
       - "If Married Spouses name": ${ other_parties[0].name_full() } 
       - "Number of dependents": ${ len(children) } 
       - "Gross Salary": ${ "{:.2f}".format(float(users[0].jobs.total(times_per_year=12)) + users[0].self_employment_income,symbol='') } 
@@ -97,35 +97,35 @@ attachment:
       - "Food Amount": ${ "{:.2f}".format(users[0].expenses.total(source=['food'], times_per_year=12)) } 
       - "Social Security": ${ "{:.2f}".format(users[0].benefits.total(source=['social_security'], times_per_year=12)) } 
       - "Payment on Debts and Credit Cards": ${ "{:.2f}".format(users[0].expenses.total(source=['debt_payment'], times_per_year=12)) } 
-      - "Child Support": ${ "{:.2f}".format(users[0].other_child_support_received + users[0].child_support_received) } 
-      - "Child Support  Expense": ${ "{:.2f}".format(users[0].other_child_support_paid + users[0].child_support_paid) } 
+      - "Child Support": ${ "{:.2f}".format(showifdef('users[0].other_child_support_received',0) + showifdef('users[0].child_support_received',0)) } 
+      - "Child Support  Expense": ${ "{:.2f}".format(showifdef('users[0].other_child_support_paid',0) + showifdef('users[0].child_support_paid',0)) } 
       - "Maintenance  Income": ${ "{:.2f}".format(users[0].maintenance_other_received + users[0].maintenance_received) } 
       - "Maintenance": ${ "{:.2f}".format(users[0].maintenance_paid + users[0].maintenance_other_paid) } 
       - "Other Income Amount": ${ "{:.2f}".format(users[0].other_incomes.total(source=['other'], times_per_year=12)) } 
       - "Medical Expenses": ${ "{:.2f}".format(users[0].expenses.total(source=['medical'], times_per_year=12)) } 
-      - "Other income to be considered": ${ comma_and_list(item.source_other for item in users[0][1].other_incomes.matches(source=['Other'])) } 
+      - "Other income to be considered": ${ comma_and_list(item.source_other for item in users[0].other_incomes.matches(source=['other'])) } 
       - "Medical expenses to be considered": ${ comma_and_list([expense.description for expense in users[0].expenses.matches(source="medical")]) } 
-      - "Total Monthly Income": ${ "{:.2f}".format(float(users[0].jobs.total(times_per_year=12)) + users[0].self_employment_income + float(users[0].benefits.total(source=['public_assistance'], times_per_year=12)) + float(users[0].other_incomes.total(source=['pension'], times_per_year=12)) + float(users[0].benefits.total(source=['social_security'], times_per_year=12)) + users[0].other_child_support_received + users[0].child_support_received + users[0].maintenance_other_received + users[0].maintenance_received + float(users[0].other_incomes.total(source=['other'], times_per_year=12))) } 
-      - "Total Monthly Expenses": ${ "{:.2f}".format(float(users[0].expenses.total(source=['rent', 'mortgage'], times_per_year=12)) + float(users[0].expenses.total(source=['utilities'], times_per_year=12)) + float(users[0].expenses.total(source=['food'], times_per_year=12)) + float(users[0].expenses.total(source=['debt_payment'], times_per_year=12)) + users[0].other_child_support_paid + users[0].child_support_paid + float(users[0].maintenance_paid + users[0].maintenance_other_paid) + float(users[0].expenses.total(source=['medical'], times_per_year=12))) } 
+      - "Total Monthly Income": ${ "{:.2f}".format(float(users[0].jobs.total(times_per_year=12)) + users[0].self_employment_income + float(users[0].benefits.total(source=['public_assistance'], times_per_year=12)) + float(users[0].other_incomes.total(source=['pension'], times_per_year=12)) + float(users[0].benefits.total(source=['social_security'], times_per_year=12)) + showifdef('users[0].other_child_support_received',0) + showifdef('users[0].child_support_received',0) + users[0].maintenance_other_received + users[0].maintenance_received + float(users[0].other_incomes.total(source=['other'], times_per_year=12))) } 
+      - "Total Monthly Expenses": ${ "{:.2f}".format(float(users[0].expenses.total(source=['rent', 'mortgage'], times_per_year=12)) + float(users[0].expenses.total(source=['utilities'], times_per_year=12)) + float(users[0].expenses.total(source=['food'], times_per_year=12)) + float(users[0].expenses.total(source=['debt_payment'], times_per_year=12)) + showifdef('users[0].other_child_support_paid',0) + showifdef('users[0].child_support_paid',0) + float(users[0].maintenance_paid + users[0].maintenance_other_paid) + float(users[0].expenses.total(source=['medical'], times_per_year=12))) } 
       - "Cash on Hand": ${ users[0].cash } 
-      - "Home Loan Balance": ${ "{:.2f}".format(real_estate.filter(recommended_award=users[0].name.full()).balance()) } 
-      - "Automobile Loan": ${ "{:.2f}".format(vehicles.filter(recommended_award=users[0].name.full()).balance()) } 
-      - "Checking Account": ${ "{:.2f}".format(users[0].bank_assets.total(source=['checking account'], times_per_year=12)) } 
+      - "Home Loan Balance": ${ "{:.2f}".format(real_estate.filter(is_amount_owed=True).filter(recommended_debt=users[0].name.full()).balance()) } 
+      - "Automobile Loan": ${ "{:.2f}".format(vehicles.filter(is_amount_owed=True).filter(recommended_award=users[0].name.full()).balance()) } 
+      - "Checking Account": ${ "{:.2f}".format(users[0].assets.market_value(source=['checking account'])) } 
       - "Credit Card Balance s ": ${ "{:.2f}".format(users[0].debts.filter(source='credit_card_debt').balance())  } 
-      - "Savings Account": ${ "{:.2f}".format(users[0].bank_assets.total(source=['savings account'], times_per_year=12)) } 
-      - "Value of Home": ${ "{:.2f}".format(users[0].real_estate.value.total(source=['house'], times_per_year=12)) } 
+      - "Savings Account": ${ "{:.2f}".format(users[0].assets.market_value(source=['savings account'])) } 
+      - "Value of Home": ${ "{:.2f}".format(users[0].assets.market_value.total(source=['house','condominium','leasehold'])) } 
       - "Other debts to be considered 1": ${ users[0].debts[0].value } 
       - "Debts Other debts to be considered 1": ${ users[0].debts[0].description } 
-      - "Value of Other Real Estate": ${ "{:.2f}".format(users[0].real_estate.total(source=['condominium', 'leasehold', 'other'], times_per_year=12)) } 
+      - "Value of Other Real Estate": ${ "{:.2f}".format(users[0].assets.market_value(source=['condominium', 'leasehold', 'other'], times_per_year=12)) } 
       - "Debts Other debts to be considered 2": ${ users[0].debts[1].description } 
       - "Other debts to be considered 2": ${ users[0].debts[1].value } 
-      - "Value of Automobiles": ${ "{:.2f}".format(users[0].vehicles.total(times_per_year=12)) } 
+      - "Value of Automobiles": ${ "{:.2f}".format(users[0].assets.market_value(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane'])) } 
       - "Debts Other debts to be considered 3": ${ "{:.2f}".format(users[0].debts.total_other_attribute(attribute='description')) } 
       - "Other debts to be considered 3": ${ users[0].debts[2].value } 
-      - "1 yrmake": ${ users[0].debts[0].display_name } 
+      - "1 yrmake": ${ users[0].assets.matches(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane'])[0].description } 
       - "Debts Other debts to be considered 4": ${ users[0].vehicles[3].description } 
       - "Other debts to be considered 4": ${ users[0].debts[3].value } 
-      - "2 yrmake": ${ users[0].debts[1].display_name } 
+      - "2 yrmake": ${ users[0].assets.matches(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane'])[1].description } 
       - "Other debts to be considered 5": ${ users[0].vehicles[4].value } 
       - "Debts Other debts to be considered 5": ${ users[0].debts[4].description } 
       - "Other debts to be considered 6": ${ users[0].debts[5].value } 

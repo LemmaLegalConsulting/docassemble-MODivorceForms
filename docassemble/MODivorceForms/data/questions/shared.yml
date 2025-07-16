@@ -3127,6 +3127,9 @@ event: mo_divorce_forms_download
 question: |
   All done
 subquestion: |
+
+  ${ "{:.2f}".format(users[0].assets.market_value(source=['checking account'])) } 
+
   Link to specific court website
   Info on Discovery
   Info and link on Parenting Class when applicable

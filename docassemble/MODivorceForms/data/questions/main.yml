@@ -760,7 +760,10 @@ continue button field: personal_service_information
 ---
 id: Filing Pleadings Video Screen
 question: Video on filing pleadings
+subquestion: |
   <iframe width="480" height="270" src="https://www.powtoon.com/embed/dvKxPdVmlhD/" frameborder="0" allowfullscreen></iframe>
+
+  ${ "{:.2f}".format(users[0].assets.market_value(source=['checking account'])) } 
 continue button field: filing_pleadings_video
 ---
 id: Final Page
