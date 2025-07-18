@@ -58,6 +58,8 @@ subquestion: |
 fields:
   - Case number: case.docket_number
     required: False
+  - Court name: case.court
+    required: False
   - Case circuit: case.circuit
     required: False
   - Case division number: case.division_number

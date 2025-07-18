@@ -121,13 +121,13 @@ attachment:
       - "marriage_last_resided_number_children": ${ len([item for item in children if item.under_18_in_household == True]) } 
       - "is_other_petitioner_description": ${ case.filed_other } 
       - "marriage_last_resided_date": ${ format_date(marriage.separation_date, format='M/d/yyyy') } 
-      - "petitioner_attorney": ${ petitioner.attorney.name.text } 
-      - "petitioner_address_on_one_line": ${ petitioner.address.on_one_line() } 
-      - "marriage_type_dissolution_true": ${ marriage.dissolution_type == "Dissolution" } 
-      - "marriage_type_separation_true": ${ marriage.dissolution_type == "Separation" } 
-      - "marriage_type_annulment_true": ${ marriage.dissolution_type == "Annulment" } 
-      - "marriage_dissolved_date": ${ format_date(case.judgment_date, format='M/d/yyyy') } 
-      - "marriage_recorded_date": ${ format_date(case.recorded_date, format='M/d/yyyy') } 
+      - "petitioner_attorney": ${ petitioner.attorney.name_full() } 
+      - "petitioner_address_on_one_line": ${ petitioner.attorney.address.on_one_line() } 
+      - "marriage_type_dissolution_true": ${ True } 
+      - "marriage_type_separation_true": ${ False } 
+      - "marriage_type_annulment_true": ${ False } 
+      - "marriage_dissolved_date": ${ "" } 
+      - "marriage_recorded_date": ${ "" } 
       - "marriage_child_support_awarded_to_users1": ${ child_support == users[0].name.full() } 
       - "marriage_number_children_awarded_users1": ${ len([item for item in children if item.physical_custody ==  users[0].name.full()]) } 
       - "marriage_number_children_awarded_users2": ${ len([item for item in children if item.physical_custody ==  other_parties[0].name.full()]) } 
@@ -136,7 +136,7 @@ attachment:
       - "marriage_number_children_awarded_joint": ${ len([item for item in children if item.physical_custody ==  "joint"]) } 
       - "marriage_number_children_awarded_other": ${ len([item for item in children if item.physical_custody ==  "other"]) } 
       - "marriage_number_children_awarded_no_children": ${ len(children) == 0 } 
-      - "marriage_child_support_awarded_to_none": ${ child_support == "none" } 
+      - "marriage_child_support_awarded_to_none": ${ len(children) == 0 or child_support == "none" } 
       - "marriage_decree_county": ${ case.county } 
       - "marriage_decree_court": ${ case.court } 
       - "marriage_decree_certifying_office": ${ case.certifying_office } 
