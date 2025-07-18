@@ -71,10 +71,10 @@ attachment:
       - "case_notice_date": ${ service.date } 
       - "other_parties0": ${ other_parties[0].name_full() } 
       - "other_parties0_service_address": ${ other_parties[0].service_address } 
-      - "other_parties1": ${ people_served[0].name_full() } 
-      - "other_parties1_service_address": ${ people_served[0].service_address } 
-      - "other_parties2": ${ people_served[1].name_full() } 
-      - "other_parties2_service_address": ${ people_served[1].service_address } 
-      - "other_parties3": ${ people_served[2].name_full() } 
-      - "other_parties3_service_address": ${ people_served[2].service_address } 
+      - "other_parties1": ${ people_served[1].name_full() } 
+      - "other_parties1_service_address": ${ people_served[1].service_address } 
+      - "other_parties2": ${ people_served[2].name_full() } 
+      - "other_parties2_service_address": ${ people_served[2].service_address } 
+      - "other_parties3": ${ people_served[3].name_full() } 
+      - "other_parties3_service_address": ${ people_served[3].service_address } 
 ---
