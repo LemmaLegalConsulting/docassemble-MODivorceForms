@@ -146,7 +146,7 @@ code: |
   ## 3 Please enter your case information
   nav.set_section("case_information")   
   if case.filed in ["user0_filed", "user1_filed"]:
-    if 'answer_attachment' in doc_list_selected.true_values():
+    if 'answer_attachment' in doc_list_selected.true_values() or 'petition_attachment' in doc_list_selected.true_values():
       previous_petitions # answer
     case_information
   case.county # property_statement, petition, notice_of_hearing, form_17, certificate_of_dissolution
@@ -208,7 +208,8 @@ code: |
     users[0].address.county
     users[0].mo_length_of_residence_choice
   users[0].address.country
-
+  if 'petition_attachment' in doc_list_selected.true_values():
+    users[0].county_length_of_residence_choice
   users[0].email
   users[0].driver_license_number
   users[0].phone_number
@@ -405,6 +406,7 @@ code: |
         personal_service_type
         personal_service_information
         fill_in_service_date # form_17
+        respondent.service_type
         people_served.gathered # notice_of_hearing
         for people in people_served:
           people.service_address.address
