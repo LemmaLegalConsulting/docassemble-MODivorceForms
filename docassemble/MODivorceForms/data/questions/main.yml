@@ -409,7 +409,8 @@ code: |
         for people in people_served:
           people.service_address.address
     filing_pleadings_video
-
+  if 'redaction_certification_attachment' in doc_list_selected.true_values():
+    al_court_bundle
   interview_order_mo_divorce_forms = True
 ---
 continue button field: assets_test_screen
