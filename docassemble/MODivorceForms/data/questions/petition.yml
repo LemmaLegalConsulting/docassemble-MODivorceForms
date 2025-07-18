@@ -308,9 +308,9 @@ attachment:
       - "howManyPetitions2": ${ previous_petitions == 1 } 
       - "howManyPetitions3": ${ previous_petitions > 1 } 
       - "petitionersStreet": ${ petitioner.address.address } 
-      - "petitionersCity": ${ petitioner.address.zip } 
-      - "petitionersState": ${ petitioner.address.state } 
-      - "petitonersZip": ${ petitioner.address.city } 
+      - "petitionersCity": ${ petitioner.address.city } 
+      - "petitionersState": ${ state_name(petitioner.address.state) } 
+      - "petitonersZip": ${ petitioner.address.zip } 
       - "petitionersPhone": ${ petitioner.phone_number } 
       - "petitonersEmail": ${ petitioner.email } 
       - "petitionersSsnLastFour": ${ petitioner.ssn } 
@@ -334,9 +334,9 @@ attachment:
       - "petitionersEmploymentStatus3": ${ len(petitioner.jobs) == 0 and petitioner.has_self_employment_income } 
       - "petitionerEmployedOrSelfEmployed": ${ showifdef('petitioner.employer.name.text', showifdef('petitioner.self_employment_description'))  } 
       - "petitionersEmploymentStreet": ${ petitioner.employer.address.address } 
-      - "petitionersEmploymentCity": ${ petitioner.employer.address.zip } 
-      - "petitionersEmploymentState": ${ petitioner.employer.address.city } 
-      - "petitionersEmploymentZip": ${ petitioner.employer.address.state } 
+      - "petitionersEmploymentCity": ${ petitioner.employer.address.city } 
+      - "petitionersEmploymentState": ${ state_name(petitioner.employer.address.state) } 
+      - "petitionersEmploymentZip": ${ petitioner.employer.address.zip } 
       - "petitionersMonthlyGrossIncome": ${ round(petitioner.monthly_gross_income,2) } 
       - "petitionerSupportYourself1": ${ petitioner.self_supporting } 
       - "petitionerSupportYourself2": ${ not petitioner.self_supporting } 
@@ -345,9 +345,9 @@ attachment:
       - "respondentsMiddleName3": ${ respondent.name.middle } 
       - "respondentsSuffixJrSrIII3": ${ respondent.name.suffix } 
       - "respondentsStreet": ${ respondent.address.address } 
-      - "respondentsCity": ${ respondent.address.zip } 
-      - "respondentsState": ${ respondent.address.state } 
-      - "respondentsZip": ${ respondent.address.city } 
+      - "respondentsCity": ${ respondent.address.city } 
+      - "respondentsState": ${ state_name(respondent.address.state) } 
+      - "respondentsZip": ${ respondent.address.zip } 
       - "respondentsPhone": ${ respondent.email } 
       - "respondentsEmail": ${ respondent.phone_number } 
       - "respondentsSsnLast4": ${ respondent.ssn } 
@@ -356,7 +356,7 @@ attachment:
       - "respondentsCountryOfResidenceName": ${ respondent.address.country if respondent.address.country != "US" else "" } 
       - "respondentsCountryOfResidence1": ${ respondent.address.country == "US" } 
       - "respondentsCountryOfResidence2": ${ respondent.address.country != "US" } 
-      - "respondentsStateOfResidenceName": ${ respondent.address.state if respondent.address.state != "MO" else "" } 
+      - "respondentsStateOfResidenceName": ${ state_name(respondent.address.state) if respondent.address.state != "MO" else "" } 
       - "respondentsStateOfResidence1": ${ respondent.address.state == "MO" } 
       - "respondentsStateOfResidence2": ${ respondent.address.state != "MO" } 
       - "respondentsStateOfResidenceYears": ${ respondent.mo_length_of_residence_years } 
