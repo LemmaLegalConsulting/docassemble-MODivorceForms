@@ -89,8 +89,8 @@ attachment:
       - "ie1r": ${ "{:.2f}".format(respondent.jobs.total(times_per_year = 12)) } 
       - "ie2p": ${ "{:.2f}".format(petitioner.self_employment_income) } 
       - "ie2r": ${ "{:.2f}".format(respondent.self_employment_income) } 
-      - "ie3r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['social_security'], times_per_year=12)) } 
-      - "ie3p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['social_security'], times_per_year=12)) } 
+      - "ie3r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['social security'], times_per_year=12)) } 
+      - "ie3p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['social security'], times_per_year=12)) } 
       - "ie4p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['retirement'], times_per_year=12)) } 
       - "ie4r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['retirement'], times_per_year=12)) } 
       - "ie5p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['pension'], times_per_year=12)) } 
@@ -101,18 +101,18 @@ attachment:
       - "ie7r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['trust'], times_per_year=12)) } 
       - "ie8p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['dividends'], times_per_year=12)) } 
       - "ie8r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['dividends'], times_per_year=12)) } 
-      - "ie9p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['unemployment_compensation'], times_per_year=12)) } 
-      - "ie9r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['unemployment_compensation'], times_per_year=12)) } 
-      - "ie10r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['severance_pay'], times_per_year=12)) } 
-      - "ie10p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['severance_pay'], times_per_year=12)) } 
-      - "ie11p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['workers_comp'], times_per_year=12)) } 
-      - "ie11r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['workers_comp'], times_per_year=12)) } 
+      - "ie9p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['unemployment income'], times_per_year=12)) } 
+      - "ie9r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['unemployment income'], times_per_year=12)) } 
+      - "ie10r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['severance'], times_per_year=12)) } 
+      - "ie10p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['severance'], times_per_year=12)) } 
+      - "ie11p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['worker comp'], times_per_year=12)) } 
+      - "ie11r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['worker comp'], times_per_year=12)) } 
       - "ie12p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['disability_insurance'], times_per_year=12)) } 
       - "ie12r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['disability_insurance'], times_per_year=12)) } 
-      - "ie13r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['veteran_disability'], times_per_year=12)) } 
-      - "ie13p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['veteran_disability'], times_per_year=12)) } 
-      - "ie14p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['military_allowance'], times_per_year=12)) } 
-      - "ie14r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['military_allowance'], times_per_year=12)) } 
+      - "ie13r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['veteran'], times_per_year=12)) } 
+      - "ie13p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['veteran'], times_per_year=12)) } 
+      - "ie14p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['military'], times_per_year=12)) } 
+      - "ie14r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['military'], times_per_year=12)) } 
       - "line1p": ${ "{:.2f}".format(float(petitioner.jobs.total(times_per_year=12)) + petitioner.self_employment_income + float(petitioner.other_incomes.total(times_per_year = 12))) } 
       - "line1r": ${ "{:.2f}".format(float(respondent.jobs.total(times_per_year=12)) + respondent.self_employment_income + float(respondent.other_incomes.total(times_per_year = 12))) } 
       - "ie16p": ${ "{:.2f}".format(petitioner.benefits.total(source=['ssi'], times_per_year=12)) } 

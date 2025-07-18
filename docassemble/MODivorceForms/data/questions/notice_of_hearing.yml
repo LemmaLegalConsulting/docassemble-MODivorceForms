@@ -22,22 +22,6 @@ code: |
   people_served.gathered
   mo_divorce_forms_download
 ---
-id: people served object
-objects:
-  - people_served: ALPeopleList.using(auto_gather=False)
----
-id: people served code
-code: |
-  people_served.clear()
-  if other_parties[0].attorney_involved:
-    people_served.append(other_parties[0].attorney)
-  if defined('guardian_ad_litem') and guardian_ad_litem.exists:
-    people_served.append(other_parties[0].attorney)
-  if defined('third_party_appears') and third_party_appears:
-    people_served.append(third_party)
-  people_served.gathered = True
-  
----
 objects:
   - notice_of_hearing_attachment: ALDocument.using(title="Notice of Hearing", filename="notice_of_hearing", has_addendum=False, )
 ---
