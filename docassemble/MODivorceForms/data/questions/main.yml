@@ -159,7 +159,8 @@ code: |
     case.matter_type # notice_of_hearing
     notice_date # property_statement.yml
     if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
-      petitioner.party_type_description # confidential_information_sheet
+      petitioner.party_type_description 
+      case.case_name
   if petitioner.attorney_involved: # petition, notice_of_hearing
     petitioner.attorney.name.first # petition
     if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
