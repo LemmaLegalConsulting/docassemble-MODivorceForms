@@ -341,6 +341,8 @@ code: |
   other_parties[0].work_childcare_expenses
   
   nav.set_section('assets')  
+  if 'fee_waiver_attachment' in doc_list_selected.true_values():
+    users[0].cash
   real_estate.gather() # property_statement, fee_waiver
   if len(real_estate.matches(source=['house'])) > 0:
     assets_warning

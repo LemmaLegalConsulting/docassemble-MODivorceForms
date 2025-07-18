@@ -113,29 +113,29 @@ attachment:
       - "Checking Account": ${ "{:.2f}".format(users[0].assets.market_value(source=['checking account'])) } 
       - "Credit Card Balance s ": ${ "{:.2f}".format(users[0].debts.filter(source='credit_card_debt').balance())  } 
       - "Savings Account": ${ "{:.2f}".format(users[0].assets.market_value(source=['savings account'])) } 
-      - "Value of Home": ${ "{:.2f}".format(users[0].assets.market_value.total(source=['house','condominium','leasehold'])) } 
-      - "Other debts to be considered 1": ${ users[0].debts[0].value } 
-      - "Debts Other debts to be considered 1": ${ users[0].debts[0].description } 
-      - "Value of Other Real Estate": ${ "{:.2f}".format(users[0].assets.market_value(source=['condominium', 'leasehold', 'other'], times_per_year=12)) } 
-      - "Debts Other debts to be considered 2": ${ users[0].debts[1].description } 
-      - "Other debts to be considered 2": ${ users[0].debts[1].value } 
+      - "Value of Home": ${ "{:.2f}".format(users[0].assets.total(source=['house'])) } 
+      - "Other debts to be considered 1": ${ users[0].debts.matches(source=None,exclude_source=['house','condominium', 'leasehold','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane'])[0].description } 
+      - "Debts Other debts to be considered 1": ${ "{:.2f}".format(users[0].debts.matches(source=None,exclude_source=['house','condominium', 'leasehold','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','credit_card_debt'])[0].balance) } 
+      - "Value of Other Real Estate": ${ "{:.2f}".format(users[0].assets.market_value(source=['condominium', 'leasehold'])) } 
+      - "Debts Other debts to be considered 2": ${ "{:.2f}".format(users[0].debts.matches(source=None,exclude_source=['house','condominium', 'leasehold','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','credit_card_debt'])[1].balance) } 
+      - "Other debts to be considered 2": ${ users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','credit_card_debt'])[1].description } 
       - "Value of Automobiles": ${ "{:.2f}".format(users[0].assets.market_value(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane'])) } 
-      - "Debts Other debts to be considered 3": ${ "{:.2f}".format(users[0].debts.total_other_attribute(attribute='description')) } 
-      - "Other debts to be considered 3": ${ users[0].debts[2].value } 
+      - "Debts Other debts to be considered 3": ${ "{:.2f}".format(users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','credit_card_debt'])[2].balance) } 
+      - "Other debts to be considered 3": ${ users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','credit_card_debt'])[2].description } 
       - "1 yrmake": ${ users[0].assets.matches(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane'])[0].description } 
-      - "Debts Other debts to be considered 4": ${ users[0].vehicles[3].description } 
-      - "Other debts to be considered 4": ${ users[0].debts[3].value } 
+      - "Debts Other debts to be considered 4": ${ "{:.2f}".format(users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','credit_card_debt'])[3].balance) } 
+      - "Other debts to be considered 4": ${ users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','credit_card_debt'])[3].description }
       - "2 yrmake": ${ users[0].assets.matches(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane'])[1].description } 
-      - "Other debts to be considered 5": ${ users[0].vehicles[4].value } 
-      - "Debts Other debts to be considered 5": ${ users[0].debts[4].description } 
-      - "Other debts to be considered 6": ${ users[0].debts[5].value } 
-      - "Debts Other debts to be considered 6": ${ users[0].debts[5].description } 
-      - "Possessions list 1": ${ users[0].personal_goods[0].display_name } 
-      - "Enter Assests Approximate value of personal possessions item 1": ${ users[0].personal_goods[0].value } 
-      - "Enter Assests Approximate value of personal possessions item 2": ${ users[0].personal_goods[1].value } 
-      - "Possessions list 2": ${ users[0].personal_goods[1].display_name } 
-      - "Possessions list 3": ${ users[0].personal_goods[2].display_name } 
-      - "Enter Assests Approximate value of personal possessions item 3": ${ users[0].personal_goods[2].value } 
-      - "Total Assets": ${ "{:.2f}".format(users[0].cash + [bank_asset for bank_asset in bank_assets if bank_asset.recommended_award == users[0].name.full()].total() + [re for re in real_estate if re.recommended_award == users[0].name.full()].total() + [vehicle for vehicle in vehicles if vehicle.recommended_award == users[0].name.full()].total()  + [personal_good for personal_good in personal_goods if personal_goods.recommended_award == users[0].name.full()].total()) } 
-      - "Total Debts": ${ "{:.2f}".format(users[0].vehicles.total_other_attribute(attribute='balance') + users[0].debts.total(times_per_year=12)) } 
+      - "Other debts to be considered 5": ${ users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','credit_card_debt'])[4].description }
+      - "Debts Other debts to be considered 5": ${ "{:.2f}".format(users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','credit_card_debt'])[4].balance) } 
+      - "Other debts to be considered 6": ${ users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','credit_card_debt'])[5].description }
+      - "Debts Other debts to be considered 6": ${ "{:.2f}".format(users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','credit_card_debt'])[5].balance) } 
+      - "Possessions list 1": ${ users[0].assets.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc","appliances", "computers", "electronics", "furnishings"])[0].display_name } 
+      - "Enter Assests Approximate value of personal possessions item 1": ${ users[0].assets.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc","appliances", "computers", "electronics", "furnishings"])[0].market_value } 
+      - "Enter Assests Approximate value of personal possessions item 2": ${ users[0].assets.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc","appliances", "computers", "electronics", "furnishings"])[1].market_value } 
+      - "Possessions list 2": ${ users[0].assets.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc","appliances", "computers", "electronics", "furnishings"])[1].display_name } 
+      - "Possessions list 3": ${ users[0].assets.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc","appliances", "computers", "electronics", "furnishings"])[2].display_name } 
+      - "Enter Assests Approximate value of personal possessions item 3": ${ users[0].assets.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc","appliances", "computers", "electronics", "furnishings"])[2].market_value } 
+      - "Total Assets": ${ "{:.2f}".format(users[0].cash + float(users[0].assets.market_value())) } 
+      - "Total Debts": ${ "{:.2f}".format(users[0].debts.balance()) } 
 ---
