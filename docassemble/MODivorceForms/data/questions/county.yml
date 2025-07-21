@@ -28,6 +28,14 @@ fields:
     code: |
       county_list
 ---
+generic object: ALIndividual
+if: x.lives_in_missouri == False
+id: what county are you in
+question: |
+  What county in ${ state_name(x.address.state) } does ${ x.name.full() } live in?
+fields:
+  - County: x.county_selected
+---
 id: what court are you in
 question: |
   What county is the court case in?

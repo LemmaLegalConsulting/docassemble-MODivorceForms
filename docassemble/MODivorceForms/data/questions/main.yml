@@ -146,7 +146,7 @@ code: |
   ## 3 Please enter your case information
   nav.set_section("case_information")   
   if case.filed in ["user0_filed", "user1_filed"]:
-    if 'answer_attachment' in doc_list_selected.true_values():
+    if 'answer_attachment' in doc_list_selected.true_values() or 'petition_attachment' in doc_list_selected.true_values():
       previous_petitions # answer
     case_information
   case.county # property_statement, petition, notice_of_hearing, form_17, certificate_of_dissolution
@@ -159,7 +159,8 @@ code: |
     case.matter_type # notice_of_hearing
     notice_date # property_statement.yml
     if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
-      petitioner.party_type_description # confidential_information_sheet
+      petitioner.party_type_description 
+      case.case_name
   if petitioner.attorney_involved: # petition, notice_of_hearing
     petitioner.attorney.name.first # petition
     if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
@@ -197,6 +198,7 @@ code: |
     elif case.filed in ['user1_filed']:
       agree_with_parenting_plan
   is_maintenance_award
+  is_additional_provisions
   
   nav.set_section("user_info")  
 
@@ -204,9 +206,10 @@ code: |
   users[0].address.address # petition
   if users[0].address.state == "MO":
     users[0].address.county
+    users[0].mo_length_of_residence_choice
   users[0].address.country
-  users[0].mo_length_of_residence_choice
-
+  if 'petition_attachment' in doc_list_selected.true_values():
+    users[0].county_length_of_residence_choice
   users[0].email
   users[0].driver_license_number
   users[0].phone_number
@@ -228,11 +231,14 @@ code: |
   if other_parties[0].address.state == "MO":
     other_parties[0].address.county
   # other_parties[0].address.country
-  other_parties[0].mo_length_of_residence_choice
+  if 'petition_attachment' in doc_list_selected.true_values():
+    other_parties[0].mo_length_of_residence_choice
+    other_parties[0].county_length_of_residence_choice
   if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
     other_parties[0].gender # confidential_information_sheet
   other_parties[0].pronouns
   other_parties[0].email
+  other_parties[0].fax
   other_parties[0].driver_license_number
   other_parties[0].phone_number
   other_parties[0].active_duty
@@ -337,6 +343,8 @@ code: |
   other_parties[0].work_childcare_expenses
   
   nav.set_section('assets')  
+  if 'fee_waiver_attachment' in doc_list_selected.true_values():
+    users[0].cash
   real_estate.gather() # property_statement, fee_waiver
   if len(real_estate.matches(source=['house'])) > 0:
     assets_warning
@@ -375,6 +383,8 @@ code: |
   other_parties[0].review_assets
     
   nav.set_section('debts')
+  users[0].in_bankruptcy
+  other_parties[0].in_bankruptcy
   secured_debts.gathered
   if len(debts) > 0:
     debts.review_items
@@ -396,11 +406,13 @@ code: |
         personal_service_type
         personal_service_information
         fill_in_service_date # form_17
+        respondent.service_type
         people_served.gathered # notice_of_hearing
         for people in people_served:
           people.service_address.address
     filing_pleadings_video
-
+  if 'redaction_certification_attachment' in doc_list_selected.true_values():
+    al_court_bundle
   interview_order_mo_divorce_forms = True
 ---
 continue button field: assets_test_screen
@@ -754,7 +766,10 @@ continue button field: personal_service_information
 ---
 id: Filing Pleadings Video Screen
 question: Video on filing pleadings
+subquestion: |
   <iframe width="480" height="270" src="https://www.powtoon.com/embed/dvKxPdVmlhD/" frameborder="0" allowfullscreen></iframe>
+
+  ${ "{:.2f}".format(users[0].assets.market_value(source=['checking account'])) } 
 continue button field: filing_pleadings_video
 ---
 id: Final Page

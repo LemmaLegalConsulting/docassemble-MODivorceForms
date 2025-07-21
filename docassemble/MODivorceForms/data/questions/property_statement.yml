@@ -1234,15 +1234,43 @@ fields:
   - Monthly Payment: debts[i].monthly_payment
     datatype: currency
     required: False 
+  - Marital or separate debt: debts[i].marital_property
+    datatype: radio
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
   - Who should pay this debt?: debts[i].recommended_debt
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
+validation code: |
+  if debts[i].source != 'other':
+    if defined('debts[i].lender'):
+      debts[i].description = debts[i].lender + " " + debts.terms_ordered.get(debts[i].source, debts[i].source) 
+    else:
+      debts.terms_ordered.get(debts[i].source, debts[i].source) 
+  else:
+    if defined('debts[i].lender'):
+      debts[i].description = debts[i].lender + " " + debts[i].source_other
+    else:
+      debts[i].description = debts[i].source_other
 ---
-question: Additional provisions
+question: Additional provisions for the Property Statement
 fields:
+  - Do you want to include additional provisions in the Statement of Property and Debt and Proposed Separation Agreement?: is_additional_provisions
+    datatype: yesnoradio
   - no label: additional_provisions
     datatype: area
+    show if: is_additional_provisions
+    
+---
+id: bankrupcy
+generic object: ALIndividual
+question: Bankruptcy
+fields: 
+  - Is ${ x.name_full() } currently in a bankruptcy prooceeding?: x.in_bankruptcy
+    datatype: yesnoradio
 ---
 code: |
   notice_date = today()
@@ -1339,336 +1367,1297 @@ attachment:
       - "respondent_trust_no": ${ len([item for item in interests_in_trust if item.recommended_award ==  respondent.name.full()]) == 0 } 
       - "respondent_other_asset_no": ${ len([item for item in other_assets if item.recommended_award ==  respondent.name.full()]) == 0 } 
       - "respondent_other_asset_yes": ${ len([item for item in other_assets if item.recommended_award ==  respondent.name.full()]) > 0 } 
-      - "petitioner_property1_marital": ${ petitioner.assets[0].marital_property } 
-      - "petitioner_property1_possession_petitioner": ${ petitioner.assets[0].has_possession } 
-      - "petitioner_amount_owed_property1_yes": ${ petitioner.assets[0].is_amount_owed } 
-      - "petitioner_market_value1": ${ "{:.2f}".format(petitioner.assets[0].market_value) } 
-      - "petitioner_property1_nonmarital": ${ petitioner.assets[0].marital_property } 
-      - "petitioner_property1_possession_respondent": ${ petitioner.assets[0].has_possession } 
-      - "petitioner_amount_owed_property1_no": ${ not petitioner.assets[0].is_amount_owed } 
-      - "petitioner_property1_both": ${ petitioner.assets[0].marital_property } 
-      - "petitioner_property1_possession_other": ${ petitioner.assets[0].has_possession } 
-      - "petitioner_property_item1": ${ petitioner.assets[0].description } 
-      - "petitioner_property2_marital": ${ petitioner.assets[1].marital_property } 
-      - "petitioner_property2_possession_petitioner": ${ petitioner.assets[1].has_possession } 
-      - "petitioner_amount_owed_property2_yes": ${ petitioner.assets[1].is_amount_owed } 
-      - "petitioner_market_value2": ${ "{:.2f}".format(petitioner.assets[1].market_value) } 
-      - "petitioner_property2_nonmarital": ${ petitioner.assets[1].marital_property } 
-      - "petitioner_property2_possession_respondent": ${ petitioner.assets[1].has_possession } 
-      - "petitioner_amount_owed_property2_no": ${ not petitioner.assets[1].is_amount_owed } 
-      - "petitioner_property2_both": ${ petitioner.assets[1].marital_property } 
-      - "petitioner_property2_possession_other": ${ petitioner.assets[1].has_possession } 
-      - "petitioner_property_item2": ${ petitioner.assets[1].description } 
-      - "petitioner_property3_marital": ${ petitioner.assets[2].marital_property } 
-      - "petitioner_property3_possession_petitioner": ${ petitioner.assets[2].has_possession } 
-      - "petitioner_amount_owed_property3_yes": ${ petitioner.assets[2].is_amount_owed } 
-      - "petitioner_market_value3": ${ "{:.2f}".format(petitioner.assets[2].market_value) } 
-      - "petitioner_property3_nonmarital": ${ petitioner.assets[2].marital_property } 
-      - "petitioner_property3_possession_respondent": ${ petitioner.assets[2].has_possession } 
-      - "petitioner_amount_owed_property3_no": ${ not petitioner.assets[2].is_amount_owed } 
-      - "petitioner_property3_both": ${ petitioner.assets[2].marital_property } 
-      - "petitioner_property3_possession_other": ${ petitioner.assets[2].has_possession } 
-      - "petitioner_property_item3": ${ petitioner.assets[2].description } 
-      - "petitioner_property4_marital l": ${ petitioner.assets[3].marital_property } 
-      - "petitioner_property4_possession_petitioner": ${ petitioner.assets[3].has_possession } 
-      - "petitioner_amount_owed_property4_yes": ${ petitioner.assets[3].is_amount_owed } 
-      - "petitioner_market_value4": ${ "{:.2f}".format(petitioner.assets[3].market_value) } 
-      - "petitioner_property4_nonmarital": ${ petitioner.assets[3].marital_property } 
-      - "petitioner_property4_possession_respondent": ${ petitioner.assets[3].has_possession } 
-      - "petitioner_amount_owed_property4_no": ${ not petitioner.assets[3].is_amount_owed } 
-      - "petitioner_property4_both": ${ petitioner.assets[3].marital_property } 
-      - "petitioner_property4_possession_other": ${ petitioner.assets[3].has_possession } 
-      - "petitioner_property_item4": ${ petitioner.assets[3].description } 
-      - "petitioner_property5_marital": ${ petitioner.assets[4].marital_property } 
-      - "petitioner_amount_owed_property5_yes": ${ petitioner.assets[4].is_amount_owed } 
-      - "petitioner_property5_possession_petitioner": ${ petitioner.assets[4].has_possession } 
-      - "petitioner_market_value5": ${ "{:.2f}".format(petitioner.assets[4].market_value) } 
-      - "petitioner_property5_nonmarital": ${ petitioner.assets[4].marital_property } 
-      - "petitioner_property5_possession_respondent": ${ petitioner.assets[4].has_possession } 
-      - "petitioner_amount_owed_property5_no": ${ not petitioner.assets[4].is_amount_owed } 
-      - "petitioner_property5_both": ${ petitioner.assets[4].marital_property } 
-      - "petitioner_property5_possession_other": ${ petitioner.assets[4].has_possession } 
-      - "petitioner_property_item5": ${ petitioner.assets[4].description } 
-      - "petitioner_property6_marital": ${ petitioner.assets[5].marital_property } 
-      - "petitioner_amount_owed_property6_yes": ${ petitioner.assets[5].is_amount_owed } 
-      - "petitioner_property6_possession_petitioner": ${ petitioner.assets[5].has_possession } 
-      - "petitioner_market_value6": ${ "{:.2f}".format(petitioner.assets[5].market_value) } 
-      - "petitioner_property6_nonmarital": ${ petitioner.assets[5].marital_property } 
-      - "petitioner_property6_possession_respondent": ${ petitioner.assets[5].has_possession } 
-      - "petitioner_amount_owed_property6_no": ${ not petitioner.assets[5].is_amount_owed } 
-      - "petitioner_property6_both": ${ petitioner.assets[5].marital_property } 
-      - "petitioner_property6_possession_other": ${ petitioner.assets[5].has_possession } 
-      - "petitioner_property_item6": ${ petitioner.assets[5].description } 
-      - "petitioner_property7_marital": ${ petitioner.assets[6].marital_property } 
-      - "petitioner_amount_owed_property7_yes": ${ petitioner.assets[6].is_amount_owed } 
-      - "petitioner_property7_possession_petitioner": ${ petitioner.assets[6].has_possession } 
-      - "petitioner_market_value7": ${ "{:.2f}".format(petitioner.assets[6].market_value) } 
-      - "petitioner_property7_nonmarital": ${ petitioner.assets[6].marital_property } 
-      - "petitioner_property7_possession_respondent": ${ petitioner.assets[6].has_possession } 
-      - "petitioner_amount_owed_property7_no": ${ not petitioner.assets[6].is_amount_owed } 
-      - "petitioner_property7_both": ${ petitioner.assets[6].marital_property } 
-      - "petitioner_property7_possession_other": ${ petitioner.assets[6].has_possession } 
-      - "petitioner_property_item7": ${ petitioner.assets[6].description } 
-      - "petitioner_property8_marital": ${ petitioner.assets[7].marital_property } 
-      - "petitioner_amount_owed_property8_yes": ${ petitioner.assets[7].is_amount_owed } 
-      - "petitioner_property8_possession_petitioner": ${ petitioner.assets[7].has_possession } 
-      - "petitioner_market_value8": ${ "{:.2f}".format(petitioner.assets[7].market_value) } 
-      - "petitioner_property8_nonmarital": ${ petitioner.assets[7].marital_property } 
-      - "petitioner_property8_possession_respondent": ${ petitioner.assets[7].has_possession } 
-      - "petitioner_amount_owed_property8_no": ${ not petitioner.assets[7].is_amount_owed } 
-      - "petitioner_property8_both": ${ petitioner.assets[7].marital_property } 
-      - "petitioner_property8_possession_other": ${ petitioner.assets[7].has_possession } 
-      - "petitioner_property_item8": ${ petitioner.assets[7].description } 
-      - "petitioner_property9_marital": ${ petitioner.assets[8].marital_property } 
-      - "petitioner_amount_owed_property9_yes": ${ petitioner.assets[8].is_amount_owed } 
-      - "petitioner_property9_possession_petitioner": ${ petitioner.assets[8].has_possession } 
-      - "petitioner_market_value9": ${ "{:.2f}".format(petitioner.assets[8].market_value) } 
-      - "petitioner_property9_nonmarital": ${ petitioner.assets[8].marital_property } 
-      - "petitioner_property9_possession_respondent": ${ petitioner.assets[8].has_possession } 
-      - "petitioner_amount_owed_property9_no": ${ not petitioner.assets[8].is_amount_owed } 
-      - "petitioner_property9_both": ${ petitioner.assets[8].marital_property } 
-      - "petitioner_property9_possession_other": ${ petitioner.assets[8].has_possession } 
-      - "petitioner_property_item9": ${ petitioner.assets[8].description } 
-      - "petitioner_property10_marital": ${ petitioner.assets[9].marital_property } 
-      - "petitioner_amount_owed_property10_yes": ${ petitioner.assets[9].is_amount_owed } 
-      - "petitioner_property10_possession_petitioner": ${ petitioner.assets[9].has_possession } 
-      - "petitioner_market_value10": ${ "{:.2f}".format(petitioner.assets[9].market_value) } 
-      - "petitioner_property10_nonmarital": ${ petitioner.assets[9].marital_property } 
-      - "petitioner_property10_possession_respondent": ${ petitioner.assets[9].has_possession } 
-      - "petitioner_amount_owed_property10_no": ${ not petitioner.assets[9].is_amount_owed } 
-      - "petitioner_property10_both": ${ petitioner.assets[9].marital_property } 
-      - "petitioner_property10_possession_other": ${ petitioner.assets[9].has_possession } 
-      - "petitioner_property_item10": ${ petitioner.assets[9].description } 
-      - "petitioner_property11_marital": ${ petitioner.assets[10].marital_property } 
-      - "petitioner_amount_owed_property11_yes": ${ petitioner.assets[10].is_amount_owed } 
-      - "petitioner_property11_possession_petitioner": ${ petitioner.assets[10].has_possession } 
-      - "petitioner_market_value11": ${ "{:.2f}".format(petitioner.assets[10].market_value) } 
-      - "petitioner_property11_nonmarital": ${ petitioner.assets[10].marital_property } 
-      - "petitioner_property11_possession_respondent": ${ petitioner.assets[10].has_possession } 
-      - "petitioner_amount_owed_property11_no": ${ not petitioner.assets[10].is_amount_owed } 
-      - "petitioner_property11_both": ${ petitioner.assets[10].marital_property } 
-      - "petitioner_property11_possession_other": ${ petitioner.assets[10].has_possession } 
-      - "petitioner_property_item11": ${ petitioner.assets[10].description } 
-      - "petitioner_property12_marital": ${ petitioner.assets[11].marital_property } 
-      - "petitioner_amount_owed_property12_yes": ${ petitioner.assets[11].is_amount_owed } 
-      - "petitioner_property12_possession_petitioner": ${ petitioner.assets[11].has_possession } 
-      - "petitioner_market_value12": ${ "{:.2f}".format(petitioner.assets[11].market_value) } 
-      - "petitioner_property12_nonmarital": ${ petitioner.assets[11].marital_property } 
-      - "petitioner_property12_possession_respondent": ${ petitioner.assets[11].has_possession } 
-      - "petitioner_amount_owed_property12_no": ${ not petitioner.assets[11].is_amount_owed } 
-      - "petitioner_property12_both": ${ petitioner.assets[11].marital_property } 
-      - "petitioner_property12_possession_other": ${ petitioner.assets[11].has_possession } 
-      - "petitioner_property_item12": ${ petitioner.assets[11].description } 
-      - "petitioner_property13_marital": ${ petitioner.assets[12].marital_property } 
-      - "petitioner_amount_owed_property13_yes": ${ petitioner.assets[12].is_amount_owed } 
-      - "petitioner_property13_possession_petitioner": ${ petitioner.assets[12].has_possession } 
-      - "petitioner_market_value13": ${ "{:.2f}".format(petitioner.assets[12].market_value) } 
-      - "petitioner_property13_nonmarital": ${ petitioner.assets[12].marital_property } 
-      - "petitioner_property13_possession_respondent": ${ petitioner.assets[12].has_possession } 
-      - "petitioner_amount_owed_property13_no": ${ not petitioner.assets[12].is_amount_owed } 
-      - "petitioner_property13_both": ${ petitioner.assets[12].marital_property } 
-      - "petitioner_property13_possession_other": ${ petitioner.assets[12].has_possession } 
-      - "petitioner_property_item13": ${ petitioner.assets[12].description } 
-      - "petitioner_property14_marital": ${ petitioner.assets[13].marital_property } 
-      - "petitioner_amount_owed_property14_yes": ${ petitioner.assets[13].is_amount_owed } 
-      - "petitioner_property14_possession_petitioner": ${ petitioner.assets[13].has_possession } 
-      - "petitioner_market_value14": ${ "{:.2f}".format(petitioner.assets[13].market_value) } 
-      - "petitioner_property14_nonmarital": ${ petitioner.assets[13].marital_property } 
-      - "petitioner_property14_possession_respondent": ${ petitioner.assets[13].has_possession } 
-      - "petitioner_amount_owed_property14_no": ${ not petitioner.assets[13].is_amount_owed } 
-      - "petitioner_property14_both": ${ petitioner.assets[13].marital_property } 
-      - "petitioner_property14_possession_other": ${ petitioner.assets[13].has_possession } 
-      - "petitioner_property_item14": ${ petitioner.assets[13].description } 
-      - "petitioner_property15_marital": ${ petitioner.assets[14].marital_property } 
-      - "petitioner_amount_owed_property15_yes": ${ petitioner.assets[14].is_amount_owed } 
-      - "petitioner_property15_possession_petitioner": ${ petitioner.assets[14].has_possession } 
-      - "petitioner_market_value15": ${ "{:.2f}".format(petitioner.assets[14].market_value) } 
-      - "petitioner_property15_nonmarital": ${ petitioner.assets[14].marital_property } 
-      - "petitioner_property15_possession_respondent": ${ petitioner.assets[14].has_possession } 
-      - "petitioner_amount_owed_property15_no": ${ not petitioner.assets[14].is_amount_owed } 
-      - "petitioner_property15_both": ${ petitioner.assets[14].marital_property } 
-      - "petitioner_property15_possession_other": ${ petitioner.assets[14].has_possession } 
-      - "petitioner_property_item15": ${ petitioner.assets[14].description } 
-      - "petitioner_amount_owed_property16_yes": ${ petitioner.assets[15].is_amount_owed } 
-      - "petitioner_property16_marital": ${ petitioner.assets[15].marital_property } 
-      - "petitioner_property16_possession_petitioner": ${ petitioner.assets[15].has_possession } 
-      - "petitioner_market_value16": ${ "{:.2f}".format(petitioner.assets[15].market_value) } 
-      - "petitioner_property16_nonmarital": ${ petitioner.assets[15].marital_property } 
-      - "petitioner_property16_possession_respondent": ${ petitioner.assets[15].has_possession } 
-      - "petitioner_amount_owed_property16_no": ${ not petitioner.assets[15].is_amount_owed } 
-      - "petitioner_property16_both": ${ petitioner.assets[15].marital_property } 
-      - "petitioner_property16_possession_other": ${ petitioner.assets[15].has_possession } 
-      - "petitioner_property_item16": ${ petitioner.assets[15].description } 
-      - "respondent_property1_marital": ${ respondent.assets[0].marital_property } 
-      - "respondent_property1_possession_petitioner": ${ respondent.assets[0].has_possession } 
-      - "respondent_amount_owed_property1_yes": ${ respondent.assets[0].is_amount_owed } 
-      - "respondent_market_value1": ${ "{:.2f}".format(respondent.assets[0].market_value) } 
-      - "respondent_property1_nonmarital": ${ respondent.assets[0].marital_property } 
-      - "respondent_property1_possession_respondent": ${ respondent.assets[0].has_possession } 
-      - "respondent_property1_other": ${ respondent.assets[0].has_possession } 
-      - "respondent_amount_owed_property1_no": ${ not respondent.assets[0].is_amount_owed } 
-      - "respondent_property1_both": ${ respondent.assets[0].marital_property } 
-      - "respondent_property_item1": ${ respondent.assets[0].description } 
-      - "respondent_property2_marital": ${ respondent.assets[1].marital_property } 
-      - "respondent_property2_possession_petitioner": ${ respondent.assets[1].has_possession } 
-      - "respondent_amount_owed_property2_yes": ${ respondent.assets[1].is_amount_owed } 
-      - "respondent_market_value2": ${ "{:.2f}".format(respondent.assets[1].market_value) } 
-      - "respondent_property2_nonmarital": ${ respondent.assets[1].marital_property } 
-      - "respondent_property2_possession_respondent": ${ respondent.assets[1].has_possession } 
-      - "respondent_property2_other": ${ respondent.assets[1].has_possession } 
-      - "respondent_amount_owed_property2_no": ${ not respondent.assets[1].is_amount_owed } 
-      - "respondent_property2_both": ${ respondent.assets[1].marital_property } 
-      - "respondent_property_item2": ${ respondent.assets[1].description } 
-      - "respondent_property3_marital": ${ respondent.assets[2].marital_property } 
-      - "respondent_property3_possession_petitioner": ${ respondent.assets[2].has_possession } 
-      - "respondent_amount_owed_property3_yes": ${ respondent.assets[2].is_amount_owed } 
-      - "respondent_market_value3": ${ "{:.2f}".format(respondent.assets[2].market_value) } 
-      - "respondent_property3_nonmarital": ${ respondent.assets[2].marital_property } 
-      - "respondent_property3_possession_respondent": ${ respondent.assets[2].has_possession } 
-      - "respondent_property3_other": ${ respondent.assets[2].has_possession } 
-      - "respondent_amount_owed_property3_no": ${ not respondent.assets[2].is_amount_owed } 
-      - "respondent_property3_both": ${ respondent.assets[2].marital_property } 
-      - "respondent_property_item3": ${ respondent.assets[2].description } 
-      - "respondent_property4_marital": ${ respondent.assets[3].marital_property } 
-      - "respondent_property4_possession_petitioner": ${ respondent.assets[3].has_possession } 
-      - "respondent_amount_owed_property4_yes": ${ respondent.assets[3].is_amount_owed } 
-      - "respondent_market_value4": ${ "{:.2f}".format(respondent.assets[3].market_value) } 
-      - "respondent_property4_nonmarital": ${ respondent.assets[3].marital_property } 
-      - "respondent_property4_possession_respondent": ${ respondent.assets[3].has_possession } 
-      - "respondent_amount_owed_property4_no": ${ not respondent.assets[3].is_amount_owed } 
-      - "respondent_property4_other": ${ respondent.assets[3].has_possession } 
-      - "respondent_property4_both": ${ respondent.assets[3].marital_property } 
-      - "respondent_property_item4": ${ respondent.assets[3].description } 
-      - "respondent_property5_marital": ${ respondent.assets[4].marital_property } 
-      - "respondent_property5_possession_petitioner": ${ respondent.assets[4].has_possession } 
-      - "respondent_amount_owed_property5_yes": ${ respondent.assets[4].is_amount_owed } 
-      - "respondent_property5_possession_respondent": ${ respondent.assets[4].has_possession } 
-      - "respondent_market_value5": ${ "{:.2f}".format(respondent.assets[4].market_value) } 
-      - "respondent_property5_nonmarital": ${ respondent.assets[4].marital_property } 
-      - "respondent_amount_owed_property5_no": ${ not respondent.assets[4].is_amount_owed } 
-      - "respondent_property5_other": ${ respondent.assets[4].has_possession } 
-      - "respondent_property5_both": ${ respondent.assets[4].marital_property } 
-      - "respondent_property_item5": ${ respondent.assets[4].description } 
-      - "respondent_property6_marital": ${ respondent.assets[5].marital_property } 
-      - "respondent_property6_possession_petitioner": ${ respondent.assets[5].has_possession } 
-      - "respondent_amount_owed_property6_yes": ${ respondent.assets[5].is_amount_owed } 
-      - "respondent_market_value6": ${ "{:.2f}".format(respondent.assets[5].market_value) } 
-      - "respondent_property6_possession_respondent": ${ respondent.assets[5].has_possession } 
-      - "respondent_property6_nonmarital": ${ respondent.assets[5].marital_property } 
-      - "respondent_amount_owed_property6_no": ${ not respondent.assets[5].is_amount_owed } 
-      - "respondent_property6_other": ${ respondent.assets[5].has_possession } 
-      - "respondent_property6_both": ${ respondent.assets[5].marital_property } 
-      - "respondent_property_item6": ${ respondent.assets[5].description } 
-      - "respondent_property7_marital": ${ respondent.assets[6].marital_property } 
-      - "respondent_property7_possession_petitioner": ${ respondent.assets[6].has_possession } 
-      - "respondent_amount_owed_property7_yes": ${ respondent.assets[6].is_amount_owed } 
-      - "respondent_property7_possession_respondent": ${ respondent.assets[6].has_possession } 
-      - "respondent_market_value7": ${ "{:.2f}".format(respondent.assets[6].market_value) } 
-      - "respondent_property7_nonmarital": ${ respondent.assets[6].marital_property } 
-      - "respondent_amount_owed_property7_no": ${ not respondent.assets[6].is_amount_owed } 
-      - "respondent_property7_other": ${ respondent.assets[6].has_possession } 
-      - "respondent_property7_both": ${ respondent.assets[6].marital_property } 
-      - "respondent_property_item7": ${ respondent.assets[6].description } 
-      - "respondent_property8_marital": ${ respondent.assets[7].marital_property } 
-      - "respondent_property8_possession_petitioner": ${ respondent.assets[7].has_possession } 
-      - "respondent_amount_owed_property8_yes": ${ respondent.assets[7].is_amount_owed } 
-      - "respondent_property8_possession_respondent": ${ respondent.assets[7].has_possession } 
-      - "respondent_market_value8": ${ "{:.2f}".format(respondent.assets[7].market_value) } 
-      - "respondent_property8_nonmarital": ${ respondent.assets[7].marital_property } 
-      - "respondent_amount_owed_property8_no": ${ not respondent.assets[7].is_amount_owed } 
-      - "respondent_property8_other": ${ respondent.assets[7].has_possession } 
-      - "respondent_property8_both": ${ respondent.assets[7].marital_property } 
-      - "respondent_property_item8": ${ respondent.assets[7].description } 
-      - "respondent_property9_marital": ${ respondent.assets[8].marital_property } 
-      - "respondent_property9_possession_petitioner": ${ respondent.assets[8].has_possession } 
-      - "respondent_amount_owed_property9_yes": ${ respondent.assets[8].is_amount_owed } 
-      - "respondent_property9_possession_respondent": ${ respondent.assets[8].has_possession } 
-      - "respondent_market_value9": ${ "{:.2f}".format(respondent.assets[8].market_value) } 
-      - "respondent_property9_nonmarital": ${ respondent.assets[8].marital_property } 
-      - "respondent_amount_owed_property9_no": ${ not respondent.assets[8].is_amount_owed } 
-      - "respondent_property9_other": ${ respondent.assets[8].has_possession } 
-      - "respondent_property9_both": ${ respondent.assets[8].marital_property } 
-      - "respondent_property_item9": ${ respondent.assets[8].description } 
-      - "respondent_property10_marital": ${ respondent.assets[9].marital_property } 
-      - "respondent_property10_possession_petitioner": ${ respondent.assets[9].has_possession } 
-      - "respondent_amount_owed_property10_yes": ${ respondent.assets[9].is_amount_owed } 
-      - "respondent_market_value10": ${ "{:.2f}".format(respondent.assets[9].market_value) } 
-      - "respondent_property10_possession_respondent": ${ respondent.assets[9].has_possession } 
-      - "respondent_property10_nonmarital": ${ respondent.assets[9].marital_property } 
-      - "respondent_amount_owed_property10_no": ${ not respondent.assets[9].is_amount_owed } 
-      - "respondent_property10_other": ${ respondent.assets[9].has_possession } 
-      - "respondent_property10_both": ${ respondent.assets[9].marital_property } 
-      - "respondent_property_item10": ${ respondent.assets[9].description } 
-      - "respondent_property11_marital": ${ respondent.assets[10].marital_property } 
-      - "respondent_property11_possession_petitioner": ${ respondent.assets[10].has_possession } 
-      - "respondent_amount_owed_property11_yes": ${ respondent.assets[10].is_amount_owed } 
-      - "respondent_property11_possession_respondent": ${ respondent.assets[10].has_possession } 
-      - "respondent_market_value11": ${ "{:.2f}".format(respondent.assets[10].market_value) } 
-      - "respondent_property11_nonmarital": ${ respondent.assets[10].marital_property } 
-      - "respondent_amount_owed_property11_no": ${ not respondent.assets[10].is_amount_owed } 
-      - "respondent_property11_other": ${ respondent.assets[10].has_possession } 
-      - "respondent_property11_both": ${ respondent.assets[10].marital_property } 
-      - "respondent_property_item11": ${ respondent.assets[10].description } 
-      - "respondent_property12_marital": ${ respondent.assets[11].marital_property } 
-      - "respondent_property12_possession_petitioner": ${ respondent.assets[11].has_possession } 
-      - "respondent_amount_owed_property12_yes": ${ respondent.assets[11].is_amount_owed } 
-      - "respondent_property12_nonmarital": ${ respondent.assets[11].marital_property } 
-      - "respondent_property12_possession_respondent": ${ respondent.assets[11].has_possession } 
-      - "respondent_market_value12": ${ "{:.2f}".format(respondent.assets[11].market_value) } 
-      - "respondent_amount_owed_property12_no": ${ not respondent.assets[11].is_amount_owed } 
-      - "respondent_property12_other": ${ respondent.assets[11].has_possession } 
-      - "respondent_property12_both": ${ respondent.assets[11].marital_property } 
-      - "respondent_property_item12": ${ respondent.assets[11].description } 
-      - "respondent_property13_marital": ${ respondent.assets[12].marital_property } 
-      - "respondent_property13_possession_petitioner": ${ respondent.assets[12].has_possession } 
-      - "respondent_amount_owed_property13_yes": ${ respondent.assets[12].is_amount_owed } 
-      - "respondent_property13_nonmarital": ${ respondent.assets[12].marital_property } 
-      - "respondent_property13_possession_respondent": ${ respondent.assets[12].has_possession } 
-      - "respondent_market_value13": ${ "{:.2f}".format(respondent.assets[12].market_value) } 
-      - "respondent_amount_owed_property13_no": ${ not respondent.assets[12].is_amount_owed } 
-      - "respondent_property13_other": ${ respondent.assets[12].has_possession } 
-      - "respondent_property13_both": ${ respondent.assets[12].marital_property } 
-      - "respondent_property_item13": ${ respondent.assets[12].description } 
-      - "respondent_property14_marital": ${ respondent.assets[13].marital_property } 
-      - "respondent_property14_possession_petitioner": ${ respondent.assets[13].has_possession } 
-      - "respondent_amount_owed_property14_yes": ${ respondent.assets[13].is_amount_owed } 
-      - "respondent_market_value14": ${ "{:.2f}".format(respondent.assets[13].market_value) } 
-      - "respondent_property14_nonmarital": ${ respondent.assets[13].marital_property } 
-      - "respondent_property14_possession_respondent": ${ respondent.assets[13].has_possession } 
-      - "respondent_amount_owed_property14_no": ${ not respondent.assets[13].is_amount_owed } 
-      - "respondent_property14_other": ${ respondent.assets[13].has_possession } 
-      - "respondent_property14_both": ${ respondent.assets[13].marital_property } 
-      - "respondent_property_item14": ${ respondent.assets[13].description } 
-      - "respondent_property15_marital": ${ respondent.assets[14].marital_property } 
-      - "respondent_property15_possession_petitioner": ${ respondent.assets[14].has_possession } 
-      - "respondent_amount_owed_property15_yes": ${ respondent.assets[14].is_amount_owed } 
-      - "respondent_property15_nonmarital": ${ respondent.assets[14].marital_property } 
-      - "respondent_property15_possession_respondent": ${ respondent.assets[14].has_possession } 
-      - "respondent_market_value15": ${ "{:.2f}".format(respondent.assets[14].market_value) } 
-      - "respondent_amount_owed_property15_no": ${ not respondent.assets[14].is_amount_owed } 
-      - "respondent_property15_other": ${ respondent.assets[14].has_possession } 
-      - "respondent_property15_both": ${ respondent.assets[14].marital_property } 
-      - "respondent_property_item15": ${ respondent.assets[14].description } 
-      - "respondent_property16_marital": ${ respondent.assets[15].marital_property } 
-      - "respondent_property16_possession_petitioner": ${ respondent.assets[15].has_possession } 
-      - "respondent_amount_owed_property16_yes": ${ respondent.assets[15].is_amount_owed } 
-      - "respondent_property16_nonmarital": ${ respondent.assets[15].marital_property } 
-      - "respondent_property16_possession_respondent": ${ respondent.assets[15].has_possession } 
-      - "respondent_market_value16": ${ "{:.2f}".format(respondent.assets[15].market_value) } 
-      - "respondent_amount_owed_property16_no": ${ not respondent.assets[15].is_amount_owed } 
-      - "respondent_property16_both": ${ respondent.assets[15].marital_property } 
-      - "respondent_property16_other": ${ respondent.assets[15].has_possession } 
-      - "respondent_property_item16": ${ respondent.assets[15].description } 
+      - "petitioner_property1_marital": |
+          % if len(petitioner.assets) > 0:
+          ${ petitioner.assets[0].marital_property == "Marital" }
+          % endif
+      - "petitioner_property1_possession_petitioner": |
+          % if len(petitioner.assets) > 0:
+          ${ petitioner.assets[0].has_possession == petitioner.name.full() }
+          % endif
+      - "petitioner_amount_owed_property1_yes": |
+          % if len(petitioner.assets) > 0:
+          ${ petitioner.assets[0].is_amount_owed }
+          % endif
+      - "petitioner_market_value1": |
+          % if len(petitioner.assets) > 0:
+          ${ "{:.2f}".format(petitioner.assets[0].market_value) }
+          % endif
+      - "petitioner_property1_nonmarital": |
+          % if len(petitioner.assets) > 0:
+          ${ petitioner.assets[0].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_property1_possession_respondent": |
+          % if len(petitioner.assets) > 0:
+          ${ petitioner.assets[0].has_possession == respondent.name.full() }
+          % endif
+      - "petitioner_amount_owed_property1_no": |
+          % if len(petitioner.assets) > 0:
+          ${ not defined("petitioner.assets[0].is_amount_owed") or not petitioner.assets[0].is_amount_owed }
+          % endif
+      - "petitioner_property1_both": |
+          % if len(petitioner.assets) > 0:
+          ${ petitioner.assets[0].marital_property == "Both" }
+          % endif
+      - "petitioner_property1_possession_other": |
+          % if len(petitioner.assets) > 0:
+          ${ petitioner.assets[0].has_possession == "other" }
+          % endif
+      - "petitioner_property_item1": |
+          % if len(petitioner.assets) > 0:
+          ${ petitioner.assets[0].description }
+          % endif
+      - "petitioner_property2_marital": |
+          % if len(petitioner.assets) > 1:
+          ${ petitioner.assets[1].marital_property == "Marital" }
+          % endif
+      - "petitioner_property2_possession_petitioner": |
+          % if len(petitioner.assets) > 1:
+          ${ petitioner.assets[1].has_possession == petitioner.name.full() }
+          % endif
+      - "petitioner_amount_owed_property2_yes": |
+          % if len(petitioner.assets) > 1:
+          ${ petitioner.assets[1].is_amount_owed }
+          % endif
+      - "petitioner_market_value2": |
+          % if len(petitioner.assets) > 1:
+          ${ "{:.2f}".format(petitioner.assets[1].market_value) }
+          % endif
+      - "petitioner_property2_nonmarital": |
+          % if len(petitioner.assets) > 1:
+          ${ petitioner.assets[1].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_property2_possession_respondent": |
+          % if len(petitioner.assets) > 1:
+          ${ petitioner.assets[1].has_possession == respondent.name.full() }
+          % endif
+      - "petitioner_amount_owed_property2_no": |
+          % if len(petitioner.assets) > 1:
+          ${ not defined("petitioner.assets[1].is_amount_owed") or not petitioner.assets[1].is_amount_owed }
+          % endif
+      - "petitioner_property2_both": |
+          % if len(petitioner.assets) > 1:
+          ${ petitioner.assets[1].marital_property == "Both" }
+          % endif
+      - "petitioner_property2_possession_other": |
+          % if len(petitioner.assets) > 1:
+          ${ petitioner.assets[1].has_possession == "other" }
+          % endif
+      - "petitioner_property_item2": |
+          % if len(petitioner.assets) > 1:
+          ${ petitioner.assets[1].description }
+          % endif
+      - "petitioner_property3_marital": |
+          % if len(petitioner.assets) > 2:
+          ${ petitioner.assets[2].marital_property == "Marital" }
+          % endif
+      - "petitioner_property3_possession_petitioner": |
+          % if len(petitioner.assets) > 2:
+          ${ petitioner.assets[2].has_possession == petitioner.name.full() }
+          % endif
+      - "petitioner_amount_owed_property3_yes": |
+          % if len(petitioner.assets) > 2:
+          ${ petitioner.assets[2].is_amount_owed }
+          % endif
+      - "petitioner_market_value3": |
+          % if len(petitioner.assets) > 2:
+          ${ "{:.2f}".format(petitioner.assets[2].market_value) }
+          % endif
+      - "petitioner_property3_nonmarital": |
+          % if len(petitioner.assets) > 2:
+          ${ petitioner.assets[2].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_property3_possession_respondent": |
+          % if len(petitioner.assets) > 2:
+          ${ petitioner.assets[2].has_possession == respondent.name.full() }
+          % endif
+      - "petitioner_amount_owed_property3_no": |
+          % if len(petitioner.assets) > 2:
+          ${ not defined("petitioner.assets[2].is_amount_owed") or not petitioner.assets[2].is_amount_owed }
+          % endif
+      - "petitioner_property3_both": |
+          % if len(petitioner.assets) > 2:
+          ${ petitioner.assets[2].marital_property == "Both" }
+          % endif
+      - "petitioner_property3_possession_other": |
+          % if len(petitioner.assets) > 2:
+          ${ petitioner.assets[2].has_possession == "other" }
+          % endif
+      - "petitioner_property_item3": |
+          % if len(petitioner.assets) > 2:
+          ${ petitioner.assets[2].description }
+          % endif
+      - "petitioner_property4_marital l": |
+          % if len(petitioner.assets) > 3:
+          ${ petitioner.assets[3].marital_property == "Marital" }
+          % endif
+      - "petitioner_property4_possession_petitioner": |
+          % if len(petitioner.assets) > 3:
+          ${ petitioner.assets[3].has_possession == petitioner.name.full() }
+          % endif
+      - "petitioner_amount_owed_property4_yes": |
+          % if len(petitioner.assets) > 3:
+          ${ petitioner.assets[3].is_amount_owed }
+          % endif
+      - "petitioner_market_value4": |
+          % if len(petitioner.assets) > 3:
+          ${ "{:.2f}".format(petitioner.assets[3].market_value) }
+          % endif
+      - "petitioner_property4_nonmarital": |
+          % if len(petitioner.assets) > 3:
+          ${ petitioner.assets[3].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_property4_possession_respondent": |
+          % if len(petitioner.assets) > 3:
+          ${ petitioner.assets[3].has_possession == respondent.name.full() }
+          % endif
+      - "petitioner_amount_owed_property4_no": |
+          % if len(petitioner.assets) > 3:
+          ${ not defined("petitioner.assets[3].is_amount_owed") or not petitioner.assets[3].is_amount_owed }
+          % endif
+      - "petitioner_property4_both": |
+          % if len(petitioner.assets) > 3:
+          ${ petitioner.assets[3].marital_property == "Both" }
+          % endif
+      - "petitioner_property4_possession_other": |
+          % if len(petitioner.assets) > 3:
+          ${ petitioner.assets[3].has_possession == "other" }
+          % endif
+      - "petitioner_property_item4": |
+          % if len(petitioner.assets) > 3:
+          ${ petitioner.assets[3].description }
+          % endif
+      - "petitioner_property5_marital": |
+          % if len(petitioner.assets) > 4:
+          ${ petitioner.assets[4].marital_property == "Marital" }
+          % endif
+      - "petitioner_amount_owed_property5_yes": |
+          % if len(petitioner.assets) > 4:
+          ${ petitioner.assets[4].is_amount_owed }
+          % endif
+      - "petitioner_property5_possession_petitioner": |
+          % if len(petitioner.assets) > 4:
+          ${ petitioner.assets[4].has_possession == petitioner.name.full() }
+          % endif
+      - "petitioner_market_value5": |
+          % if len(petitioner.assets) > 4:
+          ${ "{:.2f}".format(petitioner.assets[4].market_value) }
+          % endif
+      - "petitioner_property5_nonmarital": |
+          % if len(petitioner.assets) > 4:
+          ${ petitioner.assets[4].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_property5_possession_respondent": |
+          % if len(petitioner.assets) > 4:
+          ${ petitioner.assets[4].has_possession == respondent.name.full() }
+          % endif
+      - "petitioner_amount_owed_property5_no": |
+          % if len(petitioner.assets) > 4:
+          ${ not defined("petitioner.assets[4].is_amount_owed") or not petitioner.assets[4].is_amount_owed }
+          % endif
+      - "petitioner_property5_both": |
+          % if len(petitioner.assets) > 4:
+          ${ petitioner.assets[4].marital_property == "Both" }
+          % endif
+      - "petitioner_property5_possession_other": |
+          % if len(petitioner.assets) > 4:
+          ${ petitioner.assets[4].has_possession == "other" }
+          % endif
+      - "petitioner_property_item5": |
+          % if len(petitioner.assets) > 4:
+          ${ petitioner.assets[4].description }
+          % endif
+      - "petitioner_property6_marital": |
+          % if len(petitioner.assets) > 5:
+          ${ petitioner.assets[5].marital_property == "Marital" }
+          % endif
+      - "petitioner_amount_owed_property6_yes": |
+          % if len(petitioner.assets) > 5:
+          ${ petitioner.assets[5].is_amount_owed }
+          % endif
+      - "petitioner_property6_possession_petitioner": |
+          % if len(petitioner.assets) > 5:
+          ${ petitioner.assets[5].has_possession == petitioner.name.full() }
+          % endif
+      - "petitioner_market_value6": |
+          % if len(petitioner.assets) > 5:
+          ${ "{:.2f}".format(petitioner.assets[5].market_value) }
+          % endif
+      - "petitioner_property6_nonmarital": |
+          % if len(petitioner.assets) > 5:
+          ${ petitioner.assets[5].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_property6_possession_respondent": |
+          % if len(petitioner.assets) > 5:
+          ${ petitioner.assets[5].has_possession == respondent.name.full() }
+          % endif
+      - "petitioner_amount_owed_property6_no": |
+          % if len(petitioner.assets) > 5:
+          ${ not defined("petitioner.assets[5].is_amount_owed") or not petitioner.assets[5].is_amount_owed }
+          % endif
+      - "petitioner_property6_both": |
+          % if len(petitioner.assets) > 5:
+          ${ petitioner.assets[5].marital_property == "Both" }
+          % endif
+      - "petitioner_property6_possession_other": |
+          % if len(petitioner.assets) > 5:
+          ${ petitioner.assets[5].has_possession == "other" }
+          % endif
+      - "petitioner_property_item6": |
+          % if len(petitioner.assets) > 5:
+          ${ petitioner.assets[5].description }
+          % endif
+      - "petitioner_property7_marital": |
+          % if len(petitioner.assets) > 6:
+          ${ petitioner.assets[6].marital_property == "Marital" }
+          % endif
+      - "petitioner_amount_owed_property7_yes": |
+          % if len(petitioner.assets) > 6:
+          ${ petitioner.assets[6].is_amount_owed }
+          % endif
+      - "petitioner_property7_possession_petitioner": |
+          % if len(petitioner.assets) > 6:
+          ${ petitioner.assets[6].has_possession == petitioner.name.full() }
+          % endif
+      - "petitioner_market_value7": |
+          % if len(petitioner.assets) > 6:
+          ${ "{:.2f}".format(petitioner.assets[6].market_value) }
+          % endif
+      - "petitioner_property7_nonmarital": |
+          % if len(petitioner.assets) > 6:
+          ${ petitioner.assets[6].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_property7_possession_respondent": |
+          % if len(petitioner.assets) > 6:
+          ${ petitioner.assets[6].has_possession == respondent.name.full() }
+          % endif
+      - "petitioner_amount_owed_property7_no": |
+          % if len(petitioner.assets) > 6:
+          ${ not defined("petitioner.assets[6].is_amount_owed") or not petitioner.assets[6].is_amount_owed }
+          % endif
+      - "petitioner_property7_both": |
+          % if len(petitioner.assets) > 6:
+          ${ petitioner.assets[6].marital_property == "Both" }
+          % endif
+      - "petitioner_property7_possession_other": |
+          % if len(petitioner.assets) > 6:
+          ${ petitioner.assets[6].has_possession == "other" }
+          % endif
+      - "petitioner_property_item7": |
+          % if len(petitioner.assets) > 6:
+          ${ petitioner.assets[6].description }
+          % endif
+      - "petitioner_property8_marital": |
+          % if len(petitioner.assets) > 7:
+          ${ petitioner.assets[7].marital_property == "Marital" }
+          % endif
+      - "petitioner_amount_owed_property8_yes": |
+          % if len(petitioner.assets) > 7:
+          ${ petitioner.assets[7].is_amount_owed }
+          % endif
+      - "petitioner_property8_possession_petitioner": |
+          % if len(petitioner.assets) > 7:
+          ${ petitioner.assets[7].has_possession == petitioner.name.full() }
+          % endif
+      - "petitioner_market_value8": |
+          % if len(petitioner.assets) > 7:
+          ${ "{:.2f}".format(petitioner.assets[7].market_value) }
+          % endif
+      - "petitioner_property8_nonmarital": |
+          % if len(petitioner.assets) > 7:
+          ${ petitioner.assets[7].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_property8_possession_respondent": |
+          % if len(petitioner.assets) > 7:
+          ${ petitioner.assets[7].has_possession == respondent.name.full() }
+          % endif
+      - "petitioner_amount_owed_property8_no": |
+          % if len(petitioner.assets) > 7:
+          ${ not defined("petitioner.assets[7].is_amount_owed") or not petitioner.assets[7].is_amount_owed }
+          % endif
+      - "petitioner_property8_both": |
+          % if len(petitioner.assets) > 7:
+          ${ petitioner.assets[7].marital_property == "Both" }
+          % endif
+      - "petitioner_property8_possession_other": |
+          % if len(petitioner.assets) > 7:
+          ${ petitioner.assets[7].has_possession == "other" }
+          % endif
+      - "petitioner_property_item8": |
+          % if len(petitioner.assets) > 7:
+          ${ petitioner.assets[7].description }
+          % endif
+      - "petitioner_property9_marital": |
+          % if len(petitioner.assets) > 8:
+          ${ petitioner.assets[8].marital_property == "Marital" }
+          % endif
+      - "petitioner_amount_owed_property9_yes": |
+          % if len(petitioner.assets) > 8:
+          ${ petitioner.assets[8].is_amount_owed }
+          % endif
+      - "petitioner_property9_possession_petitioner": |
+          % if len(petitioner.assets) > 8:
+          ${ petitioner.assets[8].has_possession == petitioner.name.full() }
+          % endif
+      - "petitioner_market_value9": |
+          % if len(petitioner.assets) > 8:
+          ${ "{:.2f}".format(petitioner.assets[8].market_value) }
+          % endif
+      - "petitioner_property9_nonmarital": |
+          % if len(petitioner.assets) > 8:
+          ${ petitioner.assets[8].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_property9_possession_respondent": |
+          % if len(petitioner.assets) > 8:
+          ${ petitioner.assets[8].has_possession == respondent.name.full() }
+          % endif
+      - "petitioner_amount_owed_property9_no": |
+          % if len(petitioner.assets) > 8:
+          ${ not defined("petitioner.assets[8].is_amount_owed") or not petitioner.assets[8].is_amount_owed }
+          % endif
+      - "petitioner_property9_both": |
+          % if len(petitioner.assets) > 8:
+          ${ petitioner.assets[8].marital_property == "Both" }
+          % endif
+      - "petitioner_property9_possession_other": |
+          % if len(petitioner.assets) > 8:
+          ${ petitioner.assets[8].has_possession == "other" }
+          % endif
+      - "petitioner_property_item9": |
+          % if len(petitioner.assets) > 8:
+          ${ petitioner.assets[8].description }
+          % endif
+      - "petitioner_property10_marital": |
+          % if len(petitioner.assets) > 9:
+          ${ petitioner.assets[9].marital_property == "Marital" }
+          % endif
+      - "petitioner_amount_owed_property10_yes": |
+          % if len(petitioner.assets) > 9:
+          ${ petitioner.assets[9].is_amount_owed }
+          % endif
+      - "petitioner_property10_possession_petitioner": |
+          % if len(petitioner.assets) > 9:
+          ${ petitioner.assets[9].has_possession == petitioner.name.full() }
+          % endif
+      - "petitioner_market_value10": |
+          % if len(petitioner.assets) > 9:
+          ${ "{:.2f}".format(petitioner.assets[9].market_value) }
+          % endif
+      - "petitioner_property10_nonmarital": |
+          % if len(petitioner.assets) > 9:
+          ${ petitioner.assets[9].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_property10_possession_respondent": |
+          % if len(petitioner.assets) > 9:
+          ${ petitioner.assets[9].has_possession == respondent.name.full() }
+          % endif
+      - "petitioner_amount_owed_property10_no": |
+          % if len(petitioner.assets) > 9:
+          ${ not defined("petitioner.assets[9].is_amount_owed") or not petitioner.assets[9].is_amount_owed }
+          % endif
+      - "petitioner_property10_both": |
+          % if len(petitioner.assets) > 9:
+          ${ petitioner.assets[9].marital_property == "Both" }
+          % endif
+      - "petitioner_property10_possession_other": |
+          % if len(petitioner.assets) > 9:
+          ${ petitioner.assets[9].has_possession == "other" }
+          % endif
+      - "petitioner_property_item10": |
+          % if len(petitioner.assets) > 9:
+          ${ petitioner.assets[9].description }
+          % endif
+      - "petitioner_property11_marital": |
+          % if len(petitioner.assets) > 10:
+          ${ petitioner.assets[10].marital_property == "Marital" }
+          % endif
+      - "petitioner_amount_owed_property11_yes": |
+          % if len(petitioner.assets) > 10:
+          ${ petitioner.assets[10].is_amount_owed }
+          % endif
+      - "petitioner_property11_possession_petitioner": |
+          % if len(petitioner.assets) > 10:
+          ${ petitioner.assets[10].has_possession == petitioner.name.full() }
+          % endif
+      - "petitioner_market_value11": |
+          % if len(petitioner.assets) > 10:
+          ${ "{:.2f}".format(petitioner.assets[10].market_value) }
+          % endif
+      - "petitioner_property11_nonmarital": |
+          % if len(petitioner.assets) > 10:
+          ${ petitioner.assets[10].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_property11_possession_respondent": |
+          % if len(petitioner.assets) > 10:
+          ${ petitioner.assets[10].has_possession == respondent.name.full() }
+          % endif
+      - "petitioner_amount_owed_property11_no": |
+          % if len(petitioner.assets) > 10:
+          ${ not defined("petitioner.assets[10].is_amount_owed") or not petitioner.assets[10].is_amount_owed }
+          % endif
+      - "petitioner_property11_both": |
+          % if len(petitioner.assets) > 10:
+          ${ petitioner.assets[10].marital_property == "Both" }
+          % endif
+      - "petitioner_property11_possession_other": |
+          % if len(petitioner.assets) > 10:
+          ${ petitioner.assets[10].has_possession == "other" }
+          % endif
+      - "petitioner_property_item11": |
+          % if len(petitioner.assets) > 10:
+          ${ petitioner.assets[10].description }
+          % endif
+      - "petitioner_property12_marital": |
+          % if len(petitioner.assets) > 11:
+          ${ petitioner.assets[11].marital_property == "Marital" }
+          % endif
+      - "petitioner_amount_owed_property12_yes": |
+          % if len(petitioner.assets) > 11:
+          ${ petitioner.assets[11].is_amount_owed }
+          % endif
+      - "petitioner_property12_possession_petitioner": |
+          % if len(petitioner.assets) > 11:
+          ${ petitioner.assets[11].has_possession == petitioner.name.full() }
+          % endif
+      - "petitioner_market_value12": |
+          % if len(petitioner.assets) > 11:
+          ${ "{:.2f}".format(petitioner.assets[11].market_value) }
+          % endif
+      - "petitioner_property12_nonmarital": |
+          % if len(petitioner.assets) > 11:
+          ${ petitioner.assets[11].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_property12_possession_respondent": |
+          % if len(petitioner.assets) > 11:
+          ${ petitioner.assets[11].has_possession == respondent.name.full() }
+          % endif
+      - "petitioner_amount_owed_property12_no": |
+          % if len(petitioner.assets) > 11:
+          ${ not defined("petitioner.assets[11].is_amount_owed") or not petitioner.assets[11].is_amount_owed }
+          % endif
+      - "petitioner_property12_both": |
+          % if len(petitioner.assets) > 11:
+          ${ petitioner.assets[11].marital_property == "Both" }
+          % endif
+      - "petitioner_property12_possession_other": |
+          % if len(petitioner.assets) > 11:
+          ${ petitioner.assets[11].has_possession == "other" }
+          % endif
+      - "petitioner_property_item12": |
+          % if len(petitioner.assets) > 11:
+          ${ petitioner.assets[11].description }
+          % endif
+      - "petitioner_property13_marital": |
+          % if len(petitioner.assets) > 12:
+          ${ petitioner.assets[12].marital_property == "Marital" }
+          % endif
+      - "petitioner_amount_owed_property13_yes": |
+          % if len(petitioner.assets) > 12:
+          ${ petitioner.assets[12].is_amount_owed }
+          % endif
+      - "petitioner_property13_possession_petitioner": |
+          % if len(petitioner.assets) > 12:
+          ${ petitioner.assets[12].has_possession == petitioner.name.full() }
+          % endif
+      - "petitioner_market_value13": |
+          % if len(petitioner.assets) > 12:
+          ${ "{:.2f}".format(petitioner.assets[12].market_value) }
+          % endif
+      - "petitioner_property13_nonmarital": |
+          % if len(petitioner.assets) > 12:
+          ${ petitioner.assets[12].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_property13_possession_respondent": |
+          % if len(petitioner.assets) > 12:
+          ${ petitioner.assets[12].has_possession == respondent.name.full() }
+          % endif
+      - "petitioner_amount_owed_property13_no": |
+          % if len(petitioner.assets) > 12:
+          ${ not defined("petitioner.assets[12].is_amount_owed") or not petitioner.assets[12].is_amount_owed }
+          % endif
+      - "petitioner_property13_both": |
+          % if len(petitioner.assets) > 12:
+          ${ petitioner.assets[12].marital_property == "Both" }
+          % endif
+      - "petitioner_property13_possession_other": |
+          % if len(petitioner.assets) > 12:
+          ${ petitioner.assets[12].has_possession == "other" }
+          % endif
+      - "petitioner_property_item13": |
+          % if len(petitioner.assets) > 12:
+          ${ petitioner.assets[12].description }
+          % endif
+      - "petitioner_property14_marital": |
+          % if len(petitioner.assets) > 13:
+          ${ petitioner.assets[13].marital_property == "Marital" }
+          % endif
+      - "petitioner_amount_owed_property14_yes": |
+          % if len(petitioner.assets) > 13:
+          ${ petitioner.assets[13].is_amount_owed }
+          % endif
+      - "petitioner_property14_possession_petitioner": |
+          % if len(petitioner.assets) > 13:
+          ${ petitioner.assets[13].has_possession == petitioner.name.full() }
+          % endif
+      - "petitioner_market_value14": |
+          % if len(petitioner.assets) > 13:
+          ${ "{:.2f}".format(petitioner.assets[13].market_value) }
+          % endif
+      - "petitioner_property14_nonmarital": |
+          % if len(petitioner.assets) > 13:
+          ${ petitioner.assets[13].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_property14_possession_respondent": |
+          % if len(petitioner.assets) > 13:
+          ${ petitioner.assets[13].has_possession == respondent.name.full() }
+          % endif
+      - "petitioner_amount_owed_property14_no": |
+          % if len(petitioner.assets) > 13:
+          ${ not defined("petitioner.assets[13].is_amount_owed") or not petitioner.assets[13].is_amount_owed }
+          % endif
+      - "petitioner_property14_both": |
+          % if len(petitioner.assets) > 13:
+          ${ petitioner.assets[13].marital_property == "Both" }
+          % endif
+      - "petitioner_property14_possession_other": |
+          % if len(petitioner.assets) > 13:
+          ${ petitioner.assets[13].has_possession == "other" }
+          % endif
+      - "petitioner_property_item14": |
+          % if len(petitioner.assets) > 13:
+          ${ petitioner.assets[13].description }
+          % endif
+      - "petitioner_property15_marital": |
+          % if len(petitioner.assets) > 14:
+          ${ petitioner.assets[14].marital_property == "Marital" }
+          % endif
+      - "petitioner_amount_owed_property15_yes": |
+          % if len(petitioner.assets) > 14:
+          ${ petitioner.assets[14].is_amount_owed }
+          % endif
+      - "petitioner_property15_possession_petitioner": |
+          % if len(petitioner.assets) > 14:
+          ${ petitioner.assets[14].has_possession == petitioner.name.full() }
+          % endif
+      - "petitioner_market_value15": |
+          % if len(petitioner.assets) > 14:
+          ${ "{:.2f}".format(petitioner.assets[14].market_value) }
+          % endif
+      - "petitioner_property15_nonmarital": |
+          % if len(petitioner.assets) > 14:
+          ${ petitioner.assets[14].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_property15_possession_respondent": |
+          % if len(petitioner.assets) > 14:
+          ${ petitioner.assets[14].has_possession == respondent.name.full() }
+          % endif
+      - "petitioner_amount_owed_property15_no": |
+          % if len(petitioner.assets) > 14:
+          ${ not defined("petitioner.assets[14].is_amount_owed") or not petitioner.assets[14].is_amount_owed }
+          % endif
+      - "petitioner_property15_both": |
+          % if len(petitioner.assets) > 14:
+          ${ petitioner.assets[14].marital_property == "Both" }
+          % endif
+      - "petitioner_property15_possession_other": |
+          % if len(petitioner.assets) > 14:
+          ${ petitioner.assets[14].has_possession == "other" }
+          % endif
+      - "petitioner_property_item15": |
+          % if len(petitioner.assets) > 14:
+          ${ petitioner.assets[14].description }
+          % endif
+      - "petitioner_amount_owed_property16_yes": |
+          % if len(petitioner.assets) > 15:
+          ${ petitioner.assets[15].is_amount_owed }
+          % endif
+      - "petitioner_property16_marital": |
+          % if len(petitioner.assets) > 15:
+          ${ petitioner.assets[15].marital_property == "Marital" }
+          % endif
+      - "petitioner_property16_possession_petitioner": |
+          % if len(petitioner.assets) > 15:
+          ${ petitioner.assets[15].has_possession == petitioner.name.full() }
+          % endif
+      - "petitioner_market_value16": |
+          % if len(petitioner.assets) > 15:
+          ${ "{:.2f}".format(petitioner.assets[15].market_value) }
+          % endif
+      - "petitioner_property16_nonmarital": |
+          % if len(petitioner.assets) > 15:
+          ${ petitioner.assets[15].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_property16_possession_respondent": |
+          % if len(petitioner.assets) > 15:
+          ${ petitioner.assets[15].has_possession == respondent.name.full() }
+          % endif
+      - "petitioner_amount_owed_property16_no": |
+          % if len(petitioner.assets) > 15:
+          ${ not defined("petitioner.assets[15].is_amount_owed") or not petitioner.assets[15].is_amount_owed }
+          % endif
+      - "petitioner_property16_both": |
+          % if len(petitioner.assets) > 15:
+          ${ petitioner.assets[15].marital_property == "Both" }
+          % endif
+      - "petitioner_property16_possession_other": |
+          % if len(petitioner.assets) > 15:
+          ${ petitioner.assets[15].has_possession == "other" }
+          % endif
+      - "petitioner_property_item16": |
+          % if len(petitioner.assets) > 15:
+          ${ petitioner.assets[15].description }
+          % endif
+      - "respondent_property1_marital": |
+          % if len(respondent.assets) > 0:
+          ${ respondent.assets[0].marital_property == "Marital" }
+          % endif
+      - "respondent_property1_possession_petitioner": |
+          % if len(respondent.assets) > 0:
+          ${ respondent.assets[0].has_possession == petitioner.name.full() }
+          % endif
+      - "respondent_amount_owed_property1_yes": |
+          % if len(respondent.assets) > 0:
+          ${ respondent.assets[0].is_amount_owed }
+          % endif
+      - "respondent_market_value1": |
+          % if len(respondent.assets) > 0:
+          ${ "{:.2f}".format(respondent.assets[0].market_value) }
+          % endif
+      - "respondent_property1_nonmarital": |
+          % if len(respondent.assets) > 0:
+          ${ respondent.assets[0].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_property1_possession_respondent": |
+          % if len(respondent.assets) > 0:
+          ${ respondent.assets[0].has_possession == respondent.name.full() }
+          % endif
+      - "respondent_property1_other": |
+          % if len(respondent.assets) > 0:
+          ${ respondent.assets[0].has_possession == "other" }
+          % endif
+      - "respondent_amount_owed_property1_no": |
+          % if len(respondent.assets) > 0:
+          ${ not defined("respondent.assets[0].is_amount_owed") or not respondent.assets[0].is_amount_owed }
+          % endif
+      - "respondent_property1_both": |
+          % if len(respondent.assets) > 0:
+          ${ respondent.assets[0].marital_property == "Both" }
+          % endif
+      - "respondent_property_item1": |
+          % if len(respondent.assets) > 0:
+          ${ respondent.assets[0].description }
+          % endif
+      - "respondent_property2_marital": |
+          % if len(respondent.assets) > 1:
+          ${ respondent.assets[1].marital_property == "Marital" }
+          % endif
+      - "respondent_property2_possession_petitioner": |
+          % if len(respondent.assets) > 1:
+          ${ respondent.assets[1].has_possession == petitioner.name.full() }
+          % endif
+      - "respondent_amount_owed_property2_yes": |
+          % if len(respondent.assets) > 1:
+          ${ respondent.assets[1].is_amount_owed }
+          % endif
+      - "respondent_market_value2": |
+          % if len(respondent.assets) > 1:
+          ${ "{:.2f}".format(respondent.assets[1].market_value) }
+          % endif
+      - "respondent_property2_nonmarital": |
+          % if len(respondent.assets) > 1:
+          ${ respondent.assets[1].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_property2_possession_respondent": |
+          % if len(respondent.assets) > 1:
+          ${ respondent.assets[1].has_possession == respondent.name.full() }
+          % endif
+      - "respondent_property2_other": |
+          % if len(respondent.assets) > 1:
+          ${ respondent.assets[1].has_possession == "other" }
+          % endif
+      - "respondent_amount_owed_property2_no": |
+          % if len(respondent.assets) > 1:
+          ${ not defined("respondent.assets[1].is_amount_owed") or not respondent.assets[1].is_amount_owed }
+          % endif
+      - "respondent_property2_both": |
+          % if len(respondent.assets) > 1:
+          ${ respondent.assets[1].marital_property == "Both" }
+          % endif
+      - "respondent_property_item2": |
+          % if len(respondent.assets) > 1:
+          ${ respondent.assets[1].description }
+          % endif
+      - "respondent_property3_marital": |
+          % if len(respondent.assets) > 2:
+          ${ respondent.assets[2].marital_property == "Marital" }
+          % endif
+      - "respondent_property3_possession_petitioner": |
+          % if len(respondent.assets) > 2:
+          ${ respondent.assets[2].has_possession == petitioner.name.full() }
+          % endif
+      - "respondent_amount_owed_property3_yes": |
+          % if len(respondent.assets) > 2:
+          ${ respondent.assets[2].is_amount_owed }
+          % endif
+      - "respondent_market_value3": |
+          % if len(respondent.assets) > 2:
+          ${ "{:.2f}".format(respondent.assets[2].market_value) }
+          % endif
+      - "respondent_property3_nonmarital": |
+          % if len(respondent.assets) > 2:
+          ${ respondent.assets[2].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_property3_possession_respondent": |
+          % if len(respondent.assets) > 2:
+          ${ respondent.assets[2].has_possession == respondent.name.full() }
+          % endif
+      - "respondent_property3_other": |
+          % if len(respondent.assets) > 2:
+          ${ respondent.assets[2].has_possession == "other" }
+          % endif
+      - "respondent_amount_owed_property3_no": |
+          % if len(respondent.assets) > 2:
+          ${ not defined("respondent.assets[2].is_amount_owed") or not respondent.assets[2].is_amount_owed }
+          % endif
+      - "respondent_property3_both": |
+          % if len(respondent.assets) > 2:
+          ${ respondent.assets[2].marital_property == "Both" }
+          % endif
+      - "respondent_property_item3": |
+          % if len(respondent.assets) > 2:
+          ${ respondent.assets[2].description }
+          % endif
+      - "respondent_property4_marital": |
+          % if len(respondent.assets) > 3:
+          ${ respondent.assets[3].marital_property == "Marital" }
+          % endif
+      - "respondent_property4_possession_petitioner": |
+          % if len(respondent.assets) > 3:
+          ${ respondent.assets[3].has_possession == petitioner.name.full() }
+          % endif
+      - "respondent_amount_owed_property4_yes": |
+          % if len(respondent.assets) > 3:
+          ${ respondent.assets[3].is_amount_owed }
+          % endif
+      - "respondent_market_value4": |
+          % if len(respondent.assets) > 3:
+          ${ "{:.2f}".format(respondent.assets[3].market_value) }
+          % endif
+      - "respondent_property4_nonmarital": |
+          % if len(respondent.assets) > 3:
+          ${ respondent.assets[3].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_property4_possession_respondent": |
+          % if len(respondent.assets) > 3:
+          ${ respondent.assets[3].has_possession == respondent.name.full() }
+          % endif
+      - "respondent_amount_owed_property4_no": |
+          % if len(respondent.assets) > 3:
+          ${ not defined("respondent.assets[3].is_amount_owed") or not respondent.assets[3].is_amount_owed }
+          % endif
+      - "respondent_property4_other": |
+          % if len(respondent.assets) > 3:
+          ${ respondent.assets[3].has_possession == "other" }
+          % endif
+      - "respondent_property4_both": |
+          % if len(respondent.assets) > 3:
+          ${ respondent.assets[3].marital_property == "Both" }
+          % endif
+      - "respondent_property_item4": |
+          % if len(respondent.assets) > 3:
+          ${ respondent.assets[3].description }
+          % endif
+      - "respondent_property5_marital": |
+          % if len(respondent.assets) > 4:
+          ${ respondent.assets[4].marital_property == "Marital" }
+          % endif
+      - "respondent_property5_possession_petitioner": |
+          % if len(respondent.assets) > 4:
+          ${ respondent.assets[4].has_possession == petitioner.name.full() }
+          % endif
+      - "respondent_amount_owed_property5_yes": |
+          % if len(respondent.assets) > 4:
+          ${ respondent.assets[4].is_amount_owed }
+          % endif
+      - "respondent_property5_possession_respondent": |
+          % if len(respondent.assets) > 4:
+          ${ respondent.assets[4].has_possession == respondent.name.full() }
+          % endif
+      - "respondent_market_value5": |
+          % if len(respondent.assets) > 4:
+          ${ "{:.2f}".format(respondent.assets[4].market_value) }
+          % endif
+      - "respondent_property5_nonmarital": |
+          % if len(respondent.assets) > 4:
+          ${ respondent.assets[4].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_amount_owed_property5_no": |
+          % if len(respondent.assets) > 4:
+          ${ not defined("respondent.assets[4].is_amount_owed") or not respondent.assets[4].is_amount_owed }
+          % endif
+      - "respondent_property5_other": |
+          % if len(respondent.assets) > 4:
+          ${ respondent.assets[4].has_possession == "other" }
+          % endif
+      - "respondent_property5_both": |
+          % if len(respondent.assets) > 4:
+          ${ respondent.assets[4].marital_property == "Both" }
+          % endif
+      - "respondent_property_item5": |
+          % if len(respondent.assets) > 4:
+          ${ respondent.assets[4].description }
+          % endif
+      - "respondent_property6_marital": |
+          % if len(respondent.assets) > 5:
+          ${ respondent.assets[5].marital_property == "Marital" }
+          % endif
+      - "respondent_property6_possession_petitioner": |
+          % if len(respondent.assets) > 5:
+          ${ respondent.assets[5].has_possession == petitioner.name.full() }
+          % endif
+      - "respondent_amount_owed_property6_yes": |
+          % if len(respondent.assets) > 5:
+          ${ respondent.assets[5].is_amount_owed }
+          % endif
+      - "respondent_market_value6": |
+          % if len(respondent.assets) > 5:
+          ${ "{:.2f}".format(respondent.assets[5].market_value) }
+          % endif
+      - "respondent_property6_possession_respondent": |
+          % if len(respondent.assets) > 5:
+          ${ respondent.assets[5].has_possession == respondent.name.full() }
+          % endif
+      - "respondent_property6_nonmarital": |
+          % if len(respondent.assets) > 5:
+          ${ respondent.assets[5].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_amount_owed_property6_no": |
+          % if len(respondent.assets) > 5:
+          ${ not defined("respondent.assets[5].is_amount_owed") or not respondent.assets[5].is_amount_owed }
+          % endif
+      - "respondent_property6_other": |
+          % if len(respondent.assets) > 5:
+          ${ respondent.assets[5].has_possession == "other" }
+          % endif
+      - "respondent_property6_both": |
+          % if len(respondent.assets) > 5:
+          ${ respondent.assets[5].marital_property == "Both" }
+          % endif
+      - "respondent_property_item6": |
+          % if len(respondent.assets) > 5:
+          ${ respondent.assets[5].description }
+          % endif
+      - "respondent_property7_marital": |
+          % if len(respondent.assets) > 6:
+          ${ respondent.assets[6].marital_property == "Marital" }
+          % endif
+      - "respondent_property7_possession_petitioner": |
+          % if len(respondent.assets) > 6:
+          ${ respondent.assets[6].has_possession == petitioner.name.full() }
+          % endif
+      - "respondent_amount_owed_property7_yes": |
+          % if len(respondent.assets) > 6:
+          ${ respondent.assets[6].is_amount_owed }
+          % endif
+      - "respondent_property7_possession_respondent": |
+          % if len(respondent.assets) > 6:
+          ${ respondent.assets[6].has_possession == respondent.name.full() }
+          % endif
+      - "respondent_market_value7": |
+          % if len(respondent.assets) > 6:
+          ${ "{:.2f}".format(respondent.assets[6].market_value) }
+          % endif
+      - "respondent_property7_nonmarital": |
+          % if len(respondent.assets) > 6:
+          ${ respondent.assets[6].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_amount_owed_property7_no": |
+          % if len(respondent.assets) > 6:
+          ${ not defined("respondent.assets[6].is_amount_owed") or not respondent.assets[6].is_amount_owed }
+          % endif
+      - "respondent_property7_other": |
+          % if len(respondent.assets) > 6:
+          ${ respondent.assets[6].has_possession == "other" }
+          % endif
+      - "respondent_property7_both": |
+          % if len(respondent.assets) > 6:
+          ${ respondent.assets[6].marital_property == "Both" }
+          % endif
+      - "respondent_property_item7": |
+          % if len(respondent.assets) > 6:
+          ${ respondent.assets[6].description }
+          % endif
+      - "respondent_property8_marital": |
+          % if len(respondent.assets) > 7:
+          ${ respondent.assets[7].marital_property == "Marital" }
+          % endif
+      - "respondent_property8_possession_petitioner": |
+          % if len(respondent.assets) > 7:
+          ${ respondent.assets[7].has_possession == petitioner.name.full() }
+          % endif
+      - "respondent_amount_owed_property8_yes": |
+          % if len(respondent.assets) > 7:
+          ${ respondent.assets[7].is_amount_owed }
+          % endif
+      - "respondent_property8_possession_respondent": |
+          % if len(respondent.assets) > 7:
+          ${ respondent.assets[7].has_possession == respondent.name.full() }
+          % endif
+      - "respondent_market_value8": |
+          % if len(respondent.assets) > 7:
+          ${ "{:.2f}".format(respondent.assets[7].market_value) }
+          % endif
+      - "respondent_property8_nonmarital": |
+          % if len(respondent.assets) > 7:
+          ${ respondent.assets[7].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_amount_owed_property8_no": |
+          % if len(respondent.assets) > 7:
+          ${ not defined("respondent.assets[7].is_amount_owed") or not respondent.assets[7].is_amount_owed }
+          % endif
+      - "respondent_property8_other": |
+          % if len(respondent.assets) > 7:
+          ${ respondent.assets[7].has_possession == "other" }
+          % endif
+      - "respondent_property8_both": |
+          % if len(respondent.assets) > 7:
+          ${ respondent.assets[7].marital_property == "Both" }
+          % endif
+      - "respondent_property_item8": |
+          % if len(respondent.assets) > 7:
+          ${ respondent.assets[7].description }
+          % endif
+      - "respondent_property9_marital": |
+          % if len(respondent.assets) > 8:
+          ${ respondent.assets[8].marital_property == "Marital" }
+          % endif
+      - "respondent_property9_possession_petitioner": |
+          % if len(respondent.assets) > 8:
+          ${ respondent.assets[8].has_possession == petitioner.name.full() }
+          % endif
+      - "respondent_amount_owed_property9_yes": |
+          % if len(respondent.assets) > 8:
+          ${ respondent.assets[8].is_amount_owed }
+          % endif
+      - "respondent_property9_possession_respondent": |
+          % if len(respondent.assets) > 8:
+          ${ respondent.assets[8].has_possession == respondent.name.full() }
+          % endif
+      - "respondent_market_value9": |
+          % if len(respondent.assets) > 8:
+          ${ "{:.2f}".format(respondent.assets[8].market_value) }
+          % endif
+      - "respondent_property9_nonmarital": |
+          % if len(respondent.assets) > 8:
+          ${ respondent.assets[8].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_amount_owed_property9_no": |
+          % if len(respondent.assets) > 8:
+          ${ not defined("respondent.assets[8].is_amount_owed") or not respondent.assets[8].is_amount_owed }
+          % endif
+      - "respondent_property9_other": |
+          % if len(respondent.assets) > 8:
+          ${ respondent.assets[8].has_possession == "other" }
+          % endif
+      - "respondent_property9_both": |
+          % if len(respondent.assets) > 8:
+          ${ respondent.assets[8].marital_property == "Both" }
+          % endif
+      - "respondent_property_item9": |
+          % if len(respondent.assets) > 8:
+          ${ respondent.assets[8].description }
+          % endif
+      - "respondent_property10_marital": |
+          % if len(respondent.assets) > 9:
+          ${ respondent.assets[9].marital_property == "Marital" }
+          % endif
+      - "respondent_property10_possession_petitioner": |
+          % if len(respondent.assets) > 9:
+          ${ respondent.assets[9].has_possession == petitioner.name.full() }
+          % endif
+      - "respondent_amount_owed_property10_yes": |
+          % if len(respondent.assets) > 9:
+          ${ respondent.assets[9].is_amount_owed }
+          % endif
+      - "respondent_market_value10": |
+          % if len(respondent.assets) > 9:
+          ${ "{:.2f}".format(respondent.assets[9].market_value) }
+          % endif
+      - "respondent_property10_possession_respondent": |
+          % if len(respondent.assets) > 9:
+          ${ respondent.assets[9].has_possession == respondent.name.full() }
+          % endif
+      - "respondent_property10_nonmarital": |
+          % if len(respondent.assets) > 9:
+          ${ respondent.assets[9].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_amount_owed_property10_no": |
+          % if len(respondent.assets) > 9:
+          ${ not defined("respondent.assets[9].is_amount_owed") or not respondent.assets[9].is_amount_owed }
+          % endif
+      - "respondent_property10_other": |
+          % if len(respondent.assets) > 9:
+          ${ respondent.assets[9].has_possession == "other" }
+          % endif
+      - "respondent_property10_both": |
+          % if len(respondent.assets) > 9:
+          ${ respondent.assets[9].marital_property == "Both" }
+          % endif
+      - "respondent_property_item10": |
+          % if len(respondent.assets) > 9:
+          ${ respondent.assets[9].description }
+          % endif
+      - "respondent_property11_marital": |
+          % if len(respondent.assets) > 10:
+          ${ respondent.assets[10].marital_property == "Marital" }
+          % endif
+      - "respondent_property11_possession_petitioner": |
+          % if len(respondent.assets) > 10:
+          ${ respondent.assets[10].has_possession == petitioner.name.full() }
+          % endif
+      - "respondent_amount_owed_property11_yes": |
+          % if len(respondent.assets) > 10:
+          ${ respondent.assets[10].is_amount_owed }
+          % endif
+      - "respondent_property11_possession_respondent": |
+          % if len(respondent.assets) > 10:
+          ${ respondent.assets[10].has_possession == respondent.name.full() }
+          % endif
+      - "respondent_market_value11": |
+          % if len(respondent.assets) > 10:
+          ${ "{:.2f}".format(respondent.assets[10].market_value) }
+          % endif
+      - "respondent_property11_nonmarital": |
+          % if len(respondent.assets) > 10:
+          ${ respondent.assets[10].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_amount_owed_property11_no": |
+          % if len(respondent.assets) > 10:
+          ${ not defined("respondent.assets[10].is_amount_owed") or not respondent.assets[10].is_amount_owed }
+          % endif
+      - "respondent_property11_other": |
+          % if len(respondent.assets) > 10:
+          ${ respondent.assets[10].has_possession == "other" }
+          % endif
+      - "respondent_property11_both": |
+          % if len(respondent.assets) > 10:
+          ${ respondent.assets[10].marital_property == "Both" }
+          % endif
+      - "respondent_property_item11": |
+          % if len(respondent.assets) > 10:
+          ${ respondent.assets[10].description }
+          % endif
+      - "respondent_property12_marital": |
+          % if len(respondent.assets) > 11:
+          ${ respondent.assets[11].marital_property == "Marital" }
+          % endif
+      - "respondent_property12_possession_petitioner": |
+          % if len(respondent.assets) > 11:
+          ${ respondent.assets[11].has_possession == petitioner.name.full() }
+          % endif
+      - "respondent_amount_owed_property12_yes": |
+          % if len(respondent.assets) > 11:
+          ${ respondent.assets[11].is_amount_owed }
+          % endif
+      - "respondent_property12_nonmarital": |
+          % if len(respondent.assets) > 11:
+          ${ respondent.assets[11].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_property12_possession_respondent": |
+          % if len(respondent.assets) > 11:
+          ${ respondent.assets[11].has_possession == respondent.name.full() }
+          % endif
+      - "respondent_market_value12": |
+          % if len(respondent.assets) > 11:
+          ${ "{:.2f}".format(respondent.assets[11].market_value) }
+          % endif
+      - "respondent_amount_owed_property12_no": |
+          % if len(respondent.assets) > 11:
+          ${ not defined("respondent.assets[11].is_amount_owed") or not respondent.assets[11].is_amount_owed }
+          % endif
+      - "respondent_property12_other": |
+          % if len(respondent.assets) > 11:
+          ${ respondent.assets[11].has_possession == "other" }
+          % endif
+      - "respondent_property12_both": |
+          % if len(respondent.assets) > 11:
+          ${ respondent.assets[11].marital_property == "Both" }
+          % endif
+      - "respondent_property_item12": |
+          % if len(respondent.assets) > 11:
+          ${ respondent.assets[11].description }
+          % endif
+      - "respondent_property13_marital": |
+          % if len(respondent.assets) > 12:
+          ${ respondent.assets[12].marital_property == "Marital" }
+          % endif
+      - "respondent_property13_possession_petitioner": |
+          % if len(respondent.assets) > 12:
+          ${ respondent.assets[12].has_possession == petitioner.name.full() }
+          % endif
+      - "respondent_amount_owed_property13_yes": |
+          % if len(respondent.assets) > 12:
+          ${ respondent.assets[12].is_amount_owed }
+          % endif
+      - "respondent_property13_nonmarital": |
+          % if len(respondent.assets) > 12:
+          ${ respondent.assets[12].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_property13_possession_respondent": |
+          % if len(respondent.assets) > 12:
+          ${ respondent.assets[12].has_possession == respondent.name.full() }
+          % endif
+      - "respondent_market_value13": |
+          % if len(respondent.assets) > 12:
+          ${ "{:.2f}".format(respondent.assets[12].market_value) }
+          % endif
+      - "respondent_amount_owed_property13_no": |
+          % if len(respondent.assets) > 12:
+          ${ not defined("respondent.assets[12].is_amount_owed") or not respondent.assets[12].is_amount_owed }
+          % endif
+      - "respondent_property13_other": |
+          % if len(respondent.assets) > 12:
+          ${ respondent.assets[12].has_possession == "other" }
+          % endif
+      - "respondent_property13_both": |
+          % if len(respondent.assets) > 12:
+          ${ respondent.assets[12].marital_property == "Both" }
+          % endif
+      - "respondent_property_item13": |
+          % if len(respondent.assets) > 12:
+          ${ respondent.assets[12].description }
+          % endif
+      - "respondent_property14_marital": |
+          % if len(respondent.assets) > 13:
+          ${ respondent.assets[13].marital_property == "Marital" }
+          % endif
+      - "respondent_property14_possession_petitioner": |
+          % if len(respondent.assets) > 13:
+          ${ respondent.assets[13].has_possession == petitioner.name.full() }
+          % endif
+      - "respondent_amount_owed_property14_yes": |
+          % if len(respondent.assets) > 13:
+          ${ respondent.assets[13].is_amount_owed }
+          % endif
+      - "respondent_market_value14": |
+          % if len(respondent.assets) > 13:
+          ${ "{:.2f}".format(respondent.assets[13].market_value) }
+          % endif
+      - "respondent_property14_nonmarital": |
+          % if len(respondent.assets) > 13:
+          ${ respondent.assets[13].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_property14_possession_respondent": |
+          % if len(respondent.assets) > 13:
+          ${ respondent.assets[13].has_possession == respondent.name.full() }
+          % endif
+      - "respondent_amount_owed_property14_no": |
+          % if len(respondent.assets) > 13:
+          ${ not defined("respondent.assets[13].is_amount_owed") or not respondent.assets[13].is_amount_owed }
+          % endif
+      - "respondent_property14_other": |
+          % if len(respondent.assets) > 13:
+          ${ respondent.assets[13].has_possession == "other" }
+          % endif
+      - "respondent_property14_both": |
+          % if len(respondent.assets) > 13:
+          ${ respondent.assets[13].marital_property == "Both" }
+          % endif
+      - "respondent_property_item14": |
+          % if len(respondent.assets) > 13:
+          ${ respondent.assets[13].description }
+          % endif
+      - "respondent_property15_marital": |
+          % if len(respondent.assets) > 14:
+          ${ respondent.assets[14].marital_property == "Marital" }
+          % endif
+      - "respondent_property15_possession_petitioner": |
+          % if len(respondent.assets) > 14:
+          ${ respondent.assets[14].has_possession == petitioner.name.full() }
+          % endif
+      - "respondent_amount_owed_property15_yes": |
+          % if len(respondent.assets) > 14:
+          ${ respondent.assets[14].is_amount_owed }
+          % endif
+      - "respondent_property15_nonmarital": |
+          % if len(respondent.assets) > 14:
+          ${ respondent.assets[14].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_property15_possession_respondent": |
+          % if len(respondent.assets) > 14:
+          ${ respondent.assets[14].has_possession == respondent.name.full() }
+          % endif
+      - "respondent_market_value15": |
+          % if len(respondent.assets) > 14:
+          ${ "{:.2f}".format(respondent.assets[14].market_value) }
+          % endif
+      - "respondent_amount_owed_property15_no": |
+          % if len(respondent.assets) > 14:
+          ${ not defined("respondent.assets[14].is_amount_owed") or not respondent.assets[14].is_amount_owed }
+          % endif
+      - "respondent_property15_other": |
+          % if len(respondent.assets) > 14:
+          ${ respondent.assets[14].has_possession == "other" }
+          % endif
+      - "respondent_property15_both": |
+          % if len(respondent.assets) > 14:
+          ${ respondent.assets[14].marital_property == "Both" }
+          % endif
+      - "respondent_property_item15": |
+          % if len(respondent.assets) > 14:
+          ${ respondent.assets[14].description }
+          % endif
+      - "respondent_property16_marital": |
+          % if len(respondent.assets) > 15:
+          ${ respondent.assets[15].marital_property == "Marital" }
+          % endif
+      - "respondent_property16_possession_petitioner": |
+          % if len(respondent.assets) > 15:
+          ${ respondent.assets[15].has_possession == petitioner.name.full() }
+          % endif
+      - "respondent_amount_owed_property16_yes": |
+          % if len(respondent.assets) > 15:
+          ${ respondent.assets[15].is_amount_owed }
+          % endif
+      - "respondent_property16_nonmarital": |
+          % if len(respondent.assets) > 15:
+          ${ respondent.assets[15].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_property16_possession_respondent": |
+          % if len(respondent.assets) > 15:
+          ${ respondent.assets[15].has_possession == respondent.name.full() }
+          % endif
+      - "respondent_market_value16": |
+          % if len(respondent.assets) > 15:
+          ${ "{:.2f}".format(respondent.assets[15].market_value) }
+          % endif
+      - "respondent_amount_owed_property16_no": |
+          % if len(respondent.assets) > 15:
+          ${ not defined("respondent.assets[15].is_amount_owed") or not respondent.assets[15].is_amount_owed }
+          % endif
+      - "respondent_property16_both": |
+          % if len(respondent.assets) > 15:
+          ${ respondent.assets[15].marital_property == "Both" }
+          % endif
+      - "respondent_property16_other": |
+          % if len(respondent.assets) > 15:
+          ${ respondent.assets[15].has_possession == "other" }
+          % endif
+      - "respondent_property_item16": |
+          % if len(respondent.assets) > 15:
+          ${ respondent.assets[15].description }
+          % endif
+
       - "petitioner_bankruptcy_no": ${ not petitioner.in_bankruptcy } 
       - "petitioner_bankruptcy_yes": ${ petitioner.in_bankruptcy } 
-      - "petitioner_mortgage_yes": ${ len([item for item in debts.matches(source=['mortgages']) if item.recommended_debt ==  petitioner.name.full()]) > 0 } 
-      - "petitioner_mortgage_no": ${ len([item for item in debts.matches(source=['mortgages']) if item.recommended_debt ==  petitioner.name.full()]) == 0 } 
-      - "petitioner_car_payment_yes": ${ len([item for item in debts.matches(source=['vehicle_loans']) if item.recommended_debt ==  petitioner.name.full()]) > 0 } 
-      - "petitioner_car_payment_no": ${ len([item for item in debts.matches(source=['vehicle_loans']) if item.recommended_debt ==  petitioner.name.full()]) == 0 } 
-      - "petitioner_credit_card_payment_yes": ${ len([item for item in debts.matches(source=['credit_card_debt']) if item.recommended_debt ==  petitioner.name.full()]) == 0 } 
-      - "petitioner_credit_card_payment_no": ${ len([item for item in debts.matches(source=['credit_card_debt']) if item.recommended_debt ==  petitioner.name.full()]) > 0 } 
-      - "petitioner_owe_family_friends_yes": ${ len([item for item in debts.matches(source=['personal_loans']) if item.recommended_debt ==  petitioner.name.full()]) == 0 } 
-      - "petitioner_owe_family_friends_no": ${ len([item for item in debts.matches(source=['personal_loans']) if item.recommended_debt ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_mortgage_yes": ${ len([item for item in petitioner.debts if defined('item.list') and item.list == "real_estate"]) > 0 } 
+      - "petitioner_mortgage_no": ${ len([item for item in petitioner.debts if defined('item.list') and item.list == "real_estate"]) == 0 } 
+      - "petitioner_car_payment_yes": ${ len([item for item in petitioner.debts if defined('item.list') and item.list == "vehicles"]) > 0 } 
+      - "petitioner_car_payment_no": ${ len([item for item in petitioner.debts if defined('item.list') and item.list == "vehicles"]) == 0 } 
+      - "petitioner_credit_card_payment_yes": ${ len([item for item in debts.matches(source=['credit_card_debt']) if item.recommended_debt ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_credit_card_payment_no": ${ len([item for item in debts.matches(source=['credit_card_debt']) if item.recommended_debt ==  petitioner.name.full()])== 0 } 
+      - "petitioner_owe_family_friends_yes": ${ len([item for item in debts.matches(source=['personal_loans']) if item.recommended_debt ==  petitioner.name.full()]) > 0 } 
+      - "petitioner_owe_family_friends_no": ${ len([item for item in debts.matches(source=['personal_loans']) if item.recommended_debt ==  petitioner.name.full()]) == 0 } 
       - "petitioner_owe_medical_dental_no": ${ len([item for item in debts.matches(source=['medical_debt']) if item.recommended_debt ==  petitioner.name.full()]) == 0 } 
       - "petitioner_owe_medical_dental_yes": ${ len([item for item in debts.matches(source=['medical_debt']) if item.recommended_debt ==  petitioner.name.full()]) > 0 } 
       - "petitioner_owe_student_loans_no": ${ len([item for item in debts.matches(source=['student_loans']) if item.recommended_debt ==  petitioner.name.full()]) == 0 } 
@@ -1677,10 +2666,10 @@ attachment:
       - "petitioner_owe_other_debt_yes": ${ len([item for item in debts.matches(source=['other_debt']) if item.recommended_debt ==  petitioner.name.full()]) > 0 } 
       - "respondent_bankruptcy_yes": ${ respondent.in_bankruptcy } 
       - "respondent_bankruptcy_no": ${ not respondent.in_bankruptcy } 
-      - "respondent_mortgage_no": ${ len([item for item in debts.matches(source=['mortgages']) if item.recommended_debt ==  respondent.name.full()]) == 0 } 
-      - "respondent_mortgage_yes": ${ len([item for item in debts.matches(source=['mortgages']) if item.recommended_debt ==  respondent.name.full()]) > 0 } 
-      - "respondent_car_payment_yes": ${ len([item for item in debts.matches(source=['vehicle_loans']) if item.recommended_debt ==  respondent.name.full()]) > 0 } 
-      - "respondent_car_payment_no": ${ len([item for item in debts.matches(source=['vehicle_loans']) if item.recommended_debt ==  respondent.name.full()]) == 0 } 
+      - "respondent_mortgage_no": ${ len([item for item in respondent.debts if defined('item.list') and item.list == "real_estate"]) == 0 } 
+      - "respondent_mortgage_yes": ${ len([item for item in respondent.debts if defined('item.list') and item.list == "real_estate"]) > 0 } 
+      - "respondent_car_payment_yes": ${ len([item for item in respondent.debts if defined('item.list') and item.list == "vehicles"]) > 0 } 
+      - "respondent_car_payment_no": ${ len([item for item in respondent.debts if defined('item.list') and item.list == "vehicles"]) == 0 } 
       - "respondent_credit_card_payment_yes": ${ len([item for item in debts.matches(source=['credit_card_debt']) if item.recommended_debt ==  respondent.name.full()]) > 0 } 
       - "respondent_credit_card_payment_no": ${ len([item for item in debts.matches(source=['credit_card_debt']) if item.recommended_debt ==  respondent.name.full()]) == 0 } 
       - "respondent_owe_family_friends_yes": ${ len([item for item in debts.matches(source=['personal_loans']) if item.recommended_debt ==  respondent.name.full()]) > 0 } 
@@ -1691,244 +2680,903 @@ attachment:
       - "respondent_owe_student_loans_yes": ${ len([item for item in debts.matches(source=['student_loans']) if item.recommended_debt ==  respondent.name.full()]) > 0 } 
       - "respondent_owe_other_debt_no": ${ len([item for item in debts.matches(source=['other_debt']) if item.recommended_debt ==  respondent.name.full()]) == 0 } 
       - "respondent_owe_other_debt_yes": ${ len([item for item in debts.matches(source=['other_debt']) if item.recommended_debt ==  respondent.name.full()]) > 0 } 
-      - "petitioner_debt_marital_1": ${ petitioner.debts[0].marital_property } 
-      - "petitioner_debt_nonmarital_1": ${ petitioner.debts[0].marital_property } 
-      - "petitioner_debt_both_1": ${ petitioner.debts[0].marital_property } 
-      - "petitioner_debt_1": ${ petitioner.debts[0].lender } 
-      - "petitioner_debt_balance_1": ${ petitioner.debts[0].balance } 
-      - "petitioner_monthly_payment_1": ${ petitioner.debts[0].monthly_payment } 
-      - "petitioner_debt_type_1": ${ petitioner.debts[0].display_name } 
-      - "petitioner_debt_marital_2": ${ petitioner.debts[1].marital_property } 
-      - "petitioner_debt_nonmarital_2": ${ petitioner.debts[1].marital_property } 
-      - "petitioner_debt_both_2": ${ petitioner.debts[1].marital_property } 
-      - "petitioner_debt_2": ${ petitioner.debts[1].lender } 
-      - "petitioner_debt_balance_2": ${ petitioner.debts[1].balance } 
-      - "petitioner_monthly_payment_2": ${ petitioner.debts[1].monthly_payment } 
-      - "petitioner_debt_type_2": ${ petitioner.debts[1].display_name } 
-      - "petitioner_debt_marital_3": ${ petitioner.debts[2].marital_property } 
-      - "petitioner_debt_nonmarital_3": ${ petitioner.debts[2].marital_property } 
-      - "petitioner_debt_both_3": ${ petitioner.debts[2].marital_property } 
-      - "petitioner_debt_3": ${ petitioner.debts[2].lender } 
-      - "petitioner_debt_balance_3": ${ petitioner.debts[2].balance } 
-      - "petitioner_monthly_payment_3": ${ petitioner.debts[2].monthly_payment } 
-      - "petitioner_debt_type_3": ${ petitioner.debts[2].display_name } 
-      - "petitioner_debt_marital_4": ${ petitioner.debts[3].marital_property } 
-      - "petitioner_debt_nonmarital_4": ${ petitioner.debts[3].marital_property } 
-      - "petitioner_debt_both_4": ${ petitioner.debts[3].marital_property } 
-      - "petitioner_debt_4": ${ petitioner.debts[3].lender } 
-      - "petitioner_debt_balance_4": ${ petitioner.debts[3].balance } 
-      - "petitioner_monthly_payment_4": ${ petitioner.debts[3].monthly_payment } 
-      - "petitioner_debt_type_4": ${ petitioner.debts[3].display_name } 
-      - "petitioner_debt_marital_5": ${ petitioner.debts[4].marital_property } 
-      - "petitioner_debt_nonmarital_4": ${ petitioner.debts[4].marital_property } 
-      - "petitioner_debt_both_5": ${ petitioner.debts[4].marital_property } 
-      - "petitioner_debt_5": ${ petitioner.debts[4].lender } 
-      - "petitioner_debt_balance_5": ${ petitioner.debts[4].balance } 
-      - "petitioner_monthly_payment_5": ${ petitioner.debts[4].monthly_payment } 
-      - "petitioner_debt_type_5": ${ petitioner.debts[4].display_name } 
-      - "petitioner_debt_marital_6": ${ petitioner.debts[5].marital_property } 
-      - "petitioner_debt_nonmarital_6": ${ petitioner.debts[5].marital_property } 
-      - "petitioner_debt_both_6": ${ petitioner.debts[5].marital_property } 
-      - "petitioner_debt_6": ${ petitioner.debts[5].lender } 
-      - "petitioner_debt_balance_6": ${ petitioner.debts[5].balance } 
-      - "petitioner_monthly_payment_6": ${ petitioner.debts[5].monthly_payment } 
-      - "petitioner_debt_type_6": ${ petitioner.debts[5].display_name } 
-      - "petitioner_debt_marital_7": ${ petitioner.debts[6].marital_property } 
-      - "petitioner_debt_nonmarital_7": ${ petitioner.debts[6].marital_property } 
-      - "petitioner_debt_both_7": ${ petitioner.debts[6].marital_property } 
-      - "petitioner_debt_7": ${ petitioner.debts[6].lender } 
-      - "petitioner_debt_balance_7": ${ petitioner.debts[6].balance } 
-      - "petitioner_monthly_payment_7": ${ petitioner.debts[6].monthly_payment } 
-      - "petitioner_debt_type_7": ${ petitioner.debts[6].display_name } 
-      - "petitioner_debt_marital_8": ${ petitioner.debts[7].marital_property } 
-      - "petitioner_debt_nonmarital_8": ${ petitioner.debts[7].marital_property } 
-      - "petitioner_debt_both_8": ${ petitioner.debts[7].marital_property } 
-      - "petitioner_debt_8": ${ petitioner.debts[7].lender } 
-      - "petitioner_debt_balance_8": ${ petitioner.debts[7].balance } 
-      - "petitioner_monthly_payment_8": ${ petitioner.debts[7].monthly_payment } 
-      - "petitioner_debt_type_8": ${ petitioner.debts[7].display_name } 
-      - "petitioner_debt_marital_9": ${ petitioner.debts[8].marital_property } 
-      - "petitioner_debt_nonmarital_9": ${ petitioner.debts[8].marital_property } 
-      - "petitioner_debt_both_9": ${ petitioner.debts[8].marital_property } 
-      - "petitioner_debt_9": ${ petitioner.debts[8].lender } 
-      - "petitioner_debt_balance_9": ${ petitioner.debts[8].balance } 
-      - "petitioner_monthly_payment_9": ${ petitioner.debts[8].monthly_payment } 
-      - "petitioner_debt_type_9": ${ petitioner.debts[8].display_name } 
-      - "petitioner_debt_marital_10": ${ petitioner.debts[9].marital_property } 
-      - "petitioner_debt_nonmarital_10": ${ petitioner.debts[9].marital_property } 
-      - "petitioner_debt_both_10": ${ petitioner.debts[9].marital_property } 
-      - "petitioner_debt_10": ${ petitioner.debts[9].lender } 
-      - "petitioner_debt_balance_10": ${ petitioner.debts[9].balance } 
-      - "petitioner_monthly_payment_10": ${ petitioner.debts[9].monthly_payment } 
-      - "petitioner_debt_type_10": ${ petitioner.debts[9].display_name } 
-      - "petitioner_debt_marital_11": ${ petitioner.debts[10].marital_property } 
-      - "petitioner_debt_nonmarital_11": ${ petitioner.debts[10].marital_property } 
-      - "petitioner_debt_both_11": ${ petitioner.debts[10].marital_property } 
-      - "petitioner_debt_11": ${ petitioner.debts[10].lender } 
-      - "petitioner_debt_balance_11": ${ petitioner.debts[10].balance } 
-      - "petitioner_monthly_payment_11": ${ petitioner.debts[10].monthly_payment } 
-      - "petitioner_debt_type_11": ${ petitioner.debts[10].display_name } 
-      - "petitioner_debt_marital_12": ${ petitioner.debts[11].marital_property } 
-      - "petitioner_debt_nonmarital_12": ${ petitioner.debts[11].marital_property } 
-      - "petitioner_debt_both_12": ${ petitioner.debts[11].marital_property } 
-      - "petitioner_debt_12": ${ petitioner.debts[11].lender } 
-      - "petitioner_debt_balance_12": ${ petitioner.debts[11].balance } 
-      - "petitioner_monthly_payment_12": ${ petitioner.debts[11].monthly_payment } 
-      - "petitioner_debt_type_12": ${ petitioner.debts[11].display_name } 
-      - "petitioner_debt_marital_13": ${ petitioner.debts[12].marital_property } 
-      - "petitioner_debt_nonmarital_13": ${ petitioner.debts[12].marital_property } 
-      - "petitioner_debt_both_13": ${ petitioner.debts[12].marital_property } 
-      - "petitioner_debt_13": ${ petitioner.debts[12].lender } 
-      - "petitioner_debt_balance_13": ${ petitioner.debts[12].balance } 
-      - "petitioner_monthly_payment_13": ${ petitioner.debts[12].monthly_payment } 
-      - "petitioner_debt_type_13": ${ petitioner.debts[12].display_name } 
-      - "petitioner_debt_marital_14": ${ petitioner.debts[13].marital_property } 
-      - "petitioner_debt_nonmarital_14": ${ petitioner.debts[13].marital_property } 
-      - "petitioner_debt_both_14": ${ petitioner.debts[13].marital_property } 
-      - "petitioner_debt_14": ${ petitioner.debts[13].lender } 
-      - "petitioner_debt_balance_14": ${ petitioner.debts[13].balance } 
-      - "petitioner_monthly_payment_14": ${ petitioner.debts[13].monthly_payment } 
-      - "petitioner_debt_type_14": ${ petitioner.debts[13].display_name } 
-      - "petitioner_debt_marital_15": ${ petitioner.debts[14].marital_property } 
-      - "petitioner_debt_nonmarital_15": ${ petitioner.debts[14].marital_property } 
-      - "petitioner_debt_both_15": ${ petitioner.debts[14].marital_property } 
-      - "petitioner_debt_15": ${ petitioner.debts[14].lender } 
-      - "petitioner_debt_balance_15": ${ petitioner.debts[14].balance } 
-      - "petitioner_monthly_payment_15": ${ petitioner.debts[14].monthly_payment } 
-      - "petitioner_debt_type_15": ${ petitioner.debts[14].display_name } 
-      - "respondent_debt_marital_1": ${ respondent.debts[0].marital_property } 
-      - "respondent_debt_nonmarital_1": ${ respondent.debts[0].marital_property } 
-      - "respondent_debt_both_1": ${ respondent.debts[0].marital_property } 
-      - "respondent_debt_1": ${ respondent.debts[0].lender } 
-      - "respondent_debt_balance_1": ${ respondent.debts[0].balance } 
-      - "respondent_monthly_payment_1": ${ respondent.debts[0].monthly_payment } 
-      - "respondent_debt_type_1": ${ respondent.debts[0].display_name } 
-      - "respondent_debt_marital_2": ${ respondent.debts[1].marital_property } 
-      - "respondent_debt_nonmarital_2": ${ respondent.debts[1].marital_property } 
-      - "respondent_debt_both_2": ${ respondent.debts[1].marital_property } 
-      - "respondent_debt_2": ${ respondent.debts[1].lender } 
-      - "respondent_debt_balance_2": ${ respondent.debts[1].balance } 
-      - "respondent_monthly_payment_2": ${ respondent.debts[1].monthly_payment } 
-      - "respondent_debt_type_2": ${ respondent.debts[1].display_name } 
-      - "respondent_debt_marital_3": ${ respondent.debts[2].marital_property } 
-      - "respondent_debt_nonmarital_3": ${ respondent.debts[2].marital_property } 
-      - "respondent_debt_both_3": ${ respondent.debts[2].marital_property } 
-      - "respondent_debt_3": ${ respondent.debts[2].lender } 
-      - "respondent_debt_balance_3": ${ respondent.debts[2].balance } 
-      - "respondent_monthly_payment_3": ${ respondent.debts[2].monthly_payment } 
-      - "respondent_debt_type_3": ${ respondent.debts[2].display_name } 
-      - "respondent_debt_marital_4": ${ respondent.debts[3].marital_property } 
-      - "respondent_debt_nonmarital_4": ${ respondent.debts[3].marital_property } 
-      - "respondent_debt_both_4": ${ respondent.debts[3].marital_property } 
-      - "respondent_debt_4": ${ respondent.debts[3].lender } 
-      - "respondent_debt_balance_4": ${ respondent.debts[3].balance } 
-      - "respondent_monthly_payment_4": ${ respondent.debts[3].monthly_payment } 
-      - "respondent_debt_type_4": ${ respondent.debts[3].display_name } 
-      - "respondent_debt_marital_5": ${ respondent.debts[4].marital_property } 
-      - "respondent_debt_nonmarital_5": ${ respondent.debts[4].marital_property } 
-      - "respondent_debt_both_5": ${ respondent.debts[4].marital_property } 
-      - "respondent_debt_5": ${ respondent.debts[4].lender } 
-      - "respondent_debt_balance_5": ${ respondent.debts[4].balance } 
-      - "respondent_monthly_payment_5": ${ respondent.debts[4].monthly_payment } 
-      - "respondent_debt_type_5": ${ respondent.debts[4].display_name } 
-      - "respondent_debt_marital_6": ${ respondent.debts[5].marital_property } 
-      - "respondent_debt_nonmarital_6": ${ respondent.debts[5].marital_property } 
-      - "respondent_debt_both_6": ${ respondent.debts[5].marital_property } 
-      - "respondent_debt_6": ${ respondent.debts[5].lender } 
-      - "respondent_debt_balance_6": ${ respondent.debts[5].balance } 
-      - "respondent_monthly_payment_6": ${ respondent.debts[5].monthly_payment } 
-      - "respondent_debt_type_6": ${ respondent.debts[5].display_name } 
-      - "respondent_debt_marital_7": ${ respondent.debts[6].marital_property } 
-      - "respondent_debt_nonmarital_7": ${ respondent.debts[6].marital_property } 
-      - "respondent_debt_both_7": ${ respondent.debts[6].marital_property } 
-      - "respondent_debt_7": ${ respondent.debts[6].lender } 
-      - "respondent_debt_balance_10": ${ respondent.debts[6].balance } 
-      - "respondent_monthly_payment_7": ${ respondent.debts[6].monthly_payment } 
-      - "respondent_debt_type_7": ${ respondent.debts[6].display_name } 
-      - "respondent_debt_marital_8": ${ respondent.debts[7].marital_property } 
-      - "respondent_debt_nonmarital_8": ${ respondent.debts[7].marital_property } 
-      - "respondent_debt_both_8": ${ respondent.debts[7].marital_property } 
-      - "respondent_debt_8": ${ respondent.debts[7].lender } 
-      - "respondent_debt_balance_8": ${ respondent.debts[7].balance } 
-      - "respondent_monthly_payment_8": ${ respondent.debts[7].monthly_payment } 
-      - "respondent_debt_type_8": ${ respondent.debts[7].display_name } 
-      - "respondent_debt_marital_9": ${ respondent.debts[8].marital_property } 
-      - "respondent_debt_nonmarital_9": ${ respondent.debts[8].marital_property } 
-      - "respondent_debt_both_9": ${ respondent.debts[8].marital_property } 
-      - "respondent_debt_9": ${ respondent.debts[8].lender } 
-      - "respondent_debt_balance_9": ${ respondent.debts[8].balance } 
-      - "respondent_monthly_payment_9": ${ respondent.debts[8].monthly_payment } 
-      - "respondent_debt_type_9": ${ respondent.debts[8].display_name } 
-      - "respondent_debt_marital_10": ${ respondent.debts[9].marital_property } 
-      - "respondent_debt_nonmarital_10": ${ respondent.debts[9].marital_property } 
-      - "respondent_debt_both_10": ${ respondent.debts[9].marital_property } 
-      - "respondent_debt_10": ${ respondent.debts[9].lender } 
-      - "respondent_debt_balance_10": ${ respondent.debts[9].balance } 
-      - "respondent_monthly_payment_10": ${ respondent.debts[9].monthly_payment } 
-      - "respondent_debt_type_10": ${ respondent.debts[9].display_name } 
-      - "respondent_debt_marital_11": ${ respondent.debts[10].marital_property } 
-      - "respondent_debt_nonmarital_11": ${ respondent.debts[10].marital_property } 
-      - "respondent_debt_both_11": ${ respondent.debts[10].marital_property } 
-      - "respondent_debt_11": ${ respondent.debts[10].lender } 
-      - "respondent_debt_balance_11": ${ respondent.debts[10].balance } 
-      - "respondent_monthly_payment_11": ${ respondent.debts[10].monthly_payment } 
-      - "respondent_debt_type_11": ${ respondent.debts[10].display_name } 
-      - "respondent_debt_marital_12": ${ respondent.debts[11].marital_property } 
-      - "respondent_debt_nonmarital_12": ${ respondent.debts[11].marital_property } 
-      - "respondent_debt_both_12": ${ respondent.debts[11].marital_property } 
-      - "respondent_debt_12": ${ respondent.debts[11].lender } 
-      - "respondent_debt_balance_12": ${ respondent.debts[11].balance } 
-      - "respondent_monthly_payment_12": ${ respondent.debts[11].monthly_payment } 
-      - "respondent_debt_type_12": ${ respondent.debts[11].display_name } 
-      - "respondent_debt_marital_13": ${ respondent.debts[12].marital_property } 
-      - "respondent_debt_nonmarital_13": ${ respondent.debts[12].marital_property } 
-      - "respondent_debt_both_13": ${ respondent.debts[12].marital_property } 
-      - "respondent_debt_13": ${ respondent.debts[12].lender } 
-      - "respondent_debt_balance_13": ${ respondent.debts[12].balance } 
-      - "respondent_monthly_payment_13": ${ respondent.debts[12].monthly_payment } 
-      - "respondent_debt_type_13": ${ respondent.debts[12].display_name } 
-      - "respondent_debt_marital_14": ${ respondent.debts[13].marital_property } 
-      - "respondent_debt_nonmarital_14": ${ respondent.debts[13].marital_property } 
-      - "respondent_debt_both_14": ${ respondent.debts[13].marital_property } 
-      - "respondent_debt_14": ${ respondent.debts[13].lender } 
-      - "respondent_debt_balance_14": ${ respondent.debts[13].balance } 
-      - "respondent_monthly_payment_14": ${ respondent.debts[13].monthly_payment } 
-      - "respondent_debt_type_14": ${ respondent.debts[13].display_name } 
-      - "respondent_debt_marital_15": ${ respondent.debts[14].marital_property } 
-      - "respondent_debt_nonmarital_15": ${ respondent.debts[14].marital_property } 
-      - "respondent_debt_both_15": ${ respondent.debts[14].marital_property } 
-      - "respondent_debt_15": ${ respondent.debts[14].lender } 
-      - "respondent_debt_balance_15": ${ respondent.debts[14].balance } 
-      - "respondent_monthly_payment_15": ${ respondent.debts[14].monthly_payment } 
-      - "respondent_debt_type_15": ${ respondent.debts[14].display_name } 
-      - "petitioner_lack_jurisdiction": ${ maintenance_to_petitioner == "no_jurisdiction" } 
-      - "no_maintenance_by_respondent": ${ maintenance_to_petitioner == "none" } 
-      - "respondent_maintenance": ${ maintenance_to_petitioner_amount } 
-      - "petitioner_maintenance_sum": ${ maintenance_to_petitioner == "ordered_to_pay" } 
-      - "petitioner_maintenance_modification_allowed": ${ maintenance_to_petitioner_modifiable } 
-      - "petitioner_maintenance_no_modification": ${ not maintenance_to_petitioner_modifiable } 
-      - "respondent_lack_jurisdiction": ${ maintenance_to_respondent == "no_jurisdiction" } 
-      - "no_maintenance_by_petitioner": ${ maintenance_to_respondent == "none" } 
-      - "petitioner_maintenance": ${ maintenance_to_respondent_amount } 
-      - "respondent_maintenance_sum": ${ maintenance_to_respondent == "ordered_to_pay" } 
-      - "respondent_maintenance_modification_allowed": ${ maintenance_to_respondent_modifiable } 
-      - "respondent_maintenance_no_modification": ${ not maintenance_to_respondent_modifiable } 
+      - "petitioner_debt_marital_1": |
+          % if len(petitioner.debts) > 0:
+          ${ petitioner.debts[0].marital_property == "Marital" }
+          % endif
+      - "petitioner_debt_nonmarital_1": |
+          % if len(petitioner.debts) > 0:
+          ${ petitioner.debts[0].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_debt_both_1": |
+          % if len(petitioner.debts) > 0:
+          ${ petitioner.debts[0].marital_property == "Both" }
+          % endif
+      - "petitioner_debt_1": |
+          % if len(petitioner.debts) > 0:
+          ${ petitioner.debts[0].lender }
+          % endif
+      - "petitioner_debt_balance_1": |
+          % if len(petitioner.debts) > 0:
+          ${ petitioner.debts[0].balance }
+          % endif
+      - "petitioner_monthly_payment_1": |
+          % if len(petitioner.debts) > 0:
+          ${ petitioner.debts[0].monthly_payment }
+          % endif
+      - "petitioner_debt_type_1": |
+          % if len(petitioner.debts) > 0:
+          ${ petitioner.debts[0].description }
+          % endif
+      - "petitioner_debt_marital_2": |
+          % if len(petitioner.debts) > 1:
+          ${ petitioner.debts[1].marital_property == "Marital" }
+          % endif
+      - "petitioner_debt_nonmarital_2": |
+          % if len(petitioner.debts) > 1:
+          ${ petitioner.debts[1].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_debt_both_2": |
+          % if len(petitioner.debts) > 1:
+          ${ petitioner.debts[1].marital_property == "Both" }
+          % endif
+      - "petitioner_debt_2": |
+          % if len(petitioner.debts) > 1:
+          ${ petitioner.debts[1].lender }
+          % endif
+      - "petitioner_debt_balance_2": |
+          % if len(petitioner.debts) > 1:
+          ${ petitioner.debts[1].balance }
+          % endif
+      - "petitioner_monthly_payment_2": |
+          % if len(petitioner.debts) > 1:
+          ${ petitioner.debts[1].monthly_payment }
+          % endif
+      - "petitioner_debt_type_2": |
+          % if len(petitioner.debts) > 1:
+          ${ petitioner.debts[1].description }
+          % endif
+      - "petitioner_debt_marital_3": |
+          % if len(petitioner.debts) > 2:
+          ${ petitioner.debts[2].marital_property == "Marital" }
+          % endif
+      - "petitioner_debt_nonmarital_3": |
+          % if len(petitioner.debts) > 2:
+          ${ petitioner.debts[2].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_debt_both_3": |
+          % if len(petitioner.debts) > 2:
+          ${ petitioner.debts[2].marital_property == "Both" }
+          % endif
+      - "petitioner_debt_3": |
+          % if len(petitioner.debts) > 2:
+          ${ petitioner.debts[2].lender }
+          % endif
+      - "petitioner_debt_balance_3": |
+          % if len(petitioner.debts) > 2:
+          ${ petitioner.debts[2].balance }
+          % endif
+      - "petitioner_monthly_payment_3": |
+          % if len(petitioner.debts) > 2:
+          ${ petitioner.debts[2].monthly_payment }
+          % endif
+      - "petitioner_debt_type_3": |
+          % if len(petitioner.debts) > 2:
+          ${ petitioner.debts[2].description }
+          % endif
+      - "petitioner_debt_marital_4": |
+          % if len(petitioner.debts) > 3:
+          ${ petitioner.debts[3].marital_property == "Marital" }
+          % endif
+      - "petitioner_debt_nonmarital_4": |
+          % if len(petitioner.debts) > 3:
+          ${ petitioner.debts[3].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_debt_both_4": |
+          % if len(petitioner.debts) > 3:
+          ${ petitioner.debts[3].marital_property == "Both" }
+          % endif
+      - "petitioner_debt_4": |
+          % if len(petitioner.debts) > 3:
+          ${ petitioner.debts[3].lender }
+          % endif
+      - "petitioner_debt_balance_4": |
+          % if len(petitioner.debts) > 3:
+          ${ petitioner.debts[3].balance }
+          % endif
+      - "petitioner_monthly_payment_4": |
+          % if len(petitioner.debts) > 3:
+          ${ petitioner.debts[3].monthly_payment }
+          % endif
+      - "petitioner_debt_type_4": |
+          % if len(petitioner.debts) > 3:
+          ${ petitioner.debts[3].description }
+          % endif
+      - "petitioner_debt_marital_5": |
+          % if len(petitioner.debts) > 4:
+          ${ petitioner.debts[4].marital_property == "Marital" }
+          % endif
+      - "petitioner_debt_nonmarital_4": |
+          % if len(petitioner.debts) > 4:
+          ${ petitioner.debts[4].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_debt_both_5": |
+          % if len(petitioner.debts) > 4:
+          ${ petitioner.debts[4].marital_property == "Both" }
+          % endif
+      - "petitioner_debt_5": |
+          % if len(petitioner.debts) > 4:
+          ${ petitioner.debts[4].lender }
+          % endif
+      - "petitioner_debt_balance_5": |
+          % if len(petitioner.debts) > 4:
+          ${ petitioner.debts[4].balance }
+          % endif
+      - "petitioner_monthly_payment_5": |
+          % if len(petitioner.debts) > 4:
+          ${ petitioner.debts[4].monthly_payment }
+          % endif
+      - "petitioner_debt_type_5": |
+          % if len(petitioner.debts) > 4:
+          ${ petitioner.debts[4].description }
+          % endif
+      - "petitioner_debt_marital_6": |
+          % if len(petitioner.debts) > 5:
+          ${ petitioner.debts[5].marital_property == "Marital" }
+          % endif
+      - "petitioner_debt_nonmarital_6": |
+          % if len(petitioner.debts) > 5:
+          ${ petitioner.debts[5].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_debt_both_6": |
+          % if len(petitioner.debts) > 5:
+          ${ petitioner.debts[5].marital_property == "Both" }
+          % endif
+      - "petitioner_debt_6": |
+          % if len(petitioner.debts) > 5:
+          ${ petitioner.debts[5].lender }
+          % endif
+      - "petitioner_debt_balance_6": |
+          % if len(petitioner.debts) > 5:
+          ${ petitioner.debts[5].balance }
+          % endif
+      - "petitioner_monthly_payment_6": |
+          % if len(petitioner.debts) > 5:
+          ${ petitioner.debts[5].monthly_payment }
+          % endif
+      - "petitioner_debt_type_6": |
+          % if len(petitioner.debts) > 5:
+          ${ petitioner.debts[5].description }
+          % endif
+      - "petitioner_debt_marital_7": |
+          % if len(petitioner.debts) > 6:
+          ${ petitioner.debts[6].marital_property == "Marital" }
+          % endif
+      - "petitioner_debt_nonmarital_7": |
+          % if len(petitioner.debts) > 6:
+          ${ petitioner.debts[6].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_debt_both_7": |
+          % if len(petitioner.debts) > 6:
+          ${ petitioner.debts[6].marital_property == "Both" }
+          % endif
+      - "petitioner_debt_7": |
+          % if len(petitioner.debts) > 6:
+          ${ petitioner.debts[6].lender }
+          % endif
+      - "petitioner_debt_balance_7": |
+          % if len(petitioner.debts) > 6:
+          ${ petitioner.debts[6].balance }
+          % endif
+      - "petitioner_monthly_payment_7": |
+          % if len(petitioner.debts) > 6:
+          ${ petitioner.debts[6].monthly_payment }
+          % endif
+      - "petitioner_debt_type_7": |
+          % if len(petitioner.debts) > 6:
+          ${ petitioner.debts[6].description }
+          % endif
+      - "petitioner_debt_marital_8": |
+          % if len(petitioner.debts) > 7:
+          ${ petitioner.debts[7].marital_property == "Marital" }
+          % endif
+      - "petitioner_debt_nonmarital_8": |
+          % if len(petitioner.debts) > 7:
+          ${ petitioner.debts[7].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_debt_both_8": |
+          % if len(petitioner.debts) > 7:
+          ${ petitioner.debts[7].marital_property == "Both" }
+          % endif
+      - "petitioner_debt_8": |
+          % if len(petitioner.debts) > 7:
+          ${ petitioner.debts[7].lender }
+          % endif
+      - "petitioner_debt_balance_8": |
+          % if len(petitioner.debts) > 7:
+          ${ petitioner.debts[7].balance }
+          % endif
+      - "petitioner_monthly_payment_8": |
+          % if len(petitioner.debts) > 7:
+          ${ petitioner.debts[7].monthly_payment }
+          % endif
+      - "petitioner_debt_type_8": |
+          % if len(petitioner.debts) > 7:
+          ${ petitioner.debts[7].description }
+          % endif
+      - "petitioner_debt_marital_9": |
+          % if len(petitioner.debts) > 8:
+          ${ petitioner.debts[8].marital_property == "Marital" }
+          % endif
+      - "petitioner_debt_nonmarital_9": |
+          % if len(petitioner.debts) > 8:
+          ${ petitioner.debts[8].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_debt_both_9": |
+          % if len(petitioner.debts) > 8:
+          ${ petitioner.debts[8].marital_property == "Both" }
+          % endif
+      - "petitioner_debt_9": |
+          % if len(petitioner.debts) > 8:
+          ${ petitioner.debts[8].lender }
+          % endif
+      - "petitioner_debt_balance_9": |
+          % if len(petitioner.debts) > 8:
+          ${ petitioner.debts[8].balance }
+          % endif
+      - "petitioner_monthly_payment_9": |
+          % if len(petitioner.debts) > 8:
+          ${ petitioner.debts[8].monthly_payment }
+          % endif
+      - "petitioner_debt_type_9": |
+          % if len(petitioner.debts) > 8:
+          ${ petitioner.debts[8].description }
+          % endif
+      - "petitioner_debt_marital_10": |
+          % if len(petitioner.debts) > 9:
+          ${ petitioner.debts[9].marital_property == "Marital" }
+          % endif
+      - "petitioner_debt_nonmarital_10": |
+          % if len(petitioner.debts) > 9:
+          ${ petitioner.debts[9].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_debt_both_10": |
+          % if len(petitioner.debts) > 9:
+          ${ petitioner.debts[9].marital_property == "Both" }
+          % endif
+      - "petitioner_debt_10": |
+          % if len(petitioner.debts) > 9:
+          ${ petitioner.debts[9].lender }
+          % endif
+      - "petitioner_debt_balance_10": |
+          % if len(petitioner.debts) > 9:
+          ${ petitioner.debts[9].balance }
+          % endif
+      - "petitioner_monthly_payment_10": |
+          % if len(petitioner.debts) > 9:
+          ${ petitioner.debts[9].monthly_payment }
+          % endif
+      - "petitioner_debt_type_10": |
+          % if len(petitioner.debts) > 9:
+          ${ petitioner.debts[9].description }
+          % endif
+      - "petitioner_debt_marital_11": |
+          % if len(petitioner.debts) > 10:
+          ${ petitioner.debts[10].marital_property == "Marital" }
+          % endif
+      - "petitioner_debt_nonmarital_11": |
+          % if len(petitioner.debts) > 10:
+          ${ petitioner.debts[10].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_debt_both_11": |
+          % if len(petitioner.debts) > 10:
+          ${ petitioner.debts[10].marital_property == "Both" }
+          % endif
+      - "petitioner_debt_11": |
+          % if len(petitioner.debts) > 10:
+          ${ petitioner.debts[10].lender }
+          % endif
+      - "petitioner_debt_balance_11": |
+          % if len(petitioner.debts) > 10:
+          ${ petitioner.debts[10].balance }
+          % endif
+      - "petitioner_monthly_payment_11": |
+          % if len(petitioner.debts) > 10:
+          ${ petitioner.debts[10].monthly_payment }
+          % endif
+      - "petitioner_debt_type_11": |
+          % if len(petitioner.debts) > 10:
+          ${ petitioner.debts[10].description }
+          % endif
+      - "petitioner_debt_marital_12": |
+          % if len(petitioner.debts) > 11:
+          ${ petitioner.debts[11].marital_property == "Marital" }
+          % endif
+      - "petitioner_debt_nonmarital_12": |
+          % if len(petitioner.debts) > 11:
+          ${ petitioner.debts[11].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_debt_both_12": |
+          % if len(petitioner.debts) > 11:
+          ${ petitioner.debts[11].marital_property == "Both" }
+          % endif
+      - "petitioner_debt_12": |
+          % if len(petitioner.debts) > 11:
+          ${ petitioner.debts[11].lender }
+          % endif
+      - "petitioner_debt_balance_12": |
+          % if len(petitioner.debts) > 11:
+          ${ petitioner.debts[11].balance }
+          % endif
+      - "petitioner_monthly_payment_12": |
+          % if len(petitioner.debts) > 11:
+          ${ petitioner.debts[11].monthly_payment }
+          % endif
+      - "petitioner_debt_type_12": |
+          % if len(petitioner.debts) > 11:
+          ${ petitioner.debts[11].description }
+          % endif
+      - "petitioner_debt_marital_13": |
+          % if len(petitioner.debts) > 12:
+          ${ petitioner.debts[12].marital_property == "Marital" }
+          % endif
+      - "petitioner_debt_nonmarital_13": |
+          % if len(petitioner.debts) > 12:
+          ${ petitioner.debts[12].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_debt_both_13": |
+          % if len(petitioner.debts) > 12:
+          ${ petitioner.debts[12].marital_property == "Both" }
+          % endif
+      - "petitioner_debt_13": |
+          % if len(petitioner.debts) > 12:
+          ${ petitioner.debts[12].lender }
+          % endif
+      - "petitioner_debt_balance_13": |
+          % if len(petitioner.debts) > 12:
+          ${ petitioner.debts[12].balance }
+          % endif
+      - "petitioner_monthly_payment_13": |
+          % if len(petitioner.debts) > 12:
+          ${ petitioner.debts[12].monthly_payment }
+          % endif
+      - "petitioner_debt_type_13": |
+          % if len(petitioner.debts) > 12:
+          ${ petitioner.debts[12].description }
+          % endif
+      - "petitioner_debt_marital_14": |
+          % if len(petitioner.debts) > 13:
+          ${ petitioner.debts[13].marital_property == "Marital" }
+          % endif
+      - "petitioner_debt_nonmarital_14": |
+          % if len(petitioner.debts) > 13:
+          ${ petitioner.debts[13].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_debt_both_14": |
+          % if len(petitioner.debts) > 13:
+          ${ petitioner.debts[13].marital_property == "Both" }
+          % endif
+      - "petitioner_debt_14": |
+          % if len(petitioner.debts) > 13:
+          ${ petitioner.debts[13].lender }
+          % endif
+      - "petitioner_debt_balance_14": |
+          % if len(petitioner.debts) > 13:
+          ${ petitioner.debts[13].balance }
+          % endif
+      - "petitioner_monthly_payment_14": |
+          % if len(petitioner.debts) > 13:
+          ${ petitioner.debts[13].monthly_payment }
+          % endif
+      - "petitioner_debt_type_14": |
+          % if len(petitioner.debts) > 13:
+          ${ petitioner.debts[13].description }
+          % endif
+      - "petitioner_debt_marital_15": |
+          % if len(petitioner.debts) > 14:
+          ${ petitioner.debts[14].marital_property == "Marital" }
+          % endif
+      - "petitioner_debt_nonmarital_15": |
+          % if len(petitioner.debts) > 14:
+          ${ petitioner.debts[14].marital_property == "Nonmarital" }
+          % endif
+      - "petitioner_debt_both_15": |
+          % if len(petitioner.debts) > 14:
+          ${ petitioner.debts[14].marital_property == "Both" }
+          % endif
+      - "petitioner_debt_15": |
+          % if len(petitioner.debts) > 14:
+          ${ petitioner.debts[14].lender }
+          % endif
+      - "petitioner_debt_balance_15": |
+          % if len(petitioner.debts) > 14:
+          ${ petitioner.debts[14].balance }
+          % endif
+      - "petitioner_monthly_payment_15": |
+          % if len(petitioner.debts) > 14:
+          ${ petitioner.debts[14].monthly_payment }
+          % endif
+      - "petitioner_debt_type_15": |
+          % if len(petitioner.debts) > 14:
+          ${ petitioner.debts[14].description }
+          % endif
+      - "respondent_debt_marital_1": |
+          % if len(respondent.debts) > 0:
+          ${ respondent.debts[0].marital_property == "Marital" }
+          % endif
+      - "respondent_debt_nonmarital_1": |
+          % if len(respondent.debts) > 0:
+          ${ respondent.debts[0].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_debt_both_1": |
+          % if len(respondent.debts) > 0:
+          ${ respondent.debts[0].marital_property == "Both" }
+          % endif
+      - "respondent_debt_1": |
+          % if len(respondent.debts) > 0:
+          ${ respondent.debts[0].lender }
+          % endif
+      - "respondent_debt_balance_1": |
+          % if len(respondent.debts) > 0:
+          ${ respondent.debts[0].balance }
+          % endif
+      - "respondent_monthly_payment_1": |
+          % if len(respondent.debts) > 0:
+          ${ respondent.debts[0].monthly_payment }
+          % endif
+      - "respondent_debt_type_1": |
+          % if len(respondent.debts) > 0:
+          ${ respondent.debts[0].description }
+          % endif
+      - "respondent_debt_marital_2": |
+          % if len(respondent.debts) > 1:
+          ${ respondent.debts[1].marital_property == "Marital" }
+          % endif
+      - "respondent_debt_nonmarital_2": |
+          % if len(respondent.debts) > 1:
+          ${ respondent.debts[1].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_debt_both_2": |
+          % if len(respondent.debts) > 1:
+          ${ respondent.debts[1].marital_property == "Both" }
+          % endif
+      - "respondent_debt_2": |
+          % if len(respondent.debts) > 1:
+          ${ respondent.debts[1].lender }
+          % endif
+      - "respondent_debt_balance_2": |
+          % if len(respondent.debts) > 1:
+          ${ respondent.debts[1].balance }
+          % endif
+      - "respondent_monthly_payment_2": |
+          % if len(respondent.debts) > 1:
+          ${ respondent.debts[1].monthly_payment }
+          % endif
+      - "respondent_debt_type_2": |
+          % if len(respondent.debts) > 1:
+          ${ respondent.debts[1].description }
+          % endif
+      - "respondent_debt_marital_3": |
+          % if len(respondent.debts) > 2:
+          ${ respondent.debts[2].marital_property == "Marital" }
+          % endif
+      - "respondent_debt_nonmarital_3": |
+          % if len(respondent.debts) > 2:
+          ${ respondent.debts[2].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_debt_both_3": |
+          % if len(respondent.debts) > 2:
+          ${ respondent.debts[2].marital_property == "Both" }
+          % endif
+      - "respondent_debt_3": |
+          % if len(respondent.debts) > 2:
+          ${ respondent.debts[2].lender }
+          % endif
+      - "respondent_debt_balance_3": |
+          % if len(respondent.debts) > 2:
+          ${ respondent.debts[2].balance }
+          % endif
+      - "respondent_monthly_payment_3": |
+          % if len(respondent.debts) > 2:
+          ${ respondent.debts[2].monthly_payment }
+          % endif
+      - "respondent_debt_type_3": |
+          % if len(respondent.debts) > 2:
+          ${ respondent.debts[2].description }
+          % endif
+      - "respondent_debt_marital_4": |
+          % if len(respondent.debts) > 3:
+          ${ respondent.debts[3].marital_property == "Marital" }
+          % endif
+      - "respondent_debt_nonmarital_4": |
+          % if len(respondent.debts) > 3:
+          ${ respondent.debts[3].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_debt_both_4": |
+          % if len(respondent.debts) > 3:
+          ${ respondent.debts[3].marital_property == "Both" }
+          % endif
+      - "respondent_debt_4": |
+          % if len(respondent.debts) > 3:
+          ${ respondent.debts[3].lender }
+          % endif
+      - "respondent_debt_balance_4": |
+          % if len(respondent.debts) > 3:
+          ${ respondent.debts[3].balance }
+          % endif
+      - "respondent_monthly_payment_4": |
+          % if len(respondent.debts) > 3:
+          ${ respondent.debts[3].monthly_payment }
+          % endif
+      - "respondent_debt_type_4": |
+          % if len(respondent.debts) > 3:
+          ${ respondent.debts[3].description }
+          % endif
+      - "respondent_debt_marital_5": |
+          % if len(respondent.debts) > 4:
+          ${ respondent.debts[4].marital_property == "Marital" }
+          % endif
+      - "respondent_debt_nonmarital_5": |
+          % if len(respondent.debts) > 4:
+          ${ respondent.debts[4].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_debt_both_5": |
+          % if len(respondent.debts) > 4:
+          ${ respondent.debts[4].marital_property == "Both" }
+          % endif
+      - "respondent_debt_5": |
+          % if len(respondent.debts) > 4:
+          ${ respondent.debts[4].lender }
+          % endif
+      - "respondent_debt_balance_5": |
+          % if len(respondent.debts) > 4:
+          ${ respondent.debts[4].balance }
+          % endif
+      - "respondent_monthly_payment_5": |
+          % if len(respondent.debts) > 4:
+          ${ respondent.debts[4].monthly_payment }
+          % endif
+      - "respondent_debt_type_5": |
+          % if len(respondent.debts) > 4:
+          ${ respondent.debts[4].description }
+          % endif
+      - "respondent_debt_marital_6": |
+          % if len(respondent.debts) > 5:
+          ${ respondent.debts[5].marital_property == "Marital" }
+          % endif
+      - "respondent_debt_nonmarital_6": |
+          % if len(respondent.debts) > 5:
+          ${ respondent.debts[5].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_debt_both_6": |
+          % if len(respondent.debts) > 5:
+          ${ respondent.debts[5].marital_property == "Both" }
+          % endif
+      - "respondent_debt_6": |
+          % if len(respondent.debts) > 5:
+          ${ respondent.debts[5].lender }
+          % endif
+      - "respondent_debt_balance_6": |
+          % if len(respondent.debts) > 5:
+          ${ respondent.debts[5].balance }
+          % endif
+      - "respondent_monthly_payment_6": |
+          % if len(respondent.debts) > 5:
+          ${ respondent.debts[5].monthly_payment }
+          % endif
+      - "respondent_debt_type_6": |
+          % if len(respondent.debts) > 5:
+          ${ respondent.debts[5].description }
+          % endif
+      - "respondent_debt_marital_7": |
+          % if len(respondent.debts) > 6:
+          ${ respondent.debts[6].marital_property == "Marital" }
+          % endif
+      - "respondent_debt_nonmarital_7": |
+          % if len(respondent.debts) > 6:
+          ${ respondent.debts[6].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_debt_both_7": |
+          % if len(respondent.debts) > 6:
+          ${ respondent.debts[6].marital_property == "Both" }
+          % endif
+      - "respondent_debt_7": |
+          % if len(respondent.debts) > 6:
+          ${ respondent.debts[6].lender }
+          % endif
+      - "respondent_debt_balance_10": |
+          % if len(respondent.debts) > 6:
+          ${ respondent.debts[6].balance }
+          % endif
+      - "respondent_monthly_payment_7": |
+          % if len(respondent.debts) > 6:
+          ${ respondent.debts[6].monthly_payment }
+          % endif
+      - "respondent_debt_type_7": |
+          % if len(respondent.debts) > 6:
+          ${ respondent.debts[6].description }
+          % endif
+      - "respondent_debt_marital_8": |
+          % if len(respondent.debts) > 7:
+          ${ respondent.debts[7].marital_property == "Marital" }
+          % endif
+      - "respondent_debt_nonmarital_8": |
+          % if len(respondent.debts) > 7:
+          ${ respondent.debts[7].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_debt_both_8": |
+          % if len(respondent.debts) > 7:
+          ${ respondent.debts[7].marital_property == "Both" }
+          % endif
+      - "respondent_debt_8": |
+          % if len(respondent.debts) > 7:
+          ${ respondent.debts[7].lender }
+          % endif
+      - "respondent_debt_balance_8": |
+          % if len(respondent.debts) > 7:
+          ${ respondent.debts[7].balance }
+          % endif
+      - "respondent_monthly_payment_8": |
+          % if len(respondent.debts) > 7:
+          ${ respondent.debts[7].monthly_payment }
+          % endif
+      - "respondent_debt_type_8": |
+          % if len(respondent.debts) > 7:
+          ${ respondent.debts[7].description }
+          % endif
+      - "respondent_debt_marital_9": |
+          % if len(respondent.debts) > 8:
+          ${ respondent.debts[8].marital_property == "Marital" }
+          % endif
+      - "respondent_debt_nonmarital_9": |
+          % if len(respondent.debts) > 8:
+          ${ respondent.debts[8].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_debt_both_9": |
+          % if len(respondent.debts) > 8:
+          ${ respondent.debts[8].marital_property == "Both" }
+          % endif
+      - "respondent_debt_9": |
+          % if len(respondent.debts) > 8:
+          ${ respondent.debts[8].lender }
+          % endif
+      - "respondent_debt_balance_9": |
+          % if len(respondent.debts) > 8:
+          ${ respondent.debts[8].balance }
+          % endif
+      - "respondent_monthly_payment_9": |
+          % if len(respondent.debts) > 8:
+          ${ respondent.debts[8].monthly_payment }
+          % endif
+      - "respondent_debt_type_9": |
+          % if len(respondent.debts) > 8:
+          ${ respondent.debts[8].description }
+          % endif
+      - "respondent_debt_marital_10": |
+          % if len(respondent.debts) > 9:
+          ${ respondent.debts[9].marital_property == "Marital" }
+          % endif
+      - "respondent_debt_nonmarital_10": |
+          % if len(respondent.debts) > 9:
+          ${ respondent.debts[9].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_debt_both_10": |
+          % if len(respondent.debts) > 9:
+          ${ respondent.debts[9].marital_property == "Both" }
+          % endif
+      - "respondent_debt_10": |
+          % if len(respondent.debts) > 9:
+          ${ respondent.debts[9].lender }
+          % endif
+      - "respondent_debt_balance_10": |
+          % if len(respondent.debts) > 9:
+          ${ respondent.debts[9].balance }
+          % endif
+      - "respondent_monthly_payment_10": |
+          % if len(respondent.debts) > 9:
+          ${ respondent.debts[9].monthly_payment }
+          % endif
+      - "respondent_debt_type_10": |
+          % if len(respondent.debts) > 9:
+          ${ respondent.debts[9].description }
+          % endif
+      - "respondent_debt_marital_11": |
+          % if len(respondent.debts) > 10:
+          ${ respondent.debts[10].marital_property == "Marital" }
+          % endif
+      - "respondent_debt_nonmarital_11": |
+          % if len(respondent.debts) > 10:
+          ${ respondent.debts[10].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_debt_both_11": |
+          % if len(respondent.debts) > 10:
+          ${ respondent.debts[10].marital_property == "Both" }
+          % endif
+      - "respondent_debt_11": |
+          % if len(respondent.debts) > 10:
+          ${ respondent.debts[10].lender }
+          % endif
+      - "respondent_debt_balance_11": |
+          % if len(respondent.debts) > 10:
+          ${ respondent.debts[10].balance }
+          % endif
+      - "respondent_monthly_payment_11": |
+          % if len(respondent.debts) > 10:
+          ${ respondent.debts[10].monthly_payment }
+          % endif
+      - "respondent_debt_type_11": |
+          % if len(respondent.debts) > 10:
+          ${ respondent.debts[10].description }
+          % endif
+      - "respondent_debt_marital_12": |
+          % if len(respondent.debts) > 11:
+          ${ respondent.debts[11].marital_property == "Marital" }
+          % endif
+      - "respondent_debt_nonmarital_12": |
+          % if len(respondent.debts) > 11:
+          ${ respondent.debts[11].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_debt_both_12": |
+          % if len(respondent.debts) > 11:
+          ${ respondent.debts[11].marital_property == "Both" }
+          % endif
+      - "respondent_debt_12": |
+          % if len(respondent.debts) > 11:
+          ${ respondent.debts[11].lender }
+          % endif
+      - "respondent_debt_balance_12": |
+          % if len(respondent.debts) > 11:
+          ${ respondent.debts[11].balance }
+          % endif
+      - "respondent_monthly_payment_12": |
+          % if len(respondent.debts) > 11:
+          ${ respondent.debts[11].monthly_payment }
+          % endif
+      - "respondent_debt_type_12": |
+          % if len(respondent.debts) > 11:
+          ${ respondent.debts[11].description }
+          % endif
+      - "respondent_debt_marital_13": |
+          % if len(respondent.debts) > 12:
+          ${ respondent.debts[12].marital_property == "Marital" }
+          % endif
+      - "respondent_debt_nonmarital_13": |
+          % if len(respondent.debts) > 12:
+          ${ respondent.debts[12].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_debt_both_13": |
+          % if len(respondent.debts) > 12:
+          ${ respondent.debts[12].marital_property == "Both" }
+          % endif
+      - "respondent_debt_13": |
+          % if len(respondent.debts) > 12:
+          ${ respondent.debts[12].lender }
+          % endif
+      - "respondent_debt_balance_13": |
+          % if len(respondent.debts) > 12:
+          ${ respondent.debts[12].balance }
+          % endif
+      - "respondent_monthly_payment_13": |
+          % if len(respondent.debts) > 12:
+          ${ respondent.debts[12].monthly_payment }
+          % endif
+      - "respondent_debt_type_13": |
+          % if len(respondent.debts) > 12:
+          ${ respondent.debts[12].description }
+          % endif
+      - "respondent_debt_marital_14": |
+          % if len(respondent.debts) > 13:
+          ${ respondent.debts[13].marital_property == "Marital" }
+          % endif
+      - "respondent_debt_nonmarital_14": |
+          % if len(respondent.debts) > 13:
+          ${ respondent.debts[13].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_debt_both_14": |
+          % if len(respondent.debts) > 13:
+          ${ respondent.debts[13].marital_property == "Both" }
+          % endif
+      - "respondent_debt_14": |
+          % if len(respondent.debts) > 13:
+          ${ respondent.debts[13].lender }
+          % endif
+      - "respondent_debt_balance_14": |
+          % if len(respondent.debts) > 13:
+          ${ respondent.debts[13].balance }
+          % endif
+      - "respondent_monthly_payment_14": |
+          % if len(respondent.debts) > 13:
+          ${ respondent.debts[13].monthly_payment }
+          % endif
+      - "respondent_debt_type_14": |
+          % if len(respondent.debts) > 13:
+          ${ respondent.debts[13].description }
+          % endif
+      - "respondent_debt_marital_15": |
+          % if len(respondent.debts) > 14:
+          ${ respondent.debts[14].marital_property == "Marital" }
+          % endif
+      - "respondent_debt_nonmarital_15": |
+          % if len(respondent.debts) > 14:
+          ${ respondent.debts[14].marital_property == "Nonmarital" }
+          % endif
+      - "respondent_debt_both_15": |
+          % if len(respondent.debts) > 14:
+          ${ respondent.debts[14].marital_property == "Both" }
+          % endif
+      - "respondent_debt_15": |
+          % if len(respondent.debts) > 14:
+          ${ respondent.debts[14].lender }
+          % endif
+      - "respondent_debt_balance_15": |
+          % if len(respondent.debts) > 14:
+          ${ respondent.debts[14].balance }
+          % endif
+      - "respondent_monthly_payment_15": |
+          % if len(respondent.debts) > 14:
+          ${ respondent.debts[14].monthly_payment }
+          % endif
+      - "respondent_debt_type_15": |
+          % if len(respondent.debts) > 14:
+          ${ respondent.debts[14].description }
+          % endif
+      - "petitioner_lack_jurisdiction": ${ False } 
+      - "no_maintenance_by_respondent": ${ not is_maintenance_award or not maintenance_awarded_to == "petitioner" } 
+      - "respondent_maintenance": |
+          % if maintenance_awarded_to == "petitioner":
+          ${ maintenance_amount } 
+          % endif
+      - "petitioner_maintenance_sum": ${ maintenance_awarded_to == "petitioner" } 
+      - "petitioner_maintenance_modification_allowed": ${  maintenance_awarded_to == "petitioner" and maintenance_income_withholding } 
+      - "petitioner_maintenance_no_modification": ${ maintenance_awarded_to == "petitioner" and not maintenance_income_withholding } 
+      - "respondent_lack_jurisdiction": ${ not respondent.lives_in_missouri and not marriage.live_together_in_mo } 
+      - "no_maintenance_by_petitioner": ${ not is_maintenance_award or not maintenance_awarded_to == "respondent" } 
+      - "petitioner_maintenance": |
+          % if maintenance_awarded_to == "respondent":
+          ${ maintenance_amount }
+          % endif
+      - "respondent_maintenance_sum": ${ maintenance_awarded_to == "respondent" } 
+      - "respondent_maintenance_modification_allowed": ${ maintenance_awarded_to == "respondent" and maintenance_income_withholding } 
+      - "respondent_maintenance_no_modification": ${ maintenance_awarded_to == "respondent" and not maintenance_income_withholding } 
       - "withhold_income": ${ maintenance_income_withholding } 
       - "no_withholding_income": ${ not maintenance_income_withholding } 
       - "no_withholding_reason_1": ${ maintenance_income_withholding_reason } 
       - "additional_provision_1": ${ additional_provisions } 
       - "oath_date": ${ notice_date } 
       - "party_service_1": ${ other_parties[0].name_full() } 
-      - "party_service_address_1": ${ other_parties[0].address.on_one_line() }
-          ${  other_parties[0].email } ${  other_parties[0].fax } 
+      - "party_service_address_1": |
+          ${ other_parties[0].address.on_one_line() }
+          %if defined('other_parties[0].email'):
+          ${  other_parties[0].email } 
+          %endif
+          %if defined('other_parties[0].fax'):
+          ${  other_parties[0].fax } 
+          %endif
       - "party_service_2": ${ other_parties[1].name_full() } 
-      - "party_service_address_2": ${ other_parties[1].address.on_one_line() }
-          ${  other_parties[1].email } ${  other_parties[1].fax } 
+      - "party_service_address_2": |
+          ${ other_parties[1].address.on_one_line() }
+          %if defined('other_parties[1].email'):
+          ${  other_parties[1].email } 
+          %endif
+          %if defined('other_parties[1].fax'):
+          ${  other_parties[1].fax } 
+          %endif
       - "party_service_3": ${ other_parties[2].name_full() } 
-      - "party_service_address_3": ${ other_parties[2].address.on_one_line() }
-          ${  other_parties[2].email } ${  other_parties[2].fax } 
+      - "party_service_address_3": |
+          ${ other_parties[2].address.on_one_line() }
+          %if defined('other_parties[2].email'):
+          ${  other_parties[2].email } 
+          %endif
+          %if defined('other_parties[0].fax'):
+          ${  other_parties[2].fax } 
+          %endif
       - "party_service_4": ${ other_parties[3].name_full() } 
-      - "party_service_address_4": ${ other_parties[3].address.on_one_line() }
-          ${  other_parties[3].email } ${  other_parties[3].fax } 
+      - "party_service_address_4": |
+          ${ other_parties[3].address.on_one_line() }
+          %if defined('other_parties[3].email'):
+          ${  other_parties[3].email } 
+          %endif
+          %if defined('other_parties[3].fax'):
+          ${  other_parties[3].fax } 
+          %endif
 ---
-

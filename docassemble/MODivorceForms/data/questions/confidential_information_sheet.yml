@@ -32,6 +32,9 @@ fields:
   - Party type description: x.party_type_description
     required: False
 ---
+code: |
+  case.case_name = petitioner.name.last + " v. " + respondent.name.last
+---
 objects:
   - confidential_information_sheet_attachment: ALDocument.using(title="Confidential Case Filing Information Sheet - Domestic Relations Cases", filename="confidential_information_sheet",  has_addendum=False, )
 ---
@@ -62,11 +65,11 @@ attachment:
     - "petitioner_name_first": ${ petitioner.name.first } 
     - "petitioner_name_last": ${ petitioner.name.last } 
     - "petitioner_name_middle": ${ petitioner.name.middle } 
-    - "petitioner_address_on_one_line()": ${ petitioner.address.on_one_line() } 
+    - "P_Address": ${ petitioner.address.line_one() } 
     - "petitioner_address_city": ${ petitioner.address.city } 
     - "petitioner_address_state": ${ petitioner.address.state } 
     - "petitioner_address_zip": ${ petitioner.address.zip } 
-    - "petitioner_phone": ${ petitioner.phone } 
+    - "petitioner_phone": ${ petitioner.phone_number } 
     - "petitioner_email": ${ petitioner.email } 
     - "petitioner_gender_female": ${ petitioner.gender == "female" } 
     - "petitioner_gender_male": ${ petitioner.gender == "male" } 
@@ -82,7 +85,7 @@ attachment:
     - "respondent_name_middle": ${ respondent.name.middle } 
     - "respondent_address_address": ${ respondent.address.address } 
     - "respondent_address_zip": ${ respondent.address.zip } 
-    - "respondent_phone": ${ respondent.phone } 
+    - "respondent_phone": ${ respondent.phone_number } 
     - "respondent_address_state": ${ respondent.address.state } 
     - "respondent_address_city": ${ respondent.address.city } 
     - "respondent_email": ${ respondent.email } 
@@ -131,20 +134,20 @@ attachment:
     - "other_parties2_attorney": ${ other_parties[2].attorney } 
     - "other_parties2_attorney_bar_number": ${ other_parties[2].attorney.bar_number } 
     - "other_parties2_attorney_party_type_code": ${ other_parties[2].attorney.party_type_code } 
-    - "petitioner_employersj_name_text": ${ petitioner.employers[j].name.text } 
-    - "petitioner_employersj_address_address": ${ petitioner.employers[j].address.address } 
-    - "petitioner_employersj_address_city": ${ petitioner.employers[j].address.city } 
-    - "petitioner_employersj_address_state": ${ petitioner.employers[j].address.state } 
-    - "petitioner_employersj_address_zip": ${ petitioner.employers[j].address.zip } 
-    - "petitioner_employersj_phone_number": ${ petitioner.employers[j].phone_number } 
-    - "petitioner_employersj_email": ${ petitioner.employers[j].email } 
-    - "respondent_employersj_name_text": ${ respondent.employers[j].name.text } 
-    - "respondent_employersj_address_address": ${ respondent.employers[j].address.address } 
-    - "respondent_employersj_address_city": ${ respondent.employers[j].address.city } 
-    - "respondent_employersj_address_state": ${ respondent.employers[j].address.state } 
-    - "respondent_employersj_address_zip": ${ respondent.employers[j].address.zip } 
-    - "respondent_employersj_phone_number": ${ respondent.employers[j].phone_number } 
-    - "respondent_employersj_email": ${ respondent.employers[j].email } 
+    - "petitioner_employersj_name_text": ${ petitioner.employer.name.text } 
+    - "petitioner_employersj_address_address": ${ petitioner.employer.address.address } 
+    - "petitioner_employersj_address_city": ${ petitioner.employer.address.city } 
+    - "petitioner_employersj_address_state": ${ petitioner.employer.address.state } 
+    - "petitioner_employersj_address_zip": ${ petitioner.employer.address.zip } 
+    - "petitioner_employersj_phone_number": ${ petitioner.employer.phone_number } 
+    - "petitioner_employersj_email": ${ petitioner.employer.email } 
+    - "respondent_employersj_name_text": ${ respondent.employer.name.text } 
+    - "respondent_employersj_address_address": ${ respondent.employer.address.address } 
+    - "respondent_employersj_address_city": ${ respondent.employer.address.city } 
+    - "respondent_employersj_address_state": ${ respondent.employer.address.state } 
+    - "respondent_employersj_address_zip": ${ respondent.employer.address.zip } 
+    - "respondent_employersj_phone_number": ${ respondent.employer.phone_number } 
+    - "respondent_employersj_email": ${ respondent.employer.email } 
     - "children0": ${ children[0].name_full() } 
     - "children0_ssn": ${ children[0].ssn } 
     - "children0_birthdate": ${ children[0].birthdate } 
