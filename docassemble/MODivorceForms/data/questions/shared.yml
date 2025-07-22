@@ -3012,7 +3012,7 @@ validation code: |
     respondent.maintenance_received = 0
     respondent.maintenance_paid = 0
 ---
-if: not relief['maintenance']
+if: not 'maintenance' in relief.true_values()
 code: |
   is_maintenance_award = False
   petitioner.maintenance_received = 0
