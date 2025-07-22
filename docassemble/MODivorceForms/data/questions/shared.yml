@@ -3085,7 +3085,7 @@ fields:
       variable: fill_in_service_date
       is: yes
 validation code: |
-  if as_datetime(service.date) < today():
+  if fill_in_service_date == "yes" and as_datetime(service.date) < today():
     validation_error("Please enter today's date or a date in the future.")
 ---
 id: Type of Service Question
