@@ -204,8 +204,8 @@ code: |
 
   
   users[0].address.address # petition
+  users[0].address.county
   if users[0].address.state == "MO":
-    users[0].address.county
     users[0].mo_length_of_residence_choice
   users[0].address.country
   if 'petition_attachment' in doc_list_selected.true_values():

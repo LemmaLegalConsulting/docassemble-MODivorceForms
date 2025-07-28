@@ -186,7 +186,7 @@ generic object: ALIndividual
 question: Address for ${ x.name_full() }
 fields:
   - code: |
-      x.address.address_fields()
+      x.address.address_fields(show_country=True,country_code="US")
   - Phone: x.phone_number
     required: False
   - Email: x.email
@@ -213,7 +213,7 @@ id: Users address
 question: Your address
 fields:
   - code: |
-      users[0].address.address_fields()
+      users[0].address.address_fields(show_country=True,country_code="US")
   - Phone: users[0].phone_number
     required: False
   - Email: users[0].email
@@ -227,12 +227,16 @@ id: Address
 question: Address for ${ other_parties[0].name_full() }
 fields:
   - code: |
-      other_parties[0].address.address_fields()
+      other_parties[0].address.address_fields(show_country=True,country_code="US")
   - Phone: other_parties[0].phone_number
     required: False
   - Email: other_parties[0].email
     required: False
     datatype: email
+---
+template: state_mismatch_warning
+content: |
+  You said that ${ other_parties[0].name.full() } lived in Missouri. [Click here if you want to change this](url_action('other_parties[0].lives_in_missouri')) , which may affect jurisdiction.
 ---
 id: Birth info
 generic object: ALIndividual
