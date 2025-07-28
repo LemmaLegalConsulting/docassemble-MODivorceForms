@@ -1299,8 +1299,8 @@ attachment:
       - "petitioners_middle_name": ${ petitioner.name.middle } 
       - "petitioners_last_name": ${ petitioner.name.last } 
       - "petitioners_suffix": ${ petitioner.name.suffix } 
-      - "respondents_middle_name": ${ respondent.name.last } 
-      - "respondents_last_name": ${ respondent.name.middle } 
+      - "respondents_middle_name": ${ respondent.name.middle } 
+      - "respondents_last_name": ${ respondent.name.last } 
       - "respondents_suffix": ${ respondent.name.suffix } 
       - "respondents_first_name": ${ respondent.name.first } 
       - "petitioner_own_real_estate_no": ${ len([item for item in real_estate if item.recommended_award ==  petitioner.name.full()]) == 0 } 
