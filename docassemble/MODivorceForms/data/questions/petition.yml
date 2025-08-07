@@ -254,13 +254,6 @@ question: What are the hours of employment for ${ x.name_full() }?
 fields:
   - no label: x.hours_of_employment
 ---
-id: number of previous petitions
-question: Petitions Filed
-fields:
-  - How many petitions have you filed in this case?: previous_petitions
-    datatype: integer
-    min: 1
----
 id: Petition for Dissolution of Marriage object
 objects:
   - petition_attachment: ALDocument.using(title="Petition for Dissolution of Marriage", filename="petition", has_addendum=False, )

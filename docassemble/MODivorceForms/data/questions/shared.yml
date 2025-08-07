@@ -47,6 +47,25 @@ code: |
     previous_petitions = 0
     user_started_case = True
 ---
+if: case.filed in ["user1_filed"]
+id: previous petitons
+question: Has ${ petitioner.name.full() } filed any petitions before the one you are answering?
+fields:
+  - no label: previous_petitions
+    choices:
+      - No, I am answering the first petition: 1
+      - Yes, ${ petitioner.name.full() } has filed once before this petition: 2
+      - Yes, ${ petitioner.name.full() } has filed twice before this petition: 3
+---
+if: case.filed in ["user0_filed"]
+id: number of previous petitions
+question: Petitions Filed
+fields:
+  - How many petitions have you filed in this case?: previous_petitions
+    datatype: integer
+    min: 1
+---
+---
 objects:
   - case: Thing
 

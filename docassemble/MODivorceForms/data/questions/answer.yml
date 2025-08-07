@@ -76,15 +76,6 @@ attachment:
   skip undefined: True
   pdf template file: answer.pdf
 --- 
-id: previous petitons
-question: Has ${ petitioner.name.full() } filed any petitions before the one you are answering?
-fields:
-  - no label: previous_petitions
-    choices:
-      - No, I am answering the first petition: 1
-      - Yes, ${ petitioner.name.full() } has filed once before this petition: 2
-      - Yes, ${ petitioner.name.full() } has filed twice before this petition: 3
----
 objects:
   - answer_attachment: ALDocument.using(title="Respondent's Answer to Petition for Dissolution of Marriage", filename="answer",  has_addendum=False, )
 ---
@@ -113,9 +104,9 @@ attachment:
       - "respondentsLastName": ${ respondent.name.last } 
       - "respondentsSuffixJrSrIII": ${ respondent.name.suffix } 
       - "divisionNumber": ${ case.division_number } 
-      - "raHowManyPetitions1": ${ previous_petitions == 1 } 
-      - "raHowManyPetitions2": ${ previous_petitions == 3 } 
-      - "raHowManyPetitions3": ${ previous_petitions == 2 } 
+      - "raHowManyPetitions1": ${ previous_petitions == "1" } 
+      - "raHowManyPetitions2": ${ previous_petitions == "2" } 
+      - "raHowManyPetitions3": ${ previous_petitions == "3" } 
       - "raDenials1": ${ denials } 
       - "raRespondentsStreet": ${ respondent.address.address } 
       - "raRespondentsZip": ${ respondent.address.zip } 
@@ -140,8 +131,8 @@ attachment:
       - "raLastFourSsnSecondChild": ${ children[1].ssn } 
       - "raSecondChildLastName": ${ children[1].name.last } 
       - "raSecondChildSuffix": ${ children[1].name.suffix } 
-      - "raThirdChildSuffix": ${ date_difference(as_datetime(children[2].name.suffix),today()).years } 
-      - "raThirdChildAge": ${ children[2].age } 
+      - "raThirdChildSuffix": ${ children[2].suffix } 
+      - "raThirdChildAge": ${ date_difference(as_datetime(children[2].name.suffix),today()).years } 
       - "raLastFourSsnThirdChild": ${ children[2].ssn } 
       - "raThirdChildFirstName": ${ children[2].name.first } 
       - "raThirdChildMiddleName": ${ children[2].name.middle } 
@@ -196,7 +187,7 @@ attachment:
       - "raParticipatedInOtherLitigationCustody2": ${ not other_litigation } 
       - "raAgreeWithParentingPlanOrNot1": ${ agree_with_parenting_plan } 
       - "raAgreeWithParentingPlanOrNot2": ${ not agree_with_parenting_plan } 
-      - "raRequestReliefDissolution": ${ relief['dissolution'] } 
+      - "raRequestReliefDissolution": ${ True } 
       - "raRequestReliefCustody": ${ relief['custody'] } 
       - "raRequestReliefSupportOfTheChildren": ${ relief['child_support'] } 
       - "raRequestReliefDivideMaritalPropertyAndDebts": ${ relief['divide_property'] } 
