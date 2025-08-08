@@ -141,8 +141,7 @@ columns:
   - Party with possession?: row_item.has_possession
   - Property awarded to: row_item.recommended_award
 edit:
-  - source
-  - value
+  - market_value
 ---
 id: generic table
 generic object: ALIndividual

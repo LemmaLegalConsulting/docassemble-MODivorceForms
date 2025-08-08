@@ -23,15 +23,6 @@ fields:
   - Email: x.employer.email
     datatype: email
 ---
-id: party type information
-generic object: ALIndividual
-question: Party information about ${ x.name_full() }
-fields:
-  - Party type code: x.party_type_code
-    required: False
-  - Party type description: x.party_type_description
-    required: False
----
 code: |
   case.case_name = petitioner.name.last + " v. " + respondent.name.last
 ---

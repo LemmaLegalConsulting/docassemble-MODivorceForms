@@ -57,8 +57,11 @@ question: Denials
 subquestion: |
   Any statement not specifically denied will be deemed admitted and you may not have the opportunity to disagree with this statement when the case is presented to the court.
 fields:
-  - Is there anything in the Petition that you deny?: denials
+  - Is there anything in the Petition that you deny?: denials_exist
+    datatype: yesnoradio
+  - Explain: denials
     datatype: area
+    show if: denials_exist
 ---
 id: Respondent's Answer to Petition for Dissolution of Marriage object
 objects:

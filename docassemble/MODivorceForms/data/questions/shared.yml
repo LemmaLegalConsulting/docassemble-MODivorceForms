@@ -596,6 +596,58 @@ fields:
       variable: x.attorney_involved
       is: True
 ---
+code: |
+  if case.filed in ["user0_filed", "not_yet"]:
+    if users[0].attorney_involved and users[0].type_of_assistance == "representation":
+      users[0].party_type_code = "PET"
+      users[0].party_type_description = "Petitioner (with attorney)"
+    else:
+      users[0].party_type_code = "PETP"
+      users[0].party_type_description = "Petitioner Acting Pro Se (with no attorney)"
+  else:
+    if users[0].attorney_involved and users[0].type_of_assistance == "representation":
+      users[0].party_type_code = "RES"
+      users[0].party_type_description = "Respondent (with attorney)"
+    else:
+      users[0].party_type_code = "RESP"
+      users[0].party_type_description = "Respondent Acting Pro Se (with no attorney)"
+---
+code: |
+  if case.filed in ["user1_filed"]:
+    if other_parties[0].attorney_involved and other_parties[0].type_of_assistance == "representation":
+      other_parties[0].party_type_code = "PET"
+      other_parties[0].party_type_description = "Petitioner (with attorney)"
+    else:
+      other_parties[0].party_type_code = "PETP"
+      other_parties[0].party_type_description = "Petitioner Acting Pro Se (with no attorney)"
+  else:
+    if other_parties[0].attorney_involved and other_parties[0].type_of_assistance == "representation":
+      other_parties[0].party_type_code = "RES"
+      other_parties[0].party_type_description = "Respondent (with attorney)"
+    else:
+      other_parties[0].party_type_code = "RESP"
+      other_parties[0].party_type_description = "Respondent Acting Pro Se (with no attorney)"
+---
+code: |
+  if case.filed in ["user0_filed", "not_yet"]:
+    users[0].attorney.party_type_code = "APET"
+    users[0].attorney.party_type_description = "Attorney for Petitioner"
+  else:
+    users[0].attorney.party_type_code = "ARES"
+    users[0].attorney.party_type_description = "Attorney for Respondent"
+---
+code: |
+  if case.filed in ["user1_filed"]:
+    other_parties[0].attorney.party_type_code = "APET"
+    other_parties[0].attorney.party_type_description = "Attorney for Petitioner"
+  else:
+    other_parties[0].attorney.party_type_code = "ARES"
+    other_parties[0].attorney.party_type_description = "Attorney for Respondent"
+---
+code: |
+  children[i].party_type_code = "CHLD"
+  children[i].party_type_description = "Child"
+---
 ## CHILDREN ##
 objects:
   - children: ALPeopleList.using(complete_attribute='complete')
@@ -3029,19 +3081,13 @@ validation code: |
       petitioner.maintenance_paid = maintenance_amount
       respondent.maintenance_received = maintenance_amount
       respondent.maintenance_paid = 0
+    relief['maintenance'] = True
   else:
     petitioner.maintenance_received = 0
     petitioner.maintenance_paid = 0
     respondent.maintenance_received = 0
     respondent.maintenance_paid = 0
----
-if: not 'maintenance' in relief.true_values()
-code: |
-  is_maintenance_award = False
-  petitioner.maintenance_received = 0
-  petitioner.maintenance_paid = 0
-  respondent.maintenance_received = 0
-  respondent.maintenance_paid = 0
+    relief['maintenance'] = False
 ---
 ## CHILD SUPPORT ##
 id: Child Support Award
