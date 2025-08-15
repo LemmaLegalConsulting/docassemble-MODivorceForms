@@ -10,6 +10,8 @@ code: |
   else:
     if hasattr(x.normalized_address(), "county") and x.normalized_address().county in county_dictionary:
       x.address.county = x.normalized_address().county
+    elif hasattr(x.normalized_address(), "county"):
+      x.address.county = x.normalized_address().county
     else:
       x.address.county = x.county_selected
 ---
