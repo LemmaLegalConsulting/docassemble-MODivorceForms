@@ -74,31 +74,6 @@ code: |
 #################### Interview order #####################
 comment: |
   Controls order and branching logic for questions specific to this form
-  ---
-id: casenet code
-depends on:
-  - users[0].address.county
-  - users[0].name.first
-code: |
-  import urllib
-  url = 'https://www.courts.mo.gov/cnet/nameSearchResult.do?'
-  params = {
-    "courtType": "SW",
-    "newSearch": "Y",
-    "essn": "",
-    "courtCode": "SW",
-    "lastName": users[0].name.last,
-    "_inclAlias": "on",
-    "firstName": users[0].name.first,
-    "middleName": "",
-    "caseType": "All",
-    "yearFiled": "",
-  }
-  if users[0].normalized_address().city == "St. Louis":
-    params["countyCode"] = "STL"
-  else:
-    params["countyCode"] = county_dictionary[trial_court.county]['casenet_code']
-  formatted_casenet_url = f"{url}{urllib.parse.urlencode(params)}" 
 ---
 id: interview order certificate of dissolution of marriage
 code: |
@@ -146,9 +121,10 @@ code: |
   ## 3 Please enter your case information
   nav.set_section("case_information")   
   if case.filed in ["user0_filed", "user1_filed"]:
+    use_case_net_for_online_docket
+    case_information
     if 'answer_attachment' in doc_list_selected.true_values() or 'petition_attachment' in doc_list_selected.true_values():
       previous_petitions # answer, petition
-    case_information
   case.county # property_statement, petition, notice_of_hearing, form_17, certificate_of_dissolution
   if case.filed in ["user0_filed", "user1_filed"]:
     case.filing_date # petition
@@ -419,12 +395,6 @@ code: |
   if 'redaction_certification_attachment' in doc_list_selected.true_values():
     al_court_bundle
   interview_order_mo_divorce_forms = True
----
-continue button field: assets_test_screen
-question: Test assets
-subquestion: |
-  ${ real_estate.filter(recommended_award=petitioner.name.full())[0].description }
-  
 ---
 ###################### Main order ######################
 comment: |
