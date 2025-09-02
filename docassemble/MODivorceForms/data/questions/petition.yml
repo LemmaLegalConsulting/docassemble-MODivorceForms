@@ -304,7 +304,7 @@ attachment:
       - "petitionersCity": ${ petitioner.address.city } 
       - "petitionersState": ${ state_name(petitioner.address.state) } 
       - "petitonersZip": ${ petitioner.address.zip } 
-      - "petitionersPhone": ${ petitioner.phone_number } 
+      - "petitionersPhone": ${ phone_number_formatted(petitioner.phone_number) } 
       - "petitonersEmail": ${ petitioner.email } 
       - "petitionersSsnLastFour": ${ petitioner.ssn } 
       - "petitionerOverEighteenOrNot1": ${ petitioner.birthdate.plus(years=18) < today() } 
@@ -342,7 +342,7 @@ attachment:
       - "respondentsState": ${ state_name(respondent.address.state) } 
       - "respondentsZip": ${ respondent.address.zip } 
       - "respondentsPhone": ${ respondent.email } 
-      - "respondentsEmail": ${ respondent.phone_number } 
+      - "respondentsEmail": ${ phone_number_formatted(respondent.phone_number) } 
       - "respondentsSsnLast4": ${ respondent.ssn } 
       - "respondentOverEighteenOrNot1": ${ respondent.birthdate.plus(years=18) < today() } 
       - "respondentOverEighteenOrNot2": ${ respondent.birthdate.plus(years=18) >= today()  } 
@@ -666,7 +666,7 @@ attachment:
       - "petitionersAttorneyCity": ${ petitioner.attorney.address.state } 
       - "petitionersAttorneyState": ${ petitioner.attorney.address.city } 
       - "petitionersAttorneyZip": ${ petitioner.attorney.address.zip } 
-      - "petitionersAttorneyPhone": ${ petitioner.attorney.phone_number } 
+      - "petitionersAttorneyPhone": ${ phone_number_formatted(petitioner.attorney.phone_number) } 
       - "petitionersAttorneyFaxNumber": ${ petitioner.attorney.fax } 
       - "petitionersAttorneyEmail": ${ petitioner.attorney.email } 
 ---
