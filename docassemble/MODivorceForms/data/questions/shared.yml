@@ -96,7 +96,7 @@ fields:
   - What date was the case filed?: case.filing_date
     datatype: date
     required: False
-continue button field: case_information
+continue button field: case_header
 validation code: |
   if as_datetime(case.filing_date) > today() or as_datetime(case.filing_date) < as_datetime("1/1/1900"):
     validation_error("Please enter a realistic date in the past.")
@@ -312,16 +312,36 @@ fields:
   - Race: x.race
     input type: dropdown
     choices:
+      - American Indian or Alaska Native
+      - Asian
+      - Black or African American
+      - Native Hawaiian or other Pacific Islander
       - White
-      - Black
-      - American Indian
+      - Hispanic or Latino
+      - Middle Eastern or North African (MENA)
       - Other
+      - Unknown
     required: False
   - Other description: x.race_other
     show if:
       variable: x.race
       is: Other
     required: False
+---
+code: |
+  if users[0].race in ["American Indian or Alaska Native", "Asian", "Black or African American", "Native Hawaiian or other Pacific Islander", "White", "Hispanic or Latino", "Middle Eastern or North African (MENA)", "Other"]:
+    race_self_identified = True
+    if case.filed in ["user0_filed", "not_yet"]:
+      petitioner_race_identified = True
+      respondent_race_identified = False
+    else:
+      petitioner_race_identified = False
+      respondent_race_identified = True
+  else:
+    race_self_identified = False
+    petitioner_race_identified = False
+    respondent_race_identified = False
+  
 ---
 id: Previous marriages info
 generic object: ALIndividual
@@ -3107,20 +3127,43 @@ validation code: |
   else:
     support_recipient = respondent
     support_payer = petitioner  
+  if child_support == "none":
+    relief['child_support'] = False
+  else:
+    relief['child_support'] = True
 ---
-
 ## RELIEF ##
+objects:
+  - relief: DADict
+---
+code: |
+  relief['divide_property'] = True
+---
 id: Relief Requested
-question: Request for Relief
-subquestion:
-  In a divorce, the court can do different things in addition to dissolving the marriage.
+question: Other request for relief
 fields:
-  - What do you want the court to do?: relief
-    datatype: checkboxes
-    choices: 
-      code: relief_options
+  - Is there any other relief you want to request from the court?: relief['other']
+    datatype: yesnoradio
   - Explain: relief_other
     show if: relief['other']
+---
+if: users[0].has_prior_name
+question: Name Change
+fields:
+  - Do you want to change your name to your prior name?: relief['change_name']
+    datatype: yesnoradio
+---    
+if: not users[0].has_prior_name
+code: |
+  relief['change_name'] = False
+---
+if: not minor_children
+code: |
+  relief['custody'] = False
+---
+if: not minor_children
+code: |
+  relief['child_support'] = False
 ---
 code: |
   temp_relief_options = list()

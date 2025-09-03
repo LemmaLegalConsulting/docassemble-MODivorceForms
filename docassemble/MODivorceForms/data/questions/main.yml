@@ -110,8 +110,12 @@ code: |
   users.gather()
   if users[0].has_prior_name:
     users[0].prior_name.name.first
-  relief
   doc_list_selected
+  relief['custody']
+  relief['child_support']
+  relief['change_name']
+  relief['divide_property']
+  relief['other']
   
   other_parties.gather()
   if other_parties[0].has_prior_name:
