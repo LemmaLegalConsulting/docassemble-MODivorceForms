@@ -45,513 +45,197 @@ attachment:
   pdf template file: confidential_information_sheet.pdf
   editable: False
   fields:
-      - "case_filing_date": ${ case.filing_date } 
-      - "case_county": ${ case.county } 
-      - "case_case_name": ${ case.case_name } 
-      - "case_type_code": ${ case.type_code } 
-      - "case_type_description": ${ case.type_description } 
-      - "petitioner_represented_no": ${ not petitioner.represented } 
-      - "petitioner_represented_yes": ${ petitioner.represented } 
-      - "PET Other": ${ False } 
-      - "P_Party Type Code": ${ False } 
-      - "P_Party Type Description": ${ False } 
-      - "petitioner_name_first": ${ petitioner.name.first } 
-      - "petitioner_name_last": ${ petitioner.name.last } 
-      - "petitioner_name_suffix": ${ petitioner.name.suffix } 
-      - "petitioner_name_middle": ${ petitioner.name.middle } 
-      - "P_Address": ${ petitioner.address.line_one() } 
-      - "petitioner_address_zip": ${ petitioner.address.zip } 
-      - "petitioner_address_city": ${ petitioner.address.city } 
-      - "petitioner_address_state": ${ petitioner.address.state } 
-      - "petitioner_phone": ${ phone_number_formatted(petitioner.phone_number) } 
-      - "petitioner_email": ${ petitioner.email } 
-      - "petitioner_gender_male": ${ petitioner.gender == "male" } 
-      - "petitioner_gender_female": ${ petitioner.gender == "female" } 
-      - "petitioner_birthdate": ${ format_date(petitioner.birthdate, format='M/d/yyyy') } 
-      - "petitioner_ssn": ${ "{:.0f}".format(petitioner.ssn) } 
-      - "petitioner_race_american_indian_or_alaska_native": ${ petitioner.race == "American Indian or Alaska Native" } 
-      - "petitioner_race_asian": ${ petitioner.race == "Asian" } 
-      - "petitioner_race_black_or_african_american": ${ petitioner.race == "Black or African American" } 
-      - "petitioner_race_white": ${ petitioner.race == "White" } 
-      - "petitioner_race_native_hawaiian_or_other_pacific_islander": ${ petitioner.race == "Native Hawaiian or other Pacific Islander" } 
-      - "petitioner_race_other": ${ petitioner.race == "Other" } 
-      - "petitioner_race_onknown": ${ petitioner.race == "Unknown" } 
-      - "petitioner_race_middle_eastern_or_north_african": ${ petitioner.race == "Middle Eastern or North African (MENA)" } 
-      - "petitioner_race_hispanic_or_latino": ${ petitioner.race == "Hispanic or Latino" } 
-      - "respondent_race_identified": ${ False } 
-      - "petitioner_race_identified": ${ petitioner_race_identified } 
-      - "P Source Court": ${ False } 
-      - "P Source Law Enforcement": ${ False } 
-      - "P Source Jail": ${ False } 
-      - "P Source Dep of CorrectionsProbation and Parole": ${ False } 
-      - "P Source Another State Agency": ${ False } 
-      - "P Source Drivers License": ${ False } 
-      - "P Source Unknown_0": ${ False } 
-      - "race_self_identified": ${ petitioner_race_identified } 
-      - "P observedperceived": ${ False } 
-      - "petitioner_attorney": ${ petitioner.attorney } 
-      - "petitioner_attorney_bar_number": ${ petitioner.attorney.bar_number } 
-      - "petitioner_attorney_party_type_code": ${ petitioner.attorney.party_type_code } 
-      - "respondent_represented_no": ${ not respondent.represented } 
-      - "respondent_represented_yes": ${ respondent.represented } 
-      - "RES Other": ${ False } 
-      - "R_Party Type Code": ${ False } 
-      - "R_Party Type Description": ${ False } 
-      - "respondent_name_first": ${ respondent.name.first } 
-      - "respondent_name_last": ${ respondent.name.last } 
-      - "respondent_name_suffix": ${ respondent.name.suffix } 
-      - "respondent_name_middle": ${ respondent.name.middle } 
-      - "respondent_address_address": ${ respondent.address.line_one() } 
-      - "respondent_address_zip": ${ respondent.address.zip } 
-      - "respondent_address_state": ${ respondent.address.state } 
-      - "respondent_address_city": ${ respondent.address.city } 
-      - "respondent_phone": ${ phone_number_formatted(respondent.phone_number) } 
-      - "respondent_email": ${ respondent.email } 
-      - "respondent_birthdate": ${ format_date(respondent.birthdate, format='M/d/yyyy') } 
-      - "respondent_gender_female": ${ respondent.gender == "female" } 
-      - "respondent_gender_male": ${ respondent.gender == "male" } 
-      - "respondent_ssn": ${ "{:.0f}".format(respondent.ssn) } 
-      - "respondent_race_American Indian or Alaska Native": ${ respondent.race == "American Indian or Alaska Native" } 
-      - "respondent_race_Asian": ${ respondent.race == "Asian" } 
-      - "respondent_race_White": ${ respondent.race == "White" } 
-      - "respondent_race_Native Hawaiian or other Pacific Islander": ${ respondent.race == "Native Hawaiian or other Pacific Islander" } 
-      - "respondent_race_Black or African American": ${ respondent.race == "Black or African American" } 
-      - "respondent_race_Other": ${ respondent.race == "Other" } 
-      - "respondent_race_Middle Eastern or North African (MENA)": ${ respondent.race == "Middle Eastern or North African (MENA)" } 
-      - "respondent_race_Hispanic or Latino": ${ respondent.race == "Hispanic or Latino" } 
-      - "respondent_race_Unknown": ${ respondent.race == "Unknown" } 
-      - "respondent_race_identified": ${ respondent_race_identified } 
-      - "R P Source Race and Ethnicity": ${ False } 
-      - "R Source Court": ${ False } 
-      - "R Source Law Enforcement": ${ False } 
-      - "R Source Jail": ${ False } 
-      - "R Source Dep of CorrectionsProbation and Parole": ${ False } 
-      - "R Source Another State Agency": ${ False } 
-      - "R Source Drivers License": ${ False } 
-      - "P Source Unknown_2": ${ False } 
-      - "R selfidentified": ${ respondent_race_identified } 
-      - "R observedperceived": ${ False } 
-      - "respondent_attorney": ${ respondent.attorney } 
-      - "respondent_attorney_bar_number": ${ respondent.attorney.bar_number } 
-      - "respondent_attorney_party_type_code": ${ respondent.attorney.party_type_code } 
-      - "other_parties1_party_type_code": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].party_type_code }
-          % endif
-      - "other_parties1_party_type_description": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].party_type_description }
-          % endif
-      - "other_parties1_name_last": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].name.last if other_parties[1].person_type == "person" else "" }
-          % endif
-      - "other_parties1_name_first": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].name.first if other_parties[1].person_type == "person" else "" }
-          % endif
-      - "other_parties1_name_middle": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].name.middle if other_parties[1].person_type == "person" else "" }
-          % endif
-      - "other_parties1_name_suffix": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].name.suffix if other_parties[1].person_type == "person" else "" }
-          % endif
-      - "other_parties1_name_text": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].name.text if other_parties[1].person_type == "business" else "" }
-          % endif
-      - "other_parties1_address": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].address.line_one() }
-          % endif
-      - "other_parties1_address_zip": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].address.zip }
-          % endif
-      - "other_parties1_address_city": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].address.city }
-          % endif
-      - "other_parties1_address_state": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].address.state }
-          % endif
-      - "other_parties1_phone": |
-          % if len(other_parties) > 1:
-          ${ phone_number_formatted(other_parties[1].phone_number) }
-          % endif
-      - "other_parties1_email": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].email }
-          % endif
-      - "other_parties1_gender_female": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].gender == "female" }
-          % endif
-      - "other_parties1_gender_male": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].gender == "male" }
-          % endif
-      - "other_parties1_birthdate": |
-          % if len(other_parties) > 1:
-          ${ format_date(other_parties[1].birthdate, format='M/d/yyyy') }
-          % endif
-      - "other_parties1_ssn": |
-          % if len(other_parties) > 1:
-          ${ "{:.0f}".format(other_parties[1].ssn) }
-          % endif
-      - "Race American Indian or Alaska Native_3": ${ False } 
-      - "Race Asian_3": ${ False } 
-      - "Race White_3": ${ False } 
-      - "Race Native Hawaiian or other Pacific Islander_3": ${ False } 
-      - "Race Black or African American_3": ${ False } 
-      - "Race Ethnicity Unknown_3": ${ False } 
-      - "Race Other_3": ${ False } 
-      - "Race MENA_3": ${ False } 
-      - "Ethnicity Hispanic or Latino_3": ${ False } 
-      - "Source Race and Ethnicity P_3": ${ False } 
-      - "Source Court_3": ${ False } 
-      - "Source Respondent_3": ${ False } 
-      - "Source Law Enforcement_3": ${ False } 
-      - "Source Jail_3": ${ False } 
-      - "Source Dep of CorrectionsProbation and Parole_3": ${ False } 
-      - "Source Another State Agency_3": ${ False } 
-      - "Source Drivers License_3": ${ False } 
-      - "Source Unknown_3": ${ False } 
-      - "other_parties1_attorney": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].attorney }
-          % endif
-      - "other_parties1_attorney_bar_number": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].attorney.bar_number }
-          % endif
-      - "other_parties1_attorney_party_type_code": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].attorney.party_type_code }
-          % endif
-      - "other_parties2_party_type_code": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].party_type_code }
-          % endif
-      - "other_parties2_party_type_description": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].party_type_description }
-          % endif
-      - "other_parties2_name_last": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].name.last if other_parties[2].person_type == "person" else "" }
-          % endif
-      - "other_parties2_name_first": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].name.first if other_parties[2].person_type == "person" else "" }
-          % endif
-      - "other_parties2_name_middle": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].name.middle if other_parties[2].person_type == "person" else "" }
-          % endif
-      - "other_parties2_name_suffix": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].name.suffix if other_parties[2].person_type == "person" else "" }
-          % endif
-      - "other_parties2_name_text": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].name.text if other_parties[2].person_type == "business" else "" }
-          % endif
-      - "other_parties2_address": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].address.line_one() }
-          % endif
-      - "other_parties2_address_zip": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].address.zip }
-          % endif
-      - "other_parties2_address_state": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].address.state }
-          % endif
-      - "other_parties2_address_city": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].address.city }
-          % endif
-      - "other_parties2_phone": |
-          % if len(other_parties) > 2:
-          ${ phone_number_formatted(other_parties[2].phone_number) }
-          % endif
-      - "other_parties2_email": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].email }
-          % endif
-      - "other_parties2_gender_female": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].gender == "female" }
-          % endif
-      - "other_parties2_gender_male": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].gender == "male" }
-          % endif
-      - "other_parties2_birthdate": |
-          % if len(other_parties) > 2:
-          ${ format_date(other_parties[2].birthdate, format='M/d/yyyy') }
-          % endif
-      - "other_parties2_ssn": |
-          % if len(other_parties) > 2:
-          ${ "{:.0f}".format(other_parties[2].ssn) }
-          % endif
-      - "Race American Indian or Alaska Native_4": ${ False } 
-      - "Race Asian_4": ${ False } 
-      - "Race White_4": ${ False } 
-      - "Race Native Hawaiian or other Pacific Islander_4": ${ False } 
-      - "Race Black or African American_4": ${ False } 
-      - "Race Other_4": ${ False } 
-      - "Race MENA_4": ${ False } 
-      - "Ethnicity Hispanic or Latino_4": ${ False } 
-      - "Race Ethnicity Unknown_4": ${ False } 
-      - "Source Respondent_4": ${ False } 
-      - "Source Race and Ethnicity P_4": ${ False } 
-      - "Source Court_4": ${ False } 
-      - "Source Law Enforcement_4": ${ False } 
-      - "Source Jail_4": ${ False } 
-      - "Source Dep of CorrectionsProbation and Parole_4": ${ False } 
-      - "Source Another State Agency_4": ${ False } 
-      - "Source Drivers License_4": ${ False } 
-      - "Source Unknown_4": ${ False } 
-      - "other_parties2_attorney": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].attorney }
-          % endif
-      - "other_parties2_attorney_bar_number": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].attorney.bar_number }
-          % endif
-      - "other_parties2_attorney_party_type_code": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].attorney.party_type_code }
-          % endif
-      - "other_parties_more_than_4": ${ len(other_parties) > 4 } 
-      - "petitioner_employersj_name_text": ${ petitioner.employer.name.text } 
-      - "petitioner_employersj_address_address": ${ petitioner.employer.address.address } 
-      - "petitioner_employersj_address_state": ${ petitioner.employer.address.state } 
-      - "petitioner_employersj_address_city": ${ petitioner.employer.address.city } 
-      - "petitioner_employersj_address_zip": ${ petitioner.employer.address.zip } 
-      - "petitioner_employersj_phone_number": ${ phone_number_formatted(petitioner.employer.phone_number) } 
-      - "petitioner_employersj_email": ${ petitioner.employer.email } 
-      - "respondent_employersj_name_text": ${ respondent.employer.name.text } 
-      - "respondent_employersj_address_address": ${ respondent.employer.address.address } 
-      - "respondent_employersj_address_city": ${ respondent.employer.address.city } 
-      - "respondent_employersj_address_zip": ${ respondent.employer.address.zip } 
-      - "respondent_employersj_address_state": ${ respondent.employer.address.state } 
-      - "respondent_employersj_phone_number": ${ phone_number_formatted(respondent.employer.phone_number)} 
-      - "respondent_employersj_email": ${ respondent.employer.email } 
-      - "children0": |
-          % if len(children) > 0:
-          ${ children[0].name_full() }
-          % endif
-      - "children0_gender_female": |
-          % if len(children) > 0:
-          ${ children[0].gender }
-          % endif
-      - "children0_gender_male": |
-          % if len(children) > 0:
-          ${ children[0].gender }
-          % endif
-      - "children0_ssn": |
-          % if len(children) > 0:
-          ${ "{:.0f}".format(children[0].ssn) }
-          % endif
-      - "children0_birthdate": |
-          % if len(children) > 0:
-          ${ format_date(children[0].birthdate, format='M/d/yyyy') }
-          % endif
-      - "children1": |
-          % if len(children) > 1:
-          ${ children[1].name_full() }
-          % endif
-      - "children1_gender_male": |
-          % if len(children) > 1:
-          ${ children[1].gender }
-          % endif
-      - "children1_gender_female": |
-          % if len(children) > 1:
-          ${ children[1].gender }
-          % endif
-      - "children1_ssn": |
-          % if len(children) > 1:
-          ${ "{:.0f}".format(children[1].ssn) }
-          % endif
-      - "children1_birthdate": |
-          % if len(children) > 1:
-          ${ format_date(children[1].birthdate, format='M/d/yyyy') }
-          % endif
-      - "children2": |
-          % if len(children) > 2:
-          ${ children[2].name_full() }
-          % endif
-      - "children2_gender_female": |
-          % if len(children) > 2:
-          ${ children[2].gender }
-          % endif
-      - "children2_gender_male": |
-          % if len(children) > 2:
-          ${ children[2].gender }
-          % endif
-      - "children2_ssn": |
-          % if len(children) > 2:
-          ${ "{:.0f}".format(children[2].ssn) }
-          % endif
-      - "children2_birthdate": |
-          % if len(children) > 2:
-          ${ format_date(children[2].birthdate, format='M/d/yyyy') }
-          % endif
-      - "children3": |
-          % if len(children) > 3:
-          ${ children[3].name_full() }
-          % endif
-      - "children3_gender_male": |
-          % if len(children) > 3:
-          ${ children[3].gender }
-          % endif
-      - "children3_gender_female": |
-          % if len(children) > 3:
-          ${ children[3].gender }
-          % endif
-      - "children3_birthdate": |
-          % if len(children) > 3:
-          ${ format_date(children[3].birthdate, format='M/d/yyyy') }
-          % endif
-      - "children3_ssn": |
-          % if len(children) > 3:
-          ${ "{:.0f}".format(children[3].ssn) }
-          % endif
-      - "children4": |
-          % if len(children) > 4:
-          ${ children[4].name_full() }
-          % endif
-      - "children4_gender_female": |
-          % if len(children) > 4:
-          ${ children[4].gender }
-          % endif
-      - "children4_gender_male": |
-          % if len(children) > 4:
-          ${ children[4].gender }
-          % endif
-      - "children4_ssn": |
-          % if len(children) > 4:
-          ${ "{:.0f}".format(children[4].ssn) }
-          % endif
-      - "children4_birthdate": |
-          % if len(children) > 4:
-          ${ format_date(children[4].birthdate, format='M/d/yyyy') }
-          % endif
-      - "children5": |
-          % if len(children) > 5:
-          ${ children[5].name_full() }
-          % endif
-      - "children5_gender_female": |
-          % if len(children) > 5:
-          ${ children[5].gender }
-          % endif
-      - "children5_gender_male": |
-          % if len(children) > 5:
-          ${ children[5].gender }
-          % endif
-      - "children5_birthdate": |
-          % if len(children) > 5:
-          ${ format_date(children[5].birthdate, format='M/d/yyyy') }
-          % endif
-      - "children5_ssn": |
-          % if len(children) > 5:
-          ${ "{:.0f}".format(children[5].ssn) }
-          % endif
-      - "children6": |
-          % if len(children) > 6:
-          ${ children[6].name_full() }
-          % endif
-      - "children6_gender_male": |
-          % if len(children) > 6:
-          ${ children[6].gender }
-          % endif
-      - "children6_gender_female": |
-          % if len(children) > 6:
-          ${ children[6].gender }
-          % endif
-      - "children6_ssn": |
-          % if len(children) > 6:
-          ${ "{:.0f}".format(children[6].ssn) }
-          % endif
-      - "children6_birthdate": |
-          % if len(children) > 6:
-          ${ format_date(children[6].birthdate, format='M/d/yyyy') }
-          % endif
-      - "children7": |
-          % if len(children) > 7:
-          ${ children[7].name_full() }
-          % endif
-      - "children7_gender_female": |
-          % if len(children) > 7:
-          ${ children[7].gender }
-          % endif
-      - "children7_gender_male": |
-          % if len(children) > 7:
-          ${ children[7].gender }
-          % endif
-      - "children7_birthdate": |
-          % if len(children) > 7:
-          ${ format_date(children[7].birthdate, format='M/d/yyyy') }
-          % endif
-      - "children7_ssn": |
-          % if len(children) > 7:
-          ${ "{:.0f}".format(children[7].ssn) }
-          % endif
-      - "children8": |
-          % if len(children) > 8:
-          ${ children[8].name_full() }
-          % endif
-      - "children8_ssn": |
-          % if len(children) > 8:
-          ${ "{:.0f}".format(children[8].ssn) }
-          % endif
-      - "children8_gender_female": |
-          % if len(children) > 8:
-          ${ children[8].gender }
-          % endif
-      - "children8_gender_male": |
-          % if len(children) > 8:
-          ${ children[8].gender }
-          % endif
-      - "children8_birthdate": |
-          % if len(children) > 8:
-          ${ format_date(children[8].birthdate, format='M/d/yyyy') }
-          % endif
-      - "children9": |
-          % if len(children) > 9:
-          ${ children[9].name_full() }
-          % endif
-      - "children9_gender_female": |
-          % if len(children) > 9:
-          ${ children[9].gender }
-          % endif
-      - "children9_gender_male": |
-          % if len(children) > 9:
-          ${ children[9].gender }
-          % endif
-      - "children9_birthdate": |
-          % if len(children) > 9:
-          ${ format_date(children[9].birthdate, format='M/d/yyyy') }
-          % endif
-      - "children9_ssn": |
-          % if len(children) > 9:
-          ${ "{:.0f}".format(children[9].ssn) }
-          % endif
-      - "children_more_than_10": ${ len(children) > 10 } 
-      - "submitted_by": ${ submitted_by.name_full() } 
-      - "submitted_by_bar_number": ${ submitted_by.bar_number } 
-      - "submitted_by_address": ${ submitted_by.address } 
-      - "submitted_by_address_zip": ${ submitted_by.address.zip } 
-      - "submitted_by_address_city": ${ submitted_by.address.city } 
-      - "submitted_by_address_state": ${ submitted_by.address.state } 
-      - "submitted_by_phone": ${ phone_number_formatted(submitted_by.phone_number) } 
-      - "submitted_by_email": ${ submitted_by.email } 
----
+    - "case_filing_date": ${ case.filing_date } 
+    - "case_county": ${ case.county } 
+    - "case_unredacted_doc_attached": ${ case.unredacted_doc_attached } 
+    - "case_case_name": ${ case.case_name } 
+    - "case_type_code": ${ case.type_code } 
+    - "case_type_description": ${ case.type_description } 
+    - "petitioner_party_type_code": ${ petitioner.party_type_code } 
+    - "petitioner_party_type_description": ${ petitioner.party_type_description } 
+    - "petitioner_name_first": ${ petitioner.name.first } 
+    - "petitioner_name_last": ${ petitioner.name.last } 
+    - "petitioner_name_middle": ${ petitioner.name.middle } 
+    - "P_Address": ${ petitioner.address.line_one() } 
+    - "petitioner_address_city": ${ petitioner.address.city } 
+    - "petitioner_address_state": ${ petitioner.address.state } 
+    - "petitioner_address_zip": ${ petitioner.address.zip } 
+    - "petitioner_phone": ${ phone_number_formatted(petitioner.phone_number) } 
+    - "petitioner_email": ${ petitioner.email } 
+    - "petitioner_gender_female": ${ petitioner.gender == "female" } 
+    - "petitioner_gender_male": ${ petitioner.gender == "male" } 
+    - "petitioner_birthdate": ${ petitioner.birthdate } 
+    - "petitioner_ssn": ${ petitioner.ssn } 
+    - "petitioner_attorney": ${ petitioner.attorney } 
+    - "petitioner_attorney_bar_number": ${ petitioner.attorney.bar_number } 
+    - "petitioner_attorney_party_type_code": ${ petitioner.attorney.party_type_code } 
+    - "respondent_party_type_code": ${ respondent.party_type_code } 
+    - "respondent_party_type_description": ${ respondent.party_type_description } 
+    - "respondent_name_last": ${ respondent.name.last } 
+    - "respondent_name_first": ${ respondent.name.first } 
+    - "respondent_name_middle": ${ respondent.name.middle } 
+    - "respondent_address_address": ${ respondent.address.address } 
+    - "respondent_address_zip": ${ respondent.address.zip } 
+    - "respondent_phone": ${ phone_number_formatted(respondent.phone_number) } 
+    - "respondent_address_state": ${ respondent.address.state } 
+    - "respondent_address_city": ${ respondent.address.city } 
+    - "respondent_email": ${ respondent.email } 
+    - "respondent_gender_male": ${ respondent.gender == "male" } 
+    - "respondent_gender_female": ${ respondent.gender == "female" } 
+    - "respondent_birthdate": ${ respondent.birthdate } 
+    - "respondent_ssn": ${ respondent.ssn } 
+    - "respondent_attorney_bar_number": ${ respondent.attorney.bar_number } 
+    - "respondent_attorney": ${ respondent.attorney } 
+    - "respondent_attorney_party_type_code": ${ respondent.attorney.party_type_code } 
+    - "other_parties1_party_type_code": ${ other_parties[1].party_type_code } 
+    - "other_parties1_party_type_description": ${ other_parties[1].party_type_description } 
+    - "other_parties1_name_middle": ${ other_parties[1].name.middle if other_parties[1].person_type == "person" else "" } 
+    - "other_parties1_name_last": ${ other_parties[1].name.last if other_parties[1].person_type == "person" else "" } 
+    - "other_parties1_name_first": ${ other_parties[1].name.first if other_parties[1].person_type == "person" else "" } 
+    - "other_parties1_name_text": ${ other_parties[1].name.text if other_parties[1].person_type == "business" else "" } 
+    - "other_parties1_address": ${ other_parties[1].address.line_one() } 
+    - "other_parties1_address_city": ${ other_parties[1].address.city } 
+    - "other_parties1_address_state": ${ other_parties[1].address.state } 
+    - "other_parties1_address_zip": ${ other_parties[1].address.zip } 
+    - "other_parties1_phone": ${ phone_number_formatted(other_parties[1].phone) } 
+    - "other_parties1_email": ${ other_parties[1].email } 
+    - "other_parties1_gender_male": ${ other_parties[1].gender == "male" } 
+    - "other_parties1_gender_female": ${ other_parties[1].gender == "female" } 
+    - "other_parties1_birthdate": ${ other_parties[1].birthdate } 
+    - "other_parties1_ssn": ${ other_parties[1].ssn } 
+    - "other_parties1_attorney": ${ other_parties[1].attorney } 
+    - "other_parties1_attorney_bar_number": ${ other_parties[1].attorney.bar_number } 
+    - "other_parties1_attorney_party_type_code": ${ other_parties[1].attorney.party_type_code } 
+    - "other_parties2_party_type_code": ${ other_parties[2].party_type_code } 
+    - "other_parties2_party_type_description": ${ other_parties[2].party_type_description } 
+    - "other_parties2_name_last": ${ other_parties[2].name.last if other_parties[1].person_type == "person" else "" } 
+    - "other_parties2_name_first": ${ other_parties[2].name.first if other_parties[1].person_type == "person" else "" } 
+    - "other_parties2_name_middle": ${ other_parties[2].name.middle if other_parties[1].person_type == "person" else "" } 
+    - "other_parties2_name_text": ${ other_parties[2].name.text if other_parties[1].person_type == "business" else "" } 
+    - "other_parties2_address": ${ other_parties[2].address.line_one() } 
+    - "other_parties2_address_city": ${ other_parties[2].address.city } 
+    - "other_parties2_address_state": ${ other_parties[2].address.state } 
+    - "other_parties2_address_zip": ${ other_parties[2].address.zip } 
+    - "other_parties2_phone": ${ phone_number_formatted(other_parties[2].phone) } 
+    - "other_parties2_email": ${ other_parties[2].email } 
+    - "other_parties2_gender_female": ${ other_parties[2].gender == "female" } 
+    - "other_parties2_gender_male": ${ other_parties[2].gender == "male" } 
+    - "other_parties2_birthdate": ${ other_parties[2].birthdate } 
+    - "other_parties2_ssn": ${ other_parties[2].ssn } 
+    - "other_parties2_attorney": ${ other_parties[2].attorney } 
+    - "other_parties2_attorney_bar_number": ${ other_parties[2].attorney.bar_number } 
+    - "other_parties2_attorney_party_type_code": ${ other_parties[2].attorney.party_type_code } 
+    - "petitioner_employersj_name_text": ${ petitioner.employer.name.text } 
+    - "petitioner_employersj_address_address": ${ petitioner.employer.address.address } 
+    - "petitioner_employersj_address_city": ${ petitioner.employer.address.city } 
+    - "petitioner_employersj_address_state": ${ petitioner.employer.address.state } 
+    - "petitioner_employersj_address_zip": ${ petitioner.employer.address.zip } 
+    - "petitioner_employersj_phone_number": ${ phone_number_formatted(petitioner.employer.phone_number) } 
+    - "petitioner_employersj_email": ${ petitioner.employer.email } 
+    - "respondent_employersj_name_text": ${ respondent.employer.name.text } 
+    - "respondent_employersj_address_address": ${ respondent.employer.address.address } 
+    - "respondent_employersj_address_city": ${ respondent.employer.address.city } 
+    - "respondent_employersj_address_state": ${ respondent.employer.address.state } 
+    - "respondent_employersj_address_zip": ${ respondent.employer.address.zip } 
+    - "respondent_employersj_phone_number": ${ phone_number_formatted(respondent.employer.phone_number) } 
+    - "respondent_employersj_email": ${ respondent.employer.email } 
+    - "children0": ${ children[0].name_full() } 
+    - "children0_ssn": ${ children[0].ssn } 
+    - "children0_birthdate": ${ children[0].birthdate } 
+    - "children0_gender_female": ${ children[0].gender } 
+    - "children0_gender_male": ${ children[0].gender } 
+    - "children1": ${ children[1].name_full() } 
+    - "children1_ssn": ${ children[1].ssn } 
+    - "children1_birthdate": ${ children[1].birthdate } 
+    - "children1_gender_male": ${ children[1].gender } 
+    - "children1_gender_female": ${ children[1].gender } 
+    - "children2": ${ children[2].name_full() } 
+    - "children2_ssn": ${ children[2].ssn } 
+    - "children2_birthdate": ${ children[2].birthdate } 
+    - "children2_gender_female": ${ children[2].gender } 
+    - "children2_gender_male": ${ children[2].gender } 
+    - "children3": ${ children[3].name_full() } 
+    - "children3_ssn": ${ children[3].ssn } 
+    - "children3_birthdate": ${ children[3].birthdate } 
+    - "children3_gender_male": ${ children[3].gender } 
+    - "children3_gender_female": ${ children[3].gender } 
+    - "children4": ${ children[4].name_full() } 
+    - "children4_ssn": ${ children[4].ssn } 
+    - "children4_birthdate": ${ children[4].birthdate } 
+    - "children4_gender_male": ${ children[4].gender } 
+    - "children4_gender_female": ${ children[4].gender } 
+    - "children5": ${ children[5].name_full() } 
+    - "children5_ssn": ${ children[5].ssn } 
+    - "children5_birthdate": ${ children[5].birthdate } 
+    - "children5_gender_male": ${ children[5].gender } 
+    - "children5_gender_female": ${ children[5].gender } 
+    - "children6": ${ children[6].name_full() } 
+    - "children6_ssn": ${ children[6].ssn } 
+    - "children6_birthdate": ${ children[6].birthdate } 
+    - "children6_gender_male": ${ children[6].gender } 
+    - "children6_gender_female": ${ children[6].gender } 
+    - "children7": ${ children[7].name_full() } 
+    - "children7_ssn": ${ children[7].ssn } 
+    - "children7_birthdate": ${ children[7].birthdate } 
+    - "children7_gender_male": ${ children[7].gender } 
+    - "children7_gender_female": ${ children[7].gender } 
+    - "children8": ${ children[8].name_full() } 
+    - "children8_ssn": ${ children[8].ssn } 
+    - "children8_birthdate": ${ children[8].birthdate } 
+    - "children8_gender_male": ${ children[8].gender } 
+    - "children8_gender_female": ${ children[8].gender } 
+    - "children9": ${ children[9].name_full() } 
+    - "children9_ssn": ${ children[9].ssn } 
+    - "children9_birthdate": ${ children[9].birthdate } 
+    - "children9_gender_male": ${ children[9].gender } 
+    - "children9_gender_female": ${ children[9].gender } 
+    - "children": ${ children } 
+    - "redacted_information0_identifier": ${ redacted_information[0].identifier } 
+    - "redacted_information0_text": ${ redacted_information[0].text } 
+    - "redacted_information1_text": ${ redacted_information[1].text } 
+    - "redacted_information1_identifier": ${ redacted_information[1].identifier } 
+    - "redacted_information2_identifier": ${ redacted_information[2].identifier } 
+    - "redacted_information2_text": ${ redacted_information[2].text } 
+    - "redacted_information3_identifier": ${ redacted_information[3].identifier } 
+    - "redacted_information3_text": ${ redacted_information[3].text } 
+    - "redacted_information4_identifier": ${ redacted_information[4].identifier } 
+    - "redacted_information4_text": ${ redacted_information[4].text } 
+    - "redacted_information5_identifier": ${ redacted_information[5].identifier } 
+    - "redacted_information5_text": ${ redacted_information[5].text } 
+    - "redacted_information6_identifier": ${ redacted_information[6].identifier } 
+    - "redacted_information6_text": ${ redacted_information[6].text } 
+    - "redacted_information7_identifier": ${ redacted_information[7].identifier } 
+    - "redacted_information7_text": ${ redacted_information[7].text } 
+    - "redacted_information8_identifier": ${ redacted_information[8].identifier } 
+    - "redacted_information8_text": ${ redacted_information[8].text } 
+    - "redacted_information9_identifier": ${ redacted_information[9].identifier } 
+    - "redacted_information9_text": ${ redacted_information[9].text } 
+    - "redacted_information10_identifier": ${ redacted_information[10].identifier } 
+    - "redacted_information10_text": ${ redacted_information[10].text } 
+    - "redacted_information11_identifier": ${ redacted_information[11].identifier } 
+    - "redacted_information11_text": ${ redacted_information[11].text } 
+    - "redacted_information12_identifier": ${ redacted_information[12].identifier } 
+    - "redacted_information12_text": ${ redacted_information[12].text } 
+    - "redacted_information13_identifier": ${ redacted_information[13].identifier } 
+    - "redacted_information13_text": ${ redacted_information[13].text } 
+    - "redacted_information14_identifier": ${ redacted_information[14].identifier } 
+    - "redacted_information14_text": ${ redacted_information[14].text } 
+    - "redacted_information15_identifier": ${ redacted_information[15].identifier } 
+    - "redacted_information15_text": ${ redacted_information[15].text } 
+    - "redacted_information16_identifier": ${ redacted_information[16].identifier } 
+    - "redacted_information16_text": ${ redacted_information[16].text } 
+    - "redacted_information17_text": ${ redacted_information[17].text } 
+    - "redacted_information17_identifier": ${ redacted_information[17].identifier } 
+    - "redacted_information18_identifier": ${ redacted_information[18].identifier } 
+    - "redacted_information18_text": ${ redacted_information[18].text } 
+    - "redacted_information19_text": ${ redacted_information[19].text } 
+    - "redacted_information19_identifier": ${ redacted_information[19].identifier } 
+    - "submitted_by": ${ submitted_by.name_full() } 
+    - "submitted_by_bar_number": ${ submitted_by.bar_number } 
+    - "submitted_by_address": ${ submitted_by.address } 
+    - "submitted_by_address_state": ${ submitted_by.address.state } 
+    - "submitted_by_address_city": ${ submitted_by.address.city } 
+    - "submitted_by_address_zip": ${ submitted_by.address.zip } 
+    - "submitted_by_phone": ${ submitted_by.phone } 
+    - "submitted_by_email": ${ submitted_by.email } 
+

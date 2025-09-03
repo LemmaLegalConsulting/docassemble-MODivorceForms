@@ -115,7 +115,7 @@ attachment:
       - "raRespondentsZip": ${ respondent.address.zip } 
       - "raRespondentCity": ${ respondent.address.city } 
       - "raRespondentState": ${ respondent.address.state } 
-      - "raRespondentsPhone": ${ respondent.phone_number } 
+      - "raRespondentsPhone": ${ phone_number_formatted(respondent.phone_number) } 
       - "raRespondentsEmail": ${ respondent.email } 
       - "raRespondentsSsnLastFour": ${ respondent.ssn } 
       - "raRespondentActiveDutyOrNot1": ${ not respondent.active_duty } 
