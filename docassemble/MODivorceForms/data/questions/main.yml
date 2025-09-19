@@ -126,20 +126,24 @@ code: |
   nav.set_section("case_information")   
   if case.filed in ["user0_filed", "user1_filed"]:
     use_case_net_for_online_docket
-    case_information
     if 'answer_attachment' in doc_list_selected.true_values() or 'petition_attachment' in doc_list_selected.true_values():
       previous_petitions # answer, petition
   case.county # property_statement, petition, notice_of_hearing, form_17, certificate_of_dissolution
   if case.filed in ["user0_filed", "user1_filed"]:
-    case.filing_date # petition
-    case.circuit # form_17
-    case.judge
-    case.division_number # notice_of_hearing
-    case.docket_number # notice_of_hearing, form_17
-    case.matter_type # notice_of_hearing
+    case.docket_number_asked
+    if 'confidential_information_sheet_attachment' in doc_list_selected.true_values() or 'redaction_certification_attachment' in doc_list_selected.true_values():
+      case.name_asked
+    if 'fee_waiver_attachment' in doc_list_selected.true_values():
+      case.judge_asked
+    if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
+      case.filing_date_asked # petition
+    if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'redaction_certification_attachment' in doc_list_selected.true_values():
+      case.circuit # form_17
+    if 'answer_attachment' in doc_list_selected.true_values() or 'notice_of_hearing_attachment' in doc_list_selected.true_values():
+      case.division_number_asked # notice_of_hearing
     notice_date # property_statement.yml
     if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
-      case.case_name
+      case.matter_type # notice_of_hearing
   if petitioner.attorney_involved: # petition, notice_of_hearing
     petitioner.attorney.name.first # petition
     if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
