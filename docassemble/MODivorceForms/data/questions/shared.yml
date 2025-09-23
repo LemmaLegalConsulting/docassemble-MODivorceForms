@@ -688,6 +688,11 @@ fields:
     datatype: integer
     min: 0    
 ---
+if: not minor_children_before_marriage
+generic object: ALIndividual
+code: |
+  x.other_children = 0
+---
 generic object: ALIndividual
 objects:
   - x.attorney: ALIndividual
