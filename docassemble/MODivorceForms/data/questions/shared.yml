@@ -90,17 +90,6 @@ fields:
   - Case type description: case.type_description
     required: False
 ---
-id: Case filing date
-question: Case filing date
-fields:
-  - What date was the case filed?: case.filing_date
-    datatype: date
-    required: False
-continue button field: case_information
-validation code: |
-  if as_datetime(case.filing_date) > today() or as_datetime(case.filing_date) < as_datetime("1/1/1900"):
-    validation_error("Please enter a realistic date in the past.")
----
 id: Hearing date and time
 question: Hearing date and time
 fields:
@@ -123,7 +112,167 @@ fields:
       - Contested: contested
       - I don't know: unknown
 ---
+id: case.name question
+question: Case information - Case Name
+subquestion: |
 
+  ${ collapse_template(case.name_casenet_template) }
+
+fields:
+  - Case name: case.name.text
+    required: False
+    default: |
+      ${ petitioner.name } v. ${ respondent.name }
+    
+continue button field: case.name_asked
+---
+code: |
+  test_default = "Test"
+---
+id: case.name_casenet_template
+template: case.name_casenet_template
+subject: |
+  How do I find the case name on Case.net?
+content: | 
+  The Case name is after the case number at the top of the screen.
+
+  [FILE ch_casename.png, 100%]
+
+  ${ warn_casenet_picture_is_example_template }
+---
+id: case.description question
+question: Case information - Case Description
+subquestion: |
+
+  ${ collapse_template(case.matter_type_casenet_template) }
+  
+
+fields:
+  - Case description: case.matter_type
+    required: False
+    choices:
+      - "FC Dissolution w/ children": dissolution_with
+      - "FC Dissolution w/o children": dissolution_without
+      - "Something else": other
+    default: |
+      ${ "dissolution_without" if len(children) == 0 else "dissolution_with" }
+    
+continue button field: case.matter_type_asked
+
+---
+id: case.matter_type_casenet_template
+template: case.matter_type_casenet_template
+subject: |
+  How do I find the case type on Case.net?
+content: | 
+  With your case open on [Case.net](https://www.courts.mo.gov/cnet), click the tab labeled "Case Header" Look for "Case Type" under "Judge/Commissioner Assigned".
+
+  [FILE ch_description.png, 100%]
+
+  ${ warn_casenet_picture_is_example_template }
+---
+id: case.filing_date question
+question: Case information - Filing date
+subquestion: |
+
+  ${ collapse_template(case.filing_date_casenet_template) }
+  
+
+fields:
+  - What date was the case filed?: case.filing_date
+    datatype: date
+    required: False
+    
+continue button field: case.filing_date_asked
+
+validation code: |
+  if as_datetime(case.filing_date) > today() or as_datetime(case.filing_date) < as_datetime("1/1/1900"):
+    validation_error("Please enter a realistic date in the past.")
+---
+---
+id: case.filing_date_casenet_template
+template: case.filing_date_casenet_template
+subject: |
+  How do I find the Filing date on Case.net?
+content: | 
+  With your case open on [Case.net](https://www.courts.mo.gov/cnet), click the tab labeled "Case Header", if it is not already there. The date the case is labed Date Filed, under "Judge/Commissioner Assigned".
+
+  [FILE ch_filing_date.png, 100%]
+
+  ${ warn_casenet_picture_is_example_template }
+---
+id: case.judge question
+question: Case information - Judge
+subquestion: |
+
+  ${ collapse_template(case.judge_casenet_template) }
+  
+
+fields:
+  - Judge: case.judge
+    required: False
+    
+continue button field: case.judge_asked
+
+---
+id: case.judge_casenet_template
+template: case.judge_casenet_template
+subject: |
+  How do I find the Judge on Case.net?
+content: | 
+  With your case open on [Case.net](https://www.courts.mo.gov/cnet), click the tab labeled "Case Header" Look for "Judge/Commissioner assigned".
+
+  [FILE ch_judge.png, 100%]
+
+  ${ warn_casenet_picture_is_example_template }
+---
+id: case.docket_number question
+question: Case information - Case number
+subquestion: |
+
+  ${ collapse_template(case.docket_number_casenet_template) }
+
+fields:
+  - Case number: case.docket_number
+    required: False
+    
+continue button field: case.docket_number_asked
+
+---
+id: case.docket_number_casenet_template
+template: case.docket_number_casenet_template
+subject: |
+  How do I find the Case number on Case.net?
+content: | 
+  The Case number is at the top of the screen, regardless of what tab you are in.
+
+  The first two digits are the year that the case is filed, followed by your court's Circuit Number.  After a hyphen, the code FC is for Family Court, and the remaining digits are a unique number for your case.
+
+  [FILE ch_docket_number.png, 100%]
+
+  ${ warn_casenet_picture_is_example_template }
+---
+id: warn_casenet_picture_is_example_template
+template: warn_casenet_picture_is_example_template
+content: |
+  <div class="alert alert-warning" role="alert">
+    <i class="fas fa-exclamation-triangle"></i>
+    <strong>Important</strong>: the picture above is just a sample. Make sure you are looking at the results on Missouri Case.net for your case.
+  </div>
+---
+id: code to set circuit from county_dictionary
+code: |
+  case.circuit = county_dictionary[case.county]["circuit"]
+---
+id: division
+question: Division Number
+subquestion: |
+  The Division Number refers to the Division of your county court.  You may find the Division Number on the petition.
+fields:
+  - Division number: case.division_number
+    required: False
+continue button field: case.division_number_asked
+---
 ## PARTIES ##
 
 
@@ -312,16 +461,36 @@ fields:
   - Race: x.race
     input type: dropdown
     choices:
+      - American Indian or Alaska Native
+      - Asian
+      - Black or African American
+      - Native Hawaiian or other Pacific Islander
       - White
-      - Black
-      - American Indian
+      - Hispanic or Latino
+      - Middle Eastern or North African (MENA)
       - Other
+      - Unknown
     required: False
   - Other description: x.race_other
     show if:
       variable: x.race
       is: Other
     required: False
+---
+code: |
+  if users[0].race in ["American Indian or Alaska Native", "Asian", "Black or African American", "Native Hawaiian or other Pacific Islander", "White", "Hispanic or Latino", "Middle Eastern or North African (MENA)", "Other"]:
+    race_self_identified = True
+    if case.filed in ["user0_filed", "not_yet"]:
+      petitioner_race_identified = True
+      respondent_race_identified = False
+    else:
+      petitioner_race_identified = False
+      respondent_race_identified = True
+  else:
+    race_self_identified = False
+    petitioner_race_identified = False
+    respondent_race_identified = False
+  
 ---
 id: Previous marriages info
 generic object: ALIndividual
@@ -528,14 +697,18 @@ sets:
 id: attorney information
 generic object: ALIndividual
 question: Attorney for ${ x }
+subquestion: |
+
+  ${ collapse_template(attorney_casenet_template) }
+  
 fields:
-  - Is an attorney helping ${ x }?:  x.attorney_involved
+  - Is an attorney helping ${ "you" if x.instanceName == "users[0]" else x }?:  x.attorney_involved
     datatype: yesnoradio
     required: False
-  - Is the attorney representing ${ x }: x.type_of_assistance
+  - Is the attorney representing ${ "you" if x.instanceName == "users[0]" else x }?: x.type_of_assistance
     datatype: radio
     choices:
-      - Yes, the attorney is representing ${ x }: representation
+      - Yes, the attorney is representing ${  "me" if x.instanceName == "users[0]" else x }: representation
       - No, the attorney is only providing assistance preparing documents.: assistance
     show if:
       variable: x.attorney_involved
@@ -563,7 +736,7 @@ fields:
     show if:
       variable: x.attorney_involved
       is: True
-  - Address of attorney for ${ x }: x.attorney.address.address
+  - Address of ${ "your attorney" if x.instanceName == "users[0]" else x.possessive("attorney") }: x.attorney.address.address
     address autocomplete: True
     required: False
     show if:
@@ -596,6 +769,18 @@ fields:
       variable: x.attorney_involved
       is: True
 ---
+id: attorney_casenet_template
+template: attorney_casenet_template
+subject: |
+  How do I find information about the attorney on Case.net?
+content: | 
+  With your case open on [Case.net](https://www.courts.mo.gov/cnet), click the tab labeled "Parties & Attorneys". The date the case is labed Date Filed, under "Judge/Commissioner Assigned".
+  
+  In some cases, information about the attorney may be underneath the parties. 
+
+  [FILE pa_attorney.png, 100%]
+---
+id: party type code
 code: |
   if case.filed in ["user0_filed", "not_yet"]:
     if users[0].attorney_involved and users[0].type_of_assistance == "representation":
@@ -3107,20 +3292,43 @@ validation code: |
   else:
     support_recipient = respondent
     support_payer = petitioner  
+  if child_support == "none":
+    relief['child_support'] = False
+  else:
+    relief['child_support'] = True
 ---
-
 ## RELIEF ##
+objects:
+  - relief: DADict
+---
+code: |
+  relief['divide_property'] = True
+---
 id: Relief Requested
-question: Request for Relief
-subquestion:
-  In a divorce, the court can do different things in addition to dissolving the marriage.
+question: Other request for relief
 fields:
-  - What do you want the court to do?: relief
-    datatype: checkboxes
-    choices: 
-      code: relief_options
+  - Is there any other relief you want to request from the court?: relief['other']
+    datatype: yesnoradio
   - Explain: relief_other
     show if: relief['other']
+---
+if: users[0].has_prior_name
+question: Name Change
+fields:
+  - Do you want to change your name to your prior name?: relief['change_name']
+    datatype: yesnoradio
+---    
+if: not users[0].has_prior_name
+code: |
+  relief['change_name'] = False
+---
+if: not minor_children
+code: |
+  relief['custody'] = False
+---
+if: not minor_children
+code: |
+  relief['child_support'] = False
 ---
 code: |
   temp_relief_options = list()

@@ -60,7 +60,7 @@ attachment:
     - "petitioner_address_city": ${ petitioner.address.city } 
     - "petitioner_address_state": ${ petitioner.address.state } 
     - "petitioner_address_zip": ${ petitioner.address.zip } 
-    - "petitioner_phone": ${ petitioner.phone_number } 
+    - "petitioner_phone": ${ phone_number_formatted(petitioner.phone_number) } 
     - "petitioner_email": ${ petitioner.email } 
     - "petitioner_gender_female": ${ petitioner.gender == "female" } 
     - "petitioner_gender_male": ${ petitioner.gender == "male" } 
@@ -76,7 +76,7 @@ attachment:
     - "respondent_name_middle": ${ respondent.name.middle } 
     - "respondent_address_address": ${ respondent.address.address } 
     - "respondent_address_zip": ${ respondent.address.zip } 
-    - "respondent_phone": ${ respondent.phone_number } 
+    - "respondent_phone": ${ phone_number_formatted(respondent.phone_number) } 
     - "respondent_address_state": ${ respondent.address.state } 
     - "respondent_address_city": ${ respondent.address.city } 
     - "respondent_email": ${ respondent.email } 
@@ -97,7 +97,7 @@ attachment:
     - "other_parties1_address_city": ${ other_parties[1].address.city } 
     - "other_parties1_address_state": ${ other_parties[1].address.state } 
     - "other_parties1_address_zip": ${ other_parties[1].address.zip } 
-    - "other_parties1_phone": ${ other_parties[1].phone } 
+    - "other_parties1_phone": ${ phone_number_formatted(other_parties[1].phone) } 
     - "other_parties1_email": ${ other_parties[1].email } 
     - "other_parties1_gender_male": ${ other_parties[1].gender == "male" } 
     - "other_parties1_gender_female": ${ other_parties[1].gender == "female" } 
@@ -116,7 +116,7 @@ attachment:
     - "other_parties2_address_city": ${ other_parties[2].address.city } 
     - "other_parties2_address_state": ${ other_parties[2].address.state } 
     - "other_parties2_address_zip": ${ other_parties[2].address.zip } 
-    - "other_parties2_phone": ${ other_parties[2].phone } 
+    - "other_parties2_phone": ${ phone_number_formatted(other_parties[2].phone) } 
     - "other_parties2_email": ${ other_parties[2].email } 
     - "other_parties2_gender_female": ${ other_parties[2].gender == "female" } 
     - "other_parties2_gender_male": ${ other_parties[2].gender == "male" } 
@@ -130,14 +130,14 @@ attachment:
     - "petitioner_employersj_address_city": ${ petitioner.employer.address.city } 
     - "petitioner_employersj_address_state": ${ petitioner.employer.address.state } 
     - "petitioner_employersj_address_zip": ${ petitioner.employer.address.zip } 
-    - "petitioner_employersj_phone_number": ${ petitioner.employer.phone_number } 
+    - "petitioner_employersj_phone_number": ${ phone_number_formatted(petitioner.employer.phone_number) } 
     - "petitioner_employersj_email": ${ petitioner.employer.email } 
     - "respondent_employersj_name_text": ${ respondent.employer.name.text } 
     - "respondent_employersj_address_address": ${ respondent.employer.address.address } 
     - "respondent_employersj_address_city": ${ respondent.employer.address.city } 
     - "respondent_employersj_address_state": ${ respondent.employer.address.state } 
     - "respondent_employersj_address_zip": ${ respondent.employer.address.zip } 
-    - "respondent_employersj_phone_number": ${ respondent.employer.phone_number } 
+    - "respondent_employersj_phone_number": ${ phone_number_formatted(respondent.employer.phone_number) } 
     - "respondent_employersj_email": ${ respondent.employer.email } 
     - "children0": ${ children[0].name_full() } 
     - "children0_ssn": ${ children[0].ssn } 

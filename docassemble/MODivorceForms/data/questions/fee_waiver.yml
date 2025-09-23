@@ -81,9 +81,9 @@ attachment:
       - "Judge or Division": ${ case.docket_number } 
       - "Case Number": ${ case.judge } 
       - "Petitioner Name": ${ petitioner.name_full() } 
-      - "Petitioners AddressTelephone": ${ petitioner.phone_number } 
+      - "Petitioners AddressTelephone": ${ phone_number_formatted(petitioner.phone_number) } 
       - "Respondent Name": ${ respondent.name_full() } 
-      - "Respondents AddressTelephone": ${ respondent.phone_number } 
+      - "Respondents AddressTelephone": ${ phone_number_formatted(respondent.phone_number) } 
       - "Marital Status": "Married"
       - "If Married Spouses name": ${ other_parties[0].name_full() } 
       - "Number of dependents": ${ len(children) } 
