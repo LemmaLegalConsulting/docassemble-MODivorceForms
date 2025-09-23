@@ -42,7 +42,7 @@ objects:
   - form_17_attachment: ALDocument.using(title="Family Court Information Sheet", filename="form_17",  has_addendum=False, )
 ---
 code: |
-  form_17_attachment.enabled = True
+  form_17_attachment.enabled = False
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
