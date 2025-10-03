@@ -38,7 +38,33 @@ subquestion: |
   ${ case.schedule }
   
   % endif  
+
+  Documents for 
+  % if case.filed == "not_filed":
+  Petitioner
+  % else:
+  Respondent
+  % endif
+
+  % for doc in doc_list.true_values():
+  ${ doc_list_dictionary[doc] }
+  % endfor
+  
 continue button field: info_displayed
+---
+variable name: doc_list_dictionary
+data:
+  petition_attachment: Petition
+  answer_attachment: Answer
+  parenting_plan_attachment: Parenting Plan
+  notice_of_hearing_attachment: Notice of hearing
+  certificate_of_dissolution_attachment: Certificate of dissolution
+  judgment_attachment: Judgment
+  property_statement_attachment: Property statement
+  income_statement_attachment: Income statement
+  fee_waiver_attachment: Fee waiver
+  confidential_information_sheet_attachment: Confidential information sheet
+  redaction_certification_attachment: Redaction certification
 ---
 mandatory: True
 question: Download ${ info_displayed }
@@ -48,6 +74,40 @@ attachment:
   docx template file: mo_divorce_forms_next_steps.docx
   valid formats:
     - pdf
+---
+question: Next Steps testing questions
+fields:
+  - Petitioner or respondent: case.filed
+    datatype: radio
+    choices:
+      - Petitioner: not_filed
+      - Respondent: user1_filed
+  - Minor children?: minor_children
+    datatype: yesnoradio
+---
+objects:
+  - doc_list: DADict.using(auto_gather=False)
+---
+code: |
+  if case.filed in ["not_filed"]:
+    doc_list['petition_attachment'] = True
+    doc_list['answer_attachment'] = False
+  else:
+    doc_list['petition_attachment'] = False
+    doc_list['answer_attachment'] = True
+  if minor_children:
+    doc_list['parenting_plan_attachment'] = True
+  else:
+    doc_list['parenting_plan_attachment'] = False
+  doc_list['notice_of_hearing_attachment'] = True 
+  doc_list['certificate_of_dissolution_attachment'] = True
+  doc_list['judgment_attachment'] = True
+  doc_list['property_statement_attachment'] = True
+  doc_list['income_statement_attachment'] = True   
+  doc_list['fee_waiver_attachment'] = True
+  doc_list['confidential_information_sheet_attachment'] = True
+  doc_list['redaction_certification_attachment'] = True
+  doc_list.gathered = True
 ---
 objects: 
   - case.address: Address
