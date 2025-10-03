@@ -20,7 +20,6 @@ code: |
     petitioner.attorney.address.address
     petitioner.attorney.bar_number
     petitioner.attorney.email
-    petitioner.attorney.fax
     petitioner.attorney.phone_number
   petitioner.email
   petitioner.phone_number
@@ -47,7 +46,6 @@ code: |
     respondent.attorney.address.address
     respondent.attorney.bar_number
     respondent.attorney.email
-    respondent.attorney.fax
     respondent.attorney.phone_number
   respondent.email
   respondent.phone_number
@@ -106,8 +104,6 @@ id: additional information about attorney
 question: Additional attorney about the ${ petitioner.attorney.name_full() }, attorney helping ${ petitioner.name_full() }
 fields:
   - Email for ${ petitioner.attorney.name_full() }: petitioner.attorney.email
-    required: False
-  - Fax for ${ petitioner.attorney.name_full() }: petitioner.attorney.fax
     required: False
   - Phone for ${ petitioner.attorney.name_full() }: petitioner.attorney.phone
     required: False
@@ -667,6 +663,6 @@ attachment:
       - "petitionersAttorneyState": ${ petitioner.attorney.address.city } 
       - "petitionersAttorneyZip": ${ petitioner.attorney.address.zip } 
       - "petitionersAttorneyPhone": ${ phone_number_formatted(petitioner.attorney.phone_number) } 
-      - "petitionersAttorneyFaxNumber": ${ petitioner.attorney.fax } 
+      - "petitionersAttorneyFaxNumber": ${ "" } 
       - "petitionersAttorneyEmail": ${ petitioner.attorney.email } 
 ---

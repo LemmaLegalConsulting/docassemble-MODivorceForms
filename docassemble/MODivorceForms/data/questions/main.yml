@@ -224,7 +224,6 @@ code: |
     other_parties[0].gender # confidential_information_sheet
   other_parties[0].pronouns
   other_parties[0].email
-  other_parties[0].fax
   other_parties[0].driver_license_number
   other_parties[0].phone_number
   other_parties[0].active_duty

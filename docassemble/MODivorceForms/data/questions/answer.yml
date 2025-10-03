@@ -220,7 +220,7 @@ attachment:
       - "raRespondentsAttorneyState": ${ respondent.attorney.address.state } 
       - "raRespondentsAttorneyZip": ${ respondent.attorney.address.zip } 
       - "raRespondentsAttorneyPhone": ${ respondent.attorney.phone } 
-      - "raRespondentsAttorneyFax": ${ respondent.attorney.fax } 
+      - "raRespondentsAttorneyFax": ${ "" } 
       - "raRespondentsAttorneyEmail": ${ respondent.attorney.email } 
 
 ---

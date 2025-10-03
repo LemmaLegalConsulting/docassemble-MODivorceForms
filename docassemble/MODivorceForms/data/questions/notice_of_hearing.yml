@@ -65,7 +65,7 @@ attachment:
       - "users0_address_zip": ${ users[0].address.city } 
       - "users0_address_state": ${ users[0].address.state } 
       - "users0_address_city": ${ users[0].address.zip } 
-      - "users0_phone": ${ users[0].fax_number } 
+      - "users0_phone": ${ "" } 
       - "users0_fax_number": ${ phone_number_formatted(users[0].phone_number) } 
       - "users0_email": ${ users[0].email } 
       - "case_notice_date": ${ service.date } 

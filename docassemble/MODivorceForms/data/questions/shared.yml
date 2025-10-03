@@ -369,13 +369,6 @@ fields:
   - Email: x.email
     required: False
 ---
-id: Fax number
-generic object: ALIndividual
-question: Fax for ${ x.name_full() }
-fields:
-  - Fax: x.fax
-    required: False
----
 sets: users[0].address.address
 id: Users address
 question: Your address
