@@ -99,7 +99,7 @@ subquestion: |
 
 
   You can use [Case.net](https://www.courts.mo.gov/cnet)
-  to help answer some questions on this website. You can check the landlord's name and other information, like the court date and the case number online.
+  to help answer some questions on this website. You can find information like the hearing date and the case number online.
 
   Case.net is a free website from the Missouri Court. You do not need an
   account for Case.net.
@@ -116,7 +116,7 @@ subquestion: |
   You will need both this website and the Case.net website open at the same time. You will
   need to switch back and forth between the two windows.
 
-  Look for your eviction case in the search results. Click the link with the case number for your case to see the details about your case. If you do not see your case, try a different
+  Look for your case in the search results. Click the link with the case number for your case to see the details about your case. If you do not see your case, try a different
   search.
 
   ${ action_button_html(formatted_casenet_url, label="Search Case.net in a new window", icon="up-right-from-square") }

@@ -155,7 +155,7 @@ fields:
       - "FC Dissolution w/o children": dissolution_without
       - "Something else": other
     default: |
-      ${ "dissolution_without" if len(children) == 0 else "dissolution_with" }
+      ${ "dissolution_with" if minor_children else "dissolution_without" }
     
 continue button field: case.matter_type_asked
 
@@ -412,9 +412,15 @@ fields:
 id: education info
 generic object: ALIndividual
 question: Educational info for ${ x.name_full() }
+continue button field: x.education_info
 fields:  
-  - "Elementary/Secondary Education": x.education_elementary
+  - "Did ${ x.name_full() } graduate from high school?": x.graduated_hs
+    datatype: yesnomaybe
+  - "How many years of elementary or secondary education did ${ x.name_full() } complete?": x.education_elementary
     input type: dropdown
+    show if:
+      variable: x.graduated_hs
+      is: False
     choices:
       - 0
       - 1
@@ -430,15 +436,36 @@ fields:
       - 11
       - 12
     required: False
-  - "College (1-4 or 5+)": x.education_college
+  - "Did ${ x.name_full() } graduate from college?": x.graduated_college
+    datatype: yesnomaybe
+    show if:
+      variable: x.graduated_hs
+      is: True
+  - "How many years of college did ${ x.name_full() } complete?": x.education_college
     input type: dropdown
+    show if:
+      variable: x.graduated_college
+      is: False
     choices:
       - 1
       - 2
       - 3
       - 4
-      - 5+
     required: False
+  - "Did ${ x.name_full() } complete any post-graduate work?": x.post_grad
+    datatype: yesnomaybe
+    show if:
+      variable: x.graduated_college
+      is: True
+validation code: |
+  if x.graduated_hs:
+    x.education_elementary = "12"
+  else:
+    x.graduated_college = False
+  if x.graduated_college and x.post_grad:
+    x.education_college = "5+"
+  elif x.graduated_college:
+    x.education_college = "4"
 ---
 id: active duty info
 generic object: ALIndividual

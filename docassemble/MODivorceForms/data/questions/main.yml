@@ -206,7 +206,7 @@ code: |
   users[0].pronouns
   if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
     users[0].race # certificate_of_dissolution
-    users[0].education_elementary
+    users[0].education_info
     users[0].previously_married
     users[0].active_duty
   if 'answer_attachment' in doc_list_selected.true_values() and users[0].active_duty:
@@ -231,7 +231,7 @@ code: |
   other_parties[0].ssn
   if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
     other_parties[0].race # certificate_of_dissolution
-    other_parties[0].education_elementary
+    other_parties[0].education_info
     other_parties[0].previously_married
   other_parties[0].active_duty
     

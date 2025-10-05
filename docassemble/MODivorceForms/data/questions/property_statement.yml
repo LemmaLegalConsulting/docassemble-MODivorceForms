@@ -370,11 +370,11 @@ id: bank_assets terms_ordered
 # their order here will be their same order when shown to users.
 variable name: bank_assets.terms_ordered
 data: !!omap
-  - checking account: "Checking accounts"
-  - savings account: "Savings accounts"
+  - checking account: "Checking account"
+  - savings account: "Savings account"
   - time deposit: "Time deposit"
-  - money market: "Money market accounts"
-  - certificates: "Certificates"
+  - money market: "Money market account"
+  - certificates: "Certificate"
   - other: "Other"
 ---
 only sets: bank_assets[i].market_value
@@ -428,7 +428,15 @@ validation code: |
     bank_assets[i].display_name = bank_assets.terms_ordered.get(bank_assets[i].source, bank_assets[i].source)
   else:
     bank_assets[i].display_name = bank_assets[i].source_other
-  bank_assets[i].description = bank_assets[i].institution + " " +bank_assets[i].display_name 
+  if defined('bank_assets[i].institution') and defined('bank_assets[i].account_number'):
+    bank_assets[i].description = bank_assets[i].institution + " " + bank_assets[i].account_number + " " + bank_assets[i].display_name 
+  elif defined('bank_assets[i].institution'):
+    bank_assets[i].description = bank_assets[i].institution + " " + + bank_assets[i].display_name 
+  elif defined('bank_assets[i].account_number'):
+    bank_assets[i].description = bank_assets[i].account_number + " " + bank_assets[i].display_name 
+  else:
+    bank_assets[i].description = bank_assets[i].display_name 
+  
 ---
 code: |
   users[0].bank_assets = [bank_asset for bank_asset in bank_assets if bank_asset.recommended_award == users[0].name.full()]
