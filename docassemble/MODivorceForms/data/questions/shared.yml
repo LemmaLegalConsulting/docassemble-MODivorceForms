@@ -105,7 +105,7 @@ question: Do you believe your case will be uncontested?
 subquestion: |
   In other words, do you and your spouse agree on how you will divide up property, debt, and/or parenting time?
 fields:
-  - Contested: is_case_contested
+  - My case is:: is_case_contested
     datatype: radio
     choices:
       - Uncontested: uncontested
@@ -341,11 +341,19 @@ fields:
     maxlength: 4
     required: False
 ---
-id: Driver license number
-generic object: ALIndividual
-question: Driver's license number for ${ x.name_full() }
+id: users driver's license number
+question: Driver's license number for ${ users[0].name_full() }
 fields:
-  - no label: x.driver_license_number
+  - Your driver's license number: users[0].driver_license_number
+    required: False
+---
+id: other_parties driver's license number
+question: |
+  Driver's license number for ${ other_parties[0].name_full() }
+subquestion: |
+  If you do not know the driver's license number for ${ other_parties[0].familiar }, you can leave this blank.
+fields:
+  - ${ other_parties[0].name_full() } driver's license number: other_parties[0].driver_license_number
     required: False
 ---
 sets: x.address.address
@@ -401,7 +409,7 @@ content: |
 ---
 id: Birth info
 generic object: ALIndividual
-question: Birthdate for ${ x.name_full() }
+question: Birth information for ${ x.name_full() }
 fields:    
   - Birthdate: x.birthdate
     datatype: ThreePartsDate
@@ -471,7 +479,7 @@ id: active duty info
 generic object: ALIndividual
 question: Military info for ${ x.name_full() }
 fields:  
-  - Active duty military?: x.active_duty
+  - Is ${ x.name_full() } active duty military?: x.active_duty
     datatype: yesnoradio
 ---
 id: race
@@ -1277,7 +1285,7 @@ fields:
 id: user self employment income
 question: Self Employment Income 
 fields: 
-  - Does you have any self employment income?: users[0].has_self_employment_income
+  - Do you have any self employment income?: users[0].has_self_employment_income
     datatype: yesnoradio
   - Monthly self employment income: users[0].self_employment_income
     datatype: currency
@@ -3257,7 +3265,7 @@ fields:
       is: False
 ---
 id: one maintenance question
-question: Maintanance award
+question: Maintenance award
 fields:
   - Should the court award maintenance to ${ petitioner.name_full() } or ${ respondent.name_full() }?: is_maintenance_award
     datatype: yesnoradio

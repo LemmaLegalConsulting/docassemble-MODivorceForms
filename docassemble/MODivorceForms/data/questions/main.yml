@@ -533,7 +533,7 @@ fields:
 event: custody_exit
 question: Child Custody
 subquestion: |
-  Unfortunately, this system is unable to address custody issues at this time.  Click the link below to find legal help bettersuited for your situation.
+  Unfortunately, this system is unable to address custody issues at this time.  Click the link below to find legal help better suited to your situation.
 ---
 event: legal_separation_exit
 question: Legal Separation
@@ -597,7 +597,7 @@ fields:
        Sometimes when a child is born to two people before they get married, the court will require a separate case to establish paternity (even if everybody agrees).  However, most courts will move forward with just the divorce, assuming that paternity is acknowledged through the marriage.  For now, we'll move forward with the understanding that the paternity has been acknowledged.  However, a judge may direct you to file something else or speak to an attorney.
     js show if:   |
       val("minor_children_before_marriage") === true
-  - Have you or your spouse physically gave birth during the marriage with a third party?: child_outside_marriage
+  - Have you or your spouse physically given birth during the marriage with a third party?: child_outside_marriage
     datatype: yesnoradio
     js show if:   |
       val("minor_children_before_marriage") === true || val("minor_children_before_marriage") === false
