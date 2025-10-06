@@ -72,8 +72,8 @@ attachment:
       - "user2_address_mailing": ${ respondent.mailing_address.on_one_line() } 
       - "user1_ssn": ${ petitioner.ssn } 
       - "user2_ssn": ${ respondent.ssn } 
-      - "user1_driver_license_number": ${ petitioner.driver_license_number } 
-      - "user2_driver_license_number": ${ respondent.driver_license_number } 
+      - "user1_driver_license_number": ${ "Unknown" if petitioner.driver_license_number == "" else petitioner.driver_license_number } 
+      - "user2_driver_license_number": ${ "Unknown" if respondent.driver_license_number == "" else respondent.driver_license_number} 
       - "user1_phone_number": ${ petitioner.phone_number } 
       - "user2_phone_number": ${ respondent.phone_number } 
       - "user1_employer_name": ${ petitioner.employer.name.text } 
