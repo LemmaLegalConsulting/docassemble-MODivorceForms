@@ -3,6 +3,9 @@ include:
   - docassemble.ALToolbox:al_income.yml
   - county.yml
 ---
+modules:
+  - .al_income_other
+---
 id: list of previously entered people
 code: |
   temp_people_choices = list()
@@ -1744,7 +1747,7 @@ code: |
 id: x.benefits object
 generic object: ALIndividual
 objects:
-  - x.benefits: ALIncomeList.using(complete_attribute='complete',there_is_another=False)
+  - x.benefits: ALIncomeListOther.using(complete_attribute='complete',there_is_another=False)
 ---
 id: x.benefits ordered object for checkboxes
 generic object: ALIndividual
@@ -1752,7 +1755,7 @@ objects:
   - x.benefits_ordered: DAOrderedDict.using(elements=x.benefits.terms_ordered, auto_gather=False, gathered=True)
 ---
 id: selected types sets there_are_any
-generic object: ALIncomeList
+generic object: ALIncomeListOther
 code: |
   if x.selected_types.any_true():
     x.move_checks_to_list(selected_terms=x.terms_ordered)
@@ -1910,7 +1913,7 @@ code: |
 id: other_incomes
 generic object: ALIndividual
 objects:
-  - x.other_incomes: ALIncomeList.using(complete_attribute='complete',there_is_another=False)
+  - x.other_incomes: ALIncomeListOther.using(complete_attribute='complete',there_is_another=False)
 ---
 id: other_incomes_ordered
 generic object: ALIndividual
@@ -1918,7 +1921,7 @@ objects:
   - x.other_incomes_ordered: DAOrderedDict.using(elements=x.other_incomes.terms_ordered, auto_gather=False, gathered=True)
 ---
 comment: |
-  will use id: ALIncomeList there are any to set other_incomes.there_are_any
+  will use id: ALIncomeListOther there are any to set other_incomes.there_are_any
 ---
 generic object: ALIndividual
 id: are there other incomes
@@ -1955,7 +1958,7 @@ comment: |
 ---
 generic object: ALIndividual
 id: other income info for list
-#generic object: ALIncomeList
+#generic object: ALIncomeListOther
 reconsider: x.other_incomes[i].display_name
 question: |
   Tell us about your ${ x.other_incomes[i].display_name.lower() }
@@ -2000,7 +2003,7 @@ validation code: |
 ---
 generic object: ALIndividual
 id: other income info for list
-#generic object: ALIncomeList
+#generic object: ALIncomeListOther
 reconsider: other_parties[0].other_incomes[i].display_name
 question: |
   Tell us about ${ other_parties[0].other_incomes[i].display_name.lower() } for ${ other_parties[0] }
@@ -2411,8 +2414,8 @@ code: |
   x.health_insurance_costs = 0
 ---
 ## ASSETS
-id: ALIncomeList there are any
-generic object: ALIncomeList
+id: ALIncomeListOther there are any
+generic object: ALIncomeListOther
 code: |
   if x.selected_types.any_true():
     x.move_checks_to_list(selected_terms=x.terms_ordered)
@@ -2421,7 +2424,7 @@ code: |
     x.there_are_any = False
 ---
 id: generic set display name backup
-generic object: ALAssetList
+generic object: ALAssetListOther
 code: |
   if defined('x[i].source') and x[i].source != "other":
     x[i].display_name = x.terms_ordered.get(x[i].source, x[i].source)
@@ -2431,7 +2434,7 @@ code: |
     x[i].display_name = x.other_display
 ---
 id: generic there are any
-generic object: ALAssetList
+generic object: ALAssetListOther
 question: |
   ${ x.display_name }
 subquestion: |   
@@ -2442,13 +2445,13 @@ fields:
     code: |
       x.ordered
 ---
-generic object: ALAssetList
+generic object: ALAssetListOther
 code: |
   x[i].market_value
   x[i].complete = True
 ---
 id: generic review
-generic object: ALAssetList
+generic object: ALAssetListOther
 question: Do you want to list any other ${ x.display_name }?
 subquestion: |
 
@@ -2471,7 +2474,7 @@ subquestion: |
 continue button field: x.review_assets
 ---
 id: generic revisit
-generic object: ALAssetList
+generic object: ALAssetListOther
 continue button field: x.revisit
 question: |
   Edit ${ x.display_name }
@@ -2481,7 +2484,7 @@ subquestion: |
   ${ x.add_action() }
 ---
 id: generic table
-generic object: ALAssetList
+generic object: ALAssetListOther
 table: x.table
 rows: x
 columns:
@@ -2511,7 +2514,7 @@ edit:
 ---
 generic object: ALIndividual
 objects:
-  - x.assets: ALAssetList.using(auto_gather=False)
+  - x.assets: ALAssetListOther.using(auto_gather=False)
 ---
 generic object: ALIndividual
 code: |
@@ -2526,7 +2529,7 @@ code: |
 ---
 id: real_estate object
 objects:
-  - real_estate: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+  - real_estate: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
 ---
 id: real_estate other display
 comment: |
@@ -2618,7 +2621,7 @@ validation code: |
 ---
 id: vehicles object
 objects:
-  - vehicles: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+  - vehicles: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
 ---
 id: vehicles other display
 comment: |
@@ -2718,7 +2721,7 @@ validation code: |
 ---
 id: bank_assets object
 objects:
-  - bank_assets: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+  - bank_assets: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
 ---
 id: bank_assets other display
 comment: |
@@ -2799,7 +2802,7 @@ code: |
 ---
 id: personal_goods object
 objects:
-  - personal_goods: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+  - personal_goods: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
 ---
 id: personal_goods other display
 comment: |
@@ -2897,11 +2900,11 @@ validation code: |
 ---
 ### DEBTS
 objects: 
-  - debts: ALAssetList.using(there_is_another=False,complete_attribute='complete')
+  - debts: ALAssetListOther.using(there_is_another=False,complete_attribute='complete')
 ---
 generic object: ALIndividual
 objects:
-  - x.debts: ALAssetList.using(auto_gather=False)
+  - x.debts: ALAssetListOther.using(auto_gather=False)
 ---
 id: populate debt list from debts in assets
 code: |
@@ -2928,13 +2931,13 @@ code: |
       x.debts.append(debt)
   x.debts.gathered = True
 ---
-generic object: ALAssetList
+generic object: ALAssetListOther
 code: |
   x[i].market_value
   x[i].complete = True
 ---
 id: generic ordered object for checkboxes
-generic object: ALAssetList
+generic object: ALAssetListOther
 objects:
   - x.ordered: DAOrderedDict.using(elements=x.terms_ordered, auto_gather=False, gathered=True)
 ---
@@ -2948,7 +2951,7 @@ code: |
   debts.display_name = "other debts"
 ---
 objects: 
-  - secured_debts: ALAssetList.using(auto_gather=False)
+  - secured_debts: ALAssetListOther.using(auto_gather=False)
 ---
 id: debts terms_ordered
 # "!!omap" makes these terms ordered
@@ -2965,7 +2968,7 @@ code: |
   debts.display_name = "Debt"
 ---
 id: debts there are any
-generic object: ALAssetList
+generic object: ALAssetListOther
 question: |
   Other Debts
 subquestion: |   
