@@ -22,7 +22,6 @@ code: |
   service.date
   case.county
   case.docket_number
-  case.division_number
   petitioner.name.first
   petitioner.address.state
   petitioner.ssn
@@ -106,7 +105,7 @@ attachment:
       - "respondentsMiddleName": ${ respondent.name.middle } 
       - "respondentsLastName": ${ respondent.name.last } 
       - "respondentsSuffixJrSrIII": ${ respondent.name.suffix } 
-      - "divisionNumber": ${ case.division_number } 
+      - "divisionNumber": ${ "" } 
       - "raHowManyPetitions1": ${ previous_petitions == "1" } 
       - "raHowManyPetitions2": ${ previous_petitions == "2" } 
       - "raHowManyPetitions3": ${ previous_petitions == "3" } 

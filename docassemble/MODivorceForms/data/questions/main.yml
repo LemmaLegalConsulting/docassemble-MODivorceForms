@@ -139,8 +139,6 @@ code: |
       case.filing_date_asked # petition
     if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'redaction_certification_attachment' in doc_list_selected.true_values():
       case.circuit # form_17
-    if 'answer_attachment' in doc_list_selected.true_values() or 'notice_of_hearing_attachment' in doc_list_selected.true_values():
-      case.division_number_asked # notice_of_hearing
     notice_date # property_statement.yml
     if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
       case.matter_type # notice_of_hearing

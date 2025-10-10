@@ -264,15 +264,6 @@ id: code to set circuit from county_dictionary
 code: |
   case.circuit = county_dictionary[case.county]["circuit"]
 ---
-id: division
-question: Division Number
-subquestion: |
-  The Division Number refers to the Division of your county court.  You may find the Division Number on the petition.
-fields:
-  - Division number: case.division_number
-    required: False
-continue button field: case.division_number_asked
----
 ## PARTIES ##
 
 
