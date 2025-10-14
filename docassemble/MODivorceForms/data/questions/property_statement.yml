@@ -350,7 +350,7 @@ validation code: |
     vehicles[i].display_name = vehicles.terms_ordered.get(vehicles[i].source, vehicles[i].source)
   else:
     vehicles[i].display_name = vehicles[i].source_other
-  vehicles[i].description = vehicles[i].year + " " + vehicles[i].make + " " + vehicles[i].model
+  vehicles[i].description = vehicles[i].year + " " + vehicles[i].make + " " + vehicles[i].model + vehicles[i].display_name
 ---
 id: bank_assets object
 objects:
