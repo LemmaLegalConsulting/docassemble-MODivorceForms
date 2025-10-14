@@ -57,4 +57,3 @@ setup(name='docassemble.MODivorceForms',
       zip_safe=False,
       package_data=find_package_data(where='docassemble/MODivorceForms/', package='docassemble.MODivorceForms'),
      )
-

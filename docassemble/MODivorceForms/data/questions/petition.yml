@@ -241,6 +241,12 @@ id: service address
 generic object: ALIndividual
 question: Service address for ${ x.name_full() }
 fields:
+  - Address already provided: x.service_address
+    datatype: object_radio
+    choices: x.address
+    none of the above: A different address
+    disable others: True
+    default: x.address
   - code: |
       x.service_address.address_fields()
 ---
