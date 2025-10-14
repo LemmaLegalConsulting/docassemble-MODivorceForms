@@ -6,7 +6,7 @@ code: |
   x.address.address
   trial_court = ALCourt("trial_court")
   if not hasattr(x.normalized_address(), "county") and x.normalized_address().city.lower() in ["st. louis", "saint louis"]:
-    x.address.county = "St. Louis, City of"
+    x.address.county = "City of St. Louis"
   else:
     if hasattr(x.normalized_address(), "county") and x.normalized_address().county in county_dictionary:
       x.address.county = x.normalized_address().county

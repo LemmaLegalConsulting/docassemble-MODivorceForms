@@ -3404,7 +3404,17 @@ fields:
     choices:
       - Serve by sheriff: sheriff
       - Serve by private process server: private
-
+---
+id: method of service to respondent
+question: Service to ${ other_parties[0].name_full() }?
+fields:
+  - How will you serve ${ other_parties[0].name_full() }?: other_parties[0].service_type
+    datatype: radio
+    choices:
+      - ${ other_parties[0].name_full() } has signed a verified Respondent’s Answer to Petition for Dissolution of Marriage, which is being filed with the Petition for Dissolution of Marriage. Therefore, do not issue a summons.: none
+      - ${ other_parties[0].name_full() } should be served with a summons at their home: house
+      - ${ other_parties[0].name_full() } should be served with a summons at their place of employment: work
+      - ${ other_parties[0].name_full() } cannot be served in Missouri. Therefore, service by registered mail is requested. A copy of the Affidavit for Service by Mail is attached to this form. See Missouri Supreme Court Rule 54.12(b).: mail
 ---
 id: people_served object
 objects: 
