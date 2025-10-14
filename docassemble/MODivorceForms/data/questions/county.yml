@@ -121,6 +121,68 @@ subquestion: |
 
   ${ action_button_html(formatted_casenet_url, label="Search Case.net in a new window", icon="up-right-from-square") }
 ---
+objects: 
+  - case.address: Address
+---
+objects:
+  - case.photo: DAStaticFile
+---
+code: |
+  case.photo.filename = case.photo_filename
+---
+question: Select Court
+subquestion: |
+  There is more than one court in your county.  Select the court that your case is in.
+fields:
+  - Court: selected_court
+    datatype: radio
+    code: |
+      potential_courts
+---
+code: |
+  temp_potential_courts = list()
+  for index in range(0,len(county_dictionary[case.county]['courts'])):
+    temp_potential_courts.append({"label":county_dictionary[case.county]['courts'][index]['name'],"value":index})
+  potential_courts = temp_potential_courts
+---
+code: |
+  if len(county_dictionary[case.county]['courts']) == 1:
+    case.court_name = county_dictionary[case.county]['courts'][0]['name']
+    case.address.address = county_dictionary[case.county]['courts'][0]['address']
+    if 'unit' in county_dictionary[case.county]['courts'][0].keys():
+      case.address.unit = county_dictionary[case.county]['courts'][0]['unit']
+    case.address.city = county_dictionary[case.county]['courts'][0]['city']
+    case.address.state = county_dictionary[case.county]['courts'][0]['state']
+    case.address.zip = county_dictionary[case.county]['courts'][0]['zip']
+    if 'phone' in county_dictionary[case.county]['courts'][0].keys():
+      case.phone = county_dictionary[case.county]['courts'][0]['phone']
+    if 'rules' in county_dictionary[case.county]['courts'][0].keys():
+      case.rules = county_dictionary[case.county]['courts'][0]['rules']
+    if 'website' in county_dictionary[case.county]['courts'][0].keys():
+      case.website = county_dictionary[case.county]['courts'][0]['website']
+    if 'photo' in county_dictionary[case.county]['courts'][0].keys():
+      case.photo_filename = county_dictionary[case.county]['courts'][0]['photo']
+    if 'schedule' in county_dictionary[case.county]['courts'][0].keys():
+      case.schedule = county_dictionary[case.county]['courts'][0]['schedule']  
+  else:
+    case.court_name = county_dictionary[case.county]['courts'][int(selected_court)]['name']
+    case.address.address = county_dictionary[case.county]['courts'][int(selected_court)]['address']
+    if 'unit' in county_dictionary[case.county]['courts'][int(selected_court)].keys():
+      case.address.unit = county_dictionary[case.county]['courts'][int(selected_court)]['unit']
+    case.address.city = county_dictionary[case.county]['courts'][int(selected_court)]['city']
+    case.address.state = county_dictionary[case.county]['courts'][int(selected_court)]['state']
+    case.address.zip = county_dictionary[case.county]['courts'][int(selected_court)]['zip']
+    if 'phone' in county_dictionary[case.county]['courts'][int(selected_court)].keys():
+      case.phone = county_dictionary[case.county]['courts'][int(selected_court)]['phone']
+    if 'rules' in county_dictionary[case.county]['courts'][int(selected_court)].keys():
+      case.rules = county_dictionary[case.county]['courts'][int(selected_court)]['rules']
+    if 'website' in county_dictionary[case.county]['courts'][int(selected_court)].keys():
+      case.website = county_dictionary[case.county]['courts'][int(selected_court)]['website']
+    if 'photo' in county_dictionary[case.county]['courts'][int(selected_court)].keys():
+      case.photo_filename = county_dictionary[case.county]['courts'][int(selected_court)]['photo']
+    if 'schedule' in county_dictionary[case.county]['courts'][int(selected_court)].keys():
+      case.schedule = county_dictionary[case.county]['courts'][int(selected_court)]['schedule']  
+---
 id: county_dictionary
 variable name: county_dictionary
 data:  

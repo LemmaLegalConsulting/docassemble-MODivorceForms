@@ -1681,7 +1681,7 @@ generic object: ALIndividual
 question: Income for ${ x.name_full() }
 fields:
   - Is ${ x.name_full() } able to support themselves on their monthly income?: x.self_supporting
-    datatype: yesnoradio
+    datatype: yesnomaybe
 ---
 variable name: job_items_names
 data:
