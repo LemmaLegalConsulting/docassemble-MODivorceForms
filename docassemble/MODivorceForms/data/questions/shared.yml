@@ -1678,9 +1678,16 @@ edit:
 ---
 id: self supporting
 generic object: ALIndividual
-question: Income for ${ x.name_full() }
+question: Income for ${ users[0].name_full() }
 fields:
-  - Is ${ x.name_full() } able to support themselves on their monthly income?: x.self_supporting
+  - Are you able to support yourself on your monthly income?: users[0].self_supporting
+    datatype: yesnoradio
+---
+id: self supporting
+generic object: ALIndividual
+question: Income for ${ other_parties[0].name_full() }
+fields:
+  - Is ${ other_parties[0].name_full() } able to support themselves on their monthly income?: other_parties[0].self_supporting
     datatype: yesnomaybe
 ---
 variable name: job_items_names
@@ -1788,8 +1795,14 @@ fields:
     datatype: checkboxes
     code: |
       other_parties[0].benefits_ordered
+  - "I do not know if ${ other_parties[0] } receives these benefits": other_parties_benefits_unknown
+    datatype: yesnowide
+    disable others: True
   - note: |
       If ${ other_parties[0] } get SSDI, we will ask about that income later.
+validation code: |
+  if other_parties_benefits_unknown:
+    other_parties[0].benefits.there_are_any = False
 ---
 id: ALIncome complete
 generic object: ALIncome
@@ -3255,14 +3268,14 @@ fields:
       variable: maintenance_income_withholding
       is: False
 ---
-id: one maintenance question
+id: one maintenance award question
 question: Maintenance award
 fields:
-  - Should the court award maintenance to ${ petitioner.name_full() } or ${ respondent.name_full() }?: is_maintenance_award
+  - Should the court award maintenance to ${ petitioner.name_full() } or ${ respondent.name_full() }?: relief['maintenance']
     datatype: yesnoradio
   - Who should be awarded maintenance?: maintenance_awarded_to
     js show if: |
-      val("is_maintenance_award")
+      val("relief['maintenance']")
     choices:
       - ${ petitioner.name_full() } should be paid maintenance by ${ respondent.name_full() }: petitioner
       - ${ respondent.name_full() } should be paid maintenance by ${ petitioner.name_full() }: respondent
@@ -3278,25 +3291,43 @@ fields:
   - Reason income withholding shall not issue: maintenance_income_withholding_reason
     js show if: |
       val('maintenance_income_withholding') === false
+---
+id: maintenance currently paid question
+question: Current maintenance award
+subquestion: |
+  If maintenance was awarded in a previous divorce, or earlier in the case, you can answer yes.  But in most cases there will not already be an award of maintenance.
+fields:
+  - Is any maintenance currently paid by ${ petitioner.name_full() } or ${ respondent.name_full() } to the other?: is_maintenance_currently_paid
+    datatype: yesnoradio
+    default: False
+  - Who is currently paid maintenance?: maintenance_currently_paid_to
+    js show if: |
+      val("is_maintenance_currently_paid")
+    choices:
+      - ${ petitioner.name_full() } is paid maintenance by ${ respondent.name_full() }: petitioner
+      - ${ respondent.name_full() } is paid maintenance by ${ petitioner.name_full() }: respondent
+    datatype: radio
+  - How much per month?: maintenance_currently_paid_amount
+    datatype: currency
+    js show if: |
+      val('maintenance_currently_paid_to') === "petitioner" || val('maintenance_currently_paid_to') === "respondent"
 validation code: |
-  if is_maintenance_award:
-    if maintenance_awarded_to == "petitioner":
-      petitioner.maintenance_received = maintenance_amount
+  if is_maintenance_currently_paid:
+    if maintenance_currently_paid_to == "petitioner":
+      petitioner.maintenance_received = maintenance_currently_paid_amount
       petitioner.maintenance_paid = 0
       respondent.maintenance_received = 0
-      respondent.maintenance_paid = maintenance_amount
-    if maintenance_awarded_to == "respondent":
+      respondent.maintenance_paid = maintenance_currently_paid_amount
+    if maintenance_currently_paid_to == "respondent":
       petitioner.maintenance_received = 0
-      petitioner.maintenance_paid = maintenance_amount
-      respondent.maintenance_received = maintenance_amount
+      petitioner.maintenance_paid = maintenance_currently_paid_amount
+      respondent.maintenance_received = maintenance_currently_paid_amount
       respondent.maintenance_paid = 0
-    relief['maintenance'] = True
   else:
     petitioner.maintenance_received = 0
     petitioner.maintenance_paid = 0
     respondent.maintenance_received = 0
     respondent.maintenance_paid = 0
-    relief['maintenance'] = False
 ---
 ## CHILD SUPPORT ##
 id: Child Support Award

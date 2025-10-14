@@ -198,7 +198,8 @@ code: |
       parenting_plan
     elif case.filed in ['user1_filed']:
       agree_with_parenting_plan
-  is_maintenance_award
+  relief['maintenance']
+  is_maintenance_currently_paid
   is_additional_provisions
   if 'answer_attachment' in doc_list_selected.true_values():
     denials_exist
@@ -216,7 +217,6 @@ code: |
   if 'petition_attachment' in doc_list_selected.true_values():
     users[0].county_length_of_residence_choice
   users[0].email
-  users[0].driver_license_number
   users[0].phone_number
   users[0].birthdate
   users[0].ssn
@@ -245,7 +245,6 @@ code: |
     other_parties[0].gender # confidential_information_sheet
   other_parties[0].pronouns
   other_parties[0].email
-  other_parties[0].driver_license_number
   other_parties[0].phone_number
   other_parties[0].active_duty
   other_parties[0].birthdate

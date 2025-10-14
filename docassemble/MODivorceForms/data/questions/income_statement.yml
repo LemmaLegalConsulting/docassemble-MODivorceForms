@@ -85,10 +85,10 @@ attachment:
       - "respondentsMiddleName": ${ respondent.name.middle } 
       - "respondentsLastName": ${ respondent.name.last } 
       - "respondentsSuffixJrSrIII": ${ respondent.name.suffix } 
-      - "ie1p": ${ "{:.2f}".format(petitioner.jobs.total(times_per_year = 12)) } 
-      - "ie1r": ${ "{:.2f}".format(respondent.jobs.total(times_per_year = 12)) } 
-      - "ie2p": ${ "{:.2f}".format(petitioner.self_employment_income) } 
-      - "ie2r": ${ "{:.2f}".format(respondent.self_employment_income) } 
+      - "ie1p": ${ "Unknown" if petitioner.jobs.there_are_any == None else "{:.2f}".format(petitioner.jobs.total(times_per_year = 12)) } 
+      - "ie1r": ${ "Unknown" if respondent.jobs.there_are_any == None else "{:.2f}".format(respondent.jobs.total(times_per_year = 12)) } 
+      - "ie2p": ${ "Unknown" if petitioner.has_self_employment_income == None else "{:.2f}".format(petitioner.self_employment_income) } 
+      - "ie2r": ${ "Unknown" if respondent.has_self_employment_income == None else"{:.2f}".format(respondent.self_employment_income) } 
       - "ie3r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['social security'], times_per_year=12)) } 
       - "ie3p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['social security'], times_per_year=12)) } 
       - "ie4p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['retirement'], times_per_year=12)) } 
