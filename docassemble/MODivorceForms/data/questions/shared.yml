@@ -563,7 +563,6 @@ fields:
       variable: users[0].mo_length_of_residence_choice
       is: year    
 ---
-if: not users[0].lives_in_missouri
 id: Residency info for user
 question: Your residency in Missouri
 fields:
