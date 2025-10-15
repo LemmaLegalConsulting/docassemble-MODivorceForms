@@ -79,7 +79,22 @@ id: interview order certificate of dissolution of marriage
 code: |
   # Set the allowed courts for this interview
   allowed_courts = []
-  nav.set_section("case_information")
+  section_right_tool
+  section_relief
+  section_case_information
+  section_children
+  section_user_info
+  section_other_party
+  section_marriage
+  section_income
+  section_expenses
+  section_assets
+  section_debts
+  section_service
+  interview_order_mo_divorce_forms = True
+---
+---
+code: |  
   ## 1 Is this the appropriate tool?
   if case_type == "Custody":
     custody_exit
@@ -104,9 +119,9 @@ code: |
       jurisdiction_kickout
   if is_case_contested in ['contested','unknown']:
     mediation_info
-
-    
-  
+  section_right_tool = True
+---
+code: |  
   users.gather()
   if users[0].has_prior_name:
     users[0].prior_name.name.first
@@ -120,8 +135,9 @@ code: |
   other_parties.gather()
   if other_parties[0].has_prior_name:
     other_parties[0].prior_name.name.first
-
-  
+  section_relief = True
+---
+code: |    
   ## 3 Please enter your case information
   nav.set_section("case_information")   
   if case.filed in ["user0_filed", "user1_filed"]:
@@ -129,6 +145,8 @@ code: |
     if 'answer_attachment' in doc_list_selected.true_values() or 'petition_attachment' in doc_list_selected.true_values():
       previous_petitions # answer, petition
   case.county # property_statement, petition, notice_of_hearing, form_17, certificate_of_dissolution
+  case.court_name
+  case.photo.filename
   if case.filed in ["user0_filed", "user1_filed"]:
     case.docket_number_asked
     if 'confidential_information_sheet_attachment' in doc_list_selected.true_values() or 'redaction_certification_attachment' in doc_list_selected.true_values():
@@ -139,8 +157,6 @@ code: |
       case.filing_date_asked # petition
     if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'redaction_certification_attachment' in doc_list_selected.true_values():
       case.circuit # form_17
-    if 'answer_attachment' in doc_list_selected.true_values() or 'notice_of_hearing_attachment' in doc_list_selected.true_values():
-      case.division_number_asked # notice_of_hearing
     notice_date # property_statement.yml
     if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
       case.matter_type # notice_of_hearing
@@ -157,8 +173,9 @@ code: |
     if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
       respondent.party_type_code # confidential_information_sheet
       respondent.party_type_description  
-
-
+  section_case_information = True
+---
+code: |  
   nav.set_section("relief")
 
   if minor_children or minor_children_before_marriage:
@@ -181,11 +198,14 @@ code: |
       parenting_plan
     elif case.filed in ['user1_filed']:
       agree_with_parenting_plan
-  is_maintenance_award
+  relief['maintenance']
+  is_maintenance_currently_paid
   is_additional_provisions
   if 'answer_attachment' in doc_list_selected.true_values():
     denials_exist
-  
+  section_children = True
+---
+code: |    
   nav.set_section("user_info")  
 
   
@@ -197,7 +217,6 @@ code: |
   if 'petition_attachment' in doc_list_selected.true_values():
     users[0].county_length_of_residence_choice
   users[0].email
-  users[0].driver_license_number
   users[0].phone_number
   users[0].birthdate
   users[0].ssn
@@ -206,12 +225,14 @@ code: |
   users[0].pronouns
   if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
     users[0].race # certificate_of_dissolution
-    users[0].education_elementary
+    users[0].education_info
     users[0].previously_married
     users[0].active_duty
   if 'answer_attachment' in doc_list_selected.true_values() and users[0].active_duty:
     waive_rights
-  
+  section_user_info = True
+---
+code: |    
   nav.set_section("other_party_info")  
   other_parties[0].address.address # petition
   if other_parties[0].address.state == "MO":
@@ -224,19 +245,18 @@ code: |
     other_parties[0].gender # confidential_information_sheet
   other_parties[0].pronouns
   other_parties[0].email
-  other_parties[0].fax
-  other_parties[0].driver_license_number
   other_parties[0].phone_number
   other_parties[0].active_duty
   other_parties[0].birthdate
   other_parties[0].ssn
   if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
     other_parties[0].race # certificate_of_dissolution
-    other_parties[0].education_elementary
+    other_parties[0].education_info
     other_parties[0].previously_married
   other_parties[0].active_duty
-    
-  
+  section_other_party = True
+---
+code: |  
   nav.set_section('marriage')
   marriage_info # certificate_of dissolution
   if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
@@ -274,8 +294,9 @@ code: |
     persons_lived_with_preload # petition
     persons_lived_with.gather()
     others_with_physical_custody
-
-  
+  section_marriage = True
+---
+code: |    
   nav.set_section('income')
   users[0].jobs.gather() # income_statement.yml, fee_waiver, form_17
   if users[0].jobs.there_are_any: # form_17
@@ -310,8 +331,10 @@ code: |
   other_parties[0].other_children
   other_parties[0].other_child_support_received
   other_parties[0].monthly_gross_income # property_statement
-  other_parties[0].self_supporting # property_statement  
-  
+  other_parties[0].self_supporting # property_statement
+  section_income = True
+---
+code: |    
   nav.set_section('expenses')
   users[0].expenses.gather()
   users[0].maintenance_other_paid
@@ -327,7 +350,9 @@ code: |
   other_parties[0].extraordinary_childrearing_costs.gather()
   other_parties[0].health_insurance_costs
   other_parties[0].work_childcare_expenses
-  
+  section_expenses = True
+---
+code: |     
   nav.set_section('assets')  
   if 'fee_waiver_attachment' in doc_list_selected.true_values():
     users[0].cash
@@ -367,7 +392,9 @@ code: |
   users[0].review_assets
   other_parties[0].assets.gathered
   other_parties[0].review_assets
-    
+  section_assets = True
+---
+code: |       
   nav.set_section('debts')
   users[0].in_bankruptcy
   other_parties[0].in_bankruptcy
@@ -378,10 +405,10 @@ code: |
   users[0].review_debts
   other_parties[0].debts.gathered
   other_parties[0].review_debts
-  
-  
+  section_debts = True
+---
+code: |     
   nav.set_section('service')
-  
   if case.filed == "user0_filed" and respondent_served:
       served_information
   else:
@@ -394,15 +421,13 @@ code: |
         fill_in_service_date # form_17
         if case.filed in ["user0_filed", "not_filed"]:
           respondent.service_type
-        else:
-          petitioner.service_type
         people_served.gathered # notice_of_hearing
         for people in people_served:
           people.service_address.address
     filing_pleadings_video
   if 'redaction_certification_attachment' in doc_list_selected.true_values():
     al_court_bundle
-  interview_order_mo_divorce_forms = True
+  section_service = True
 ---
 ###################### Main order ######################
 comment: |
@@ -534,7 +559,7 @@ fields:
 event: custody_exit
 question: Child Custody
 subquestion: |
-  Unfortunately, this system is unable to address custody issues at this time.  Click the link below to find legal help bettersuited for your situation.
+  Unfortunately, this system is unable to address custody issues at this time.  Click the link below to find legal help better suited to your situation.
 ---
 event: legal_separation_exit
 question: Legal Separation
@@ -598,7 +623,7 @@ fields:
        Sometimes when a child is born to two people before they get married, the court will require a separate case to establish paternity (even if everybody agrees).  However, most courts will move forward with just the divorce, assuming that paternity is acknowledged through the marriage.  For now, we'll move forward with the understanding that the paternity has been acknowledged.  However, a judge may direct you to file something else or speak to an attorney.
     js show if:   |
       val("minor_children_before_marriage") === true
-  - Have you or your spouse physically gave birth during the marriage with a third party?: child_outside_marriage
+  - Have you or your spouse physically given birth during the marriage with a third party?: child_outside_marriage
     datatype: yesnoradio
     js show if:   |
       val("minor_children_before_marriage") === true || val("minor_children_before_marriage") === false

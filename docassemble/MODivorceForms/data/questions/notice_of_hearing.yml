@@ -13,7 +13,6 @@ code: |
   petitioner.name.first
   respondent.name.first
   case.county
-  case.division_number
   case.docket_number
   hearing_date
   hearing_time
@@ -48,7 +47,7 @@ attachment:
       - "petitioner_name_last": ${ petitioner.name.last } 
       - "case_docket_number": ${ case.docket_number } 
       - "respondent_name_suffix": ${ respondent.name.suffix } 
-      - "respondent_name_last": ${ case.division_number } 
+      - "respondent_name_last": ${ "" } 
       - "respondent_name_first": ${ respondent.name.middle } 
       - "respondent_name_middle": ${ respondent.name.last } 
       - "case_division_number": ${ respondent.name.first } 
@@ -65,7 +64,7 @@ attachment:
       - "users0_address_zip": ${ users[0].address.city } 
       - "users0_address_state": ${ users[0].address.state } 
       - "users0_address_city": ${ users[0].address.zip } 
-      - "users0_phone": ${ users[0].fax_number } 
+      - "users0_phone": ${ "" } 
       - "users0_fax_number": ${ phone_number_formatted(users[0].phone_number) } 
       - "users0_email": ${ users[0].email } 
       - "case_notice_date": ${ service.date } 

@@ -3,6 +3,9 @@ include:
   - docassemble.ALToolbox:al_income.yml
   - county.yml
 ---
+modules:
+  - .al_income_other
+---
 id: list of previously entered people
 code: |
   temp_people_choices = list()
@@ -105,7 +108,7 @@ question: Do you believe your case will be uncontested?
 subquestion: |
   In other words, do you and your spouse agree on how you will divide up property, debt, and/or parenting time?
 fields:
-  - Contested: is_case_contested
+  - My case is:: is_case_contested
     datatype: radio
     choices:
       - Uncontested: uncontested
@@ -155,7 +158,7 @@ fields:
       - "FC Dissolution w/o children": dissolution_without
       - "Something else": other
     default: |
-      ${ "dissolution_without" if len(children) == 0 else "dissolution_with" }
+      ${ "dissolution_with" if minor_children else "dissolution_without" }
     
 continue button field: case.matter_type_asked
 
@@ -264,15 +267,6 @@ id: code to set circuit from county_dictionary
 code: |
   case.circuit = county_dictionary[case.county]["circuit"]
 ---
-id: division
-question: Division Number
-subquestion: |
-  The Division Number refers to the Division of your county court.  You may find the Division Number on the petition.
-fields:
-  - Division number: case.division_number
-    required: False
-continue button field: case.division_number_asked
----
 ## PARTIES ##
 
 
@@ -341,11 +335,19 @@ fields:
     maxlength: 4
     required: False
 ---
-id: Driver license number
-generic object: ALIndividual
-question: Driver's license number for ${ x.name_full() }
+id: users driver's license number
+question: Driver's license number for ${ users[0].name_full() }
 fields:
-  - no label: x.driver_license_number
+  - Your driver's license number: users[0].driver_license_number
+    required: False
+---
+id: other_parties driver's license number
+question: |
+  Driver's license number for ${ other_parties[0].name_full() }
+subquestion: |
+  If you do not know the driver's license number for ${ other_parties[0].familiar }, you can leave this blank.
+fields:
+  - ${ other_parties[0].name_full() } driver's license number: other_parties[0].driver_license_number
     required: False
 ---
 sets: x.address.address
@@ -367,13 +369,6 @@ fields:
   - Phone: x.phone_number
     required: False
   - Email: x.email
-    required: False
----
-id: Fax number
-generic object: ALIndividual
-question: Fax for ${ x.name_full() }
-fields:
-  - Fax: x.fax
     required: False
 ---
 sets: users[0].address.address
@@ -408,7 +403,7 @@ content: |
 ---
 id: Birth info
 generic object: ALIndividual
-question: Birthdate for ${ x.name_full() }
+question: Birth information for ${ x.name_full() }
 fields:    
   - Birthdate: x.birthdate
     datatype: ThreePartsDate
@@ -419,9 +414,15 @@ fields:
 id: education info
 generic object: ALIndividual
 question: Educational info for ${ x.name_full() }
+continue button field: x.education_info
 fields:  
-  - "Elementary/Secondary Education": x.education_elementary
+  - "Did ${ x.name_full() } graduate from high school?": x.graduated_hs
+    datatype: yesnomaybe
+  - "How many years of elementary or secondary education did ${ x.name_full() } complete?": x.education_elementary
     input type: dropdown
+    show if:
+      variable: x.graduated_hs
+      is: False
     choices:
       - 0
       - 1
@@ -437,21 +438,42 @@ fields:
       - 11
       - 12
     required: False
-  - "College (1-4 or 5+)": x.education_college
+  - "Did ${ x.name_full() } graduate from college?": x.graduated_college
+    datatype: yesnomaybe
+    show if:
+      variable: x.graduated_hs
+      is: True
+  - "How many years of college did ${ x.name_full() } complete?": x.education_college
     input type: dropdown
+    show if:
+      variable: x.graduated_college
+      is: False
     choices:
       - 1
       - 2
       - 3
       - 4
-      - 5+
     required: False
+  - "Did ${ x.name_full() } complete any post-graduate work?": x.post_grad
+    datatype: yesnomaybe
+    show if:
+      variable: x.graduated_college
+      is: True
+validation code: |
+  if x.graduated_hs:
+    x.education_elementary = "12"
+  else:
+    x.graduated_college = False
+  if x.graduated_college and x.post_grad:
+    x.education_college = "5+"
+  elif x.graduated_college:
+    x.education_college = "4"
 ---
 id: active duty info
 generic object: ALIndividual
 question: Military info for ${ x.name_full() }
 fields:  
-  - Active duty military?: x.active_duty
+  - Is ${ x.name_full() } active duty military?: x.active_duty
     datatype: yesnoradio
 ---
 id: race
@@ -544,7 +566,6 @@ fields:
       variable: users[0].mo_length_of_residence_choice
       is: year    
 ---
-if: not users[0].lives_in_missouri
 id: Residency info for user
 question: Your residency in Missouri
 fields:
@@ -687,6 +708,11 @@ fields:
   - "How many other children does ${ x.name_full() } have?": x.other_children
     datatype: integer
     min: 0    
+---
+if: not minor_children_before_marriage
+generic object: ALIndividual
+code: |
+  x.other_children = 0
 ---
 generic object: ALIndividual
 objects:
@@ -1252,7 +1278,7 @@ fields:
 id: user self employment income
 question: Self Employment Income 
 fields: 
-  - Does you have any self employment income?: users[0].has_self_employment_income
+  - Do you have any self employment income?: users[0].has_self_employment_income
     datatype: yesnoradio
   - Monthly self employment income: users[0].self_employment_income
     datatype: currency
@@ -1654,10 +1680,17 @@ edit:
 ---
 id: self supporting
 generic object: ALIndividual
-question: Income for ${ x.name_full() }
+question: Income for ${ users[0].name_full() }
 fields:
-  - Is ${ x.name_full() } able to support themselves on their monthly income?: x.self_supporting
+  - Are you able to support yourself on your monthly income?: users[0].self_supporting
     datatype: yesnoradio
+---
+id: self supporting
+generic object: ALIndividual
+question: Income for ${ other_parties[0].name_full() }
+fields:
+  - Is ${ other_parties[0].name_full() } able to support themselves on their monthly income?: other_parties[0].self_supporting
+    datatype: yesnomaybe
 ---
 variable name: job_items_names
 data:
@@ -1719,7 +1752,7 @@ code: |
 id: x.benefits object
 generic object: ALIndividual
 objects:
-  - x.benefits: ALIncomeList.using(complete_attribute='complete',there_is_another=False)
+  - x.benefits: ALIncomeListOther.using(complete_attribute='complete',there_is_another=False)
 ---
 id: x.benefits ordered object for checkboxes
 generic object: ALIndividual
@@ -1727,7 +1760,7 @@ objects:
   - x.benefits_ordered: DAOrderedDict.using(elements=x.benefits.terms_ordered, auto_gather=False, gathered=True)
 ---
 id: selected types sets there_are_any
-generic object: ALIncomeList
+generic object: ALIncomeListOther
 code: |
   if x.selected_types.any_true():
     x.move_checks_to_list(selected_terms=x.terms_ordered)
@@ -1764,8 +1797,14 @@ fields:
     datatype: checkboxes
     code: |
       other_parties[0].benefits_ordered
+  - "I do not know if ${ other_parties[0] } receives these benefits": other_parties[0].benefits_unknown
+    datatype: yesnowide
+    disable others: True
   - note: |
       If ${ other_parties[0] } get SSDI, we will ask about that income later.
+validation code: |
+  if other_parties[0].benefits_unknown:
+    other_parties[0].benefits.there_are_any = None
 ---
 id: ALIncome complete
 generic object: ALIncome
@@ -1885,7 +1924,7 @@ code: |
 id: other_incomes
 generic object: ALIndividual
 objects:
-  - x.other_incomes: ALIncomeList.using(complete_attribute='complete',there_is_another=False)
+  - x.other_incomes: ALIncomeListOther.using(complete_attribute='complete',there_is_another=False)
 ---
 id: other_incomes_ordered
 generic object: ALIndividual
@@ -1893,7 +1932,7 @@ objects:
   - x.other_incomes_ordered: DAOrderedDict.using(elements=x.other_incomes.terms_ordered, auto_gather=False, gathered=True)
 ---
 comment: |
-  will use id: ALIncomeList there are any to set other_incomes.there_are_any
+  will use id: ALIncomeListOther there are any to set other_incomes.there_are_any
 ---
 generic object: ALIndividual
 id: are there other incomes
@@ -1924,13 +1963,19 @@ fields:
     datatype: checkboxes
     code: |
       other_parties[0].other_incomes_ordered
+  - "I do not know if ${ other_parties[0] } receives any other income": other_parties[0].other_incomes_unknown
+    datatype: yesnowide
+    disable others: True
+validation code: |
+  if other_parties[0].other_incomes_unknown:
+    other_parties[0].other_incomes.there_are_any = None
 ---
 comment: |
   will use id: ALIncome complete to set other_incomes[i].complete
 ---
 generic object: ALIndividual
 id: other income info for list
-#generic object: ALIncomeList
+#generic object: ALIncomeListOther
 reconsider: x.other_incomes[i].display_name
 question: |
   Tell us about your ${ x.other_incomes[i].display_name.lower() }
@@ -1975,7 +2020,7 @@ validation code: |
 ---
 generic object: ALIndividual
 id: other income info for list
-#generic object: ALIncomeList
+#generic object: ALIncomeListOther
 reconsider: other_parties[0].other_incomes[i].display_name
 question: |
   Tell us about ${ other_parties[0].other_incomes[i].display_name.lower() } for ${ other_parties[0] }
@@ -2386,8 +2431,8 @@ code: |
   x.health_insurance_costs = 0
 ---
 ## ASSETS
-id: ALIncomeList there are any
-generic object: ALIncomeList
+id: ALIncomeListOther there are any
+generic object: ALIncomeListOther
 code: |
   if x.selected_types.any_true():
     x.move_checks_to_list(selected_terms=x.terms_ordered)
@@ -2396,7 +2441,7 @@ code: |
     x.there_are_any = False
 ---
 id: generic set display name backup
-generic object: ALAssetList
+generic object: ALAssetListOther
 code: |
   if defined('x[i].source') and x[i].source != "other":
     x[i].display_name = x.terms_ordered.get(x[i].source, x[i].source)
@@ -2406,7 +2451,7 @@ code: |
     x[i].display_name = x.other_display
 ---
 id: generic there are any
-generic object: ALAssetList
+generic object: ALAssetListOther
 question: |
   ${ x.display_name }
 subquestion: |   
@@ -2417,13 +2462,13 @@ fields:
     code: |
       x.ordered
 ---
-generic object: ALAssetList
+generic object: ALAssetListOther
 code: |
   x[i].market_value
   x[i].complete = True
 ---
 id: generic review
-generic object: ALAssetList
+generic object: ALAssetListOther
 question: Do you want to list any other ${ x.display_name }?
 subquestion: |
 
@@ -2446,7 +2491,7 @@ subquestion: |
 continue button field: x.review_assets
 ---
 id: generic revisit
-generic object: ALAssetList
+generic object: ALAssetListOther
 continue button field: x.revisit
 question: |
   Edit ${ x.display_name }
@@ -2456,7 +2501,7 @@ subquestion: |
   ${ x.add_action() }
 ---
 id: generic table
-generic object: ALAssetList
+generic object: ALAssetListOther
 table: x.table
 rows: x
 columns:
@@ -2486,7 +2531,7 @@ edit:
 ---
 generic object: ALIndividual
 objects:
-  - x.assets: ALAssetList.using(auto_gather=False)
+  - x.assets: ALAssetListOther.using(auto_gather=False)
 ---
 generic object: ALIndividual
 code: |
@@ -2501,7 +2546,7 @@ code: |
 ---
 id: real_estate object
 objects:
-  - real_estate: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+  - real_estate: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
 ---
 id: real_estate other display
 comment: |
@@ -2593,7 +2638,7 @@ validation code: |
 ---
 id: vehicles object
 objects:
-  - vehicles: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+  - vehicles: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
 ---
 id: vehicles other display
 comment: |
@@ -2693,7 +2738,7 @@ validation code: |
 ---
 id: bank_assets object
 objects:
-  - bank_assets: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+  - bank_assets: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
 ---
 id: bank_assets other display
 comment: |
@@ -2774,7 +2819,7 @@ code: |
 ---
 id: personal_goods object
 objects:
-  - personal_goods: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+  - personal_goods: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
 ---
 id: personal_goods other display
 comment: |
@@ -2872,11 +2917,11 @@ validation code: |
 ---
 ### DEBTS
 objects: 
-  - debts: ALAssetList.using(there_is_another=False,complete_attribute='complete')
+  - debts: ALAssetListOther.using(there_is_another=False,complete_attribute='complete')
 ---
 generic object: ALIndividual
 objects:
-  - x.debts: ALAssetList.using(auto_gather=False)
+  - x.debts: ALAssetListOther.using(auto_gather=False)
 ---
 id: populate debt list from debts in assets
 code: |
@@ -2903,13 +2948,13 @@ code: |
       x.debts.append(debt)
   x.debts.gathered = True
 ---
-generic object: ALAssetList
+generic object: ALAssetListOther
 code: |
   x[i].market_value
   x[i].complete = True
 ---
 id: generic ordered object for checkboxes
-generic object: ALAssetList
+generic object: ALAssetListOther
 objects:
   - x.ordered: DAOrderedDict.using(elements=x.terms_ordered, auto_gather=False, gathered=True)
 ---
@@ -2923,7 +2968,7 @@ code: |
   debts.display_name = "other debts"
 ---
 objects: 
-  - secured_debts: ALAssetList.using(auto_gather=False)
+  - secured_debts: ALAssetListOther.using(auto_gather=False)
 ---
 id: debts terms_ordered
 # "!!omap" makes these terms ordered
@@ -2940,7 +2985,7 @@ code: |
   debts.display_name = "Debt"
 ---
 id: debts there are any
-generic object: ALAssetList
+generic object: ALAssetListOther
 question: |
   Other Debts
 subquestion: |   
@@ -3231,14 +3276,14 @@ fields:
       variable: maintenance_income_withholding
       is: False
 ---
-id: one maintenance question
-question: Maintanance award
+id: one maintenance award question
+question: Maintenance award
 fields:
-  - Should the court award maintenance to ${ petitioner.name_full() } or ${ respondent.name_full() }?: is_maintenance_award
+  - Should the court award maintenance to ${ petitioner.name_full() } or ${ respondent.name_full() }?: relief['maintenance']
     datatype: yesnoradio
   - Who should be awarded maintenance?: maintenance_awarded_to
     js show if: |
-      val("is_maintenance_award")
+      val("relief['maintenance']")
     choices:
       - ${ petitioner.name_full() } should be paid maintenance by ${ respondent.name_full() }: petitioner
       - ${ respondent.name_full() } should be paid maintenance by ${ petitioner.name_full() }: respondent
@@ -3254,25 +3299,43 @@ fields:
   - Reason income withholding shall not issue: maintenance_income_withholding_reason
     js show if: |
       val('maintenance_income_withholding') === false
+---
+id: maintenance currently paid question
+question: Current maintenance award
+subquestion: |
+  If maintenance was awarded in a previous divorce, or earlier in the case, you can answer yes.  But in most cases there will not already be an award of maintenance.
+fields:
+  - Is any maintenance currently paid by ${ petitioner.name_full() } or ${ respondent.name_full() } to the other?: is_maintenance_currently_paid
+    datatype: yesnoradio
+    default: False
+  - Who is currently paid maintenance?: maintenance_currently_paid_to
+    js show if: |
+      val("is_maintenance_currently_paid")
+    choices:
+      - ${ petitioner.name_full() } is paid maintenance by ${ respondent.name_full() }: petitioner
+      - ${ respondent.name_full() } is paid maintenance by ${ petitioner.name_full() }: respondent
+    datatype: radio
+  - How much per month?: maintenance_currently_paid_amount
+    datatype: currency
+    js show if: |
+      val('maintenance_currently_paid_to') === "petitioner" || val('maintenance_currently_paid_to') === "respondent"
 validation code: |
-  if is_maintenance_award:
-    if maintenance_awarded_to == "petitioner":
-      petitioner.maintenance_received = maintenance_amount
+  if is_maintenance_currently_paid:
+    if maintenance_currently_paid_to == "petitioner":
+      petitioner.maintenance_received = maintenance_currently_paid_amount
       petitioner.maintenance_paid = 0
       respondent.maintenance_received = 0
-      respondent.maintenance_paid = maintenance_amount
-    if maintenance_awarded_to == "respondent":
+      respondent.maintenance_paid = maintenance_currently_paid_amount
+    if maintenance_currently_paid_to == "respondent":
       petitioner.maintenance_received = 0
-      petitioner.maintenance_paid = maintenance_amount
-      respondent.maintenance_received = maintenance_amount
+      petitioner.maintenance_paid = maintenance_currently_paid_amount
+      respondent.maintenance_received = maintenance_currently_paid_amount
       respondent.maintenance_paid = 0
-    relief['maintenance'] = True
   else:
     petitioner.maintenance_received = 0
     petitioner.maintenance_paid = 0
     respondent.maintenance_received = 0
     respondent.maintenance_paid = 0
-    relief['maintenance'] = False
 ---
 ## CHILD SUPPORT ##
 id: Child Support Award
@@ -3380,7 +3443,17 @@ fields:
     choices:
       - Serve by sheriff: sheriff
       - Serve by private process server: private
-
+---
+id: method of service to respondent
+question: Service to ${ other_parties[0].name_full() }?
+fields:
+  - How will you serve ${ other_parties[0].name_full() }?: other_parties[0].service_type
+    datatype: radio
+    choices:
+      - ${ other_parties[0].name_full() } has signed a verified Respondent’s Answer to Petition for Dissolution of Marriage, which is being filed with the Petition for Dissolution of Marriage. Therefore, do not issue a summons.: none
+      - ${ other_parties[0].name_full() } should be served with a summons at their home: house
+      - ${ other_parties[0].name_full() } should be served with a summons at their place of employment: work
+      - ${ other_parties[0].name_full() } cannot be served in Missouri. Therefore, service by registered mail is requested. A copy of the Affidavit for Service by Mail is attached to this form. See Missouri Supreme Court Rule 54.12(b).: mail
 ---
 id: people_served object
 objects: 

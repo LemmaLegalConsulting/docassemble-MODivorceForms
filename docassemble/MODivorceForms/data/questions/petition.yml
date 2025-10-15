@@ -20,7 +20,6 @@ code: |
     petitioner.attorney.address.address
     petitioner.attorney.bar_number
     petitioner.attorney.email
-    petitioner.attorney.fax
     petitioner.attorney.phone_number
   petitioner.email
   petitioner.phone_number
@@ -47,7 +46,6 @@ code: |
     respondent.attorney.address.address
     respondent.attorney.bar_number
     respondent.attorney.email
-    respondent.attorney.fax
     respondent.attorney.phone_number
   respondent.email
   respondent.phone_number
@@ -107,8 +105,6 @@ question: Additional attorney about the ${ petitioner.attorney.name_full() }, at
 fields:
   - Email for ${ petitioner.attorney.name_full() }: petitioner.attorney.email
     required: False
-  - Fax for ${ petitioner.attorney.name_full() }: petitioner.attorney.fax
-    required: False
   - Phone for ${ petitioner.attorney.name_full() }: petitioner.attorney.phone
     required: False
 continue button field: additional_attorney_infomation
@@ -160,17 +156,6 @@ fields:
     required: False
     show if: other_allegations_exist
 
----
-id: method of service to respondent
-question: Service to ${ other_parties[0].name_full() }?
-fields:
-  - How will you serve ${ other_parties[0].name_full() }?: other_parties[0].service_type
-    datatype: radio
-    choices:
-      - ${ other_parties[0].name_full() } has signed a verified Respondent’s Answer to Petition for Dissolution of Marriage, which is being filed with the Petition for Dissolution of Marriage. Therefore, do not issue a summons.: none
-      - ${ other_parties[0].name_full() } should be served with a summons at their home: house
-      - ${ other_parties[0].name_full() } should be served with a summons at their place of employment: work
-      - ${ other_parties[0].name_full() } cannot be served in Missouri. Therefore, service by registered mail is requested. A copy of the Affidavit for Service by Mail is attached to this form. See Missouri Supreme Court Rule 54.12(b).: mail
 ---
 ## CHILDREN  
 ---
@@ -245,6 +230,12 @@ id: service address
 generic object: ALIndividual
 question: Service address for ${ x.name_full() }
 fields:
+  - Address already provided: x.service_address
+    datatype: object_radio
+    choices: x.address
+    none of the above: A different address
+    disable others: True
+    default: x.address
   - code: |
       x.service_address.address_fields()
 ---
@@ -667,6 +658,6 @@ attachment:
       - "petitionersAttorneyState": ${ petitioner.attorney.address.city } 
       - "petitionersAttorneyZip": ${ petitioner.attorney.address.zip } 
       - "petitionersAttorneyPhone": ${ phone_number_formatted(petitioner.attorney.phone_number) } 
-      - "petitionersAttorneyFaxNumber": ${ petitioner.attorney.fax } 
+      - "petitionersAttorneyFaxNumber": ${ "" } 
       - "petitionersAttorneyEmail": ${ petitioner.attorney.email } 
 ---

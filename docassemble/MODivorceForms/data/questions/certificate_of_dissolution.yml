@@ -142,24 +142,34 @@ attachment:
       - "marriage_decree_certifying_office": ${ case.certifying_office } 
       - "users1_race_white": ${ users[0].race == "White" } 
       - "users1_last_marriage_ended_death": ${ users[0].last_marriage_end == "Death" } 
-      - "users1_race_black": ${ users[0].race == "Black" } 
+      - "users1_race_black": ${ users[0].race == "Black or African American" } 
       - "users1_last_marriage_ended_divorce": ${ users[0].last_marriage_end == "Divorce" } 
-      - "users1_race_AmericanIndian": ${ users[0].race == "American Indian" } 
+      - "users1_race_AmericanIndian": ${ users[0].race == "American Indian or Alaska Native" } 
       - "users1_number_of_marriage": ${ ordinal(users[0].number_of_marriages) } 
       - "users1_last_marriage_ended_date": ${ format_date(users[0].last_marriage_end_date, format='M/d/yyyy') } 
-      - "users1_race_other": ${ users[0].race == "other" } 
-      - "users1_race_other_description": ${ users[0].race_other } 
+      - "users1_race_other": ${ users[0].race in ["Asian", "Native Hawaiian or other Pacific Islander", "Hispanic or Latino", "Middle Eastern or North African (MENA)","Other"] } 
+      - "users1_race_other_description": |
+          % if users[0].race in ["Asian", "Native Hawaiian or other Pacific Islander", "Hispanic or Latino", "Middle Eastern or North African (MENA)"]:
+          ${ users[0].race }
+          % elif users[0].race == "Other":
+          ${ users[0].race_other }
+          % endif
       - "users1_education_elementary": ${ users[0].education_elementary } 
       - "users1_education_college": ${ users[0].education_college } 
       - "users2_race_white": ${ other_parties[0].race == "White" } 
       - "users2_last_marriage_ended_death": ${ other_parties[0].last_marriage_end == "Death" } 
-      - "users2_race_black": ${ other_parties[0].race == "Black" } 
+      - "users2_race_black": ${ other_parties[0].race == "Black or African American" } 
       - "users2_last_marriage_ended_divorce": ${ other_parties[0].last_marriage_end == "Divorce" } 
-      - "users2_race_AmericanIndian": ${ other_parties[0].race == "American Indian" } 
+      - "users2_race_AmericanIndian": ${ other_parties[0].race == "American Indian or Alaska Native" } 
       - "users2_number_of_marriage": ${ ordinal(other_parties[0].number_of_marriages) } 
-      - "users2_race_other": ${ other_parties[0].race == "other" } 
+      - "users2_race_other": ${ other_parties[0].race in ["Asian", "Native Hawaiian or other Pacific Islander", "Hispanic or Latino", "Middle Eastern or North African (MENA)","Other"] } 
       - "users2_last_marriage_ended_date": ${ format_date(other_parties[0].last_marriage_end_date, format='M/d/yyyy') } 
-      - "users2_race_other_description": ${ other_parties[0].race } 
+      - "users2_race_other_description": |
+          % if other_parties[0].race in ["Asian", "Native Hawaiian or other Pacific Islander", "Hispanic or Latino", "Middle Eastern or North African (MENA)"]:
+          ${ other_parties[0].race }
+          % elif other_parties[0].race == "Other":
+          ${ other_parties[0].race_other }
+          % endif
       - "users2_education_elementary": ${ other_parties[0].education_elementary } 
       - "users2_education_college": ${ other_parties[0].education_college } 
 

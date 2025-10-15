@@ -85,44 +85,44 @@ attachment:
       - "respondentsMiddleName": ${ respondent.name.middle } 
       - "respondentsLastName": ${ respondent.name.last } 
       - "respondentsSuffixJrSrIII": ${ respondent.name.suffix } 
-      - "ie1p": ${ "{:.2f}".format(petitioner.jobs.total(times_per_year = 12)) } 
-      - "ie1r": ${ "{:.2f}".format(respondent.jobs.total(times_per_year = 12)) } 
-      - "ie2p": ${ "{:.2f}".format(petitioner.self_employment_income) } 
-      - "ie2r": ${ "{:.2f}".format(respondent.self_employment_income) } 
-      - "ie3r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['social security'], times_per_year=12)) } 
-      - "ie3p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['social security'], times_per_year=12)) } 
-      - "ie4p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['retirement'], times_per_year=12)) } 
-      - "ie4r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['retirement'], times_per_year=12)) } 
-      - "ie5p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['pension'], times_per_year=12)) } 
-      - "ie5r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['pension'], times_per_year=12)) } 
-      - "ie6p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['interest'], times_per_year=12)) } 
-      - "ie6r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['interest'], times_per_year=12)) } 
-      - "ie7p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['trust'], times_per_year=12)) } 
-      - "ie7r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['trust'], times_per_year=12)) } 
+      - "ie1p": ${ "Unknown" if petitioner.jobs.there_are_any == None else "{:.2f}".format(petitioner.jobs.total(times_per_year = 12)) } 
+      - "ie1r": ${ "Unknown" if respondent.jobs.there_are_any == None else "{:.2f}".format(respondent.jobs.total(times_per_year = 12)) } 
+      - "ie2p": ${ "Unknown" if petitioner.has_self_employment_income == None else "{:.2f}".format(petitioner.self_employment_income) } 
+      - "ie2r": ${ "Unknown" if respondent.has_self_employment_income == None else"{:.2f}".format(respondent.self_employment_income) } 
+      - "ie3r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['social security'], times_per_year=12)) } 
+      - "ie3p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['social security'], times_per_year=12)) } 
+      - "ie4p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['retirement'], times_per_year=12)) } 
+      - "ie4r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['retirement'], times_per_year=12)) } 
+      - "ie5p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['pension'], times_per_year=12)) } 
+      - "ie5r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['pension'], times_per_year=12)) } 
+      - "ie6p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['interest'], times_per_year=12)) } 
+      - "ie6r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['interest'], times_per_year=12)) } 
+      - "ie7p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['trust'], times_per_year=12)) } 
+      - "ie7r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['trust'], times_per_year=12)) } 
       - "ie8p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['dividends'], times_per_year=12)) } 
-      - "ie8r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['dividends'], times_per_year=12)) } 
-      - "ie9p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['unemployment income'], times_per_year=12)) } 
-      - "ie9r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['unemployment income'], times_per_year=12)) } 
-      - "ie10r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['severance'], times_per_year=12)) } 
-      - "ie10p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['severance'], times_per_year=12)) } 
-      - "ie11p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['worker comp'], times_per_year=12)) } 
-      - "ie11r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['worker comp'], times_per_year=12)) } 
-      - "ie12p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['disability_insurance'], times_per_year=12)) } 
-      - "ie12r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['disability_insurance'], times_per_year=12)) } 
-      - "ie13r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['veteran'], times_per_year=12)) } 
-      - "ie13p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['veteran'], times_per_year=12)) } 
-      - "ie14p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['military'], times_per_year=12)) } 
-      - "ie14r": ${ "{:.2f}".format(respondent.other_incomes.total(source=['military'], times_per_year=12)) } 
-      - "line1p": ${ "{:.2f}".format(float(petitioner.jobs.total(times_per_year=12)) + petitioner.self_employment_income + float(petitioner.other_incomes.total(times_per_year = 12))) } 
-      - "line1r": ${ "{:.2f}".format(float(respondent.jobs.total(times_per_year=12)) + respondent.self_employment_income + float(respondent.other_incomes.total(times_per_year = 12))) } 
-      - "ie16p": ${ "{:.2f}".format(petitioner.benefits.total(source=['ssi'], times_per_year=12)) } 
-      - "ie16r": ${ "{:.2f}".format(respondent.benefits.total(source=['ssi'], times_per_year=12)) } 
-      - "ie17p": ${ "{:.2f}".format(petitioner.benefits.total(source=['tanf'], times_per_year=12)) } 
-      - "ie17r": ${ "{:.2f}".format(respondent.benefits.total(source=['tanf'], times_per_year=12)) } 
-      - "ie18p": ${ "{:.2f}".format(petitioner.benefits.total(source=['medicaid'], times_per_year=12)) } 
-      - "ie18r": ${ "{:.2f}".format(respondent.benefits.total(source=['medicaid'], times_per_year=12)) } 
-      - "ie19p": ${ "{:.2f}".format(petitioner.benefits.total(source=['food_stamps'], times_per_year=12)) } 
-      - "ie19r": ${ "{:.2f}".format(respondent.benefits.total(source=['food_stamps'], times_per_year=12)) } 
+      - "ie8r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['dividends'], times_per_year=12)) } 
+      - "ie9p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['unemployment income'], times_per_year=12)) } 
+      - "ie9r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['unemployment income'], times_per_year=12)) } 
+      - "ie10r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['severance'], times_per_year=12)) } 
+      - "ie10p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['severance'], times_per_year=12)) } 
+      - "ie11p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['worker comp'], times_per_year=12)) } 
+      - "ie11r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['worker comp'], times_per_year=12)) } 
+      - "ie12p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['disability_insurance'], times_per_year=12)) } 
+      - "ie12r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['disability_insurance'], times_per_year=12)) } 
+      - "ie13r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['veteran'], times_per_year=12)) } 
+      - "ie13p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['veteran'], times_per_year=12)) } 
+      - "ie14p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['military'], times_per_year=12)) } 
+      - "ie14r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['military'], times_per_year=12)) } 
+      - "line1p": ${  "{:.2f}".format(float(petitioner.jobs.total(times_per_year=12)) + petitioner.self_employment_income + float(petitioner.other_incomes.total(times_per_year = 12))) } 
+      - "line1r": ${  "{:.2f}".format(float(respondent.jobs.total(times_per_year=12)) + respondent.self_employment_income + float(respondent.other_incomes.total(times_per_year = 12))) } 
+      - "ie16p": ${ "Unknown" if petitioner.benefits.there_are_any == None else "{:.2f}".format(petitioner.benefits.total(source=['ssi'], times_per_year=12)) } 
+      - "ie16r": ${ "Unknown" if respondent.benefits.there_are_any == None else "{:.2f}".format(respondent.benefits.total(source=['ssi'], times_per_year=12)) } 
+      - "ie17p": ${ "Unknown" if petitioner.benefits.there_are_any == None else "{:.2f}".format(petitioner.benefits.total(source=['tanf'], times_per_year=12)) } 
+      - "ie17r": ${ "Unknown" if respondent.benefits.there_are_any == None else "{:.2f}".format(respondent.benefits.total(source=['tanf'], times_per_year=12)) } 
+      - "ie18p": ${ "Unknown" if petitioner.benefits.there_are_any == None else "{:.2f}".format(petitioner.benefits.total(source=['medicaid'], times_per_year=12)) } 
+      - "ie18r": ${ "Unknown" if respondent.benefits.there_are_any == None else "{:.2f}".format(respondent.benefits.total(source=['medicaid'], times_per_year=12)) } 
+      - "ie19p": ${ "Unknown" if petitioner.benefits.there_are_any == None else "{:.2f}".format(petitioner.benefits.total(source=['food_stamps'], times_per_year=12)) } 
+      - "ie19r": ${ "Unknown" if respondent.benefits.there_are_any == None else "{:.2f}".format(respondent.benefits.total(source=['food_stamps'], times_per_year=12)) } 
       - "line2c1p": ${ petitioner.other_children } 
       - "line2c1r": ${ respondent.other_children } 
       - "line2c3p": ${ "{:.2f}".format(petitioner.other_child_support_received) } 
