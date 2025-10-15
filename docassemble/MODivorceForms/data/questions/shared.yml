@@ -1794,14 +1794,14 @@ fields:
     datatype: checkboxes
     code: |
       other_parties[0].benefits_ordered
-  - "I do not know if ${ other_parties[0] } receives these benefits": other_parties_benefits_unknown
+  - "I do not know if ${ other_parties[0] } receives these benefits": other_parties[0].benefits_unknown
     datatype: yesnowide
     disable others: True
   - note: |
       If ${ other_parties[0] } get SSDI, we will ask about that income later.
 validation code: |
-  if other_parties_benefits_unknown:
-    other_parties[0].benefits.there_are_any = False
+  if other_parties[0].benefits_unknown:
+    other_parties[0].benefits.there_are_any = None
 ---
 id: ALIncome complete
 generic object: ALIncome
@@ -1960,6 +1960,12 @@ fields:
     datatype: checkboxes
     code: |
       other_parties[0].other_incomes_ordered
+  - "I do not know if ${ other_parties[0] } receives any other income": other_parties[0].other_incomes_unknown
+    datatype: yesnowide
+    disable others: True
+validation code: |
+  if other_parties[0].other_incomes_unknown:
+    other_parties[0].other_incomes.there_are_any = None
 ---
 comment: |
   will use id: ALIncome complete to set other_incomes[i].complete
