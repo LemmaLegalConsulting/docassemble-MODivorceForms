@@ -560,6 +560,8 @@ event: custody_exit
 question: Child Custody
 subquestion: |
   Unfortunately, this system is unable to address custody issues at this time.  Click the link below to find legal help better suited to your situation.
+
+  [Missouri Supreme Court Website](https://www.courts.mo.gov/page.jsp?id=611)
 ---
 event: legal_separation_exit
 question: Legal Separation
@@ -582,7 +584,13 @@ subquestion: |
 id: Finding your case
 question: How to find your case
 subquestion: |
-  Link and info on how to find a case in casenet
+  You can use [Case.net](https://www.courts.mo.gov/cnet) to see if a case has been filed against you.
+
+  Case.net is a free website from the Missouri Court. You do not need an
+  account for Case.net.
+
+  You can search using your name.  You can choose "All Participating Courts".
+
 continue button field: how_to_find_your_case
 ---
 id: Is Divorce Contested
@@ -605,9 +613,16 @@ subquestion: |
    Video on how mediation works, example below.
   <iframe width="480" height="270" src="https://www.powtoon.com/embed/dvKxPdVmlhD/" frameborder="0" allowfullscreen></iframe>
   
-   
+  ### How to find a mediator
   
-  Link to finding a mediator.
+  The following websites are provided solely for informational purposes and to offer a starting point for finding a mediator. We do not endorse or guarantee the services of any third-party mediator. It is important to understand that mediation services are often fee-based. Contact any potential mediation service provider directly to confirm their fees, payment options, and terms of service.
+
+  [Missouri Bar Mediator Search](https://mobar.org/site/For_the_Public/Search_for_Arbitrators_Neutrals/site/content/For-the-Public/Search_for_Arbitrators_Neutrals.aspx?hkey=68545556-0bd7-46a1-b9ab-446753038187)
+
+  [The Association of Missouri Mediators](https://www.momediators.org/missourimediators-bylocation.html)
+
+  [MARCH Mediation Services](https://www.marchmediation.org/mo-service-providers)
+  
 continue button field: mediation_info
 ---
 id: Children
@@ -628,7 +643,7 @@ fields:
     js show if:   |
       val("minor_children_before_marriage") === true || val("minor_children_before_marriage") === false
   - note: |
-      Missouri law automatically assumes that the husband is the father of the child unless a separate case is filed establishing paternity of the biological father and non-paternity of the husband, even if the biological father is the one on the birth certificate.  It would be in your best interest to find an attorney.  
+      Missouri law automatically assumes that the husband is the father of the child unless a separate case is filed establishing paternity of the biological father and non-paternity of the husband, even if the biological father is the one on the birth certificate.  It would be in your best interest to [find an attorney](https://www.courts.mo.gov/page.jsp?id=611).  
     js show if:   |
       val("child_outside_marriage") === true
   - Are you or your spouse currently pregnant?: pregnant
@@ -765,11 +780,37 @@ continue button field: served_information
 
 ---
 id: Publication Service Information Screen
-question: Service Information
+question: Service by Publication
+subquestion: |
+  If attempts to serve your spouse in person have failed, you can file a request to serve them by publication.
+  
+  What to know about service by publication:
+  
+  * A notice will be posted in your local legal newspaper, also called a paper of record, informing your spouse that you have filed for divorce.
+  * The court may be unable to award monetary relief such as maintenance or child support
+  
 continue button field: service_by_publication_information
 ---
 id: Personal Service Information Screen
-question:  Service Information
+question:  In Person Service
+subquestion: |
+  Your spouse can be served:
+
+  * Where they’re staying;
+  * Where they work; or
+  * Anywhere they might be (e.g. a friend or family member's house, a bar, or at a court date.)
+
+  ## By Sheriff
+  
+  Standard method of service and most cost-effective option.
+
+  ## By Process Server
+  
+  If the Sheriff is not able to serve your spouse, a special process server is another option. You may need to file a motion with the court for permission to use a special process server. 
+  
+  Visit [NAPPS.ORG](https://napps.org/) to find a special process server in your area.
+  
+  Check your local court rules for more information and rules for appointing a special process server.
 continue button field: personal_service_information
 ---
 id: Filing Pleadings Video Screen
@@ -777,7 +818,20 @@ question: Video on filing pleadings
 subquestion: |
   <iframe width="480" height="270" src="https://www.powtoon.com/embed/dvKxPdVmlhD/" frameborder="0" allowfullscreen></iframe>
 
-  ${ "{:.2f}".format(users[0].assets.market_value(source=['checking account'])) } 
+  Your courthouse is located at ${ case.address.on_one_line() }.
+  
+  Documents are filed with the Circuit Clerk’s office.
+  
+  Be prepared to pay a filing fee [even if you are filing a Motion to Proceed as a Poor Person].
+  
+  After you file, you will receive a letter in the mail from the court with your assigned case number and first court date.
+  
+  % if minor_children:
+  Check your local court rules to find if your county requires a specific parenting class. If not, go to [courseforparents.com](https://courseforparents.com/) or [Focus on Kids](https://extension.missouri.edu/programs/focus-on-kids)
+  
+  % endif 
+  
+  ## MAKE SURE TO UPDATE THE COURT IF YOUR MAILING ADDRESS CHANGES
 continue button field: filing_pleadings_video
 ---
 id: Final Page
