@@ -39,6 +39,11 @@ subquestion: |
   
   % endif  
 
+  % if defined('case.legal_aid_program'):
+  [${ case.legal_aid_program }](${ case.legal_aid_program_website } )
+  
+  % endif  
+
   TESTING INFO - WILL BE REMOVED
   
   Documents for 

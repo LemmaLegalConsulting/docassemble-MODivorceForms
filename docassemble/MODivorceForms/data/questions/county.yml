@@ -182,6 +182,11 @@ code: |
       case.photo_filename = county_dictionary[case.county]['courts'][int(selected_court)]['photo']
     if 'schedule' in county_dictionary[case.county]['courts'][int(selected_court)].keys():
       case.schedule = county_dictionary[case.county]['courts'][int(selected_court)]['schedule']  
+  if 'legal_aid_program_website' in county_dictionary[case.county].keys():
+    case.legal_aid_program_website = county_dictionary[case.county]['legal_aid_program_website']  
+  if 'legal_aid_program' in county_dictionary[case.county].keys():
+    case.legal_aid_program = county_dictionary[case.county]['legal_aid_program']  
+  
 ---
 id: county_dictionary
 variable name: county_dictionary
