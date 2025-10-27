@@ -100,6 +100,8 @@ code: |
     custody_exit
   if marriage.can_be_preserved or not marriage.is_broken:
     legal_separation_exit
+  if users[0].in_bankruptcy or other_parties[0].in_bankruptcy:
+    bankruptcy_kickout
   children
   if pregnant:
     pregnant_exit
@@ -396,8 +398,6 @@ code: |
 ---
 code: |       
   nav.set_section('debts')
-  users[0].in_bankruptcy
-  other_parties[0].in_bankruptcy
   secured_debts.gathered
   if len(debts) > 0:
     debts.review_items
@@ -567,6 +567,25 @@ event: legal_separation_exit
 question: Legal Separation
 subquestion: |
   If your marriage can be preserved or is not irretrievably broken, then a legal separation is more appropriate than a dissolution.  Unfortunately, this tool helps only with a dissolution.
+---
+question: Bankruptcy
+fields: 
+  - Are you or your spouse currently in a bankruptcy prooceeding?: in_bankruptcy
+    datatype: yesnoradio
+---
+code: |
+  if not in_bankruptcy:
+    users[0].in_bankruptcy = False
+    other_parties[0].in_bankruptcy = False
+  else:
+    users[0].in_bankruptcy = True
+    other_parties[0].in_bankruptcy = True
+---
+event: bankruptcy_kickout
+question: Bankruptcy
+subquestion: |
+  Pursuant to (11 USC § 362(b)(2)(A)(iv)) the court will not be able to grant a divorce while a bankruptcy case is ongoing. Please come back when your bankruptcy has concluded.
+
 ---
 id: personal_jurisdiction_warning
 question: No personal jurisdiction
