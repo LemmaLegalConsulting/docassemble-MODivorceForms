@@ -129,7 +129,6 @@ code: |
     users[0].prior_name.name.first
   doc_list_selected
   relief['custody']
-  relief['child_support']
   relief['change_name']
   relief['divide_property']
   relief['other']
@@ -191,9 +190,11 @@ code: |
       visitation_supervisor.name.first
     elif physical_custody == "Third Party":
       physical_custody_other.name.first
+    relief['child_support']
     if communications["third_party"]:
       communications_other.name.first
     ask_about_dispute_resolution
+    
     child_support # certificate_of_dissolution
   
     if case.filed in ['user0_filed']:
@@ -271,8 +272,9 @@ code: |
   marriage.separation_date
 
   if minor_children or minor_children_before_marriage:
-    if others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect: # form_17
-      related_case_explanation
+  #    # if others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect: # form_17
+  #      related_case_explanation
+    received_welfare # form_17, petition
     if abuse_or_neglect: # petition
       abuse_or_neglect_explanation
     if other_custody_proceeding:
@@ -282,7 +284,7 @@ code: |
     if others_with_physical_custody:
       others_with_physical_custody_explanation
     family_support_order
-    received_welfare # form_17
+
   if 'petition_attachment' in doc_list_selected.true_values():
     if other_allegations_exist:
       other_allegations # petition
@@ -418,7 +420,7 @@ code: |
       else:
         personal_service_type
         personal_service_information
-        fill_in_service_date # form_17
+        ## fill_in_service_date # form_17
         if case.filed in ["user0_filed", "not_filed"]:
           respondent.service_type
         people_served.gathered # notice_of_hearing
@@ -452,7 +454,6 @@ code: |
   mo_divorce_forms_download
 ---
 include:
-  - form_17.yml
   - property_statement.yml
   - parenting_plan.yml
   - answer.yml
@@ -695,8 +696,6 @@ code: |
   elif case.filed == "user1_filed":
     temp_doc_list_options.append({'value':'answer_attachment','label':'Answer','default':True})   
   
-  if  case.filed in ["not_filed","unknown"]:
-    temp_doc_list_options.append({'value':'form_17_attachment','label':'Form 17','default':True})
   temp_doc_list_options.append({'value':'notice_of_hearing_attachment','label':'Notice of hearing','default':True})   
   if  case.filed in ["user0_filed","not_filed","unknown"]:
     temp_doc_list_options.append({'value':'certificate_of_dissolution_attachment','label':'Certificate of Dissolution','default':True})   
@@ -937,13 +936,6 @@ code: |
   else:
     answer_attachment.enabled = False
 ---
-id: form_17 enabled block for main interview
-code: |
-  if True:
-    form_17_attachment.enabled = True
-  else:
-    form_17_attachment.enabled = False
----
 id: notice_of_hearing enabled block for main interview
 code: |
   if True:
@@ -1009,6 +1001,6 @@ code: |
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, form_17_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, form_17_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---

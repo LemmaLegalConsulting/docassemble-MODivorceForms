@@ -3337,22 +3337,30 @@ validation code: |
     respondent.maintenance_received = 0
     respondent.maintenance_paid = 0
 ---
+code: |
+  temp_child_support_choices = list()
+  temp_child_support_choices.append({"petitioner":petitioner.name_full()})  
+  temp_child_support_choices.append({"respondent":respondent.name_full()})
+  if physical_custody == "Third Party":
+    temp_child_support_choices.append({"third_party":physical_custody_other.name_full()})
+  temp_child_support_choices.append({"none":"No child support awarded"})
+  child_support_choices = temp_child_support_choices
+---
 ## CHILD SUPPORT ##
 id: Child Support Award
+reconsider: child_support_choices
 question: |
   Child Support Award
 fields:
-  - Who is awarded child support?: child_support
+  - Who are you asking the court to award child support to?: child_support
     datatype: radio
-    choices:
-      - ${ petitioner.name_full() }
-      - ${ respondent.name_full() }
-      - No child support awarded: none
+    code: |
+      child_support_choices
 validation code: |
-  if child_support in ["petitioner", "none"]:
+  if child_support in ["petitioner", "none","third_party"]:
     support_recipient = petitioner
     support_payer = respondent
-  else:
+  elif child_support in ["respondent"]:
     support_recipient = respondent
     support_payer = petitioner  
   if child_support == "none":
@@ -3385,9 +3393,11 @@ if: not users[0].has_prior_name
 code: |
   relief['change_name'] = False
 ---
-if: not minor_children
 code: |
-  relief['custody'] = False
+  if minor_children:
+    relief['custody'] = True
+  else:
+    relief['custody'] = False
 ---
 if: not minor_children
 code: |
