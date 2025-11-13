@@ -31,7 +31,7 @@ fields:
     datatype: radio
     choices:
       - Yes, I filed myself: user0_filed
-      - Yes, my spouse filed: user1_filed
+      - Yes, my spouse filed: other_parties0_filed
       - Not yet: not_filed
       - I'm not sure: unknown
 ---
@@ -42,7 +42,7 @@ code: |
     user_started_case = True
     if case.filed in ["not_filed"]:
       previous_petitions = 0
-  elif case.filed == "user1_filed":
+  elif case.filed == "other_parties0_filed":
     petitioner = other_parties[0]
     respondent = users[0]
     user_started_case = False
@@ -50,7 +50,7 @@ code: |
     previous_petitions = 0
     user_started_case = True
 ---
-if: case.filed in ["user1_filed"]
+if: case.filed in ["other_parties0_filed"]
 id: previous petitons
 question: Has ${ petitioner.name.full() } filed any petitions before the one you are answering?
 fields:
@@ -824,7 +824,7 @@ code: |
       users[0].party_type_description = "Respondent Acting Pro Se (with no attorney)"
 ---
 code: |
-  if case.filed in ["user1_filed"]:
+  if case.filed in ["other_parties0_filed"]:
     if other_parties[0].attorney_involved and other_parties[0].type_of_assistance == "representation":
       other_parties[0].party_type_code = "PET"
       other_parties[0].party_type_description = "Petitioner (with attorney)"
@@ -848,7 +848,7 @@ code: |
     users[0].attorney.party_type_description = "Attorney for Respondent"
 ---
 code: |
-  if case.filed in ["user1_filed"]:
+  if case.filed in ["other_parties0_filed"]:
     other_parties[0].attorney.party_type_code = "APET"
     other_parties[0].attorney.party_type_description = "Attorney for Petitioner"
   else:
@@ -927,13 +927,28 @@ fields:
       - This child is attending high school: high_school
       - This child is attending college or vocational school: college
 ---
+code: |
+  temp_people_choices = list()
+  temp_people_choices.append(petitioner)
+  temp_people_choices.append(respondent)
+  if hasattr(legal_custody_other.name,"first"):
+    temp_people_choices.append(legal_custody_other)
+  if hasattr(physical_custody_other.name,"first"):
+    temp_people_choices.append(physical_custody_other)
+  if hasattr(visitation_supervisor.name,"first"):
+    temp_people_choices.append(visitation_supervisor)
+  if hasattr(communications_other.name,"first"):
+    temp_people_choices.append(communications_other)
+  parent_and_people_choices = temp_people_choices
+---
 sets: children[i].lived_with.name.first
 id: who child lived with
+reconsider: people_choices
 question: Who ${ children[i].name_full() } lived with?
 fields:
   - Who has ${ children[i].name_full() } lived with in the previous 60 days?: children[i].lived_with
     datatype: object
-    choices: people_choices
+    choices: parent_and_people_choices
     disable others: True
   - code: |
       children[i].lived_with.name_fields()
@@ -3407,10 +3422,10 @@ code: |
   temp_relief_options = list()
   if minor_children:
     temp_relief_options.append({"custody":"Grant custody of the children"})
-    if case.filed == "user1_filed" or other_parties[0].lives_in_missouri or marriage.live_together_in_mo:
+    if case.filed == "other_parties0_filed" or other_parties[0].lives_in_missouri or marriage.live_together_in_mo:
       temp_relief_options.append({"child_support":"Enter appropriate orders whith respect to the support of the children"})
   temp_relief_options.append({"divide_property":"Divide the marital property and debts"})
-  if case.filed == "user1_filed" or other_parties[0].lives_in_missouri or marriage.live_together_in_mo:
+  if case.filed == "other_parties0_filed" or other_parties[0].lives_in_missouri or marriage.live_together_in_mo:
     temp_relief_options.append({"maintenance":"Award maintenance"})
   if users[0].has_prior_name:
     temp_relief_options.append({"change_name":"Change my name to my former name"})
@@ -3517,8 +3532,8 @@ objects:
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, form_17_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, form_17_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=doc_list_selected.true_values(), filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=doc_list_selected.true_values(),  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---
 # Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
 # used for "preview" and "final" keys, and logic in the template checks the value of 

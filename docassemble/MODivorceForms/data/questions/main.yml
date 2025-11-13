@@ -86,10 +86,12 @@ code: |
   section_user_info
   section_other_party
   section_marriage
-  section_income
-  section_expenses
-  section_assets
-  section_debts
+  if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'income_statement_attachment' in doc_list_selected.true_values() or 'property_statement_attachment' in doc_list_selected.true_values():
+    section_income
+    section_expenses
+  if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'property_statement_attachment' in doc_list_selected.true_values():
+    section_assets
+    section_debts
   section_service
   interview_order_mo_divorce_forms = True
 ---
@@ -141,14 +143,14 @@ code: |
 code: |    
   ## 3 Please enter your case information
   nav.set_section("case_information")   
-  if case.filed in ["user0_filed", "user1_filed"]:
+  if case.filed in ["user0_filed", "other_parties0_filed"]:
     use_case_net_for_online_docket
     if 'answer_attachment' in doc_list_selected.true_values() or 'petition_attachment' in doc_list_selected.true_values():
       previous_petitions # answer, petition
   case.county # property_statement, petition, notice_of_hearing, form_17, certificate_of_dissolution
   case.court_name
   case.photo.filename
-  if case.filed in ["user0_filed", "user1_filed"]:
+  if case.filed in ["user0_filed", "other_parties0_filed"]:
     case.docket_number_asked
     if 'confidential_information_sheet_attachment' in doc_list_selected.true_values() or 'redaction_certification_attachment' in doc_list_selected.true_values():
       case.name_asked
@@ -166,7 +168,7 @@ code: |
     if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
       petitioner.attorney.party_type_code # confidential_information_sheet
       petitioner.party_type_description 
-  if case.filed in ["user0_filed", "user1_filed"]:
+  if case.filed in ["user0_filed", "other_parties0_filed"]:
     if respondent.attorney_involved:
       respondent.attorney.name.first
       if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
@@ -199,7 +201,7 @@ code: |
   
     if case.filed in ['user0_filed']:
       parenting_plan
-    elif case.filed in ['user1_filed']:
+    elif case.filed in ['other_parties0_filed']:
       agree_with_parenting_plan
   relief['maintenance']
   is_maintenance_currently_paid
@@ -414,7 +416,7 @@ code: |
   if case.filed == "user0_filed" and respondent_served:
       served_information
   else:
-    if case.filed in ["user0_filed", "user1_filed", "not_filed"]:
+    if case.filed in ["user0_filed", "other_parties0_filed", "not_filed"]:
       if service_type == "publication":
         service_by_publication_information
       else:
@@ -693,12 +695,12 @@ code: |
   if  case.filed in ["user0_filed","not_filed","unknown"]:
     temp_doc_list_options.append({'petition_attachment':'Petition','default':True}) 
     
-  elif case.filed == "user1_filed":
+  elif case.filed == "other_parties0_filed":
     temp_doc_list_options.append({'value':'answer_attachment','label':'Answer','default':True})   
   
   temp_doc_list_options.append({'value':'notice_of_hearing_attachment','label':'Notice of hearing','default':True})   
-  if  case.filed in ["user0_filed","not_filed","unknown"]:
-    temp_doc_list_options.append({'value':'certificate_of_dissolution_attachment','label':'Certificate of Dissolution','default':True})   
+  if  case.filed in ["user0_filed","other_parties0_filed","not_filed","unknown"]:
+    temp_doc_list_options.append({'value':'certificate_of_dissolution_attachment', 'label':'Certificate of Dissolution', 'default':True})   
   if  case.filed in ["user0_filed","not_filed","unknown"]:
     temp_doc_list_options.append({'value':'judgment_attachment','label':'Judgment','default':True})   
   temp_doc_list_options.append({'value':'property_statement_attachment','label':'Property statement','default':True})     
@@ -931,73 +933,76 @@ confirm: True
 ---
 id: answer enabled block for main interview
 code: |
-  if case.filed == "user1_filed":
+  if "answer_attachment" in doc_list_selected.true_values():
     answer_attachment.enabled = True
   else:
     answer_attachment.enabled = False
 ---
 id: notice_of_hearing enabled block for main interview
 code: |
-  if True:
+  if "notice_of_hearing_attachment" in doc_list_selected.true_values():
     notice_of_hearing_attachment.enabled = True
   else:
     notice_of_hearing_attachment.enabled = False
 ---
 id: certificate_of_dissolution enabled block for main interview
 code: |
-  if True:
+  if "certificate_of_dissolution_attachment" in doc_list_selected.true_values():
     certificate_of_dissolution_attachment.enabled = True
   else:
     certificate_of_dissolution_attachment.enabled = False
 ---
 id: fee_waiver enabled block for main interview
 code: |
-  if True:
+  if "fee_waiver_attachment" in doc_list_selected.true_values():
     fee_waiver_attachment.enabled = True
   else:
     fee_waiver_attachment.enabled = False
 ---
 id: judgment enabled block for main interview
 code: |
-  if case.filed == "user0_filed":
+  if "judgment_attachment" in doc_list_selected.true_values():
     judgment_attachment.enabled = True
   else:
     judgment_attachment.enabled = False
 ---
 id: petition enabled block for main interview
 code: |
-  if case.filed == "user0_filed":
+  if "petition_attachment" in doc_list_selected.true_values():
     petition_attachment.enabled = True
   else:
     petition_attachment.enabled = False
 ---
 id: income_statement enabled block for main interview
 code: |
-  if True:
+  if "income_statement_attachment" in doc_list_selected.true_values():
     income_statement_attachment.enabled = True
   else:
     income_statement_attachment.enabled = False
 ---
 id: property_statement enabled block for main interview
 code: |
-  if True:
+  if "property_statement_attachment" in doc_list_selected.true_values():
     property_statement_attachment.enabled = True
   else:
     property_statement_attachment.enabled = False
 ---
 id: confidential_information_sheet enabled block for main interview
 code: |
-  if True:
+  if "confidential_information_sheet_attachment" in doc_list_selected.true_values():
     confidential_information_sheet_attachment.enabled = True
   else:
     confidential_information_sheet_attachment.enabled = False
 ---
 id: redaction_certification enabled block for main interview
 code: |
-  if True:
+  if "redaction_certification_attachment" in doc_list_selected.true_values():
     redaction_certification_attachment.enabled = True
   else:
     redaction_certification_attachment.enabled = False
+---
+code: |
+  document_list = doc_list_selected.true_values()
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:

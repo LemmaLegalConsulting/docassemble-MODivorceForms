@@ -1,0 +1,293 @@
+mandatory: True
+code: |
+  exchanges.gather()
+  biweekly_schedule_review
+  mo_divorce_forms_download
+---
+objects: 
+  - exchanges: DAList.using(object_type=DAObject,there_are_any=True,complete_attribute="complete")
+---
+include:
+  - shared.yml
+---
+code: |
+  exchanges[0].starting_date = 0
+  exchanges[0].starting_week = 0
+  exchanges[0].information
+  exchanges[0].complete = True
+---
+code: |
+  exchanges[i].starting_date = exchanges[i-1].exchange_date
+  exchanges[i].starting_parent = exchanges[i-1].exchange_parent
+  exchanges[i].exchange_parent = exchanges[i-1].starting_parent
+  exchanges[i].information
+  exchanges[i].complete = True
+---
+question: Do you want to add another exchange?
+subquestion: |
+  % if float(exchanges.complete_elements()[-1].exchange_date) < 13: 
+  If you say no, then ${ exchanges.complete_elements()[-1].exchange_parent } will be listed as having the children for the remainder of the biweekly schedule.
+  % endif
+fields:
+  - Add another exchange?: exchanges.there_is_another
+    datatype: yesnoradio
+---
+if: len(exchanges.complete_elements()) > 0 and exchanges.complete_elements()[-1].exchange_parent != exchanges[0].starting_parent
+code: |
+  exchanges.there_is_another = True
+---
+reconsider: remaining_days
+id: exchange intro
+question: Schedule for Exchange
+subquestion: |
+  Each exchange should be written on the Weekend and Weekday Exchange Schedule. The parents
+  shall have physical custody of the children as they agree. In the event they do not agree, then the
+  parents shall exchange the children as set forth in the residential schedules.
+
+  Each parent shall consider reasonable changes when requested by the other parent or the children.
+  If a significant change is made, either parent may reduce their agreement to writing. All changes are
+  unenforceable unless in writing and signed by both parents.
+fields:
+  - "Who should have the child at the start of the schedule?": exchanges[0].starting_parent
+    datatype: object
+    choices:
+      - users[0]
+      - other_parties[0]
+  - "What is the day of the first transfer?": exchanges[0].exchange_date
+    datatype: dropdown
+    code: |
+      remaining_days
+  - "What time?": exchanges[0].exchange_time
+    datatype: time
+  - "Should the child be dropped off or picked up?": exchanges[0].exchange_method
+    datatype: radio
+    choices:
+      -  Drop off: Drop off
+      -  Pick up: Pick up
+  - "Where?": exchanges[0].exchange_location
+    js show if: |
+      val('exchanges[0].exchange_method') === "Drop off" || val('exchanges[0].exchange_method') === "Pick up" 
+    choices:
+      - ${ users[0].possessive('house') }
+      - ${ other_parties[0].possessive('house') }
+      - School
+      - Other
+  - "Explain": exchanges[0].exchange_location_other
+    js show if: |
+      val('exchanges[0].exchange_location') === "Other"
+  - "Add pick up from school?": exchanges[0].add_pick_up_from_school
+    datatype: yesnoradio
+    js show if: |
+      val("exchanges[0].exchange_method") === "Drop off" && val("exchanges[0].exchange_location") === "School"
+  - "What time?": exchanges[0].exchange_time2
+    datatype: time
+    js show if: |
+      val('exchanges[0].add_pick_up_from_school') === true
+continue button field: exchanges[0].information  
+validation code: |
+  if exchanges[0].starting_parent == users[0]:
+    exchanges[0].exchange_parent = other_parties[0]
+  elif exchanges[0].starting_parent == other_parties[0]:
+    exchanges[0].exchange_parent = users[0]
+---
+
+reconsider: remaining_days
+id: exchange intro
+question: Schedule for Exchange
+subquestion: |
+  ${ exchanges[i].starting_parent }
+fields:
+  - What is the day of the next transfer to ${ exchanges[i].exchange_parent }?: exchanges[i].exchange_date
+    datatype: dropdown
+    code: |
+      remaining_days
+  - What time?: exchanges[i].exchange_time
+    datatype: time
+  - Should ${ exchanges[i].starting_parent } drop off the child or should ${ exchanges[i].exchange_parent } pick up the child?: exchanges[i].exchange_method
+    datatype: radio
+    choices:
+      -  ${ exchanges[i].starting_parent } should drop off the child: Drop off
+      -  ${ exchanges[i].exchange_parent } should pick up the child: Pick up
+  - Where?: exchanges[i].exchange_location
+    js show if: |
+      val('exchanges[i].exchange_method') === "Drop off" || val('exchanges[i].exchange_method') === "Pick up"
+    choices:
+      - ${ users[0].possessive('house') }
+      - ${ other_parties[0].possessive('house') }
+      - School
+      - Other
+  - Explain: exchanges[i].exchange_location_other
+    js show if: |
+      val('exchanges[i].exchange_location') === "Other"
+  - Add pick up from school?: exchanges[i].add_pick_up_from_school
+    datatype: yesnoradio
+    js show if: |
+      val("exchanges[i].exchange_method") === "Drop off" && val("exchanges[i].exchange_location") === "School"
+  - What time: exchanges[i].exchange_time2
+    datatype: time
+    js show if: |
+      val('exchanges[i].add_pick_up_from_school') === true
+continue button field: exchanges[i].information  
+
+---
+code: |
+  week_dict = {
+    0:"Sunday Week 1",
+    1:"Monday Week 1",
+    2:"Tuesday Week 1",
+    3:"Wednesday Week 1",
+    4:"Thursday Week 1",
+    5:"Friday Week 1",
+    6:"Saturday Week 1",
+    7:"Sunday Week 2",
+    8:"Monday Week 2",
+    9:"Tuesday Week 2",
+    10:"Wednesday Week 2",
+    11:"Thursday Week 2",
+    12:"Friday Week 2",
+    13:"Saturday Week 2",
+  }
+
+---
+id: remaining_days code
+code: |
+  temp_week_list_of_dicts = list()
+  for index in range(0,14):
+    if len(exchanges.complete_elements()) == 0 or index >= float(exchanges.complete_elements()[-1].exchange_date):
+      temp_week_list_of_dicts.append({index:week_dict[index]})
+  remaining_days = temp_week_list_of_dicts
+
+---
+question: Weekday and Weekend Exchange Schedule
+subquestion: |
+  Enter the parent who is receiving custody and the specified time for each exchange.
+fields:
+  - note: |
+      **Week 1 **
+  - Sunday:  biweekly_schedule[0]
+    datatype: area
+    required: False
+  - Monday:  biweekly_schedule[1]
+    datatype: area
+    required: False
+  - Tuesday:  biweekly_schedule[2]
+    datatype: area
+    required: False
+  - Wednesday:  biweekly_schedule[3]
+    datatype: area
+    required: False
+  - Thursday:  biweekly_schedule[4]
+    datatype: area
+    required: False
+  - Friday:  biweekly_schedule[5]
+    datatype: area
+    required: False
+  - Saturday:  biweekly_schedule[6]
+    datatype: area
+    required: False
+  - note: |
+      **Week 2 **
+  - Sunday:  biweekly_schedule[7]
+    datatype: area
+    required: False
+  - Monday:  biweekly_schedule[8]
+    datatype: area
+    required: False
+  - Tuesday:  biweekly_schedule[9]
+    datatype: area
+    required: False
+  - Wednesday:  biweekly_schedule[10]
+    datatype: area
+    required: False
+  - Thursday:  biweekly_schedule[11]
+    datatype: area
+    required: False
+  - Friday:  biweekly_schedule[12]
+    datatype: area
+    required: False
+  - Saturday:  biweekly_schedule[13]
+    datatype: area
+    required: False
+continue button field: biweekly_schedule_review
+---
+code: |
+  starting_weekly_list = list()
+  for index in range(0,14):
+    starting_weekly_list.append("")
+---
+reconsider: starting_weekly_list
+code: |
+  for exchange in exchanges.complete_elements():
+    if exchange.starting_date == exchange.exchange_date:
+      if exchange.exchange_method == "Drop off":
+        temp_description = str(exchange.exchange_time) + " " + exchange.starting_parent.name.full() + " drops off children at " + exchange.exchange_location  + "\n"
+        if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
+          temp_description += str(exchange.exchange_time2) + " " + exchange.exchange_parent.name.full() + " picks up children from " + exchange.exchange_location + "\n"
+      elif exchange.exchange_method == "Pick up":
+        temp_description = str(exchange.exchange_time) + " " + exchange.exchange_parent.name.full() + " picks up children from " + exchange.exchange_location + "\n"
+      starting_weekly_list[int(exchange.exchange_date)] += temp_description
+    elif int(exchange.starting_date) == 0:
+      for date in range(int(exchange.starting_date),(int(exchange.exchange_date))):
+        starting_weekly_list[date] = exchange.starting_parent.name.full()
+      if exchange.exchange_method == "Drop off":
+        temp_description = str(exchange.exchange_time) + " " + exchange.starting_parent.name.full() + " drops off children at " + exchange.exchange_location  + "\n"
+        if exchange.exchange_location == "School" and exchange.add_pick_up_from_school:
+          temp_description += str(exchange.exchange_time2) + " " + exchange.exchange_parent.name.full() + " picks up children from " + exchange.exchange_location + "\n"
+      elif exchange.exchange_method == "Pick up":
+        temp_description = str(exchange.exchange_time) + " " + exchange.exchange_parent.name.full() + " picks up children from " + exchange.exchange_location + "\n"
+      starting_weekly_list[int(exchange.exchange_date)] += temp_description
+    else:
+      for date in range(int(exchange.starting_date) + 1,(int(exchange.exchange_date))):
+        starting_weekly_list[date] = exchange.starting_parent.name.full()
+      if exchange.exchange_method == "Drop off":
+        temp_description = str(exchange.exchange_time) + " " + exchange.starting_parent.name.full() + " drops off children at " + exchange.exchange_location  + "\n"
+        if exchange.exchange_location == "School" and exchange.add_pick_up_from_school:
+          temp_description += str(exchange.exchange_time2) + " " + exchange.exchange_parent.name.full() + " picks up children from " + exchange.exchange_location + "\n"
+      elif exchange.exchange_method == "Pick up":
+        temp_description = str(exchange.exchange_time) + " " + exchange.exchange_parent.name.full() + " picks up children from " + exchange.exchange_location + "\n"
+      starting_weekly_list[int(exchange.exchange_date)] += temp_description
+  if exchanges.gathered and int(exchanges[-1].exchange_date) < 14:
+    for date_index in range(int(exchanges[-1].exchange_date) + 1,14):
+      starting_weekly_list[date_index] = exchanges[-1].exchange_parent.name.full()
+  biweekly_schedule = starting_weekly_list
+---
+id: answer enabled block for main interview
+code: |
+  parenting_plan_attachment.enabled = True
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[parenting_plan_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[parenting_plan_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+---
+id: Parenting Plan object
+objects:
+  - parenting_plan_attachment: ALDocument.using(title="Parenting Plan", filename="Parenting_Plan", has_addendum=False, )
+---
+id: Parenting Plan attachment
+attachment:
+  name: Parenting Plan
+  filename: Parenting_Plan
+  variable name: parenting_plan_attachment[i]
+  skip undefined: True
+  pdf template file: parenting_plan.pdf
+  editable: False
+  fields:
+   - paScheduleWeekOneSunday: ${ biweekly_schedule[0] }
+   - paScheduleWeekOneMonday: ${ biweekly_schedule[1] }
+   - paScheduleWeekOneTuesday: ${ biweekly_schedule[2] }
+   - paScheduleWeekOneWednesday: ${ biweekly_schedule[3] }
+   - paScheduleWeekOneThursday: ${ biweekly_schedule[4] }
+   - paScheduleWeekOneFriday: ${ biweekly_schedule[5] }
+   - paScheduleWeekOneSaturday: ${ biweekly_schedule[6] }
+   - paScheduleWeekTwoSunday: ${ biweekly_schedule[7] }
+   - paScheduleWeekTwoMonday: ${ biweekly_schedule[8] }
+   - paScheduleWeekTwoTuesday: ${ biweekly_schedule[9] }
+   - paScheduleWeekTwoWednesday: ${ biweekly_schedule[10] }
+   - paScheduleWeekTwoThursday: ${ biweekly_schedule[11] }
+   - paScheduleWeekTwoFriday: ${ biweekly_schedule[12] }
+   - paScheduleWeekTwoSaturday: ${ biweekly_schedule[13] }
+---
+        
+        
+
