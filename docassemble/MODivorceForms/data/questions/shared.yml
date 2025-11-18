@@ -927,20 +927,6 @@ fields:
       - This child is attending high school: high_school
       - This child is attending college or vocational school: college
 ---
-code: |
-  temp_people_choices = list()
-  temp_people_choices.append(petitioner)
-  temp_people_choices.append(respondent)
-  if hasattr(legal_custody_other.name,"first"):
-    temp_people_choices.append(legal_custody_other)
-  if hasattr(physical_custody_other.name,"first"):
-    temp_people_choices.append(physical_custody_other)
-  if hasattr(visitation_supervisor.name,"first"):
-    temp_people_choices.append(visitation_supervisor)
-  if hasattr(communications_other.name,"first"):
-    temp_people_choices.append(communications_other)
-  parent_and_people_choices = temp_people_choices
----
 sets: children[i].lived_with.name.first
 id: who child lived with
 reconsider: people_choices
@@ -948,7 +934,7 @@ question: Who ${ children[i].name_full() } lived with?
 fields:
   - Who has ${ children[i].name_full() } lived with in the previous 60 days?: children[i].lived_with
     datatype: object
-    choices: parent_and_people_choices
+    choices: people_choices
     disable others: True
   - code: |
       children[i].lived_with.name_fields()
@@ -3530,10 +3516,10 @@ progress: 100
 objects:
   - mo_divorce_forms_Post_interview_instructions: ALDocument.using(title="Instructions", filename="certificate_of_dissolution_of_marri_next_steps.docx", enabled=True, has_addendum=False)
 ---
-# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+# This isn't used because there is an objects block in main.yml
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=doc_list_selected.true_values(), filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=doc_list_selected.true_values(),  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, fee_waiver_attachment, judgment_attachment, petition_attachment, income_statement_attachment, property_statement_attachment, confidential_information_sheet_attachment, redaction_certification_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, fee_waiver_attachment, judgment_attachment, petition_attachment, income_statement_attachment, property_statement_attachment, confidential_information_sheet_attachment, redaction_certification_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---
 # Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
 # used for "preview" and "final" keys, and logic in the template checks the value of 
