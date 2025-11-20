@@ -1,5 +1,6 @@
 mandatory: True
 code: |
+  case.filed
   exchanges.gather()
   biweekly_schedule_review
   if not holidays_default:
@@ -73,7 +74,6 @@ fields:
     js show if: |
       val('exchanges[0].exchange_method') === "Drop off" && val('exchanges[0].starting_parent') == "users[0]"
     choices:
-      - ${ users[0].possessive('house') }
       - ${ other_parties[0].possessive('house') }
       - School
       - Other
@@ -82,7 +82,6 @@ fields:
       val('exchanges[0].exchange_method') === "Drop off" && val('exchanges[0].starting_parent') == "other_parties[0]"
     choices:
       - ${ users[0].possessive('house') }
-      - ${ other_parties[0].possessive('house') }
       - School
       - Other
   - "Where should ${ other_parties[0] } pick up the child?": exchanges[0].exchange_location
@@ -90,14 +89,12 @@ fields:
       val('exchanges[0].exchange_method') === "Pick up" && val('exchanges[0].starting_parent') == "users[0]"
     choices:
       - ${ users[0].possessive('house') }
-      - ${ other_parties[0].possessive('house') }
       - School
       - Other
   - "Where should ${ users[0] } pick up the child?": exchanges[0].exchange_location
     js show if: |
       val('exchanges[0].exchange_method') === "Pick up" && val('exchanges[0].starting_parent') == "other_parties[0]"
     choices:
-      - ${ users[0].possessive('house') }
       - ${ other_parties[0].possessive('house') }
       - School
       - Other
@@ -266,7 +263,7 @@ code: |
         temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent.name.full() + " picks up children from " + exchange.exchange_location + "\n"
       starting_weekly_list[int(exchange.exchange_date)] += temp_description
     elif int(exchange.starting_date) == 0:
-      if exchanges.instanceName == "exchanges[0]":
+      if exchange.instanceName == "exchanges[0]":
         starting_date = int(exchange.starting_date)
       else:
         starting_date = int(exchange.starting_date)+1
