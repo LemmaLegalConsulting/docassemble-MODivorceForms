@@ -46,6 +46,46 @@ reconsider: remaining_days
 id: exchange intro
 question: Schedule for Exchange
 subquestion: |
+fields:
+  - "Who should have the child at the start of the schedule?": starting_parent
+    datatype: object
+    choices:
+      - users[0]
+      - other_parties[0]
+  - Do you want to use a schedule template or build your own schedule?: use_template
+    choices:
+      - Use a template: template
+      - Build a schedule: build
+  - What template do you want to use?: template_choice
+    choices:
+      - Every other week: every_other_week
+      - "2-2-3": two_two_three
+      - "2-2-5-5": two_two_five_five
+      - "3-4-4-3": three_four_four_three
+      - "Every weekend": every_weekend
+      - "Every other weekend": every_other_weekend
+    js show if: |
+      val('use_template') === "template"
+  - note: |
+      [FILE every_other_week.png]
+      
+
+    js show if: |
+      val('template_choice') === "every_other_week"
+  - note: |
+      ${ users[0] } [FILE mayablue.png, 20px]
+      
+      ${ other_parties[0] } [FILE plum.png, 20px]
+    js show if: |
+      val('starting_parent') === "users[0]" && val('template_choice') === "every_other_week" 
+validation code: |
+  if starting_parent == users[0]:
+    exchange_parent = other_parties[0]
+  else:
+    exchange_parent = users[0]
+---
+question: Make your own schedule
+subquestion: |
   Each exchange should be written on the Weekend and Weekday Exchange Schedule. The parents
   shall have physical custody of the children as they agree. In the event they do not agree, then the
   parents shall exchange the children as set forth in the residential schedules.
@@ -53,12 +93,15 @@ subquestion: |
   Each parent shall consider reasonable changes when requested by the other parent or the children.
   If a significant change is made, either parent may reduce their agreement to writing. All changes are
   unenforceable unless in writing and signed by both parents.
+
+
 fields:
   - "Who should have the child at the start of the schedule?": exchanges[0].starting_parent
     datatype: object
     choices:
       - users[0]
       - other_parties[0]
+    default: starting_parent
   - "What is the day of the first transfer?": exchanges[0].exchange_date
     datatype: dropdown
     code: |
@@ -192,7 +235,455 @@ code: |
     if len(exchanges.complete_elements()) == 0 or index >= float(exchanges.complete_elements()[-1].exchange_date):
       temp_week_list_of_dicts.append({index:week_dict[index]})
   remaining_days = temp_week_list_of_dicts
-
+---
+code: |
+  default_exchange_time = "09:00:00"
+  default_exchange_method = "Drop off"
+  default_exchange_location = exchange_parent.possessive('house')
+---
+if: use_template == "template" and template_choice == "every_other_week"
+variable name: exchanges
+use objects: objects
+data from code:
+  object: DAObject
+  module: docassemble.base.util
+  items:
+    - starting_parent: |
+        starting_parent.name.full()
+      starting_date: |
+        0 
+      exchange_parent: | 
+        exchange_parent.name.full()
+      exchange_date: |
+        5
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        exchange_parent.name.full()
+      starting_date: |
+        5
+      exchange_parent: |
+        starting_parent.name.full()
+      exchange_date: |
+        12
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+---
+if: use_template == "template" and template_choice == "two_two_three"
+variable name: exchanges
+use objects: objects
+data from code:
+  object: DAObject
+  module: docassemble.base.util
+  items:
+    - starting_parent: |
+        starting_parent.name.full()
+      starting_date: |
+        0 
+      exchange_parent: | 
+        exchange_parent.name.full()
+      exchange_date: |
+        1
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        exchange_parent.name.full()
+      starting_date: |
+        1
+      exchange_parent: |
+        starting_parent.name.full()
+      exchange_date: |
+        3
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        starting_parent.name.full()
+      starting_date: |
+        3 
+      exchange_parent: | 
+        exchange_parent.name.full()
+      exchange_date: |
+        5
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        exchange_parent.name.full()
+      starting_date: |
+        5
+      exchange_parent: |
+        starting_parent.name.full()
+      exchange_date: |
+        8
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        starting_parent.name.full()
+      starting_date: |
+        8
+      exchange_parent: | 
+        exchange_parent.name.full()
+      exchange_date: |
+        10
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        exchange_parent.name.full()
+      starting_date: |
+        10
+      exchange_parent: |
+        starting_parent.name.full()
+      exchange_date: |
+        12
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+---
+if: use_template == "template" and template_choice == "two_two_five_five"
+variable name: exchanges
+use objects: objects
+data from code:
+  object: DAObject
+  module: docassemble.base.util
+  items:
+    - starting_parent: |
+        starting_parent.name.full()
+      starting_date: |
+        0 
+      exchange_parent: | 
+        exchange_parent.name.full()
+      exchange_date: |
+        3
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        exchange_parent.name.full()
+      starting_date: |
+        3
+      exchange_parent: |
+        starting_parent.name.full()
+      exchange_date: |
+        8
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        starting_parent.name.full()
+      starting_date: |
+        8
+      exchange_parent: | 
+        exchange_parent.name.full()
+      exchange_date: |
+        10
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        exchange_parent.name.full()
+      starting_date: |
+        10
+      exchange_parent: |
+        starting_parent.name.full()
+      exchange_date: |
+        12
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+---
+if: use_template == "template" and template_choice == "three_four_four_three"
+variable name: exchanges
+use objects: objects
+data from code:
+  object: DAObject
+  module: docassemble.base.util
+  items:
+    - starting_parent: |
+        starting_parent.name.full()
+      starting_date: |
+        0 
+      exchange_parent: | 
+        exchange_parent.name.full()
+      exchange_date: |
+        0
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        exchange_parent.name.full()
+      starting_date: |
+        0
+      exchange_parent: |
+        starting_parent.name.full()
+      exchange_date: |
+        4
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        starting_parent.name.full()
+      starting_date: |
+        4
+      exchange_parent: | 
+        exchange_parent.name.full()
+      exchange_date: |
+        7
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        exchange_parent.name.full()
+      starting_date: |
+        7
+      exchange_parent: |
+        starting_parent.name.full()
+      exchange_date: |
+        10
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+---
+if: use_template == "template" and template_choice == "every_weekend"
+variable name: exchanges
+use objects: objects
+data from code:
+  object: DAObject
+  module: docassemble.base.util
+  items:
+    - starting_parent: |
+        starting_parent.name.full()
+      starting_date: |
+        0 
+      exchange_parent: | 
+        exchange_parent.name.full()
+      exchange_date: |
+        1
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        exchange_parent.name.full()
+      starting_date: |
+        1
+      exchange_parent: |
+        starting_parent.name.full()
+      exchange_date: |
+        5
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        starting_parent.name.full()
+      starting_date: |
+        5
+      exchange_parent: | 
+        exchange_parent.name.full()
+      exchange_date: |
+        8
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        exchange_parent.name.full()
+      starting_date: |
+        8
+      exchange_parent: |
+        starting_parent.name.full()
+      exchange_date: |
+        12
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+---
+if: use_template == "template" and template_choice == "every_other_weekend"
+variable name: exchanges
+use objects: objects
+data from code:
+  object: DAObject
+  module: docassemble.base.util
+  items:
+    - starting_parent: |
+        starting_parent.name.full()
+      starting_date: |
+        0 
+      exchange_parent: | 
+        exchange_parent.name.full()
+      exchange_date: |
+        1
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        exchange_parent.name.full()
+      starting_date: |
+        1
+      exchange_parent: |
+        starting_parent.name.full()
+      exchange_date: |
+        12
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
 ---
 question: Weekday and Weekend Exchange Schedule
 subquestion: |
@@ -256,11 +747,11 @@ code: |
   for exchange in exchanges.complete_elements():
     if exchange.starting_date == exchange.exchange_date:
       if exchange.exchange_method == "Drop off":
-        temp_description = str(format_time(exchange.exchange_time))  + " " + exchange.starting_parent.name.full() + " drops off children at " + exchange.exchange_location  + "\n"
+        temp_description = str(format_time(exchange.exchange_time))  + " " + exchange.starting_parent + " drops off children at " + exchange.exchange_location  + "\n"
         if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
-          temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent.name.full() + " picks up children from " + exchange.exchange_location + "\n"
+          temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
       elif exchange.exchange_method == "Pick up":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent.name.full() + " picks up children from " + exchange.exchange_location + "\n"
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
       starting_weekly_list[int(exchange.exchange_date)] += temp_description
     elif int(exchange.starting_date) == 0:
       if exchange.instanceName == "exchanges[0]":
@@ -268,27 +759,27 @@ code: |
       else:
         starting_date = int(exchange.starting_date)+1
       for date in range(starting_date,(int(exchange.exchange_date))):
-        starting_weekly_list[date] = exchange.starting_parent.name.full()
+        starting_weekly_list[date] = exchange.starting_parent
       if exchange.exchange_method == "Drop off":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent.name.full() + " drops off children at " + exchange.exchange_location  + "\n"
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + exchange.exchange_location  + "\n"
         if exchange.exchange_location == "School" and exchange.add_pick_up_from_school:
-          temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent.name.full() + " picks up children from " + exchange.exchange_location + "\n"
+          temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
       elif exchange.exchange_method == "Pick up":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent.name.full() + " picks up children from " + exchange.exchange_location + "\n"
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
       starting_weekly_list[int(exchange.exchange_date)] += temp_description
     else:
       for date in range(int(exchange.starting_date) + 1,(int(exchange.exchange_date))):
-        starting_weekly_list[date] = exchange.starting_parent.name.full()
+        starting_weekly_list[date] = exchange.starting_parent
       if exchange.exchange_method == "Drop off":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent.name.full() + " drops off children at " + exchange.exchange_location  + "\n"
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + exchange.exchange_location  + "\n"
         if exchange.exchange_location == "School" and exchange.add_pick_up_from_school:
-          temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent.name.full() + " picks up children from " + exchange.exchange_location + "\n"
+          temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
       elif exchange.exchange_method == "Pick up":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent.name.full() + " picks up children from " + exchange.exchange_location + "\n"
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
       starting_weekly_list[int(exchange.exchange_date)] += temp_description
   if exchanges.gathered and int(exchanges[-1].exchange_date) < 14:
     for date_index in range(int(exchanges[-1].exchange_date) + 1,14):
-      starting_weekly_list[date_index] = exchanges[-1].exchange_parent.name.full()
+      starting_weekly_list[date_index] = exchanges[-1].exchange_parent
   biweekly_schedule = starting_weekly_list
 ---
 id: answer enabled block for main interview
