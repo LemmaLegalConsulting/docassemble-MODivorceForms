@@ -120,9 +120,25 @@ fields:
 ---
 id: personal_jurisdiction
 question: Personal Juridisdiction
+subquestion: |
+  % if personal_jurisdiction_over_respondent_default:
+  It appears that there is personal jurisdiction over ${ respondent } because ${ respondent } has been a resident of Missouri for at least 90 days.
+  % else:
+  It appears that there is not personal jurisdiction over ${ respondent } because ${ respondent } has not been a resident of Missouri for at least 90 days.
+  % endif
 fields:
   - Does the court have personal jurisdiction over ${ respondent }?: personal_jurisdiction_over_respondent
     datatype: yesnoradio
+    default: ${ personal_jurisdiction_over_respondent_default }
+---
+depends on: 
+  - respondent.resident_for_90_days
+code: |
+  if respondent.resident_for_90_days:
+    personal_jurisdiction_over_respondent_default = True
+  else:
+    personal_jurisdiction_over_respondent_default = False
+  
 ---
 id: child custody jurisdiction
 question: Jurisdiction over child custody
@@ -283,4 +299,198 @@ attachment:
       - "respondent_name_middle": ${ respondent.name.middle } 
       - "respondent_name_last": ${ respondent.name.last } 
       - "respondent_name_suffix": ${ respondent.name.suffix } 
+      - "petitioner_ssn": ${ petitioner.ssn } 
+      - "respondent_ssn": ${ respondent.ssn } 
+      - "case_personal_jurisdiction_over_respondent": ${ personal_jurisdiction_over_respondent } 
+      - "case_personal_jurisdiction_over_respondent_no": ${ not personal_jurisdiction_over_respondent } 
+      - "petitioner_resident_for_90 days": ${ petitioner.resident_for_90_days } 
+      - "respondent_resident_for_90 days": ${ respondent.resident_for_90_days } 
+      - "marriage_date": ${ format_date(marriage.recorded_date, format='M/d/yyyy') } 
+      - "marriage_address_county": ${ marriage.address.county } 
+      - "marriage_address_state": ${ state_name(marriage.address.state) } 
+      - "marriage_date_last_resided": ${ format_date(marriage.separation_date, format='M/d/yyyy') } 
+      - "petitioner_pregnant": ${ True } 
+      - "respondent_pregnant": ${ True } 
+      - "children": ${ len(children) == 0 } 
+      - "children4": ${ len(children) > 0 } 
+      - "children5": ${ len(children) if len(children) > 0 else "" } 
+      - "children0_name_first": |
+          % if len(children) > 0:
+          ${ children[0].name.first }
+          % endif
+      - "children0_name_suffix": |
+          % if len(children) > 0:
+          ${ children[0].name.suffix }
+          % endif
+      - "children0_age": |
+          % if len(children) > 0:
+          ${ "round(date_difference(as_datetime(children[0].birthdate),today()).years,0)" }
+          % endif
+      - "children0_ssn": |
+          % if len(children) > 0:
+          ${ "{:.0f}".format(children[0].ssn) }
+          % endif
+      - "children0_name_middle": |
+          % if len(children) > 0:
+          ${ children[0].name.middle }
+          % endif
+      - "children0_name_last": |
+          % if len(children) > 0:
+          ${ children[0].name.last }
+          % endif
+      - "children1_name_first": |
+          % if len(children) > 1:
+          ${ children[1].name.first }
+          % endif
+      - "children1_age": |
+          % if len(children) > 1:
+          ${ children[1].name.suffix }
+          % endif
+      - "children1_name_middle": |
+          % if len(children) > 1:
+          ${ "{:.0f}".format(children[1].name.middle) }
+          % endif
+      - "children1_name_ssn": |
+          % if len(children) > 1:
+          ${ children[1].ssn }
+          % endif
+      - "children1_name_name_last": |
+          % if len(children) > 1:
+          ${ children[1].name.last }
+          % endif
+      - "children1_name_suffix": |
+          % if len(children) > 1:
+          ${ "round(date_difference(as_datetime(children[1].birthdate),today()).years,0)" }
+          % endif
+      - "children2_name_middle": |
+          % if len(children) > 2:
+          ${ children[2].name.middle }
+          % endif
+      - "children2_name_suffix": |
+          % if len(children) > 2:
+          ${ "round(date_difference(as_datetime(children[2].birthdate),today()).years,0)" }
+          % endif
+      - "children2_name_first": |
+          % if len(children) > 2:
+          ${ children[2].name.first }
+          % endif
+      - "children2_name_last": |
+          % if len(children) > 2:
+          ${ "{:.0f}".format(children[2].name.last) }
+          % endif
+      - "children2_name_age": |
+          % if len(children) > 2:
+          ${ children[2].name.suffix }
+          % endif
+      - "children2_ssn": |
+          % if len(children) > 2:
+          ${ children[2].ssn }
+          % endif
+      - "children3_name_middle": |
+          % if len(children) > 3:
+          ${ children[3].name.middle }
+          % endif
+      - "children3_name_first": |
+          % if len(children) > 3:
+          ${ children[3].name.first }
+          % endif
+      - "children3_name_last": |
+          % if len(children) > 3:
+          ${ children[3].name.last }
+          % endif
+      - "children3_name_suffix": |
+          % if len(children) > 3:
+          ${ children[3].name.suffix }
+          % endif
+      - "children3_age": |
+          % if len(children) > 3:
+          ${ "round(date_difference(as_datetime(children[3].birthdate),today()).years,0)" }
+          % endif
+      - "children3_ssn": |
+          % if len(children) > 3:
+          ${ "{:.0f}".format(children[3].ssn) }
+          % endif
+      - "children4_name_first": |
+          % if len(children) > 4:
+          ${ children[4].name.first }
+          % endif
+      - "children4_age": |
+          % if len(children) > 4:
+          ${ "{:.0f}".format(children[4].ssn) }
+          % endif
+      - "children4_name_suffix": |
+          % if len(children) > 4:
+          ${ "round(date_difference(as_datetime(children[4].birthdate),today()).years,0)" }
+          % endif
+      - "children4_ssn": |
+          % if len(children) > 4:
+          ${ children[4].name.suffix }
+          % endif
+      - "children4_name_middle": |
+          % if len(children) > 4:
+          ${ children[4].name.middle }
+          % endif
+      - "children4_name_last": |
+          % if len(children) > 4:
+          ${ children[4].name.last }
+          % endif
+      - "children5_name_first": |
+          % if len(children) > 5:
+          ${ children[5].name.first }
+          % endif
+      - "children5_name_middle": |
+          % if len(children) > 5:
+          ${ children[5].name.middle }
+          % endif
+      - "children5_name_last": |
+          % if len(children) > 5:
+          ${ children[5].name.last }
+          % endif
+      - "children5_age": |
+          % if len(children) > 5:
+          ${ "round(date_difference(as_datetime(children[5].birthdate),today()).years,0)" }
+          % endif
+      - "children5_ssn": |
+          % if len(children) > 5:
+          ${ "{:.0f}".format(children[5].ssn) }
+          % endif
+      - "children5_name_suffix": |
+          % if len(children) > 5:
+          ${ children[5].name.suffix }
+          % endif
+      - "other_parties1": ${ case.filed ==  "other_parties0_filed" } 
+      - "petitioner_full_name": ${ case.filed in  ["user0_filed","not_filed"] } 
+      - "petitioner": |
+          % if case.filed ==  "other_parties0_filed":
+          ${ petitioner.name_full() }
+          % endif
+      - "respondent_full_name": |
+          % if case.filed in  ["user0_filed","not_filed"]:
+          ${ respondent.name_full() }
+          % endif
+      - "petitioner_address": |
+          % if case.filed ==  "other_parties0_filed":
+          ${ petitioner.address.line_one() }
+          % endif
+      - "respondent_address": |
+          % if case.filed in  ["user0_filed","not_filed"]:
+          ${ respondent.address.line_one() }
+          % endif
+      - "petitioner_address14": |
+          % if case.filed ==  "other_parties0_filed":
+          ${ petitioner.address.line_two() }
+          % endif
+      - "respondent_address15": |
+          % if case.filed in  ["user0_filed","not_filed"]:
+          ${ respondent.address.line_two() }
+          % endif
+      - "petitioner_phone": |
+          % if case.filed ==  "other_parties0_filed":
+          ${ phone_number_formatted(petitioner.phone_number) }
+          % endif
+      - "respondent_phone": |
+          % if case.filed in  ["user0_filed","not_filed"]:
+          ${ phone_number_formatted(respondent.phone_number) }
+          % endif
+
 ---

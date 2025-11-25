@@ -125,14 +125,14 @@ attachment:
     - "other_parties2_attorney": ${ other_parties[2].attorney } 
     - "other_parties2_attorney_bar_number": ${ other_parties[2].attorney.bar_number } 
     - "other_parties2_attorney_party_type_code": ${ other_parties[2].attorney.party_type_code } 
-    - "petitioner_employersj_name_text": ${ petitioner.employer.name.text } 
+    - "petitioner_employersj_name_text": ${ "Unknown" if petitioner.jobs.there_are_any == None and petitioner.has_self_employment_income == None else petitioner.employer.name.text } 
     - "petitioner_employersj_address_address": ${ petitioner.employer.address.address } 
     - "petitioner_employersj_address_city": ${ petitioner.employer.address.city } 
     - "petitioner_employersj_address_state": ${ petitioner.employer.address.state } 
     - "petitioner_employersj_address_zip": ${ petitioner.employer.address.zip } 
     - "petitioner_employersj_phone_number": ${ phone_number_formatted(petitioner.employer.phone_number) } 
     - "petitioner_employersj_email": ${ petitioner.employer.email } 
-    - "respondent_employersj_name_text": ${ respondent.employer.name.text } 
+    - "respondent_employersj_name_text": ${ "Unknown" if respondent.jobs.there_are_any == None and respondent.has_self_employment_income == None else respondent.employer.name.text } 
     - "respondent_employersj_address_address": ${ respondent.employer.address.address } 
     - "respondent_employersj_address_city": ${ respondent.employer.address.city } 
     - "respondent_employersj_address_state": ${ respondent.employer.address.state } 

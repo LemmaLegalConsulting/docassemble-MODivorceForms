@@ -1207,7 +1207,7 @@ fields:
   - "County": marriage.address.county
     maxlength: 24
   - "State": marriage.address.state
-    maxlength: 32
+    code: states_list()
   - "Country": marriage.address.country
   - note: |
       Please spell out the full name of the state or country, instead of using abbreviations.
@@ -1276,6 +1276,7 @@ fields:
 
 
 ---
+only sets: users[0].has_self_employment_income
 id: user self employment income
 question: Self Employment Income 
 fields: 
@@ -1284,13 +1285,12 @@ fields:
   - Monthly self employment income: users[0].self_employment_income
     datatype: currency
     show if: users[0].has_self_employment_income
-  - Description of your self employment: users[0].self_employment_description
-    show if: users[0].has_self_employment_income
+
 validation code: |
   if not users[0].has_self_employment_income:
     users[0].self_employment_income = 0
-    users[0].self_employment_description = None
 ---
+only sets: other_parties[0].has_self_employment_income
 id: other party self employment income
 question: Self Employment Income 
 fields: 
@@ -1299,7 +1299,21 @@ fields:
   - Monthly self employment income: other_parties[0].self_employment_income
     datatype: currency
     show if: other_parties[0].has_self_employment_income
-  - Description of ${ other_parties[0].pronoun_possessive("self employment")} : other_parties[0].self_employment_description
+  - Description of ${ other_parties[0].pronoun_possessive("self employment")} : other_parties[0].employer.name.text
+    show if: other_parties[0].has_self_employment_income
+  - Street address: other_parties[0].employer.address.address 
+    address autocomplete: True
+    show if: other_parties[0].has_self_employment_income
+  - Unit: other_parties[0].employer.address.unit
+    required: False
+    show if: other_parties[0].has_self_employment_income
+  - City: other_parties[0].employer.address.city
+    show if: other_parties[0].has_self_employment_income
+  - State: other_parties[0].employer.address.state
+    show if: other_parties[0].has_self_employment_income
+  - Zip or postal code: other_parties[0].employer.address.zip
+    show if: other_parties[0].has_self_employment_income
+  - Phone: other_parties[0].employer.phone_number
     show if: other_parties[0].has_self_employment_income
 validation code: |
   if not other_parties[0].has_self_employment_income:
@@ -1390,16 +1404,30 @@ id: employer info
 generic object: ALIndividual
 question: |
   % if x == users[0]:
-  Tell us about your main employer
+  % if x.jobs.there_are_any:
+  Tell us about your main employer.
+  % elif x.has_self_employment_income:
+  Describe your self employment and provide the address for your self employment.
   % else:
   Tell us about the main employer for ${ other_parties[0].name_full() }.
   % endif
+  % endif
 fields:
-  - Employer's name: x.employer.name.text
+  - field: x.employer.name.text
+    label: |
+      % if x.jobs.there_are_any:
+      Employer's name
+      % elif x.has_self_employment_income:
+      Self employment description
+      % endif
   - note: |
       ---
-
+    
+      % if x.jobs.there_are_any:
       Employer's address
+      % elif x.has_self_employment_income:
+      Self employment address
+      % endif
   - Street address: x.employer.address.address 
     address autocomplete: True
   - Unit: x.employer.address.unit

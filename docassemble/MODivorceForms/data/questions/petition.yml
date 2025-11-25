@@ -354,17 +354,17 @@ attachment:
       - "didCoupleLiveInMissouri2": ${ not marriage.live_together_in_mo } 
       - "didCoupleLiveInMissouri3": ${ other_parties[0].address.state == "MO" } 
       - "respondentsEmploymentStatus1": ${ len(respondent.jobs) > 0 } 
-      - "respondentsEmploymentStatus2": ${ len(respondent.jobs) == 0 and not respondent.has_self_employment_income } 
+      - "respondentsEmploymentStatus2": ${ len(respondent.jobs) == 0 and respondent.has_self_employment_income == False} 
       - "respondentsEmploymentStatus3": ${ len(respondent.jobs) == 0 and respondent.has_self_employment_income } 
       - "respondentsEmploymentStatus4": ${ respondent.jobs.there_are_any == None and respondent.has_self_employment_income == None } 
-      - "respondentEmployedOrSelfEmployed": ${ showifdef('respondent.employer.name.text', showifdef('respondent.self_employment_description')) } 
-      - "respondentsEmploymentStreet": ${ respondent.employer.address.address } 
-      - "respondentsEmploymentState": ${ respondent.employer.address.zip } 
-      - "respondentsEmploymentCity": ${ respondent.employer.address.city } 
-      - "respondentsEmploymentZip": ${ respondent.employer.address.state } 
+      - "respondentEmployedOrSelfEmployed": ${ "Unknown" if respondent.jobs.there_are_any == None and respondent.has_self_employment_income == None else showifdef('respondent.employer.name.text') } 
+      - "respondentsEmploymentStreet": ${ "" if respondent.jobs.there_are_any == None and respondent.has_self_employment_income == None else respondent.employer.address.address } 
+      - "respondentsEmploymentState": ${ "" if respondent.jobs.there_are_any == None and respondent.has_self_employment_income == None else respondent.employer.address.state } 
+      - "respondentsEmploymentCity": ${ "" if respondent.jobs.there_are_any == None and respondent.has_self_employment_income == None else respondent.employer.address.city } 
+      - "respondentsEmploymentZip": ${ "" if respondent.jobs.there_are_any == None and respondent.has_self_employment_income == None else respondent.employer.address.zip } 
       - "respondentsMonthlyGrossIncome": ${ round(respondent.monthly_gross_income,2) } 
       - "respondentSupportThemselves1": ${ respondent.self_supporting } 
-      - "respondentSupportThemselves2": ${ not respondent.self_supporting } 
+      - "respondentSupportThemselves2": ${ respondent.self_supporting == False } 
       - "respondentSupportThemselves3": ${ respondent.self_supporting == None } 
       - "respondentActiveDuty1": ${ respondent.active_duty } 
       - "respondentActiveDuty2": ${ not respondent.active_duty } 
