@@ -1,3 +1,6 @@
+modules:
+  - .function_import
+---
 mandatory: True
 code: |
   case.filed
@@ -48,10 +51,9 @@ question: Schedule for Exchange
 subquestion: |
 fields:
   - "Who should have the child at the start of the schedule?": starting_parent
-    datatype: object
     choices:
-      - users[0]
-      - other_parties[0]
+      - ${ users[0].name.full() }: users0
+      - ${ other_parties[0].name.full() }: other_parties0
   - Do you want to use a schedule template or build your own schedule?: use_template
     choices:
       - Use a template: template
@@ -77,12 +79,18 @@ fields:
       
       ${ other_parties[0] } [FILE plum.png, 20px]
     js show if: |
-      val('starting_parent') === "users[0]" && val('template_choice') === "every_other_week" 
+      val('starting_parent') === "users0" && val('template_choice') === "every_other_week" 
+  - note: |
+      ${ other_parties[0] } [FILE mayablue.png, 20px]
+      
+      ${ users[0] } [FILE plum.png, 20px]
+    js show if: |
+      val('starting_parent') === "other_parties0" && val('template_choice') === "every_other_week" 
 validation code: |
-  if starting_parent == users[0]:
-    exchange_parent = other_parties[0]
+  if starting_parent == "users0":
+    exchange_parent = "other_parties0"
   else:
-    exchange_parent = users[0]
+    exchange_parent = "users0"
 ---
 question: Make your own schedule
 subquestion: |
@@ -96,11 +104,10 @@ subquestion: |
 
 
 fields:
-  - "Who should have the child at the start of the schedule?": exchanges[0].starting_parent
-    datatype: object
+  - "Who should have the child at the start of the schedule?": exchanges[0].temp_starting_parent
     choices:
-      - users[0]
-      - other_parties[0]
+      - ${ users[0].name.full() }: "users0"
+      - ${ other_parties[0].name.full() }: "other_parties0"
     default: starting_parent
   - "What is the day of the first transfer?": exchanges[0].exchange_date
     datatype: dropdown
@@ -115,28 +122,28 @@ fields:
       -  Pick up: Pick up
   - "Where should ${ users[0] } drop off the child?": exchanges[0].exchange_location
     js show if: |
-      val('exchanges[0].exchange_method') === "Drop off" && val('exchanges[0].starting_parent') == "users[0]"
+      val('exchanges[0].exchange_method') === "Drop off" && val('exchanges[0].temp_starting_parent') == "users0"
     choices:
-      - ${ other_parties[0].possessive('house') }
-      - School
-      - Other
+      - ${ other_parties[0].possessive('house') }: house
+      - School: school
+      - Other: other
   - "Where should ${ other_parties[0] } drop off the child?": exchanges[0].exchange_location
     js show if: |
-      val('exchanges[0].exchange_method') === "Drop off" && val('exchanges[0].starting_parent') == "other_parties[0]"
+      val('exchanges[0].exchange_method') === "Drop off" && val('exchanges[0].temp_starting_parent') == "other_parties0"
     choices:
-      - ${ users[0].possessive('house') }
-      - School
-      - Other
+      - ${ users[0].possessive('house') }: house
+      - School: school
+      - Other: other
   - "Where should ${ other_parties[0] } pick up the child?": exchanges[0].exchange_location
     js show if: |
-      val('exchanges[0].exchange_method') === "Pick up" && val('exchanges[0].starting_parent') == "users[0]"
+      val('exchanges[0].exchange_method') === "Pick up" && val('exchanges[0].temp_starting_parent') == "users0"
     choices:
       - ${ users[0].possessive('house') }
       - School
       - Other
   - "Where should ${ users[0] } pick up the child?": exchanges[0].exchange_location
     js show if: |
-      val('exchanges[0].exchange_method') === "Pick up" && val('exchanges[0].starting_parent') == "other_parties[0]"
+      val('exchanges[0].exchange_method') === "Pick up" && val('exchanges[0].temp_starting_parent') == "other_parties0"
     choices:
       - ${ other_parties[0].possessive('house') }
       - School
@@ -147,21 +154,23 @@ fields:
   - "Add pick up from school by ${ other_parties[0] }?": exchanges[0].add_pick_up_from_school
     datatype: yesnoradio
     js show if: |
-      val("exchanges[0].exchange_method") === "Drop off" && val("exchanges[0].exchange_location") === "School" && val('exchanges[0].starting_parent') == "users[0]"
+      val("exchanges[0].exchange_method") === "Drop off" && val("exchanges[0].exchange_location") === "school" && val('exchanges[0].temp_starting_parent') == "users0"
   - "Add pick up from school by ${ users[0] }?": exchanges[0].add_pick_up_from_school
     datatype: yesnoradio
     js show if: |
-      val("exchanges[0].exchange_method") === "Drop off" && val("exchanges[0].exchange_location") === "School" && val('exchanges[0].starting_parent') == "other_parties[0]"
+      val("exchanges[0].exchange_method") === "Drop off" && val("exchanges[0].exchange_location") === "school" && val('exchanges[0].temp_starting_parent') == "other_parties0"
   - "What time?": exchanges[0].exchange_time2
     datatype: time
     js show if: |
       val('exchanges[0].add_pick_up_from_school') === true
 continue button field: exchanges[0].information  
 validation code: |
-  if exchanges[0].starting_parent == users[0]:
-    exchanges[0].exchange_parent = other_parties[0]
-  elif exchanges[0].starting_parent == other_parties[0]:
-    exchanges[0].exchange_parent = users[0]
+  if exchanges[0].temp_starting_parent == "users0":
+    exchanges[0].starting_parent = users[0].name.full()
+    exchanges[0].exchange_parent = other_parties[0].name.full()
+  elif exchanges[0].starting_parent == "other_parties0":
+    exchanges[0].starting_parent = other_parties[0].name.full()
+    exchanges[0].exchange_parent = users[0].name.full()
 ---
 
 reconsider: remaining_days
@@ -185,23 +194,23 @@ fields:
     js show if: |
       val('exchanges[i].exchange_method') === "Drop off" 
     choices:
-      - ${ exchanges[i].exchange_parent.possessive('house') }
-      - School
-      - Other
+      - ${ possessify(exchanges[i].exchange_parent,'house') }: house
+      - School: school
+      - Other: other
   - Where should ${ exchanges[i].exchange_parent } pick up the child?: exchanges[i].exchange_location
     js show if: |
       val('exchanges[i].exchange_method') === "Pick up"
     choices:
-      - ${ exchanges[i].starting_parent.possessive('house') }
-      - School
-      - Other
+      - ${ possessify(exchanges[i].starting_parent,'house') }: house
+      - School: school
+      - Other: other
   - Explain: exchanges[i].exchange_location_other
     js show if: |
-      val('exchanges[i].exchange_location') === "Other"
+      val('exchanges[i].exchange_location') === "other"
   - Add pick up from school by ${ exchanges[i].exchange_parent } ?: exchanges[i].add_pick_up_from_school
     datatype: yesnoradio
     js show if: |
-      val("exchanges[i].exchange_method") === "Drop off" && val("exchanges[i].exchange_location") === "School"
+      val("exchanges[i].exchange_method") === "Drop off" && val("exchanges[i].exchange_location") === "school"
   - What time: exchanges[i].exchange_time2
     datatype: time
     js show if: |
@@ -239,7 +248,7 @@ code: |
 code: |
   default_exchange_time = "09:00:00"
   default_exchange_method = "Drop off"
-  default_exchange_location = exchange_parent.possessive('house')
+  default_exchange_location = 'house'
 ---
 if: use_template == "template" and template_choice == "every_other_week"
 variable name: exchanges
@@ -249,11 +258,11 @@ data from code:
   module: docassemble.base.util
   items:
     - starting_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       starting_date: |
         0 
       exchange_parent: | 
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       exchange_date: |
         5
       exchange_time: |
@@ -267,11 +276,11 @@ data from code:
       exchange_time2: |
         None
     - starting_parent: |
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
         5
       exchange_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       exchange_date: |
         12
       exchange_time: |
@@ -293,11 +302,11 @@ data from code:
   module: docassemble.base.util
   items:
     - starting_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       starting_date: |
         0 
       exchange_parent: | 
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       exchange_date: |
         1
       exchange_time: |
@@ -311,11 +320,11 @@ data from code:
       exchange_time2: |
         None
     - starting_parent: |
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
         1
       exchange_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       exchange_date: |
         3
       exchange_time: |
@@ -329,11 +338,11 @@ data from code:
       exchange_time2: |
         None
     - starting_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       starting_date: |
         3 
       exchange_parent: | 
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       exchange_date: |
         5
       exchange_time: |
@@ -347,11 +356,11 @@ data from code:
       exchange_time2: |
         None
     - starting_parent: |
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
         5
       exchange_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       exchange_date: |
         8
       exchange_time: |
@@ -365,11 +374,11 @@ data from code:
       exchange_time2: |
         None
     - starting_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       starting_date: |
         8
       exchange_parent: | 
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       exchange_date: |
         10
       exchange_time: |
@@ -383,11 +392,11 @@ data from code:
       exchange_time2: |
         None
     - starting_parent: |
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
         10
       exchange_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       exchange_date: |
         12
       exchange_time: |
@@ -409,11 +418,11 @@ data from code:
   module: docassemble.base.util
   items:
     - starting_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       starting_date: |
         0 
       exchange_parent: | 
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       exchange_date: |
         3
       exchange_time: |
@@ -427,11 +436,11 @@ data from code:
       exchange_time2: |
         None
     - starting_parent: |
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
         3
       exchange_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       exchange_date: |
         8
       exchange_time: |
@@ -445,11 +454,11 @@ data from code:
       exchange_time2: |
         None
     - starting_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       starting_date: |
         8
       exchange_parent: | 
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       exchange_date: |
         10
       exchange_time: |
@@ -463,11 +472,11 @@ data from code:
       exchange_time2: |
         None
     - starting_parent: |
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
         10
       exchange_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       exchange_date: |
         12
       exchange_time: |
@@ -489,11 +498,11 @@ data from code:
   module: docassemble.base.util
   items:
     - starting_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       starting_date: |
         0 
       exchange_parent: | 
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       exchange_date: |
         0
       exchange_time: |
@@ -507,11 +516,11 @@ data from code:
       exchange_time2: |
         None
     - starting_parent: |
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
         0
       exchange_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       exchange_date: |
         4
       exchange_time: |
@@ -525,11 +534,11 @@ data from code:
       exchange_time2: |
         None
     - starting_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       starting_date: |
         4
       exchange_parent: | 
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       exchange_date: |
         7
       exchange_time: |
@@ -543,11 +552,11 @@ data from code:
       exchange_time2: |
         None
     - starting_parent: |
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
         7
       exchange_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       exchange_date: |
         10
       exchange_time: |
@@ -569,11 +578,11 @@ data from code:
   module: docassemble.base.util
   items:
     - starting_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       starting_date: |
         0 
       exchange_parent: | 
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       exchange_date: |
         1
       exchange_time: |
@@ -587,11 +596,11 @@ data from code:
       exchange_time2: |
         None
     - starting_parent: |
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
         1
       exchange_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       exchange_date: |
         5
       exchange_time: |
@@ -605,11 +614,11 @@ data from code:
       exchange_time2: |
         None
     - starting_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       starting_date: |
         5
       exchange_parent: | 
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       exchange_date: |
         8
       exchange_time: |
@@ -623,11 +632,11 @@ data from code:
       exchange_time2: |
         None
     - starting_parent: |
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
         8
       exchange_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       exchange_date: |
         12
       exchange_time: |
@@ -649,11 +658,11 @@ data from code:
   module: docassemble.base.util
   items:
     - starting_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       starting_date: |
         0 
       exchange_parent: | 
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       exchange_date: |
         1
       exchange_time: |
@@ -667,11 +676,11 @@ data from code:
       exchange_time2: |
         None
     - starting_parent: |
-        exchange_parent.name.full()
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
         1
       exchange_parent: |
-        starting_parent.name.full()
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       exchange_date: |
         12
       exchange_time: |
@@ -747,11 +756,11 @@ code: |
   for exchange in exchanges.complete_elements():
     if exchange.starting_date == exchange.exchange_date:
       if exchange.exchange_method == "Drop off":
-        temp_description = str(format_time(exchange.exchange_time))  + " " + exchange.starting_parent + " drops off children at " + exchange.exchange_location  + "\n"
+        temp_description = str(format_time(exchange.exchange_time))  + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location)  + "\n"
         if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
           temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
       elif exchange.exchange_method == "Pick up":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + e(possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location) + "\n"
       starting_weekly_list[int(exchange.exchange_date)] += temp_description
     elif int(exchange.starting_date) == 0:
       if exchange.instanceName == "exchanges[0]":
@@ -761,21 +770,21 @@ code: |
       for date in range(starting_date,(int(exchange.exchange_date))):
         starting_weekly_list[date] = exchange.starting_parent
       if exchange.exchange_method == "Drop off":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + exchange.exchange_location  + "\n"
-        if exchange.exchange_location == "School" and exchange.add_pick_up_from_school:
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location)  + "\n"
+        if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
           temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
       elif exchange.exchange_method == "Pick up":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location) + "\n"
       starting_weekly_list[int(exchange.exchange_date)] += temp_description
     else:
       for date in range(int(exchange.starting_date) + 1,(int(exchange.exchange_date))):
         starting_weekly_list[date] = exchange.starting_parent
       if exchange.exchange_method == "Drop off":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + exchange.exchange_location  + "\n"
-        if exchange.exchange_location == "School" and exchange.add_pick_up_from_school:
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location)  + "\n"
+        if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
           temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
       elif exchange.exchange_method == "Pick up":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location) + "\n"
       starting_weekly_list[int(exchange.exchange_date)] += temp_description
   if exchanges.gathered and int(exchanges[-1].exchange_date) < 14:
     for date_index in range(int(exchanges[-1].exchange_date) + 1,14):
