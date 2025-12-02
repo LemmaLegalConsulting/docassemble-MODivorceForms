@@ -118,12 +118,21 @@ code: |
     reconsider('case.filed')
   if is_case_contested in ['contested','unknown']:
     mediation_info
-  elif case.filed in ["user0_filed","not_filed"]:
-    if petitioner.lives_in_missouri and (petitioner.mo_length_of_residence_choice != "less_than_4" or petitioner.mo_length_of_residence_days >= 90):
-      if not respondent.lives_in_missouri and not marriage.live_together_in_mo:
-        personal_jurisdiction_warning
-    elif not (respondent.lives_in_missouri and (respondent.mo_length_of_residence_choice != "less_than_4" or respondent.mo_length_of_residence_days >= 90)):
-      jurisdiction_kickout
+  users[0].address.address
+  if case.filed in ["user0_filed", "not_filed"]:
+    if users[0].lives_in_missouri:
+      users[0].county_length_of_residence_choice
+      users[0].mo_length_of_residence_choice
+  other_parties[0].address.address
+  if case.filed in ["user0_filed", "not_filed"]:
+    if other_parties[0].lives_in_missouri:
+      other_parties[0].county_length_of_residence_choice
+      other_parties[0].mo_length_of_residence_choice
+  if petitioner.lives_in_missouri and (petitioner.mo_length_of_residence_choice != "less_than_4" or petitioner.mo_length_of_residence_days >= 90):
+    if not respondent.lives_in_missouri and not marriage.live_together_in_mo:
+      personal_jurisdiction_warning
+  elif not (respondent.lives_in_missouri and (respondent.mo_length_of_residence_choice != "less_than_4" or respondent.mo_length_of_residence_days >= 90)):
+    jurisdiction_kickout
   section_right_tool = True
 ---
 code: |  

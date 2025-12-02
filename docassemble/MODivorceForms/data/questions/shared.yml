@@ -386,8 +386,8 @@ fields:
 sets: 
   - other_parties[0].address.address
   - other_parties[0].address.state
-id: Address
-question: Address for ${ other_parties[0].name_full() }
+id: Address other party
+question: What is your current spouse’s address?
 fields:
   - code: |
       other_parties[0].address.address_fields(show_country=True,country_code="US")
@@ -538,125 +538,28 @@ validation code: |
   if x.previously_married and (as_datetime(x.last_marriage_end_date) > today() or as_datetime(x.last_marriage_end_date) < as_datetime(users[0].birthdate)):
     validation_error("Please enter a date in the past that isn't before the date you were born.")
 ---
-id: Residency info for user
-question: Your residency in Missouri
-fields:
-  - Do you live in Missouri?: users[0].lives_in_missouri
-    datatype: yesnoradio
-  - How long have you lived in Missouri?: users[0].mo_length_of_residence_choice
-    datatype: radio
-    show if: users[0].lives_in_missouri
-    choices:
-      - Less than 4 months: less_than_4
-      - More than 4 months but less than a year: more_than_4
-      - A year or more: year
-  - How many days?: users[0].mo_length_of_residence_days
-    datatype: integer
-    show if:
-      variable: users[0].mo_length_of_residence_choice
-      is: less_than_4
-  - How many months?: users[0].mo_length_of_residence_months
-    datatype: integer
-    show if:
-      variable: users[0].mo_length_of_residence_choice
-      is: more_than_4
-  - How many years?: users[0].mo_length_of_residence_years
-    datatype: integer
-    show if:
-      variable: users[0].mo_length_of_residence_choice
-      is: year    
----
-id: Residency info for user
-question: Your residency in Missouri
-fields:
-  - How long have you lived in ${ state_name(users[0].address.state) }?: users[0].mo_length_of_residence_choice
-    datatype: radio
-    choices:
-      - Less than 4 months: less_than_4
-      - More than 4 months but less than a year: more_than_4
-      - A year or more: year
-  - How many days?: users[0].mo_length_of_residence_days
-    datatype: integer
-    show if:
-      variable: users[0].mo_length_of_residence_choice
-      is: less_than_4
-  - How many months?: users[0].mo_length_of_residence_months
-    datatype: integer
-    show if:
-      variable: users[0].mo_length_of_residence_choice
-      is: more_than_4
-  - How many years?: users[0].mo_length_of_residence_years
-    datatype: integer
-    show if:
-      variable: users[0].mo_length_of_residence_choice
-      is: year    
----
-id: Residency info for user
-question: Your spouse's residency in Missouri
-fields:
-  - Does your spouse live in Missouri?: other_parties[0].lives_in_missouri
-    datatype: yesnoradio
-  - How long has your spouse lived in Missouri?: other_parties[0].mo_length_of_residence_choice
-    datatype: radio
-    show if: other_parties[0].lives_in_missouri
-    choices:
-      - Less than 4 months: less_than_4
-      - More than 4 months but less than a year: more_than_4
-      - A year or more: year
-  - How many days?: other_parties[0].mo_length_of_residence_days
-    datatype: integer
-    show if:
-      variable: other_parties[0].mo_length_of_residence_choice
-      is: less_than_4
-  - How many months?: other_parties[0].mo_length_of_residence_months
-    datatype: integer
-    show if:
-      variable: other_parties[0].mo_length_of_residence_choice
-      is: more_than_4
-  - How many years?: other_parties[0].mo_length_of_residence_years
-    datatype: integer
-    show if:
-      variable: other_parties[0].mo_length_of_residence_choice
-      is: year    
----
-if: other_parties[0].lives_in_missouri == False
-id: Residency info for user
-question: Your spouse's residency in ${ state_name(other_parties[0].address.state) }
-fields:
-  - How long has ${ other_parties[0].name_full() } lived in ${ state_name(other_parties[0].address.state) }?: other_parties[0].mo_length_of_residence_choice
-    datatype: radio
-    choices:
-      - Less than 4 months: less_than_4
-      - More than 4 months but less than a year: more_than_4
-      - A year or more: year
-  - How many days?: other_parties[0].mo_length_of_residence_days
-    datatype: integer
-    show if:
-      variable: other_parties[0].mo_length_of_residence_choice
-      is: less_than_4
-  - How many months?: other_parties[0].mo_length_of_residence_months
-    datatype: integer
-    show if:
-      variable: other_parties[0].mo_length_of_residence_choice
-      is: more_than_4
-  - How many years?: other_parties[0].mo_length_of_residence_years
-    datatype: integer
-    show if:
-      variable: other_parties[0].mo_length_of_residence_choice
-      is: year    
----
-id: Residency info
 generic object: ALIndividual
-question: Residency for ${ x.name_full() }
+id: missouri residency code
+code: |
+  if x.address.state == "MO":
+    x.lives_in_missouri = True
+  else:
+    x.lives_in_missouri = False
+---
+generic object: ALIndividual
+id: Residency info for user for any state
+question: ${ "Your" if x.instanceName == "users[0]" else "Your spouse's" } residency in ${ state_name(x.address.state) }
 fields:
-  - How long has ${ x.name_full() } lived in Missouri?: x.mo_length_of_residence_choice
+  - How long ${ "have you" if x.instanceName == "users[0]" else "has your spouse" } lived in ${ state_name(x.address.state) }?: x.mo_length_of_residence_choice
     datatype: radio
+    default: ${ x.county_length_of_residence_choice }
     choices:
       - Less than 4 months: less_than_4
       - More than 4 months but less than a year: more_than_4
       - A year or more: year
   - How many days?: x.mo_length_of_residence_days
     datatype: integer
+    default: ${ x.county_length_of_residence_days if defined('x.county_length_of_residence_days') else '' }
     show if:
       variable: x.mo_length_of_residence_choice
       is: less_than_4
@@ -665,16 +568,18 @@ fields:
     show if:
       variable: x.mo_length_of_residence_choice
       is: more_than_4
+    default: ${ x.county_length_of_residence_months if defined('x.county_length_of_residence_months') else '' }
   - How many years?: x.mo_length_of_residence_years
     datatype: integer
     show if:
       variable: x.mo_length_of_residence_choice
-      is: year
+      is: year    
+    default: ${ x.county_length_of_residence_years if defined('x.county_length_of_residence_years') else '' }
 ---
 generic object: ALIndividual
 question: Residence in ${ x.address.county }
 fields:
-  - How long has ${ x.name_full() } lived in ${ x.address.county }?: x.county_length_of_residence_choice
+  - How long ${ "have you" if x.instanceName == "users[0]" else "has your spouse" } lived in ${ x.address.county }?: x.county_length_of_residence_choice
     datatype: radio
     choices:
       - Less than 4 months: less_than_4
@@ -1874,6 +1779,43 @@ validation code: |
     x.benefits[i].display_name = x.benefits.terms_ordered.get(x.benefits[i].source, x.benefits[i].source)
   else:
     x.benefits[i].display_name = x.benefits[i].source_other
+
+---
+if: x.benefits[i].source == "medicaid"
+id: public benefits info for list
+generic object: ALIndividual
+reconsider: x.benefits[i].display_name
+question: |
+  Tell us about ${ x.benefits[i].display_name }
+subquestion: |
+  % if i > 1:
+  You have already told us about ${ comma_and_list(public_benefit.display_name for public_benefit in x.benefits.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about ${ comma_and_list(public_benefit.display_name for public_benefit in x.benefits.complete_elements()) }.
+  % endif
+fields:
+  - note: |
+      This is uncommon, but we have to ask anyway.
+  - ${ "Do you" if x.instanceName == "users[0]" else "Does your spouse" } receive any cash benefits from Medicaid?: x.benefits[i].medicaid_cash_benefits
+    datatype: yesnoradio
+    default: False
+  - Times per year ${ 'you receive' if x == users[0] else other_parties[0].name_full() + " receives" } this income: x.benefits[i].times_per_year
+    input type: radio
+    default: 12
+    code: |
+      times_per_year_list
+    show if: x.benefits[i].medicaid_cash_benefits
+  - Amount of income: x.benefits[i].value
+    datatype: currency
+    show if: x.benefits[i].medicaid_cash_benefits
+validation code: |
+  if x.benefits[i].source != "other":
+    x.benefits[i].display_name = x.benefits.terms_ordered.get(x.benefits[i].source, x.benefits[i].source)
+  else:
+    x.benefits[i].display_name = x.benefits[i].source_other
+  if not x.benefits[i].medicaid_cash_benefits:
+    x.benefits[i].times_per_year = 12
+    x.benefits[i].value = 0
 
 ---
 id: x.benefits set display name
