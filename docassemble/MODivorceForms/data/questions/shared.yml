@@ -426,16 +426,13 @@ fields:
 ---
 id: education info
 generic object: ALIndividual
-question: Educational info for ${ x.name_full() }
+question: Educational info for ${ x.name_full() } completed?
 continue button field: x.education_info
+subquestion: |
+  Specify only the highest grade completed.
 fields:  
-  - "Did ${ x.name_full() } graduate from high school?": x.graduated_hs
-    datatype: yesnomaybe
-  - "How many years of elementary or secondary education did ${ x.name_full() } complete?": x.education_elementary
+  - "What is the highest level of education ${ 'you have' if x.instanceName == 'users[0]' else x.name_full() + ' has' } completed?": x.education
     input type: dropdown
-    show if:
-      variable: x.graduated_hs
-      is: False
     choices:
       - 0
       - 1
@@ -450,37 +447,21 @@ fields:
       - 10
       - 11
       - 12
+      - 1 year of college
+      - 2 years of college
+      - 3 years of college
+      - 4 years of college
+      - Post graduate
     required: False
-  - "Did ${ x.name_full() } graduate from college?": x.graduated_college
-    datatype: yesnomaybe
-    show if:
-      variable: x.graduated_hs
-      is: True
-  - "How many years of college did ${ x.name_full() } complete?": x.education_college
-    input type: dropdown
-    show if:
-      variable: x.graduated_college
-      is: False
-    choices:
-      - 1
-      - 2
-      - 3
-      - 4
-    required: False
-  - "Did ${ x.name_full() } complete any post-graduate work?": x.post_grad
-    datatype: yesnomaybe
-    show if:
-      variable: x.graduated_college
-      is: True
 validation code: |
-  if x.graduated_hs:
+  if x.education in ["1 year of college", "2 years of college", "3 years of college", "4 years of college", "Post graduate"]:
     x.education_elementary = "12"
+    if x.education == "Post graduate":
+      x.education_college = "5+"
+    else:
+      x.education_college = x.education[0]
   else:
-    x.graduated_college = False
-  if x.graduated_college and x.post_grad:
-    x.education_college = "5+"
-  elif x.graduated_college:
-    x.education_college = "4"
+    x.education_elementary = x.education
 ---
 id: active duty info
 generic object: ALIndividual
@@ -515,7 +496,7 @@ fields:
 code: |
   if users[0].race in ["American Indian or Alaska Native", "Asian", "Black or African American", "Native Hawaiian or other Pacific Islander", "White", "Hispanic or Latino", "Middle Eastern or North African (MENA)", "Other"]:
     race_self_identified = True
-    if case.filed in ["user0_filed", "not_yet"]:
+    if case.filed in ["user0_filed", "not_filed"]:
       petitioner_race_identified = True
       respondent_race_identified = False
     else:
@@ -731,7 +712,7 @@ content: |
 ---
 id: party type code
 code: |
-  if case.filed in ["user0_filed", "not_yet"]:
+  if case.filed in ["user0_filed", "not_filed"]:
     if users[0].attorney_involved and users[0].type_of_assistance == "representation":
       users[0].party_type_code = "PET"
       users[0].party_type_description = "Petitioner (with attorney)"
@@ -763,7 +744,7 @@ code: |
       other_parties[0].party_type_description = "Respondent Acting Pro Se (with no attorney)"
 ---
 code: |
-  if case.filed in ["user0_filed", "not_yet"]:
+  if case.filed in ["user0_filed", "not_filed"]:
     users[0].attorney.party_type_code = "APET"
     users[0].attorney.party_type_description = "Attorney for Petitioner"
   else:
