@@ -53,8 +53,16 @@ subquestion: |
   Respondent
   % endif
 
+  ## ALL DOCUMENTS
   % for doc in doc_list_selected.true_values():
-  ${ doc_list_dictionary[doc] }
+   -   ${ doc_list_dictionary[doc] }
+  
+  % endfor
+
+  ## REDACTED DOCUMENTS
+  % for doc in doc_list_redacted.true_values():
+   -   ${ doc_list_dictionary[doc] }
+  
   % endfor
   
 continue button field: info_displayed
@@ -99,6 +107,7 @@ fields:
 ---
 objects:
   - doc_list_selected: DADict.using(auto_gather=False)
+  - doc_list_redacted: DADict.using(auto_gather=False)
 ---
 code: |
   if case.filed in ["not_filed"]:
@@ -120,4 +129,25 @@ code: |
   doc_list_selected['confidential_information_sheet_attachment'] = True
   doc_list_selected['redaction_certification_attachment'] = True
   doc_list_selected.gathered = True
+---
+code: |
+  if case.filed in ["not_filed"]:
+    doc_list_redacted['petition_attachment'] = True
+    doc_list_redacted['answer_attachment'] = False
+  else:
+    doc_list_redacted['petition_attachment'] = False
+    doc_list_redacted['answer_attachment'] = True
+  if minor_children:
+    doc_list_redacted['parenting_plan_attachment'] = True
+  else:
+    doc_list_redacted['parenting_plan_attachment'] = False
+  doc_list_redacted['notice_of_hearing_attachment'] = True 
+  doc_list_redacted['certificate_of_dissolution_attachment'] = True
+  doc_list_redacted['judgment_attachment'] = True
+  doc_list_redacted['property_statement_attachment'] = True
+  doc_list_redacted['income_statement_attachment'] = True   
+  doc_list_redacted['fee_waiver_attachment'] = True
+  doc_list_redacted['confidential_information_sheet_attachment'] = False
+  doc_list_redacted['redaction_certification_attachment'] = False
+  doc_list_redacted.gathered = True
 ---
