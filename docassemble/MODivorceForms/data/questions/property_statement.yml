@@ -3553,31 +3553,28 @@ attachment:
       - "party_service_1": ${ other_parties[0].name_full() } 
       - "party_service_address_1": |
           ${ other_parties[0].address.on_one_line() }
-          %if defined('other_parties[0].email'):
-          ${  other_parties[0].email } 
-          %endif
-      - "party_service_2": ${ other_parties[1].name_full() } 
+      - "party_service_2": |
+          % if len(other_parties) > 1:
+          ${ other_parties[1].name_full() } 
+          % endif
       - "party_service_address_2": |
+          % if len(other_parties) > 1:
           ${ other_parties[1].address.on_one_line() }
-          %if defined('other_parties[1].email'):
-          ${  other_parties[1].email } 
-          %endif
-      - "party_service_3": ${ other_parties[2].name_full() } 
+          % endif
+      - "party_service_3": |
+          % if len(other_parties) > 1:
+          ${ other_parties[2].name_full() } 
+          % endif
       - "party_service_address_3": |
+          % if len(other_parties) > 1:
           ${ other_parties[2].address.on_one_line() }
-          %if defined('other_parties[2].email'):
-          ${  other_parties[2].email } 
-          %endif
-          %if defined('other_parties[0].fax'):
-          ${  other_parties[2].fax } 
-          %endif
-      - "party_service_4": ${ other_parties[3].name_full() } 
+          % endif
+      - "party_service_4": |
+          % if len(other_parties) > 1:
+          ${ other_parties[3].name_full() } 
+          % endif
       - "party_service_address_4": |
+          % if len(other_parties) > 1:
           ${ other_parties[3].address.on_one_line() }
-          %if defined('other_parties[3].email'):
-          ${  other_parties[3].email } 
-          %endif
-          %if defined('other_parties[3].fax'):
-          ${  other_parties[3].fax } 
-          %endif
+          % endif
 ---

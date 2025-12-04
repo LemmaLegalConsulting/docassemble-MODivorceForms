@@ -86,10 +86,13 @@ code: |
   section_user_info
   section_other_party
   section_marriage
-  section_income
-  section_expenses
-  section_assets
-  section_debts
+  if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'income_statement_attachment' in doc_list_selected.true_values() or 'property_statement_attachment' in doc_list_selected.true_values() or 'petition_attachment' in doc_list_selected.true_values():
+    section_income
+  if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'income_statement_attachment' in doc_list_selected.true_values() or 'property_statement_attachment' in doc_list_selected.true_values():
+    section_expenses
+  if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'property_statement_attachment' in doc_list_selected.true_values():
+    section_assets
+    section_debts
   section_service
   interview_order_mo_divorce_forms = True
 ---
@@ -100,6 +103,8 @@ code: |
     custody_exit
   if marriage.can_be_preserved or not marriage.is_broken:
     legal_separation_exit
+  if users[0].in_bankruptcy or other_parties[0].in_bankruptcy:
+    bankruptcy_kickout
   children
   if pregnant:
     pregnant_exit
@@ -111,23 +116,54 @@ code: |
   if case.filed == "unknown":
     how_to_find_your_case
     reconsider('case.filed')
-  elif case.filed in ["user0_filed","not_filed"]:
+  if is_case_contested in ['contested','unknown']:
+    mediation_info
+  users[0].address.address
+  if case.filed in ["user0_filed", "not_filed"]:
+    if users[0].lives_in_missouri:
+      users[0].county_length_of_residence_choice
+      users[0].mo_length_of_residence_choice
+  other_parties[0].address.address
+  if case.filed in ["user0_filed", "not_filed"]:
+    if other_parties[0].lives_in_missouri:
+      other_parties[0].county_length_of_residence_choice
+      other_parties[0].mo_length_of_residence_choice
+  if case.filed in ["not_filed"]:
     if petitioner.lives_in_missouri and (petitioner.mo_length_of_residence_choice != "less_than_4" or petitioner.mo_length_of_residence_days >= 90):
       if not respondent.lives_in_missouri and not marriage.live_together_in_mo:
         personal_jurisdiction_warning
     elif not (respondent.lives_in_missouri and (respondent.mo_length_of_residence_choice != "less_than_4" or respondent.mo_length_of_residence_days >= 90)):
-      jurisdiction_kickout
-  if is_case_contested in ['contested','unknown']:
-    mediation_info
+      jurisdiction_kickout  
+  elif case.filed in ["other_parties0_filed"]:
+    if petitioner.lives_in_missouri and petitioner.resident_for_90_days :
+      if not (respondent.lives_in_missouri and respondent.resident_for_90_days) and not marriage.live_together_in_mo:
+        respondent_personal_jurisdiction_warning
+    elif not (respondent.lives_in_missouri and respondent.resident_for_90_days):
+      if not waive_jurisdiction:
+        respondent_jurisdiction_kickout  
   section_right_tool = True
 ---
 code: |  
   users.gather()
   if users[0].has_prior_name:
     users[0].prior_name.name.first
+  users[0].address.address # petition
+  users[0].address.county
+  if users[0].address.state == "MO":
+    users[0].mo_length_of_residence_choice
+  users[0].address.country
+  if 'petition_attachment' in doc_list_selected.true_values():
+    users[0].county_length_of_residence_choice
+  other_parties[0].address.address # petition
+  if other_parties[0].address.state == "MO":
+    other_parties[0].address.county
+  # other_parties[0].address.country
+  if 'petition_attachment' in doc_list_selected.true_values():
+    other_parties[0].mo_length_of_residence_choice
+    other_parties[0].county_length_of_residence_choice
   doc_list_selected
+  doc_list_dictionary
   relief['custody']
-  relief['child_support']
   relief['change_name']
   relief['divide_property']
   relief['other']
@@ -140,14 +176,15 @@ code: |
 code: |    
   ## 3 Please enter your case information
   nav.set_section("case_information")   
-  if case.filed in ["user0_filed", "user1_filed"]:
+  if case.filed in ["user0_filed", "other_parties0_filed"]:
     use_case_net_for_online_docket
-    if 'answer_attachment' in doc_list_selected.true_values() or 'petition_attachment' in doc_list_selected.true_values():
-      previous_petitions # answer, petition
   case.county # property_statement, petition, notice_of_hearing, form_17, certificate_of_dissolution
   case.court_name
-  case.photo.filename
-  if case.filed in ["user0_filed", "user1_filed"]:
+  if defined('case.photo_filename'):
+    case.photo.filename
+  if case.filed in ["user0_filed", "other_parties0_filed"]:
+    if 'answer_attachment' in doc_list_selected.true_values() or 'petition_attachment' in doc_list_selected.true_values():
+      previous_petitions # answer, petition
     case.docket_number_asked
     if 'confidential_information_sheet_attachment' in doc_list_selected.true_values() or 'redaction_certification_attachment' in doc_list_selected.true_values():
       case.name_asked
@@ -165,7 +202,7 @@ code: |
     if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
       petitioner.attorney.party_type_code # confidential_information_sheet
       petitioner.party_type_description 
-  if case.filed in ["user0_filed", "user1_filed"]:
+  if case.filed in ["user0_filed", "other_parties0_filed"]:
     if respondent.attorney_involved:
       respondent.attorney.name.first
       if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
@@ -189,14 +226,16 @@ code: |
       visitation_supervisor.name.first
     elif physical_custody == "Third Party":
       physical_custody_other.name.first
+    relief['child_support']
     if communications["third_party"]:
       communications_other.name.first
     ask_about_dispute_resolution
+    
     child_support # certificate_of_dissolution
   
     if case.filed in ['user0_filed']:
       parenting_plan
-    elif case.filed in ['user1_filed']:
+    elif case.filed in ['other_parties0_filed']:
       agree_with_parenting_plan
   relief['maintenance']
   is_maintenance_currently_paid
@@ -209,13 +248,7 @@ code: |
   nav.set_section("user_info")  
 
   
-  users[0].address.address # petition
-  users[0].address.county
-  if users[0].address.state == "MO":
-    users[0].mo_length_of_residence_choice
-  users[0].address.country
-  if 'petition_attachment' in doc_list_selected.true_values():
-    users[0].county_length_of_residence_choice
+
   users[0].email
   users[0].phone_number
   users[0].birthdate
@@ -234,13 +267,6 @@ code: |
 ---
 code: |    
   nav.set_section("other_party_info")  
-  other_parties[0].address.address # petition
-  if other_parties[0].address.state == "MO":
-    other_parties[0].address.county
-  # other_parties[0].address.country
-  if 'petition_attachment' in doc_list_selected.true_values():
-    other_parties[0].mo_length_of_residence_choice
-    other_parties[0].county_length_of_residence_choice
   if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
     other_parties[0].gender # confidential_information_sheet
   other_parties[0].pronouns
@@ -269,8 +295,9 @@ code: |
   marriage.separation_date
 
   if minor_children or minor_children_before_marriage:
-    if others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect: # form_17
-      related_case_explanation
+  #    # if others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect: # form_17
+  #      related_case_explanation
+    received_welfare # form_17, petition
     if abuse_or_neglect: # petition
       abuse_or_neglect_explanation
     if other_custody_proceeding:
@@ -280,7 +307,7 @@ code: |
     if others_with_physical_custody:
       others_with_physical_custody_explanation
     family_support_order
-    received_welfare # form_17
+
   if 'petition_attachment' in doc_list_selected.true_values():
     if other_allegations_exist:
       other_allegations # petition
@@ -299,15 +326,13 @@ code: |
 code: |    
   nav.set_section('income')
   users[0].jobs.gather() # income_statement.yml, fee_waiver, form_17
-  if users[0].jobs.there_are_any: # form_17
+  if users[0].jobs.there_are_any or users[0].has_self_employment_income: # form_17
     users[0].employer.name.text
     users[0].employer.email # confidential information sheet order
     users[0].employer.address.address
   users[0].jobs.total(times_per_year = 12)
+  users[0].has_self_employment_income
   users[0].benefits.gather()
-  if users[0].has_self_employment_income:
-    users[0].self_employment_description
-  users[0].self_employment_income
   users[0].other_incomes.gather()
   users[0].maintenance_other_received
   users[0].other_children
@@ -315,17 +340,15 @@ code: |
   users[0].monthly_gross_income # property_statement
   users[0].self_supporting # property_statement
   other_parties[0].jobs.gather() # income_statement.yml, fee_waiver, form_17
-  if other_parties[0].jobs.there_are_any: # form_17
+  if other_parties[0].jobs.there_are_any or other_parties[0].has_self_employment_income: # form_17
     other_parties[0].employer.name.text
     other_parties[0].employer.email # confidential information sheet order
     other_parties[0].employer.address.address
     if case.filed in ["user0_filed"]:   
       other_parties[0].hours_of_employment
   other_parties[0].jobs.total(times_per_year = 12)
+  other_parties[0].has_self_employment_income
   other_parties[0].benefits.gather()
-  if other_parties[0].has_self_employment_income:
-    other_parties[0].self_employment_description
-  other_parties[0].self_employment_income
   other_parties[0].other_incomes.gather()
   other_parties[0].maintenance_other_received
   other_parties[0].other_children
@@ -396,8 +419,6 @@ code: |
 ---
 code: |       
   nav.set_section('debts')
-  users[0].in_bankruptcy
-  other_parties[0].in_bankruptcy
   secured_debts.gathered
   if len(debts) > 0:
     debts.review_items
@@ -412,13 +433,13 @@ code: |
   if case.filed == "user0_filed" and respondent_served:
       served_information
   else:
-    if case.filed in ["user0_filed", "user1_filed", "not_filed"]:
+    if case.filed in ["user0_filed", "other_parties0_filed", "not_filed"]:
       if service_type == "publication":
         service_by_publication_information
       else:
         personal_service_type
         personal_service_information
-        fill_in_service_date # form_17
+        ## fill_in_service_date # form_17
         if case.filed in ["user0_filed", "not_filed"]:
           respondent.service_type
         people_served.gathered # notice_of_hearing
@@ -452,7 +473,6 @@ code: |
   mo_divorce_forms_download
 ---
 include:
-  - form_17.yml
   - property_statement.yml
   - parenting_plan.yml
   - answer.yml
@@ -568,6 +588,25 @@ question: Legal Separation
 subquestion: |
   If your marriage can be preserved or is not irretrievably broken, then a legal separation is more appropriate than a dissolution.  Unfortunately, this tool helps only with a dissolution.
 ---
+question: Bankruptcy
+fields: 
+  - Are you or your spouse currently in a bankruptcy prooceeding?: in_bankruptcy
+    datatype: yesnoradio
+---
+code: |
+  if not in_bankruptcy:
+    users[0].in_bankruptcy = False
+    other_parties[0].in_bankruptcy = False
+  else:
+    users[0].in_bankruptcy = True
+    other_parties[0].in_bankruptcy = True
+---
+event: bankruptcy_kickout
+question: Bankruptcy
+subquestion: |
+  Pursuant to (11 USC § 362(b)(2)(A)(iv)) the court will not be able to grant a divorce while a bankruptcy case is ongoing. Please come back when your bankruptcy has concluded.
+
+---
 id: personal_jurisdiction_warning
 question: No personal jurisdiction
 subquestion: |
@@ -576,10 +615,31 @@ subquestion: |
   You may want to consider filing for divorce in the state where your spouse lives.
 continue button field: personal_jurisdiction_warning
 ---
+id: personal_jurisdiction_warning for respondent
+question: No personal jurisdiction
+subquestion: |
+  If your do not live in Missouri currently, and you and your spouse did not live together in Missouri, then the court will not have personal jurisdiction over you.  This means the court can not make you pay maintenance or child support.  
+  
+  You may want to consider talking to a lawyer if your spouse is asking the court for maintenance or child support that you don't agree with.
+continue button field: respondent_personal_jurisdiction_warning
+---
 event: jurisdiction_kickout
 question: No jurisdiction
 subquestion: |
   Missouri law requires that at least one party in the divorce live in Missouri for at least 90 days before filing divorce.  Since neither you nor your spouse has lived in Missouri for 90 days, this tool is not appropriate for you.
+---
+event: respondent_jurisdiction_kickout
+question: No jurisdiction
+subquestion: |
+  Missouri law requires that at least one party in the divorce live in Missouri for at least 90 days before filing divorce.  Since neither you nor your spouse has lived in Missouri for 90 days and you do not agree to the divorce in Missouri, you should find a lawyer to help you.
+---
+id: waive_jurisdiction
+question: Jurisdiction in Missouri
+subquestion: |
+  If neither you nor your spouse live in Missouri, then the court does not have jurisdiction.
+fields:
+  - "Do you agree that your case should be in Missouri?": waive_jurisdiction
+    datatype: yesnoradio
 ---
 id: Finding your case
 question: How to find your case
@@ -673,14 +733,12 @@ code: |
   if  case.filed in ["user0_filed","not_filed","unknown"]:
     temp_doc_list_options.append({'petition_attachment':'Petition','default':True}) 
     
-  elif case.filed == "user1_filed":
+  elif case.filed == "other_parties0_filed":
     temp_doc_list_options.append({'value':'answer_attachment','label':'Answer','default':True})   
   
-  if  case.filed in ["not_filed","unknown"]:
-    temp_doc_list_options.append({'value':'form_17_attachment','label':'Form 17','default':True})
   temp_doc_list_options.append({'value':'notice_of_hearing_attachment','label':'Notice of hearing','default':True})   
-  if  case.filed in ["user0_filed","not_filed","unknown"]:
-    temp_doc_list_options.append({'value':'certificate_of_dissolution_attachment','label':'Certificate of Dissolution','default':True})   
+  if  case.filed in ["user0_filed","other_parties0_filed","not_filed","unknown"]:
+    temp_doc_list_options.append({'value':'certificate_of_dissolution_attachment', 'label':'Certificate of Dissolution', 'default':True})   
   if  case.filed in ["user0_filed","not_filed","unknown"]:
     temp_doc_list_options.append({'value':'judgment_attachment','label':'Judgment','default':True})   
   temp_doc_list_options.append({'value':'property_statement_attachment','label':'Property statement','default':True})     
@@ -699,6 +757,20 @@ fields:
     datatype: checkboxes
     code: |
       doc_list_options
+---
+variable name: doc_list_dictionary
+data:
+  petition_attachment: Petition
+  answer_attachment: Answer
+  parenting_plan_attachment: Parenting Plan
+  notice_of_hearing_attachment: Notice of hearing
+  certificate_of_dissolution_attachment: Certificate of dissolution
+  judgment_attachment: Judgment
+  property_statement_attachment: Property statement
+  income_statement_attachment: Income statement
+  fee_waiver_attachment: Fee waiver
+  confidential_information_sheet_attachment: Confidential information sheet
+  redaction_certification_attachment: Redaction certification
 ---
 id: set pregnant to false since kick out if pregnant
 generic object: ALIndividual
@@ -913,83 +985,79 @@ confirm: True
 ---
 id: answer enabled block for main interview
 code: |
-  if case.filed == "user1_filed":
+  if "answer_attachment" in doc_list_selected.true_values():
     answer_attachment.enabled = True
   else:
     answer_attachment.enabled = False
 ---
-id: form_17 enabled block for main interview
-code: |
-  if True:
-    form_17_attachment.enabled = True
-  else:
-    form_17_attachment.enabled = False
----
 id: notice_of_hearing enabled block for main interview
 code: |
-  if True:
+  if "notice_of_hearing_attachment" in doc_list_selected.true_values():
     notice_of_hearing_attachment.enabled = True
   else:
     notice_of_hearing_attachment.enabled = False
 ---
 id: certificate_of_dissolution enabled block for main interview
 code: |
-  if True:
+  if "certificate_of_dissolution_attachment" in doc_list_selected.true_values():
     certificate_of_dissolution_attachment.enabled = True
   else:
     certificate_of_dissolution_attachment.enabled = False
 ---
 id: fee_waiver enabled block for main interview
 code: |
-  if True:
+  if "fee_waiver_attachment" in doc_list_selected.true_values():
     fee_waiver_attachment.enabled = True
   else:
     fee_waiver_attachment.enabled = False
 ---
 id: judgment enabled block for main interview
 code: |
-  if case.filed == "user0_filed":
+  if "judgment_attachment" in doc_list_selected.true_values():
     judgment_attachment.enabled = True
   else:
     judgment_attachment.enabled = False
 ---
 id: petition enabled block for main interview
 code: |
-  if case.filed == "user0_filed":
+  if "petition_attachment" in doc_list_selected.true_values():
     petition_attachment.enabled = True
   else:
     petition_attachment.enabled = False
 ---
 id: income_statement enabled block for main interview
 code: |
-  if True:
+  if "income_statement_attachment" in doc_list_selected.true_values():
     income_statement_attachment.enabled = True
   else:
     income_statement_attachment.enabled = False
 ---
 id: property_statement enabled block for main interview
 code: |
-  if True:
+  if "property_statement_attachment" in doc_list_selected.true_values():
     property_statement_attachment.enabled = True
   else:
     property_statement_attachment.enabled = False
 ---
 id: confidential_information_sheet enabled block for main interview
 code: |
-  if True:
+  if "confidential_information_sheet_attachment" in doc_list_selected.true_values():
     confidential_information_sheet_attachment.enabled = True
   else:
     confidential_information_sheet_attachment.enabled = False
 ---
 id: redaction_certification enabled block for main interview
 code: |
-  if True:
+  if "redaction_certification_attachment" in doc_list_selected.true_values():
     redaction_certification_attachment.enabled = True
   else:
     redaction_certification_attachment.enabled = False
 ---
+code: |
+  document_list = doc_list_selected.true_values()
+---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, form_17_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, form_17_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---

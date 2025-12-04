@@ -39,6 +39,11 @@ subquestion: |
   
   % endif  
 
+  % if defined('case.legal_aid_program'):
+  [${ case.legal_aid_program }](${ case.legal_aid_program_website } )
+  
+  % endif  
+
   TESTING INFO - WILL BE REMOVED
   
   Documents for 
@@ -48,7 +53,7 @@ subquestion: |
   Respondent
   % endif
 
-  % for doc in doc_list.true_values():
+  % for doc in doc_list_selected.true_values():
   ${ doc_list_dictionary[doc] }
   % endfor
   
@@ -74,6 +79,7 @@ attachment:
   name: MO PRIYA Next Steps
   filename: mo_priya_next_steps
   docx template file: mo_divorce_forms_next_steps.docx
+  skip undefined: True
   valid formats:
     - pdf
 ---
@@ -86,28 +92,32 @@ fields:
       - Respondent: user1_filed
   - Minor children?: minor_children
     datatype: yesnoradio
+  - Received welfare: received_welfare
+    datatype: yesnoradio
+  - code: |
+      users[0].name_fields()
 ---
 objects:
-  - doc_list: DADict.using(auto_gather=False)
+  - doc_list_selected: DADict.using(auto_gather=False)
 ---
 code: |
   if case.filed in ["not_filed"]:
-    doc_list['petition_attachment'] = True
-    doc_list['answer_attachment'] = False
+    doc_list_selected['petition_attachment'] = True
+    doc_list_selected['answer_attachment'] = False
   else:
-    doc_list['petition_attachment'] = False
-    doc_list['answer_attachment'] = True
+    doc_list_selected['petition_attachment'] = False
+    doc_list_selected['answer_attachment'] = True
   if minor_children:
-    doc_list['parenting_plan_attachment'] = True
+    doc_list_selected['parenting_plan_attachment'] = True
   else:
-    doc_list['parenting_plan_attachment'] = False
-  doc_list['notice_of_hearing_attachment'] = True 
-  doc_list['certificate_of_dissolution_attachment'] = True
-  doc_list['judgment_attachment'] = True
-  doc_list['property_statement_attachment'] = True
-  doc_list['income_statement_attachment'] = True   
-  doc_list['fee_waiver_attachment'] = True
-  doc_list['confidential_information_sheet_attachment'] = True
-  doc_list['redaction_certification_attachment'] = True
-  doc_list.gathered = True
+    doc_list_selected['parenting_plan_attachment'] = False
+  doc_list_selected['notice_of_hearing_attachment'] = True 
+  doc_list_selected['certificate_of_dissolution_attachment'] = True
+  doc_list_selected['judgment_attachment'] = True
+  doc_list_selected['property_statement_attachment'] = True
+  doc_list_selected['income_statement_attachment'] = True   
+  doc_list_selected['fee_waiver_attachment'] = True
+  doc_list_selected['confidential_information_sheet_attachment'] = True
+  doc_list_selected['redaction_certification_attachment'] = True
+  doc_list_selected.gathered = True
 ---
