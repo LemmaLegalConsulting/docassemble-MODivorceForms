@@ -301,8 +301,8 @@ attachment:
       - "respondent_name_suffix": ${ respondent.name.suffix } 
       - "petitioner_ssn": ${ petitioner.ssn } 
       - "respondent_ssn": ${ respondent.ssn } 
-      - "case_personal_jurisdiction_over_respondent": ${ personal_jurisdiction_over_respondent } 
-      - "case_personal_jurisdiction_over_respondent_no": ${ not personal_jurisdiction_over_respondent } 
+      - "case_personal_jurisdiction_over_respondent": ${ (respondent.lives_in_missouri and respondent.resident_for_90_days) or marriage.live_together_in_mo } 
+      - "case_personal_jurisdiction_over_respondent_no": ${ not ((respondent.lives_in_missouri and respondent.resident_for_90_days) or marriage.live_together_in_mo) } 
       - "petitioner_resident_for_90 days": ${ petitioner.resident_for_90_days } 
       - "respondent_resident_for_90 days": ${ respondent.resident_for_90_days } 
       - "marriage_date": ${ format_date(marriage.recorded_date, format='M/d/yyyy') } 

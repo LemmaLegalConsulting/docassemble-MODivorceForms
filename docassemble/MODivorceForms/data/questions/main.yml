@@ -128,11 +128,19 @@ code: |
     if other_parties[0].lives_in_missouri:
       other_parties[0].county_length_of_residence_choice
       other_parties[0].mo_length_of_residence_choice
-  if petitioner.lives_in_missouri and (petitioner.mo_length_of_residence_choice != "less_than_4" or petitioner.mo_length_of_residence_days >= 90):
-    if not respondent.lives_in_missouri and not marriage.live_together_in_mo:
-      personal_jurisdiction_warning
-  elif not (respondent.lives_in_missouri and (respondent.mo_length_of_residence_choice != "less_than_4" or respondent.mo_length_of_residence_days >= 90)):
-    jurisdiction_kickout
+  if case.filed in ["not_filed"]:
+    if petitioner.lives_in_missouri and (petitioner.mo_length_of_residence_choice != "less_than_4" or petitioner.mo_length_of_residence_days >= 90):
+      if not respondent.lives_in_missouri and not marriage.live_together_in_mo:
+        personal_jurisdiction_warning
+    elif not (respondent.lives_in_missouri and (respondent.mo_length_of_residence_choice != "less_than_4" or respondent.mo_length_of_residence_days >= 90)):
+      jurisdiction_kickout  
+  elif case.filed in ["other_parties0_filed"]:
+    if petitioner.lives_in_missouri and petitioner.resident_for_90_days :
+      if not (respondent.lives_in_missouri and respondent.resident_for_90_days) and not marriage.live_together_in_mo:
+        respondent_personal_jurisdiction_warning
+    elif not (respondent.lives_in_missouri and respondent.resident_for_90_days):
+      if not waive_jurisdiction:
+        respondent_jurisdiction_kickout  
   section_right_tool = True
 ---
 code: |  
@@ -607,10 +615,31 @@ subquestion: |
   You may want to consider filing for divorce in the state where your spouse lives.
 continue button field: personal_jurisdiction_warning
 ---
+id: personal_jurisdiction_warning for respondent
+question: No personal jurisdiction
+subquestion: |
+  If your do not live in Missouri currently, and you and your spouse did not live together in Missouri, then the court will not have personal jurisdiction over you.  This means the court can not make you pay maintenance or child support.  
+  
+  You may want to consider talking to a lawyer if your spouse is asking the court for maintenance or child support that you don't agree with.
+continue button field: respondent_personal_jurisdiction_warning
+---
 event: jurisdiction_kickout
 question: No jurisdiction
 subquestion: |
   Missouri law requires that at least one party in the divorce live in Missouri for at least 90 days before filing divorce.  Since neither you nor your spouse has lived in Missouri for 90 days, this tool is not appropriate for you.
+---
+event: respondent_jurisdiction_kickout
+question: No jurisdiction
+subquestion: |
+  Missouri law requires that at least one party in the divorce live in Missouri for at least 90 days before filing divorce.  Since neither you nor your spouse has lived in Missouri for 90 days and you do not agree to the divorce in Missouri, you should find a lawyer to help you.
+---
+id: waive_jurisdiction
+question: Jurisdiction in Missouri
+subquestion: |
+  If neither you nor your spouse live in Missouri, then the court does not have jurisdiction.
+fields:
+  - "Do you agree that your case should be in Missouri?": waive_jurisdiction
+    datatype: yesnoradio
 ---
 id: Finding your case
 question: How to find your case

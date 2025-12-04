@@ -92,6 +92,10 @@ fields:
       - Respondent: user1_filed
   - Minor children?: minor_children
     datatype: yesnoradio
+  - Received welfare: received_welfare
+    datatype: yesnoradio
+  - code: |
+      users[0].name_fields()
 ---
 objects:
   - doc_list_selected: DADict.using(auto_gather=False)

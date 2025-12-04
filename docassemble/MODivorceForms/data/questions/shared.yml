@@ -34,6 +34,19 @@ fields:
       - Yes, my spouse filed: other_parties0_filed
       - Not yet: not_filed
       - I'm not sure: unknown
+  - Has the case you filed been dismissed?: active_case
+    datatype: noyesradio
+    show if: 
+      variable: case.filed
+      is: user0_filed
+  - note: |
+      If the case has been dismissed, you will have to file a petition to start a new case.
+    show if:
+      variable: active_case
+      is: False
+validation code: |
+  if defined('active_case') and not active_case:
+    case.filed = "not_filed"
 ---
 code: |
   if case.filed in ["user0_filed","not_filed"]:
@@ -575,6 +588,11 @@ fields:
       variable: x.mo_length_of_residence_choice
       is: year    
     default: ${ x.county_length_of_residence_years if defined('x.county_length_of_residence_years') else '' }
+validation code: |
+  if x.mo_length_of_residence_choice != "less_than_4" or x.mo_length_of_residence_days >= 90:
+    x.resident_for_90_days = True
+  else:
+    x.resident_for_90_days = False
 ---
 generic object: ALIndividual
 question: Residence in ${ x.address.county }
