@@ -1242,6 +1242,17 @@ fields:
     datatype: yesnoradio
 ---
 id: name of one itemized job in list
+generic object: ALItemizedJobList
+question: |
+  What is your job title for ${ "this" if i == 0 else "your " + ordinal(i) } job?
+subquestion: |
+  % if len(x.complete_elements()) > 0:
+  You've already told us about being a ${ comma_and_list([job.source for job in x.complete_elements()]) }.
+  % endif
+fields:
+  - Job title: x[i].source
+---
+id: name of one itemized job in list
 question: |
   What is the job title for the ${ordinal(i)} job for ${ other_parties[0] }?
 subquestion: |
@@ -1715,8 +1726,10 @@ fields:
     code: |
       x.benefits_ordered
   - note: |
-      If you get SSDI, we will ask about that income later.
+      ### If you get disability income (SSDI), we will ask about that income later on.###
 ---
+only sets: 
+  - other_parties[0].benefits.selected_types
 id: are there public benefits for other_party
 generic object: ALIndividual
 question: |
@@ -1734,7 +1747,7 @@ fields:
     datatype: yesnowide
     disable others: True
   - note: |
-      If ${ other_parties[0] } get SSDI, we will ask about that income later.
+      ###If ${ other_parties[0] } gets disability income (SSDI), we will ask about that income later.###
 validation code: |
   if other_parties[0].benefits_unknown:
     other_parties[0].benefits.there_are_any = None
@@ -1851,7 +1864,7 @@ subquestion: |
 id: x.benefits table
 generic object: ALIndividual
 table: x.benefits_table
-rows: benefits
+rows: x.benefits
 columns:
   - Source: |
       row_item.display_name if defined("row_item.source") else ""
@@ -1882,7 +1895,7 @@ data: !!omap
 ---
 variable name: help_text
 data: !!omap
-  - unemployment income help: "Enter gross amount of unemployment income — before taxes were taken out."
+  - unemployment income help: "Enter gross amount of unemployment income, which means the total amount of income before taxes were taken out."
   - default: " "
 ---
 id: other income display default
@@ -1919,6 +1932,8 @@ fields:
     code: |
       x.other_incomes_ordered
 ---
+only sets: 
+  - other_parties[0].other_incomes.selected_types
 generic object: ALIndividual
 id: are there other incomes for other party
 #other_incomes
@@ -2582,6 +2597,23 @@ fields:
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
+      - Split the debt: split
+  - How much should ${ users[0].name.full() } pay?: real_estate[i].user_percentage_choice
+    choices:
+      - "50%": 50
+      - "75%": 75
+      - "25%": 25
+      - Other: other
+    show if:
+      variable: real_estate[i].recommended_debt
+      is: split
+  - What percentage?: real_estate[i].user_percentage_other
+    datatype: number
+    min: 0
+    max: 100
+    show if:
+      variable: real_estate[i].user_percentage_choice
+      is: other
   - Is this marital or nonmarital property?: real_estate[i].marital_property
     choices:
       - Marital
@@ -2605,6 +2637,17 @@ validation code: |
   else:
     real_estate[i].display_name = real_estate[i].source_other
   real_estate[i].description = real_estate[i].display_name + " at " + real_estate[i].address + " " + real_estate[i].legal_description
+  if real_estate[i].is_amount_owed and real_estate[i].recommended_debt == "split" and real_estate[i].user_percentage_choice == "other":
+    real_estate[i].user_percentage = real_estate[i].user_percentage_other/100
+  elif real_estate[i].is_amount_owed and real_estate[i].recommended_debt == "split":
+    real_estate[i].user_percentage = float(real_estate[i].user_percentage_choice)/100
+---
+id: marital_property_template
+template: marital_property_template
+subject: |
+  What is marital and nonmarital property?
+content: |
+  Marital property is property acquired throughout the marriage together.  Nonmarital property is property acquired before the marriage or separately.
 ---
 id: vehicles object
 objects:
@@ -2682,6 +2725,23 @@ fields:
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
+      - Split the debt: split
+  - How much should ${ users[0].name.full() } pay?: vehicles[i].user_percentage_choice
+    choices:
+      - "50%": 50
+      - "75%": 75
+      - "25%": 25
+      - Other: other
+    show if:
+      variable: vehicles[i].recommended_debt
+      is: split
+  - What percentage?: vehicles[i].user_percentage_other
+    datatype: number
+    min: 0
+    max: 100
+    show if:
+      variable: vehicles[i].user_percentage_choice
+      is: other
   - Is this marital or nonmarital property?: vehicles[i].marital_property
     choices:
       - Marital
@@ -2705,6 +2765,10 @@ validation code: |
   else:
     vehicles[i].display_name = vehicles[i].source_other
   vehicles[i].description = vehicles[i].year + " " + vehicles[i].make + " " + vehicles[i].model
+  if vehicles[i].is_amount_owed and vehicles[i].recommended_debt == "split" and vehicles[i].user_percentage_choice == "other":
+    vehicles[i].user_percentage = vehicles[i].user_percentage_other/100
+  elif vehicles[i].is_amount_owed and vehicles[i].recommended_debt == "split":
+    vehicles[i].user_percentage = float(vehicles[i].user_percentage_choice)/100
 ---
 id: bank_assets object
 objects:
@@ -2771,6 +2835,7 @@ fields:
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
+      - ${ petitioner.name.full() } & ${ respondent.name.full() }
       - Other: other
   - Recommended Award: bank_assets[i].recommended_award
     choices:
@@ -2861,6 +2926,23 @@ fields:
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
+      - Split the debt: split
+  - How much should ${ users[0].name.full() } pay?: personal_goods[i].user_percentage_choice
+    choices:
+      - "50%": 50
+      - "75%": 75
+      - "25%": 25
+      - Other: other
+    show if:
+      variable: personal_goods[i].recommended_debt
+      is: split
+  - What percentage?: personal_goods[i].user_percentage_other
+    datatype: number
+    min: 0
+    max: 100
+    show if:
+      variable: personal_goods[i].user_percentage_choice
+      is: other
   - Is this marital or nonmarital property?: personal_goods[i].marital_property
     choices:
       - Marital
@@ -2884,6 +2966,10 @@ validation code: |
   else:
     personal_goods[i].display_name = personal_goods[i].source_other
   personal_goods[i].description = personal_goods[i].display_name
+  if personal_goods[i].is_amount_owed and personal_goods[i].recommended_debt == "split" and personal_goods[i].user_percentage_choice == "other":
+    personal_goods[i].user_percentage = personal_goods[i].user_percentage_other/100
+  elif personal_goods[i].is_amount_owed and personal_goods[i].recommended_debt == "split":
+    personal_goods[i].user_percentage = float(personal_goods[i].user_percentage_choice)/100
 ---
 ### DEBTS
 objects: 
@@ -2913,9 +2999,33 @@ code: |
   for debt in secured_debts:
     if debt.recommended_debt == x.name.full():
       x.debts.append(debt)
+    elif debt.recommended_debt == "split":
+      x.debts.appendObject()
+      x.debts[-1].marital_property = debt.marital_property
+      x.debts[-1].lender = showifdef('debt.lender')
+      x.debts[-1].source = debt.source
+      x.debts[-1].description = debt.description
+      if x.instanceName == "users[0]":
+        x.debts[-1].balance = debt.balance * debt.user_percentage
+        x.debts[-1].monthly_payment = debt.monthly_payment * debt.user_percentage
+      else:
+        x.debts[-1].balance = debt.balance * (1 - debt.user_percentage)
+        x.debts[-1].monthly_payment = debt.monthly_payment * (1 - debt.user_percentage)
   for debt in debts:
     if debt.recommended_debt == x.name.full():
       x.debts.append(debt)
+    elif debt.recommended_debt == "split":
+      x.debts.appendObject()
+      x.debts[-1].marital_property = debt.marital_property
+      x.debts[-1].lender = showifdef('debt.lender')
+      x.debts[-1].display_name = showifdef('debt.display_name')
+      x.debts[-1].source = debt.source
+      if x.instanceName == "users[0]":
+        x.debts[-1].balance = debt.balance * debt.user_percentage
+        x.debts[-1].monthly_payment = debt.monthly_payment * debt.user_percentage
+      else:
+        x.debts[-1].balance = debt.balance * (1 - debt.user_percentage)
+        x.debts[-1].monthly_payment = debt.monthly_payment * (1 - debt.user_percentage)
   x.debts.gathered = True
 ---
 generic object: ALAssetListOther
@@ -3004,10 +3114,42 @@ fields:
   - Monthly Payment: debts[i].monthly_payment
     datatype: currency
     required: False 
+  - Marital or separate debt: debts[i].marital_property
+    datatype: radio
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
   - Who should pay this debt?: debts[i].recommended_debt
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
+      - Split the debt: split
+  - How much should ${ users[0].name.full() } pay?: debts[i].user_percentage_choice
+    choices:
+      - "50%": 50
+      - "75%": 75
+      - "25%": 25
+      - Other: other
+    show if:
+      variable: debts[i].recommended_debt
+      is: split
+  - What percentage?: debts[i].user_percentage_other
+    datatype: number
+    min: 0
+    max: 100
+    show if:
+      variable: debts[i].user_percentage_choice
+      is: other
+validation code: |
+  if debts[i].source != "other":
+    debts[i].display_name = debts.terms_ordered.get(debts[i].source, debts[i].source)
+  else:
+    debts[i].display_name = debts[i].source_other
+  if debts[i].recommended_debt == "split" and debts[i].user_percentage_choice == "other":
+    debts[i].user_percentage = debts[i].user_percentage_other/100
+  elif debts[i].recommended_debt == "split":
+    debts[i].user_percentage = float(debts[i].user_percentage_choice)/100
 ---
 generic object: ALAsset
 question: Who should pay this debt?
@@ -3016,6 +3158,23 @@ fields:
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
+      - Split the debt: split
+  - How much should ${ users[0].name.full() } pay?: x.user_percentage_choice
+    choices:
+      - "50%": 50
+      - "75%": 75
+      - "25%": 25
+      - Other: other
+    show if:
+      variable: x.recommended_debt
+      is: split
+  - What percentage?: x.user_percentage_other
+    datatype: number
+    min: 0
+    max: 100
+    show if:
+      variable: x.user_percentage_choice
+      is: other
 ---
 id: debts review
 question: Do you want to list any other debts?
@@ -3042,18 +3201,41 @@ table: debts.table
 rows: debts
 columns:
   - Type: |
-      row_item.source
+      row_item.display_name
   - Lender: |
       row_item.lender
   - Balance: |
       currency(row_item.balance) if defined("row_item.balance") else ""
   - Monthly payment:
       currency(row_item.monthly_payment) if defined("row_item.monthly_payment") else ""
-  - Marital property?:  row_item.marital_property
-  - Party with possession?: row_item.has_possession
   - Debts to be paid by: row_item.recommended_debt if defined("row_item.recommended_debt") else ""
 edit:
   - lender
+---
+id: generic review
+generic object: ALIndividual
+question: Debts of ${ x.name.full() }
+subquestion: |
+
+  Tap Next if you don't have more to add.
+  
+  ${ x.debts_table }
+  
+continue button field: x.review_debts
+---
+id: generic table
+generic object: ALIndividual
+table: x.debts_table
+rows: x.debts
+columns:
+  - Type: |
+      row_item.display_name if defined('row_item.display_name') else row_item.source
+  - Lender: |
+      row_item.lender
+  - Balance: |
+      currency(row_item.balance) if defined("row_item.balance") else ""
+  - Monthly payment:
+      currency(row_item.monthly_payment) if defined("row_item.monthly_payment") else ""
 ---
 ## DECREE
 id: legal_custody question

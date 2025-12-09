@@ -382,35 +382,20 @@ code: |
   real_estate.gather() # property_statement, fee_waiver
   if len(real_estate.matches(source=['house'])) > 0:
     assets_warning
-  if len(real_estate) > 0:
-    real_estate.review_items
-  if len(vehicles) > 0:
-    vehicles.review_items
-  if len(bank_assets) > 0:
-    bank_assets.review_items 
-  if len(securities) > 0:
-    securities.review_items 
-  if len(personal_goods) > 0:
-    personal_goods.review_items 
-  if len(retirement_accounts) > 0:
-    retirement_accounts.review_items 
+  vehicles.gather()
+  bank_assets.gather()
+  securities.gather()
+  personal_goods.gather()
+  retirement_accounts.gather() 
   there_are_any_screen
-  if len(life_insurance) > 0:
-    life_insurance.review_items 
-  if len(interests_in_trust) > 0:
-    interests_in_trust.review_items 
-  if len(interest_in_contract) > 0:
-    interest_in_contract.review_items 
-  if len(interest_in_litigation) > 0:
-    interest_in_litigation.review_items 
-  if len(farm) > 0:
-    farm.review_items 
-  if len(debts_owed_to_you) > 0:
-    debts_owed_to_you.review_items 
-  if len(businesses) > 0:
-    businesses.review_items 
-  if len(other_assets) > 0:
-    other_assets.review_items 
+  life_insurance.gather()
+  interests_in_trust.gather()
+  interest_in_contract.gather()
+  interest_in_litigation.gather()
+  farm.gather()
+  debts_owed_to_you.gather()
+  businesses.gather()
+  other_assets.gather() 
   users[0].assets.gathered
   users[0].review_assets
   other_parties[0].assets.gathered
