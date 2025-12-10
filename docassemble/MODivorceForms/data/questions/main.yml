@@ -418,18 +418,11 @@ code: |
   if case.filed == "user0_filed" and respondent_served:
       served_information
   else:
-    if case.filed in ["user0_filed", "other_parties0_filed", "not_filed"]:
-      if service_type == "publication":
-        service_by_publication_information
-      else:
-        personal_service_type
-        personal_service_information
-        ## fill_in_service_date # form_17
-        if case.filed in ["user0_filed", "not_filed"]:
-          respondent.service_type
-        people_served.gathered # notice_of_hearing
-        for people in people_served:
-          people.service_address.address
+    if case.filed in ["user0_filed", "not_filed"]:
+      respondent.service_type
+      people_served.gathered # notice_of_hearing
+      for people in people_served:
+        people.service_address.address
     filing_pleadings_video
   if 'redaction_certification_attachment' in doc_list_selected.true_values():
     al_court_bundle
@@ -1041,11 +1034,25 @@ code: |
   else:
     redaction_certification_attachment.enabled = False
 ---
+id: service_by_mail_notice enabled block for main interview
+code: |
+  if case.filed in ["user0","not_filed"] and respondent.service_type == "mail":
+    service_by_mail_notice_attachment.enabled = True
+  else:
+    service_by_mail_notice_attachment.enabled = False
+---
+id: service_by_mail_affidavit enabled block for main interview
+code: |
+  if case.filed in ["user0","not_filed"] and respondent.service_type == "mail":
+    service_by_mail_affidavit_attachment.enabled = True
+  else:
+    service_by_mail_affidavit_attachment.enabled = False
+---
 code: |
   document_list = doc_list_selected.true_values()
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---

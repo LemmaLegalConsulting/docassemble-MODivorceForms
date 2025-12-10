@@ -1703,6 +1703,17 @@ generic object: ALIndividual
 objects:
   - x.benefits_ordered: DAOrderedDict.using(elements=x.benefits.terms_ordered, auto_gather=False, gathered=True)
 ---
+
+id: ALIncomeList there are any
+generic object: ALIncomeList
+code: |
+  if x.selected_types.any_true():
+    x.move_checks_to_list(selected_terms=x.terms_ordered)
+    x.there_are_any = True
+  else:
+    x.there_are_any = False
+---
+---
 id: selected types sets there_are_any
 generic object: ALIncomeListOther
 code: |
@@ -3669,8 +3680,8 @@ objects:
 ---
 # This isn't used because there is an objects block in main.yml
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, fee_waiver_attachment, judgment_attachment, petition_attachment, income_statement_attachment, property_statement_attachment, confidential_information_sheet_attachment, redaction_certification_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, fee_waiver_attachment, judgment_attachment, petition_attachment, income_statement_attachment, property_statement_attachment, confidential_information_sheet_attachment, redaction_certification_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, fee_waiver_attachment, judgment_attachment, petition_attachment, income_statement_attachment, property_statement_attachment, confidential_information_sheet_attachment, redaction_certification_attachment, service_by_mail_affidavit_attachment, service_by_mail_notice_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, fee_waiver_attachment, judgment_attachment, petition_attachment, income_statement_attachment, property_statement_attachment, confidential_information_sheet_attachment, redaction_certification_attachment, service_by_mail_affidavit_attachment, service_by_mail_notice_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---
 # Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
 # used for "preview" and "final" keys, and logic in the template checks the value of 
@@ -3682,4 +3693,26 @@ attachment:
   variable name: mo_divorce_forms_Post_interview_instructions[i]
   skip undefined: True
   tagged pdf: True
+---
+attachment:
+  name: Notice and Acknowledgment Service By Mail
+  filename: service_by_mail_notice
+  docx template file: service_by_mail_notice.docx
+  variable name: service_by_mail_notice_attachment[i]
+  skip undefined: True
+---
+objects:
+  - service_by_mail_notice_attachment: ALDocument.using(title="Notice and Acknowledgment Service By Mail", filename="service_by_mail_notice",  has_addendum=False, )
+---
+attachment:
+  name: Affidavit Service By Mail
+  filename: service_by_mail_affidavit
+  docx template file: service_by_mail_affidavit.docx
+  variable name: service_by_mail_affidavit_attachment[i]
+  skip undefined: True
+---
+objects:
+  - service_by_mail_affidavit_attachment: ALDocument.using(title="Affidavit Service By Mail", filename="service_by_mail_affidavit",  has_addendum=False, )
+---
+  
 
