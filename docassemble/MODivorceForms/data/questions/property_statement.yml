@@ -61,7 +61,7 @@ fields:
 ---
 id: securities object
 objects:
-  - securities: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - securities: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: securities other display
 comment: |
@@ -176,7 +176,7 @@ validation code: |
 ---
 id: retirement_accounts object
 objects:
-  - retirement_accounts: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - retirement_accounts: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: retirement_accounts terms_ordered
 # "!!omap" makes these terms ordered
@@ -295,7 +295,7 @@ continue button field: there_are_any_screen
 ---
 
 only sets: businesses[i].market_value
-generic object: ALAssetListOther
+generic object: ALAssetList
 id: describe generic
 question: |
   Tell us about your businesses
@@ -370,7 +370,7 @@ validation code: |
     businesses[i].user_percentage = float(businesses[i].user_percentage_choice)/100
 ---
 only sets: farm[i].market_value
-generic object: ALAssetListOther
+generic object: ALAssetList
 id: describe generic
 question: |
   Tell us about your farm
@@ -445,7 +445,7 @@ validation code: |
     farm[i].user_percentage = float(farm[i].user_percentage_choice)/100
 ---
 only sets: other_assets[i].market_value
-generic object: ALAssetListOther
+generic object: ALAssetList
 id: describe generic
 question: |
   Tell us about your other assets
@@ -520,7 +520,7 @@ validation code: |
     other_assets[i].user_percentage = float(other_assets[i].user_percentage_choice)/100
 ---
 only sets: x[i].market_value
-generic object: ALAssetListOther
+generic object: ALAssetList
 id: describe generic
 question: |
   Tell us about your ${ x.display_name }
@@ -558,7 +558,7 @@ fields:
 ---
 id: life_insurance object
 objects:
-  - life_insurance: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - life_insurance: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: life insurance other display
 comment: |
@@ -639,7 +639,7 @@ edit:
 ---
 id: interests_in_trust object
 objects:
-  - interests_in_trust: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - interests_in_trust: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: interests_in_trust other display
 comment: |
@@ -718,7 +718,7 @@ edit:
 ---
 id: interest_in_contract object
 objects:
-  - interest_in_contract: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - interest_in_contract: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: interest_in_contract other display
 comment: |
@@ -731,7 +731,7 @@ code: |
 ---
 id: interest_in_litigation object
 objects:
-  - interest_in_litigation: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - interest_in_litigation: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: interest_in_litigation other display
 comment: |
@@ -744,7 +744,7 @@ code: |
 ---
 id: farm object
 objects:
-  - farm: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - farm: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: farms other display
 comment: |
@@ -757,7 +757,7 @@ code: |
 ---
 id: debts_owed_to_you object
 objects:
-  - debts_owed_to_you: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - debts_owed_to_you: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: interests_in_trust other display
 comment: |
@@ -770,7 +770,7 @@ code: |
 ---
 id: businesses object
 objects:
-  - businesses: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - businesses: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: businesses other display
 comment: |
@@ -783,7 +783,7 @@ code: |
 ---
 id: other_assets object
 objects:
-  - other_assets: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - other_assets: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: other_assets other display
 comment: |
@@ -796,7 +796,7 @@ code: |
 ---
 generic object: ALIndividual
 objects:
-  - x.assets: ALAssetListOther.using(auto_gather=False)
+  - x.assets: ALAssetList.using(auto_gather=False)
 ---
 id: code to determine individual assets based on recommended award
 generic object: ALIndividual

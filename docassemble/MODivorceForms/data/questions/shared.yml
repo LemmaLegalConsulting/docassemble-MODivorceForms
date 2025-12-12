@@ -1,10 +1,11 @@
+
 include:
   - docassemble.AssemblyLine:assembly_line.yml
   - docassemble.ALToolbox:al_income.yml
   - county.yml
 ---
 modules:
-  - .al_income_other
+  - .al_income
 ---
 id: list of previously entered people
 code: |
@@ -1696,7 +1697,7 @@ code: |
 id: x.benefits object
 generic object: ALIndividual
 objects:
-  - x.benefits: ALIncomeListOther.using(complete_attribute='complete',there_is_another=False)
+  - x.benefits: ALIncomeList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: x.benefits ordered object for checkboxes
 generic object: ALIndividual
@@ -1708,17 +1709,17 @@ id: ALIncomeList there are any
 generic object: ALIncomeList
 code: |
   if x.selected_types.any_true():
-    x.move_checks_to_list(selected_terms=x.terms_ordered)
+    x.move_checks_to_list(selected_terms=x.terms_ordered, set_other=True)
     x.there_are_any = True
   else:
     x.there_are_any = False
 ---
 ---
 id: selected types sets there_are_any
-generic object: ALIncomeListOther
+generic object: ALIncomeList
 code: |
   if x.selected_types.any_true():
-    x.move_checks_to_list(selected_terms=x.terms_ordered)
+    x.move_checks_to_list(selected_terms=x.terms_ordered, set_other=True)
     x.there_are_any = True
   else:
     x.there_are_any = False
@@ -1918,7 +1919,7 @@ code: |
 id: other_incomes
 generic object: ALIndividual
 objects:
-  - x.other_incomes: ALIncomeListOther.using(complete_attribute='complete',there_is_another=False)
+  - x.other_incomes: ALIncomeList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: other_incomes_ordered
 generic object: ALIndividual
@@ -1926,7 +1927,7 @@ objects:
   - x.other_incomes_ordered: DAOrderedDict.using(elements=x.other_incomes.terms_ordered, auto_gather=False, gathered=True)
 ---
 comment: |
-  will use id: ALIncomeListOther there are any to set other_incomes.there_are_any
+  will use id: ALIncomeList there are any to set other_incomes.there_are_any
 ---
 generic object: ALIndividual
 id: are there other incomes
@@ -1971,7 +1972,7 @@ comment: |
 ---
 generic object: ALIndividual
 id: other income info for list
-#generic object: ALIncomeListOther
+#generic object: ALIncomeList
 reconsider: x.other_incomes[i].display_name
 question: |
   Tell us about your ${ x.other_incomes[i].display_name.lower() }
@@ -2016,7 +2017,7 @@ validation code: |
 ---
 generic object: ALIndividual
 id: other income info for list
-#generic object: ALIncomeListOther
+#generic object: ALIncomeList
 reconsider: other_parties[0].other_incomes[i].display_name
 question: |
   Tell us about ${ other_parties[0].other_incomes[i].display_name.lower() } for ${ other_parties[0] }
@@ -2427,17 +2428,17 @@ code: |
   x.health_insurance_costs = 0
 ---
 ## ASSETS
-id: ALIncomeListOther there are any
-generic object: ALIncomeListOther
+id: ALIncomeList there are any
+generic object: ALIncomeList
 code: |
   if x.selected_types.any_true():
-    x.move_checks_to_list(selected_terms=x.terms_ordered)
+    x.move_checks_to_list(selected_terms=x.terms_ordered, set_other=True)
     x.there_are_any = True
   else:
     x.there_are_any = False
 ---
 id: generic set display name backup
-generic object: ALAssetListOther
+generic object: ALAssetList
 code: |
   if defined('x[i].source') and x[i].source != "other":
     x[i].display_name = x.terms_ordered.get(x[i].source, x[i].source)
@@ -2447,7 +2448,7 @@ code: |
     x[i].display_name = x.other_display
 ---
 id: generic there are any
-generic object: ALAssetListOther
+generic object: ALAssetList
 question: |
   ${ x.display_name }
 subquestion: |   
@@ -2458,13 +2459,13 @@ fields:
     code: |
       x.ordered
 ---
-generic object: ALAssetListOther
+generic object: ALAssetList
 code: |
   x[i].market_value
   x[i].complete = True
 ---
 id: generic review
-generic object: ALAssetListOther
+generic object: ALAssetList
 question: Do you want to list any other ${ x.display_name }?
 subquestion: |
 
@@ -2487,7 +2488,7 @@ subquestion: |
 continue button field: x.review_assets
 ---
 id: generic revisit
-generic object: ALAssetListOther
+generic object: ALAssetList
 continue button field: x.revisit
 question: |
   Edit ${ x.display_name }
@@ -2497,7 +2498,7 @@ subquestion: |
   ${ x.add_action() }
 ---
 id: generic table
-generic object: ALAssetListOther
+generic object: ALAssetList
 table: x.table
 rows: x
 columns:
@@ -2509,8 +2510,8 @@ columns:
   - Party with possession?: row_item.has_possession
   - Property awarded to: row_item.recommended_award
 edit:
-  - source
-  - value
+  - market_value
+
 ---
 id: generic table
 generic object: ALIndividual
@@ -2527,7 +2528,7 @@ edit:
 ---
 generic object: ALIndividual
 objects:
-  - x.assets: ALAssetListOther.using(auto_gather=False)
+  - x.assets: ALAssetList.using(auto_gather=False)
 ---
 generic object: ALIndividual
 code: |
@@ -2542,7 +2543,10 @@ code: |
 ---
 id: real_estate object
 objects:
-  - real_estate: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - real_estate: ALAssetList.using(complete_attribute='complete')
+---
+code: |
+  real_estate.there_is_another = False
 ---
 id: real_estate other display
 comment: |
@@ -2606,8 +2610,8 @@ fields:
   - Who should pay this debt?: real_estate[i].recommended_debt
     show if: real_estate[i].is_amount_owed
     choices:
-      - ${ petitioner.name.full() }
-      - ${ respondent.name.full() }
+      - petitioner.name.full()
+      - respondent.name.full()
       - Split the debt: split
   - How much should ${ users[0].name.full() } pay?: real_estate[i].user_percentage_choice
     choices:
@@ -2630,17 +2634,15 @@ fields:
       - Marital
       - Nonmarital
       - Both
-  - note: |
-      ${ collapse_template(marital_property_template) }
   - Party with possession of this property?: real_estate[i].has_possession
     choices:
-      - ${ petitioner.name.full() }
-      - ${ respondent.name.full() }
+      - petitioner.name.full() 
+      - respondent.name.full() 
       - Other: other
   - Recommended Award: real_estate[i].recommended_award
     choices:
-      - ${ petitioner.name.full() }
-      - ${ respondent.name.full() }
+      - petitioner.name.full() 
+      - respondent.name.full() 
       - Other: other
 validation code: |
   if real_estate[i].source != "other":
@@ -2662,7 +2664,7 @@ content: |
 ---
 id: vehicles object
 objects:
-  - vehicles: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - vehicles: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: vehicles other display
 comment: |
@@ -2783,7 +2785,7 @@ validation code: |
 ---
 id: bank_assets object
 objects:
-  - bank_assets: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - bank_assets: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: bank_assets other display
 comment: |
@@ -2865,7 +2867,7 @@ code: |
 ---
 id: personal_goods object
 objects:
-  - personal_goods: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - personal_goods: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: personal_goods other display
 comment: |
@@ -2984,11 +2986,11 @@ validation code: |
 ---
 ### DEBTS
 objects: 
-  - debts: ALAssetListOther.using(there_is_another=False,complete_attribute='complete')
+  - debts: ALAssetList.using(there_is_another=False,complete_attribute='complete')
 ---
 generic object: ALIndividual
 objects:
-  - x.debts: ALAssetListOther.using(auto_gather=False)
+  - x.debts: ALAssetList.using(auto_gather=False)
 ---
 id: populate debt list from debts in assets
 code: |
@@ -3039,13 +3041,13 @@ code: |
         x.debts[-1].monthly_payment = debt.monthly_payment * (1 - debt.user_percentage)
   x.debts.gathered = True
 ---
-generic object: ALAssetListOther
+generic object: ALAssetList
 code: |
   x[i].market_value
   x[i].complete = True
 ---
 id: generic ordered object for checkboxes
-generic object: ALAssetListOther
+generic object: ALAssetList
 objects:
   - x.ordered: DAOrderedDict.using(elements=x.terms_ordered, auto_gather=False, gathered=True)
 ---
@@ -3059,7 +3061,7 @@ code: |
   debts.display_name = "other debts"
 ---
 objects: 
-  - secured_debts: ALAssetListOther.using(auto_gather=False)
+  - secured_debts: ALAssetList.using(auto_gather=False)
 ---
 id: debts terms_ordered
 # "!!omap" makes these terms ordered
@@ -3076,7 +3078,7 @@ code: |
   debts.display_name = "Debt"
 ---
 id: debts there are any
-generic object: ALAssetListOther
+generic object: ALAssetList
 question: |
   Other Debts
 subquestion: |   
@@ -3715,4 +3717,164 @@ objects:
   - service_by_mail_affidavit_attachment: ALDocument.using(title="Affidavit Service By Mail", filename="service_by_mail_affidavit",  has_addendum=False, )
 ---
   
+---
+id: real_estate object test
+objects:
+  - real_estate: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: generic ordered object for checkboxes test
+generic object: ALAssetList
+objects:
+  - x.ordered: DAOrderedDict.using(elements=x.terms_ordered, auto_gather=False, gathered=True)
+---
+id: real_estate other display test
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  real_estate.other_display = "other real estate"
+  real_estate.display_name = "real estate"
+---
+id: generic set display name backup test
+generic object: ALAssetList
+code: |
+  if defined('x[i].source') and x[i].source != "other":
+    x[i].display_name = x.terms_ordered.get(x[i].source, x[i].source)
+  elif defined('x[i].source') and x[i].source == "other" and defined('x[i].source_other'):
+    x[i].display_name = x[i].source_other
+  else:
+    x[i].display_name = x.other_display
+---
+id: real_estate terms_ordered test
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: real_estate.terms_ordered
+data: !!omap
+  - house: "House"
+  - condominium: "Condominium"
+  - leasehold: "Leasehold"
+  - other: "Other"
+---
+id: generic there are any test
+generic object: ALAssetList
+question: |
+  ${ x.display_name }
+subquestion: |   
+  Do you or your spouse own any ${ x.display_name }?
+fields:
+  - no label: x.selected_types
+    datatype: checkboxes
+    code: |
+      x.ordered
+---
+## ASSETS
+id: ALIncomeListOther there are any test
+generic object: ALAssetList
+code: |
+  if x.selected_types.any_true():
+    x.move_checks_to_list(selected_terms=x.terms_ordered, set_other=True)
+    x.there_are_any = True
+  else:
+    x.there_are_any = False
+---
+id: complete for assets  test
+generic object: ALAssetList
+code: |
+  x[i].market_value
+  x[i].complete = True
+---
+id: generic review test
+generic object: ALAssetList
+question: Do you want to list any other ${ x.display_name }?
+subquestion: |
 
+  Tap Next if you don't have more to add.
+  
+  ${ x.table }
+  
+  ${ x.add_action() }
+continue button field: x.review_items
+---
+id: generic table test
+generic object: ALAssetList
+table: x.table
+rows: x
+columns:
+  - Description: |
+      row_item.description
+  - Market value: |
+      currency(row_item.market_value) if defined("row_item.market_value") else ""
+  - Marital property?:  row_item.marital_property
+  - Party with possession?: row_item.has_possession
+  - Property awarded to: row_item.recommended_award
+edit:
+  - market_value
+---
+only sets: real_estate[i].market_value
+id: describe real_estate test
+reconsider: real_estate[i].display_name
+question: |
+  Tell us about your ${ real_estate[i].display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in real_estate.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.display_name for asset in real_estate.complete_elements()) }.
+  % endif
+fields:
+  - Type of asset: real_estate[i].source
+    code: |
+      real_estate.ordered
+  - Other (explain): real_estate[i].source_other
+    show if:
+      variable: real_estate[i].source
+      is: other
+  - Address: real_estate[i].address
+    required: False
+  - Legal description: real_estate[i].legal_description
+    required: False
+  - What is its market value? How much would you get if you sold it?: real_estate[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is there an amount owed on this property?: real_estate[i].is_amount_owed
+    datatype: yesnoradio
+  - Who is the money owed to?: real_estate[i].lender
+    required: False 
+    show if: real_estate[i].is_amount_owed
+  - Balance: real_estate[i].balance
+    datatype: currency
+    show if: real_estate[i].is_amount_owed
+  - Monthly Payment: real_estate[i].monthly_payment
+    datatype: currency
+    show if: real_estate[i].is_amount_owed
+  - Who should pay this debt?: real_estate[i].recommended_debt
+    show if: real_estate[i].is_amount_owed
+    choices:
+      - petitioner.name.full()
+      - respondent.name.full()
+  - Is this marital or nonmarital property?: real_estate[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - Party with possession of this property?: real_estate[i].has_possession
+    choices:
+      - petitioner.name.full()
+      - respondent.name.full()
+      - Other: other
+  - Recommended Award: real_estate[i].recommended_award
+    choices:
+      - petitioner.name.full()
+      - respondent.name.full()
+      - Other: other
+validation code: |
+  if real_estate[i].source != "other":
+    real_estate[i].display_name = real_estate.terms_ordered.get(real_estate[i].source, real_estate[i].source)
+  else:
+    real_estate[i].display_name = real_estate[i].source_other
+  real_estate[i].description = real_estate[i].display_name + " at " + real_estate[i].address + " " + real_estate[i].legal_description
+---
