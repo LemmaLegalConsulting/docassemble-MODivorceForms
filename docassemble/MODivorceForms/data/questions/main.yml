@@ -10,7 +10,7 @@ metadata:
   description: |-
     This interview helps someone in Missouri prepare forms to file for a divorce.
   can_I_use_this_form: |
-    Icomf you are a Missouri resident, you can use this interview to prepare forms for a divorce.
+    If you are a Missouri resident, you can use this interview to prepare forms for a divorce.
   before_you_start: |
     This interview will help you ask the court for a Certificate of dissolution of marriage.
     
@@ -336,7 +336,11 @@ code: |
   users[0].jobs.total(times_per_year = 12)
   users[0].has_self_employment_income
   users[0].benefits.gather()
+  if len(users[0].benefits) > 0:
+    users[0].benefits.review_items
   users[0].other_incomes.gather()
+  if len(users[0].other_incomes) > 0:
+    users[0].other_incomes.review_items
   users[0].maintenance_other_received
   users[0].other_children
   users[0].other_child_support_received
@@ -352,7 +356,11 @@ code: |
   other_parties[0].jobs.total(times_per_year = 12)
   other_parties[0].has_self_employment_income
   other_parties[0].benefits.gather()
+  if len(other_parties[0].benefits) > 0:
+    other_parties[0].benefits.review_items
   other_parties[0].other_incomes.gather()
+  if len(other_parties[0].other_incomes) > 0:
+    other_parties[0].other_incomes.review_items
   other_parties[0].maintenance_other_received
   other_parties[0].other_children
   other_parties[0].other_child_support_received
@@ -363,6 +371,8 @@ code: |
 code: |    
   nav.set_section('expenses')
   users[0].expenses.gather()
+  if len(users[0].expenses) > 0:
+    users[0].expenses.review_items
   users[0].maintenance_other_paid
   users[0].other_child_support_paid
   users[0].extraordinary_medical_costs.gather()
@@ -370,6 +380,8 @@ code: |
   users[0].health_insurance_costs
   users[0].work_childcare_expenses
   other_parties[0].expenses.gather()
+  if len(other_parties[0].expenses) > 0:
+    other_parties[0].expenses.review_items
   other_parties[0].maintenance_other_paid
   other_parties[0].other_child_support_paid
   other_parties[0].extraordinary_medical_costs.gather()
@@ -480,6 +492,22 @@ include:
   - income_statement.yml
   - fee_waiver.yml
   - confidential_information_sheet.yml
+---
+comment: |
+  moved this from shared.yml because something in one of these documents in the include above must be making the al_toolbox.yml take precedence when it is in shared.yml
+id: generic table ALIncomeList
+generic object: ALIncomeList
+table: x.table
+rows: x
+columns:
+  - Description: |
+      row_item.display_name
+  - Amount: |
+      currency(row_item.value)
+  - How often paid: |
+      times_per_year(times_per_year_list, row_item.times_per_year)
+edit:
+  - value
 ---
 code: |
   enable_al_nav_sections = True

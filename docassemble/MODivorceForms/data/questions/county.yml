@@ -58,7 +58,7 @@ subquestion: |
 fields:
   - Trial Court County: case.county
     datatype: dropdown
-    default: ${ users[0].address.county if case.filed == "not_filed" else "" }
+    default: ${ users[0].address.county if users[0].address.state == "MO" else other_parties[0].address.county }
     code: |
       county_list
 ---

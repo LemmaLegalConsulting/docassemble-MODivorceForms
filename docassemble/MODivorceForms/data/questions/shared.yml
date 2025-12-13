@@ -1916,6 +1916,11 @@ generic object: ALIndividual
 code: |
   x.other_incomes_other_display = "other source of income"
 ---
+id: other incomes display name
+generic object: ALIndividual
+code: |
+  x.other_incomes.display_name = "incomes"
+---
 id: other_incomes
 generic object: ALIndividual
 objects:
@@ -2166,10 +2171,11 @@ data: !!omap
   - laundry: "Laundry/dry cleaning"
   - repairs: "Maintenance/repairs"
 --- 
+generic object: ALIndividual
 id:  expenses other display
 code: |
   x.expenses_other_display = "another household expense"
-
+  x.expenses.display_name = x.expenses_other_display
 ---
 id: expenses object
 generic object: ALIndividual
@@ -2464,7 +2470,19 @@ code: |
   x[i].market_value
   x[i].complete = True
 ---
-id: generic review
+id: generic review ALIncomeList
+generic object: ALIncomeList
+question: Do you want to list any other ${ x.display_name }?
+subquestion: |
+
+  Tap Next if you don't have more to add.
+  
+  ${ x.table }
+  
+  ${ x.add_action() }
+continue button field: x.review_items
+---
+id: generic review ALAssetList
 generic object: ALAssetList
 question: Do you want to list any other ${ x.display_name }?
 subquestion: |
@@ -2497,7 +2515,21 @@ subquestion: |
 
   ${ x.add_action() }
 ---
-id: generic table
+id: generic table ALIncomeList
+generic object: ALIncomeList
+table: x.table
+rows: x
+columns:
+  - Description: |
+      row_item.display_name
+  - Amount: |
+      currency(row_item.value)
+  - How often paid: |
+      times_per_year(times_per_year_list, row_item.times_per_year)
+edit:
+  - value
+---
+id: generic table ALAssetList
 generic object: ALAssetList
 table: x.table
 rows: x
@@ -2610,8 +2642,8 @@ fields:
   - Who should pay this debt?: real_estate[i].recommended_debt
     show if: real_estate[i].is_amount_owed
     choices:
-      - petitioner.name.full()
-      - respondent.name.full()
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
       - Split the debt: split
   - How much should ${ users[0].name.full() } pay?: real_estate[i].user_percentage_choice
     choices:
@@ -2636,13 +2668,13 @@ fields:
       - Both
   - Party with possession of this property?: real_estate[i].has_possession
     choices:
-      - petitioner.name.full() 
-      - respondent.name.full() 
+      - ${ petitioner.name.full() } 
+      - ${ respondent.name.full() }
       - Other: other
   - Recommended Award: real_estate[i].recommended_award
     choices:
-      - petitioner.name.full() 
-      - respondent.name.full() 
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
       - Other: other
 validation code: |
   if real_estate[i].source != "other":
@@ -2777,7 +2809,7 @@ validation code: |
     vehicles[i].display_name = vehicles.terms_ordered.get(vehicles[i].source, vehicles[i].source)
   else:
     vehicles[i].display_name = vehicles[i].source_other
-  vehicles[i].description = vehicles[i].year + " " + vehicles[i].make + " " + vehicles[i].model
+  vehicles[i].description = vehicles[i].year + " " + vehicles[i].make + " " + vehicles[i].model + " " + vehicles[i].display_name
   if vehicles[i].is_amount_owed and vehicles[i].recommended_debt == "split" and vehicles[i].user_percentage_choice == "other":
     vehicles[i].user_percentage = vehicles[i].user_percentage_other/100
   elif vehicles[i].is_amount_owed and vehicles[i].recommended_debt == "split":
@@ -3811,70 +3843,4 @@ columns:
 edit:
   - market_value
 ---
-only sets: real_estate[i].market_value
-id: describe real_estate test
-reconsider: real_estate[i].display_name
-question: |
-  Tell us about your ${ real_estate[i].display_name }
-subquestion: |
 
-  Make your best guess for the market value.
-  
-  % if i > 1:
-  You have already told us about your ${ comma_and_list(asset.display_name for asset in real_estate.complete_elements()) }.
-  % elif i > 0:
-  You have already told us about your ${ comma_and_list(asset.display_name for asset in real_estate.complete_elements()) }.
-  % endif
-fields:
-  - Type of asset: real_estate[i].source
-    code: |
-      real_estate.ordered
-  - Other (explain): real_estate[i].source_other
-    show if:
-      variable: real_estate[i].source
-      is: other
-  - Address: real_estate[i].address
-    required: False
-  - Legal description: real_estate[i].legal_description
-    required: False
-  - What is its market value? How much would you get if you sold it?: real_estate[i].market_value
-    maxlength: 76
-    datatype: currency
-  - Is there an amount owed on this property?: real_estate[i].is_amount_owed
-    datatype: yesnoradio
-  - Who is the money owed to?: real_estate[i].lender
-    required: False 
-    show if: real_estate[i].is_amount_owed
-  - Balance: real_estate[i].balance
-    datatype: currency
-    show if: real_estate[i].is_amount_owed
-  - Monthly Payment: real_estate[i].monthly_payment
-    datatype: currency
-    show if: real_estate[i].is_amount_owed
-  - Who should pay this debt?: real_estate[i].recommended_debt
-    show if: real_estate[i].is_amount_owed
-    choices:
-      - petitioner.name.full()
-      - respondent.name.full()
-  - Is this marital or nonmarital property?: real_estate[i].marital_property
-    choices:
-      - Marital
-      - Nonmarital
-      - Both
-  - Party with possession of this property?: real_estate[i].has_possession
-    choices:
-      - petitioner.name.full()
-      - respondent.name.full()
-      - Other: other
-  - Recommended Award: real_estate[i].recommended_award
-    choices:
-      - petitioner.name.full()
-      - respondent.name.full()
-      - Other: other
-validation code: |
-  if real_estate[i].source != "other":
-    real_estate[i].display_name = real_estate.terms_ordered.get(real_estate[i].source, real_estate[i].source)
-  else:
-    real_estate[i].display_name = real_estate[i].source_other
-  real_estate[i].description = real_estate[i].display_name + " at " + real_estate[i].address + " " + real_estate[i].legal_description
----
