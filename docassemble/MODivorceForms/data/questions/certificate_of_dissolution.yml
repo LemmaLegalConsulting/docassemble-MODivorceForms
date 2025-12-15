@@ -113,7 +113,7 @@ attachment:
       - "marriage_address_county": ${ marriage.address.county } 
       - "marriage_address_state": ${ marriage.address.state } 
       - "marriage_date": ${ format_date(marriage.recorded_date, format='M/d/yyyy') } 
-      - "is_users1_petitioner": ${ case.filed == "user0_filed" } 
+      - "is_users1_petitioner": ${ case.filed in ["user0_filed","not_filed"] } 
       - "is_users2_petitioner": ${ case.filed == "other_parties0_filed" } 
       - "is_joint_petitioners": ${ case.filed == "joint" } 
       - "marriage_last_resided_number_children_none": ${ len([item for item in children if item.under_18_in_household == True]) == 0 } 
