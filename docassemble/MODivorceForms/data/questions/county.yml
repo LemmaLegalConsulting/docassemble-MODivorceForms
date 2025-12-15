@@ -16,7 +16,7 @@ code: |
       x.address.county = x.county_selected
 ---
 generic object: ALIndividual
-id: what court are you in
+id: what county is x in
 question: |
   What county does ${ x.name.full() } live in?
 subquestion: |
@@ -32,7 +32,7 @@ fields:
 ---
 generic object: ALIndividual
 if: x.lives_in_missouri == False
-id: what county are you in
+id: what county is x in in other state
 question: |
   What county in ${ state_name(x.address.state) } does ${ x.name.full() } live in?
 fields:
@@ -40,15 +40,25 @@ fields:
 ---
 id: what court are you in
 question: |
-  What county is the court case in?
+  ${ "In what county do you want to file the petition?" if case.filed == "not_filed" else "What county is the court case in?" }
 subquestion: |
-  If the court is in the City of St Louis, pick "City of St Louis" as your
-  county.
+  % if case.filed == "not_filed":
+  You can file the petition in the county where you reside, or in the county where your spouse resides.
+
+  % elif case.filed == "other_parties0_filed":
+  You can find the county on the top of the petition:
+  
+  [FILE petition_county.png, 100%]
+  
+  % endif
+  
+  If the court is in the City of St Louis, pick "City of St Louis" as your county.
   
   ${ collapse_template(find_county_name_template) }
 fields:
   - Trial Court County: case.county
     datatype: dropdown
+    default: ${ users[0].address.county if users[0].address.state == "MO" else other_parties[0].address.county }
     code: |
       county_list
 ---

@@ -1,10 +1,11 @@
+
 include:
   - docassemble.AssemblyLine:assembly_line.yml
   - docassemble.ALToolbox:al_income.yml
   - county.yml
 ---
 modules:
-  - .al_income_other
+  - .al_income
 ---
 id: list of previously entered people
 code: |
@@ -426,16 +427,13 @@ fields:
 ---
 id: education info
 generic object: ALIndividual
-question: Educational info for ${ x.name_full() }
+question: Educational info for ${ x.name_full() } completed?
 continue button field: x.education_info
+subquestion: |
+  Specify only the highest grade completed.
 fields:  
-  - "Did ${ x.name_full() } graduate from high school?": x.graduated_hs
-    datatype: yesnomaybe
-  - "How many years of elementary or secondary education did ${ x.name_full() } complete?": x.education_elementary
+  - "What is the highest level of education ${ 'you have' if x.instanceName == 'users[0]' else x.name_full() + ' has' } completed?": x.education
     input type: dropdown
-    show if:
-      variable: x.graduated_hs
-      is: False
     choices:
       - 0
       - 1
@@ -450,37 +448,21 @@ fields:
       - 10
       - 11
       - 12
+      - 1 year of college
+      - 2 years of college
+      - 3 years of college
+      - 4 years of college
+      - Post graduate
     required: False
-  - "Did ${ x.name_full() } graduate from college?": x.graduated_college
-    datatype: yesnomaybe
-    show if:
-      variable: x.graduated_hs
-      is: True
-  - "How many years of college did ${ x.name_full() } complete?": x.education_college
-    input type: dropdown
-    show if:
-      variable: x.graduated_college
-      is: False
-    choices:
-      - 1
-      - 2
-      - 3
-      - 4
-    required: False
-  - "Did ${ x.name_full() } complete any post-graduate work?": x.post_grad
-    datatype: yesnomaybe
-    show if:
-      variable: x.graduated_college
-      is: True
 validation code: |
-  if x.graduated_hs:
+  if x.education in ["1 year of college", "2 years of college", "3 years of college", "4 years of college", "Post graduate"]:
     x.education_elementary = "12"
+    if x.education == "Post graduate":
+      x.education_college = "5+"
+    else:
+      x.education_college = x.education[0]
   else:
-    x.graduated_college = False
-  if x.graduated_college and x.post_grad:
-    x.education_college = "5+"
-  elif x.graduated_college:
-    x.education_college = "4"
+    x.education_elementary = x.education
 ---
 id: active duty info
 generic object: ALIndividual
@@ -515,7 +497,7 @@ fields:
 code: |
   if users[0].race in ["American Indian or Alaska Native", "Asian", "Black or African American", "Native Hawaiian or other Pacific Islander", "White", "Hispanic or Latino", "Middle Eastern or North African (MENA)", "Other"]:
     race_self_identified = True
-    if case.filed in ["user0_filed", "not_yet"]:
+    if case.filed in ["user0_filed", "not_filed"]:
       petitioner_race_identified = True
       respondent_race_identified = False
     else:
@@ -731,7 +713,7 @@ content: |
 ---
 id: party type code
 code: |
-  if case.filed in ["user0_filed", "not_yet"]:
+  if case.filed in ["user0_filed", "not_filed"]:
     if users[0].attorney_involved and users[0].type_of_assistance == "representation":
       users[0].party_type_code = "PET"
       users[0].party_type_description = "Petitioner (with attorney)"
@@ -763,7 +745,7 @@ code: |
       other_parties[0].party_type_description = "Respondent Acting Pro Se (with no attorney)"
 ---
 code: |
-  if case.filed in ["user0_filed", "not_yet"]:
+  if case.filed in ["user0_filed", "not_filed"]:
     users[0].attorney.party_type_code = "APET"
     users[0].attorney.party_type_description = "Attorney for Petitioner"
   else:
@@ -1261,6 +1243,17 @@ fields:
     datatype: yesnoradio
 ---
 id: name of one itemized job in list
+generic object: ALItemizedJobList
+question: |
+  What is your job title for ${ "this" if i == 0 else "your " + ordinal(i) } job?
+subquestion: |
+  % if len(x.complete_elements()) > 0:
+  You've already told us about being a ${ comma_and_list([job.source for job in x.complete_elements()]) }.
+  % endif
+fields:
+  - Job title: x[i].source
+---
+id: name of one itemized job in list
 question: |
   What is the job title for the ${ordinal(i)} job for ${ other_parties[0] }?
 subquestion: |
@@ -1704,18 +1697,29 @@ code: |
 id: x.benefits object
 generic object: ALIndividual
 objects:
-  - x.benefits: ALIncomeListOther.using(complete_attribute='complete',there_is_another=False)
+  - x.benefits: ALIncomeList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: x.benefits ordered object for checkboxes
 generic object: ALIndividual
 objects:
   - x.benefits_ordered: DAOrderedDict.using(elements=x.benefits.terms_ordered, auto_gather=False, gathered=True)
 ---
-id: selected types sets there_are_any
-generic object: ALIncomeListOther
+
+id: ALIncomeList there are any
+generic object: ALIncomeList
 code: |
   if x.selected_types.any_true():
-    x.move_checks_to_list(selected_terms=x.terms_ordered)
+    x.move_checks_to_list(selected_terms=x.terms_ordered, set_other=True)
+    x.there_are_any = True
+  else:
+    x.there_are_any = False
+---
+---
+id: selected types sets there_are_any
+generic object: ALIncomeList
+code: |
+  if x.selected_types.any_true():
+    x.move_checks_to_list(selected_terms=x.terms_ordered, set_other=True)
     x.there_are_any = True
   else:
     x.there_are_any = False
@@ -1734,8 +1738,10 @@ fields:
     code: |
       x.benefits_ordered
   - note: |
-      If you get SSDI, we will ask about that income later.
+      ### If you get disability income (SSDI), we will ask about that income later on.###
 ---
+only sets: 
+  - other_parties[0].benefits.selected_types
 id: are there public benefits for other_party
 generic object: ALIndividual
 question: |
@@ -1753,7 +1759,7 @@ fields:
     datatype: yesnowide
     disable others: True
   - note: |
-      If ${ other_parties[0] } get SSDI, we will ask about that income later.
+      ###If ${ other_parties[0] } gets disability income (SSDI), we will ask about that income later.###
 validation code: |
   if other_parties[0].benefits_unknown:
     other_parties[0].benefits.there_are_any = None
@@ -1870,7 +1876,7 @@ subquestion: |
 id: x.benefits table
 generic object: ALIndividual
 table: x.benefits_table
-rows: benefits
+rows: x.benefits
 columns:
   - Source: |
       row_item.display_name if defined("row_item.source") else ""
@@ -1901,7 +1907,7 @@ data: !!omap
 ---
 variable name: help_text
 data: !!omap
-  - unemployment income help: "Enter gross amount of unemployment income — before taxes were taken out."
+  - unemployment income help: "Enter gross amount of unemployment income, which means the total amount of income before taxes were taken out."
   - default: " "
 ---
 id: other income display default
@@ -1910,10 +1916,15 @@ generic object: ALIndividual
 code: |
   x.other_incomes_other_display = "other source of income"
 ---
+id: other incomes display name
+generic object: ALIndividual
+code: |
+  x.other_incomes.display_name = "incomes"
+---
 id: other_incomes
 generic object: ALIndividual
 objects:
-  - x.other_incomes: ALIncomeListOther.using(complete_attribute='complete',there_is_another=False)
+  - x.other_incomes: ALIncomeList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: other_incomes_ordered
 generic object: ALIndividual
@@ -1921,7 +1932,7 @@ objects:
   - x.other_incomes_ordered: DAOrderedDict.using(elements=x.other_incomes.terms_ordered, auto_gather=False, gathered=True)
 ---
 comment: |
-  will use id: ALIncomeListOther there are any to set other_incomes.there_are_any
+  will use id: ALIncomeList there are any to set other_incomes.there_are_any
 ---
 generic object: ALIndividual
 id: are there other incomes
@@ -1938,6 +1949,8 @@ fields:
     code: |
       x.other_incomes_ordered
 ---
+only sets: 
+  - other_parties[0].other_incomes.selected_types
 generic object: ALIndividual
 id: are there other incomes for other party
 #other_incomes
@@ -1964,7 +1977,7 @@ comment: |
 ---
 generic object: ALIndividual
 id: other income info for list
-#generic object: ALIncomeListOther
+#generic object: ALIncomeList
 reconsider: x.other_incomes[i].display_name
 question: |
   Tell us about your ${ x.other_incomes[i].display_name.lower() }
@@ -2009,7 +2022,7 @@ validation code: |
 ---
 generic object: ALIndividual
 id: other income info for list
-#generic object: ALIncomeListOther
+#generic object: ALIncomeList
 reconsider: other_parties[0].other_incomes[i].display_name
 question: |
   Tell us about ${ other_parties[0].other_incomes[i].display_name.lower() } for ${ other_parties[0] }
@@ -2158,10 +2171,11 @@ data: !!omap
   - laundry: "Laundry/dry cleaning"
   - repairs: "Maintenance/repairs"
 --- 
+generic object: ALIndividual
 id:  expenses other display
 code: |
   x.expenses_other_display = "another household expense"
-
+  x.expenses.display_name = x.expenses_other_display
 ---
 id: expenses object
 generic object: ALIndividual
@@ -2420,17 +2434,17 @@ code: |
   x.health_insurance_costs = 0
 ---
 ## ASSETS
-id: ALIncomeListOther there are any
-generic object: ALIncomeListOther
+id: ALIncomeList there are any
+generic object: ALIncomeList
 code: |
   if x.selected_types.any_true():
-    x.move_checks_to_list(selected_terms=x.terms_ordered)
+    x.move_checks_to_list(selected_terms=x.terms_ordered, set_other=True)
     x.there_are_any = True
   else:
     x.there_are_any = False
 ---
 id: generic set display name backup
-generic object: ALAssetListOther
+generic object: ALAssetList
 code: |
   if defined('x[i].source') and x[i].source != "other":
     x[i].display_name = x.terms_ordered.get(x[i].source, x[i].source)
@@ -2440,7 +2454,7 @@ code: |
     x[i].display_name = x.other_display
 ---
 id: generic there are any
-generic object: ALAssetListOther
+generic object: ALAssetList
 question: |
   ${ x.display_name }
 subquestion: |   
@@ -2451,13 +2465,25 @@ fields:
     code: |
       x.ordered
 ---
-generic object: ALAssetListOther
+generic object: ALAssetList
 code: |
   x[i].market_value
   x[i].complete = True
 ---
-id: generic review
-generic object: ALAssetListOther
+id: generic review ALIncomeList
+generic object: ALIncomeList
+question: Do you want to list any other ${ x.display_name }?
+subquestion: |
+
+  Tap Next if you don't have more to add.
+  
+  ${ x.table }
+  
+  ${ x.add_action() }
+continue button field: x.review_items
+---
+id: generic review ALAssetList
+generic object: ALAssetList
 question: Do you want to list any other ${ x.display_name }?
 subquestion: |
 
@@ -2480,7 +2506,7 @@ subquestion: |
 continue button field: x.review_assets
 ---
 id: generic revisit
-generic object: ALAssetListOther
+generic object: ALAssetList
 continue button field: x.revisit
 question: |
   Edit ${ x.display_name }
@@ -2489,8 +2515,22 @@ subquestion: |
 
   ${ x.add_action() }
 ---
-id: generic table
-generic object: ALAssetListOther
+id: generic table ALIncomeList
+generic object: ALIncomeList
+table: x.table
+rows: x
+columns:
+  - Description: |
+      row_item.display_name
+  - Amount: |
+      currency(row_item.value)
+  - How often paid: |
+      times_per_year(times_per_year_list, row_item.times_per_year)
+edit:
+  - value
+---
+id: generic table ALAssetList
+generic object: ALAssetList
 table: x.table
 rows: x
 columns:
@@ -2502,8 +2542,8 @@ columns:
   - Party with possession?: row_item.has_possession
   - Property awarded to: row_item.recommended_award
 edit:
-  - source
-  - value
+  - market_value
+
 ---
 id: generic table
 generic object: ALIndividual
@@ -2520,7 +2560,7 @@ edit:
 ---
 generic object: ALIndividual
 objects:
-  - x.assets: ALAssetListOther.using(auto_gather=False)
+  - x.assets: ALAssetList.using(auto_gather=False)
 ---
 generic object: ALIndividual
 code: |
@@ -2535,7 +2575,10 @@ code: |
 ---
 id: real_estate object
 objects:
-  - real_estate: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - real_estate: ALAssetList.using(complete_attribute='complete')
+---
+code: |
+  real_estate.there_is_another = False
 ---
 id: real_estate other display
 comment: |
@@ -2601,16 +2644,31 @@ fields:
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
+      - Split the debt: split
+  - How much should ${ users[0].name.full() } pay?: real_estate[i].user_percentage_choice
+    choices:
+      - "50%": 50
+      - "75%": 75
+      - "25%": 25
+      - Other: other
+    show if:
+      variable: real_estate[i].recommended_debt
+      is: split
+  - What percentage?: real_estate[i].user_percentage_other
+    datatype: number
+    min: 0
+    max: 100
+    show if:
+      variable: real_estate[i].user_percentage_choice
+      is: other
   - Is this marital or nonmarital property?: real_estate[i].marital_property
     choices:
       - Marital
       - Nonmarital
       - Both
-  - note: |
-      ${ collapse_template(marital_property_template) }
   - Party with possession of this property?: real_estate[i].has_possession
     choices:
-      - ${ petitioner.name.full() }
+      - ${ petitioner.name.full() } 
       - ${ respondent.name.full() }
       - Other: other
   - Recommended Award: real_estate[i].recommended_award
@@ -2624,10 +2682,21 @@ validation code: |
   else:
     real_estate[i].display_name = real_estate[i].source_other
   real_estate[i].description = real_estate[i].display_name + " at " + real_estate[i].address + " " + real_estate[i].legal_description
+  if real_estate[i].is_amount_owed and real_estate[i].recommended_debt == "split" and real_estate[i].user_percentage_choice == "other":
+    real_estate[i].user_percentage = real_estate[i].user_percentage_other/100
+  elif real_estate[i].is_amount_owed and real_estate[i].recommended_debt == "split":
+    real_estate[i].user_percentage = float(real_estate[i].user_percentage_choice)/100
+---
+id: marital_property_template
+template: marital_property_template
+subject: |
+  What is marital and nonmarital property?
+content: |
+  Marital property is property acquired throughout the marriage together.  Nonmarital property is property acquired before the marriage or separately.
 ---
 id: vehicles object
 objects:
-  - vehicles: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - vehicles: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: vehicles other display
 comment: |
@@ -2701,6 +2770,23 @@ fields:
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
+      - Split the debt: split
+  - How much should ${ users[0].name.full() } pay?: vehicles[i].user_percentage_choice
+    choices:
+      - "50%": 50
+      - "75%": 75
+      - "25%": 25
+      - Other: other
+    show if:
+      variable: vehicles[i].recommended_debt
+      is: split
+  - What percentage?: vehicles[i].user_percentage_other
+    datatype: number
+    min: 0
+    max: 100
+    show if:
+      variable: vehicles[i].user_percentage_choice
+      is: other
   - Is this marital or nonmarital property?: vehicles[i].marital_property
     choices:
       - Marital
@@ -2723,11 +2809,15 @@ validation code: |
     vehicles[i].display_name = vehicles.terms_ordered.get(vehicles[i].source, vehicles[i].source)
   else:
     vehicles[i].display_name = vehicles[i].source_other
-  vehicles[i].description = vehicles[i].year + " " + vehicles[i].make + " " + vehicles[i].model
+  vehicles[i].description = vehicles[i].year + " " + vehicles[i].make + " " + vehicles[i].model + " " + vehicles[i].display_name
+  if vehicles[i].is_amount_owed and vehicles[i].recommended_debt == "split" and vehicles[i].user_percentage_choice == "other":
+    vehicles[i].user_percentage = vehicles[i].user_percentage_other/100
+  elif vehicles[i].is_amount_owed and vehicles[i].recommended_debt == "split":
+    vehicles[i].user_percentage = float(vehicles[i].user_percentage_choice)/100
 ---
 id: bank_assets object
 objects:
-  - bank_assets: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - bank_assets: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: bank_assets other display
 comment: |
@@ -2790,6 +2880,7 @@ fields:
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
+      - ${ petitioner.name.full() } & ${ respondent.name.full() }
       - Other: other
   - Recommended Award: bank_assets[i].recommended_award
     choices:
@@ -2808,7 +2899,7 @@ code: |
 ---
 id: personal_goods object
 objects:
-  - personal_goods: ALAssetListOther.using(complete_attribute='complete',there_is_another=False)
+  - personal_goods: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
 id: personal_goods other display
 comment: |
@@ -2880,6 +2971,23 @@ fields:
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
+      - Split the debt: split
+  - How much should ${ users[0].name.full() } pay?: personal_goods[i].user_percentage_choice
+    choices:
+      - "50%": 50
+      - "75%": 75
+      - "25%": 25
+      - Other: other
+    show if:
+      variable: personal_goods[i].recommended_debt
+      is: split
+  - What percentage?: personal_goods[i].user_percentage_other
+    datatype: number
+    min: 0
+    max: 100
+    show if:
+      variable: personal_goods[i].user_percentage_choice
+      is: other
   - Is this marital or nonmarital property?: personal_goods[i].marital_property
     choices:
       - Marital
@@ -2903,14 +3011,18 @@ validation code: |
   else:
     personal_goods[i].display_name = personal_goods[i].source_other
   personal_goods[i].description = personal_goods[i].display_name
+  if personal_goods[i].is_amount_owed and personal_goods[i].recommended_debt == "split" and personal_goods[i].user_percentage_choice == "other":
+    personal_goods[i].user_percentage = personal_goods[i].user_percentage_other/100
+  elif personal_goods[i].is_amount_owed and personal_goods[i].recommended_debt == "split":
+    personal_goods[i].user_percentage = float(personal_goods[i].user_percentage_choice)/100
 ---
 ### DEBTS
 objects: 
-  - debts: ALAssetListOther.using(there_is_another=False,complete_attribute='complete')
+  - debts: ALAssetList.using(there_is_another=False,complete_attribute='complete')
 ---
 generic object: ALIndividual
 objects:
-  - x.debts: ALAssetListOther.using(auto_gather=False)
+  - x.debts: ALAssetList.using(auto_gather=False)
 ---
 id: populate debt list from debts in assets
 code: |
@@ -2932,18 +3044,42 @@ code: |
   for debt in secured_debts:
     if debt.recommended_debt == x.name.full():
       x.debts.append(debt)
+    elif debt.recommended_debt == "split":
+      x.debts.appendObject()
+      x.debts[-1].marital_property = debt.marital_property
+      x.debts[-1].lender = showifdef('debt.lender')
+      x.debts[-1].source = debt.source
+      x.debts[-1].description = debt.description
+      if x.instanceName == "users[0]":
+        x.debts[-1].balance = debt.balance * debt.user_percentage
+        x.debts[-1].monthly_payment = debt.monthly_payment * debt.user_percentage
+      else:
+        x.debts[-1].balance = debt.balance * (1 - debt.user_percentage)
+        x.debts[-1].monthly_payment = debt.monthly_payment * (1 - debt.user_percentage)
   for debt in debts:
     if debt.recommended_debt == x.name.full():
       x.debts.append(debt)
+    elif debt.recommended_debt == "split":
+      x.debts.appendObject()
+      x.debts[-1].marital_property = debt.marital_property
+      x.debts[-1].lender = showifdef('debt.lender')
+      x.debts[-1].display_name = showifdef('debt.display_name')
+      x.debts[-1].source = debt.source
+      if x.instanceName == "users[0]":
+        x.debts[-1].balance = debt.balance * debt.user_percentage
+        x.debts[-1].monthly_payment = debt.monthly_payment * debt.user_percentage
+      else:
+        x.debts[-1].balance = debt.balance * (1 - debt.user_percentage)
+        x.debts[-1].monthly_payment = debt.monthly_payment * (1 - debt.user_percentage)
   x.debts.gathered = True
 ---
-generic object: ALAssetListOther
+generic object: ALAssetList
 code: |
   x[i].market_value
   x[i].complete = True
 ---
 id: generic ordered object for checkboxes
-generic object: ALAssetListOther
+generic object: ALAssetList
 objects:
   - x.ordered: DAOrderedDict.using(elements=x.terms_ordered, auto_gather=False, gathered=True)
 ---
@@ -2957,7 +3093,7 @@ code: |
   debts.display_name = "other debts"
 ---
 objects: 
-  - secured_debts: ALAssetListOther.using(auto_gather=False)
+  - secured_debts: ALAssetList.using(auto_gather=False)
 ---
 id: debts terms_ordered
 # "!!omap" makes these terms ordered
@@ -2974,7 +3110,7 @@ code: |
   debts.display_name = "Debt"
 ---
 id: debts there are any
-generic object: ALAssetListOther
+generic object: ALAssetList
 question: |
   Other Debts
 subquestion: |   
@@ -3023,10 +3159,42 @@ fields:
   - Monthly Payment: debts[i].monthly_payment
     datatype: currency
     required: False 
+  - Marital or separate debt: debts[i].marital_property
+    datatype: radio
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
   - Who should pay this debt?: debts[i].recommended_debt
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
+      - Split the debt: split
+  - How much should ${ users[0].name.full() } pay?: debts[i].user_percentage_choice
+    choices:
+      - "50%": 50
+      - "75%": 75
+      - "25%": 25
+      - Other: other
+    show if:
+      variable: debts[i].recommended_debt
+      is: split
+  - What percentage?: debts[i].user_percentage_other
+    datatype: number
+    min: 0
+    max: 100
+    show if:
+      variable: debts[i].user_percentage_choice
+      is: other
+validation code: |
+  if debts[i].source != "other":
+    debts[i].display_name = debts.terms_ordered.get(debts[i].source, debts[i].source)
+  else:
+    debts[i].display_name = debts[i].source_other
+  if debts[i].recommended_debt == "split" and debts[i].user_percentage_choice == "other":
+    debts[i].user_percentage = debts[i].user_percentage_other/100
+  elif debts[i].recommended_debt == "split":
+    debts[i].user_percentage = float(debts[i].user_percentage_choice)/100
 ---
 generic object: ALAsset
 question: Who should pay this debt?
@@ -3035,6 +3203,23 @@ fields:
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
+      - Split the debt: split
+  - How much should ${ users[0].name.full() } pay?: x.user_percentage_choice
+    choices:
+      - "50%": 50
+      - "75%": 75
+      - "25%": 25
+      - Other: other
+    show if:
+      variable: x.recommended_debt
+      is: split
+  - What percentage?: x.user_percentage_other
+    datatype: number
+    min: 0
+    max: 100
+    show if:
+      variable: x.user_percentage_choice
+      is: other
 ---
 id: debts review
 question: Do you want to list any other debts?
@@ -3061,18 +3246,41 @@ table: debts.table
 rows: debts
 columns:
   - Type: |
-      row_item.source
+      row_item.display_name
   - Lender: |
       row_item.lender
   - Balance: |
       currency(row_item.balance) if defined("row_item.balance") else ""
   - Monthly payment:
       currency(row_item.monthly_payment) if defined("row_item.monthly_payment") else ""
-  - Marital property?:  row_item.marital_property
-  - Party with possession?: row_item.has_possession
   - Debts to be paid by: row_item.recommended_debt if defined("row_item.recommended_debt") else ""
 edit:
   - lender
+---
+id: generic review
+generic object: ALIndividual
+question: Debts of ${ x.name.full() }
+subquestion: |
+
+  Tap Next if you don't have more to add.
+  
+  ${ x.debts_table }
+  
+continue button field: x.review_debts
+---
+id: generic table
+generic object: ALIndividual
+table: x.debts_table
+rows: x.debts
+columns:
+  - Type: |
+      row_item.display_name if defined('row_item.display_name') else row_item.source
+  - Lender: |
+      row_item.lender
+  - Balance: |
+      currency(row_item.balance) if defined("row_item.balance") else ""
+  - Monthly payment:
+      currency(row_item.monthly_payment) if defined("row_item.monthly_payment") else ""
 ---
 ## DECREE
 id: legal_custody question
@@ -3506,8 +3714,8 @@ objects:
 ---
 # This isn't used because there is an objects block in main.yml
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, fee_waiver_attachment, judgment_attachment, petition_attachment, income_statement_attachment, property_statement_attachment, confidential_information_sheet_attachment, redaction_certification_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, fee_waiver_attachment, judgment_attachment, petition_attachment, income_statement_attachment, property_statement_attachment, confidential_information_sheet_attachment, redaction_certification_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, fee_waiver_attachment, judgment_attachment, petition_attachment, income_statement_attachment, property_statement_attachment, confidential_information_sheet_attachment, redaction_certification_attachment, service_by_mail_affidavit_attachment, service_by_mail_notice_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, fee_waiver_attachment, judgment_attachment, petition_attachment, income_statement_attachment, property_statement_attachment, confidential_information_sheet_attachment, redaction_certification_attachment, service_by_mail_affidavit_attachment, service_by_mail_notice_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---
 # Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
 # used for "preview" and "final" keys, and logic in the template checks the value of 
@@ -3519,4 +3727,120 @@ attachment:
   variable name: mo_divorce_forms_Post_interview_instructions[i]
   skip undefined: True
   tagged pdf: True
+---
+attachment:
+  name: Notice and Acknowledgment Service By Mail
+  filename: service_by_mail_notice
+  docx template file: service_by_mail_notice.docx
+  variable name: service_by_mail_notice_attachment[i]
+  skip undefined: True
+---
+objects:
+  - service_by_mail_notice_attachment: ALDocument.using(title="Notice and Acknowledgment Service By Mail", filename="service_by_mail_notice",  has_addendum=False, )
+---
+attachment:
+  name: Affidavit Service By Mail
+  filename: service_by_mail_affidavit
+  docx template file: service_by_mail_affidavit.docx
+  variable name: service_by_mail_affidavit_attachment[i]
+  skip undefined: True
+---
+objects:
+  - service_by_mail_affidavit_attachment: ALDocument.using(title="Affidavit Service By Mail", filename="service_by_mail_affidavit",  has_addendum=False, )
+---
+  
+---
+id: real_estate object test
+objects:
+  - real_estate: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+id: generic ordered object for checkboxes test
+generic object: ALAssetList
+objects:
+  - x.ordered: DAOrderedDict.using(elements=x.terms_ordered, auto_gather=False, gathered=True)
+---
+id: real_estate other display test
+comment: |
+  This keeps the text that may be changed near the top of the section.
+  Used in:
+  Tell us about your ______
+code: |
+  real_estate.other_display = "other real estate"
+  real_estate.display_name = "real estate"
+---
+id: generic set display name backup test
+generic object: ALAssetList
+code: |
+  if defined('x[i].source') and x[i].source != "other":
+    x[i].display_name = x.terms_ordered.get(x[i].source, x[i].source)
+  elif defined('x[i].source') and x[i].source == "other" and defined('x[i].source_other'):
+    x[i].display_name = x[i].source_other
+  else:
+    x[i].display_name = x.other_display
+---
+id: real_estate terms_ordered test
+# "!!omap" makes these terms ordered
+# their order here will be their same order when shown to users.
+variable name: real_estate.terms_ordered
+data: !!omap
+  - house: "House"
+  - condominium: "Condominium"
+  - leasehold: "Leasehold"
+  - other: "Other"
+---
+id: generic there are any test
+generic object: ALAssetList
+question: |
+  ${ x.display_name }
+subquestion: |   
+  Do you or your spouse own any ${ x.display_name }?
+fields:
+  - no label: x.selected_types
+    datatype: checkboxes
+    code: |
+      x.ordered
+---
+## ASSETS
+id: ALIncomeListOther there are any test
+generic object: ALAssetList
+code: |
+  if x.selected_types.any_true():
+    x.move_checks_to_list(selected_terms=x.terms_ordered, set_other=True)
+    x.there_are_any = True
+  else:
+    x.there_are_any = False
+---
+id: complete for assets  test
+generic object: ALAssetList
+code: |
+  x[i].market_value
+  x[i].complete = True
+---
+id: generic review test
+generic object: ALAssetList
+question: Do you want to list any other ${ x.display_name }?
+subquestion: |
+
+  Tap Next if you don't have more to add.
+  
+  ${ x.table }
+  
+  ${ x.add_action() }
+continue button field: x.review_items
+---
+id: generic table test
+generic object: ALAssetList
+table: x.table
+rows: x
+columns:
+  - Description: |
+      row_item.description
+  - Market value: |
+      currency(row_item.market_value) if defined("row_item.market_value") else ""
+  - Marital property?:  row_item.marital_property
+  - Party with possession?: row_item.has_possession
+  - Property awarded to: row_item.recommended_award
+edit:
+  - market_value
+---
 

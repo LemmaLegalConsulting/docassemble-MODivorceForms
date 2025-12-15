@@ -1,4 +1,7 @@
 ---
+include:
+  - shared.yml
+---
 metadata:
   title: >-
     Divorce Forms
@@ -333,7 +336,11 @@ code: |
   users[0].jobs.total(times_per_year = 12)
   users[0].has_self_employment_income
   users[0].benefits.gather()
+  if len(users[0].benefits) > 0:
+    users[0].benefits.review_items
   users[0].other_incomes.gather()
+  if len(users[0].other_incomes) > 0:
+    users[0].other_incomes.review_items
   users[0].maintenance_other_received
   users[0].other_children
   users[0].other_child_support_received
@@ -349,7 +356,11 @@ code: |
   other_parties[0].jobs.total(times_per_year = 12)
   other_parties[0].has_self_employment_income
   other_parties[0].benefits.gather()
+  if len(other_parties[0].benefits) > 0:
+    other_parties[0].benefits.review_items
   other_parties[0].other_incomes.gather()
+  if len(other_parties[0].other_incomes) > 0:
+    other_parties[0].other_incomes.review_items
   other_parties[0].maintenance_other_received
   other_parties[0].other_children
   other_parties[0].other_child_support_received
@@ -360,6 +371,8 @@ code: |
 code: |    
   nav.set_section('expenses')
   users[0].expenses.gather()
+  if len(users[0].expenses) > 0:
+    users[0].expenses.review_items
   users[0].maintenance_other_paid
   users[0].other_child_support_paid
   users[0].extraordinary_medical_costs.gather()
@@ -367,6 +380,8 @@ code: |
   users[0].health_insurance_costs
   users[0].work_childcare_expenses
   other_parties[0].expenses.gather()
+  if len(other_parties[0].expenses) > 0:
+    other_parties[0].expenses.review_items
   other_parties[0].maintenance_other_paid
   other_parties[0].other_child_support_paid
   other_parties[0].extraordinary_medical_costs.gather()
@@ -433,18 +448,11 @@ code: |
   if case.filed == "user0_filed" and respondent_served:
       served_information
   else:
-    if case.filed in ["user0_filed", "other_parties0_filed", "not_filed"]:
-      if service_type == "publication":
-        service_by_publication_information
-      else:
-        personal_service_type
-        personal_service_information
-        ## fill_in_service_date # form_17
-        if case.filed in ["user0_filed", "not_filed"]:
-          respondent.service_type
-        people_served.gathered # notice_of_hearing
-        for people in people_served:
-          people.service_address.address
+    if case.filed in ["user0_filed", "not_filed"]:
+      respondent.service_type
+      people_served.gathered # notice_of_hearing
+      for people in people_served:
+        people.service_address.address
     filing_pleadings_video
   if 'redaction_certification_attachment' in doc_list_selected.true_values():
     al_court_bundle
@@ -484,7 +492,22 @@ include:
   - income_statement.yml
   - fee_waiver.yml
   - confidential_information_sheet.yml
-  - shared.yml
+---
+comment: |
+  moved this from shared.yml because something in one of these documents in the include above must be making the al_toolbox.yml take precedence when it is in shared.yml
+id: generic table ALIncomeList
+generic object: ALIncomeList
+table: x.table
+rows: x
+columns:
+  - Description: |
+      row_item.display_name
+  - Amount: |
+      currency(row_item.value)
+  - How often paid: |
+      times_per_year(times_per_year_list, row_item.times_per_year)
+edit:
+  - value
 ---
 code: |
   enable_al_nav_sections = True
@@ -556,14 +579,14 @@ fields:
   - What issue are you looking for help with?:  case_type
     datatype: radio
     choices:
-      - Divorce
-      - Custody
+      - "Divorce (this includes child custody and support)": Divorce
+      - "Child Custody and Support (for parents who are not married)": Custody
   - note: |
-      This tool can help with a dissolution.  A dissolution in Missouri requires that a marriage is irretrievably broken and a marriage cannot be preserved.
+      This tool can help with a divorce.  A divorce in Missouri requires that a marriage is irreparably broken and a marriage cannot be preserved.
     show if: 
       variable: case_type
       is: Divorce
-  - Is your marriage irretrievably broken?: marriage.is_broken
+  - Is your marriage irreparably broken?: marriage.is_broken
     datatype: yesnoradio
     default: True
     show if: 
@@ -583,10 +606,13 @@ subquestion: |
 
   [Missouri Supreme Court Website](https://www.courts.mo.gov/page.jsp?id=611)
 ---
+id: legal separation kickout
 event: legal_separation_exit
 question: Legal Separation
 subquestion: |
-  If your marriage can be preserved or is not irretrievably broken, then a legal separation is more appropriate than a dissolution.  Unfortunately, this tool helps only with a dissolution.
+  Unfortunately, this tool only helps with divorce. If you believe it is possible that you and your spouse may reconcile and want to legally separate, you should seek advice on legal separation from a Missouri licensed attorney. 
+  
+  [Missouri Supreme Court Website](https://www.courts.mo.gov/page.jsp?id=611)
 ---
 question: Bankruptcy
 fields: 
@@ -698,7 +724,7 @@ fields:
        Sometimes when a child is born to two people before they get married, the court will require a separate case to establish paternity (even if everybody agrees).  However, most courts will move forward with just the divorce, assuming that paternity is acknowledged through the marriage.  For now, we'll move forward with the understanding that the paternity has been acknowledged.  However, a judge may direct you to file something else or speak to an attorney.
     js show if:   |
       val("minor_children_before_marriage") === true
-  - Have you or your spouse physically given birth during the marriage with a third party?: child_outside_marriage
+  - Have you or your spouse physically given birth to a child with a third party during the marriage?: child_outside_marriage
     datatype: yesnoradio
     js show if:   |
       val("minor_children_before_marriage") === true || val("minor_children_before_marriage") === false
@@ -1053,11 +1079,25 @@ code: |
   else:
     redaction_certification_attachment.enabled = False
 ---
+id: service_by_mail_notice enabled block for main interview
+code: |
+  if case.filed in ["user0","not_filed"] and respondent.service_type == "mail":
+    service_by_mail_notice_attachment.enabled = True
+  else:
+    service_by_mail_notice_attachment.enabled = False
+---
+id: service_by_mail_affidavit enabled block for main interview
+code: |
+  if case.filed in ["user0","not_filed"] and respondent.service_type == "mail":
+    service_by_mail_affidavit_attachment.enabled = True
+  else:
+    service_by_mail_affidavit_attachment.enabled = False
+---
 code: |
   document_list = doc_list_selected.true_values()
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---
