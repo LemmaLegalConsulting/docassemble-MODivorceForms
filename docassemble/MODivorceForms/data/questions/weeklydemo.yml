@@ -60,7 +60,8 @@ fields:
       - Build a schedule: build
   - What template do you want to use?: template_choice
     choices:
-      - Every other week: every_other_week
+      - "Every other week, exchange on Monday": every_other_week_monday
+      - "Every other week, exchange on Saturday": every_other_week_saturday
       - "2-2-3": two_two_three
       - "2-2-5-5": two_two_five_five
       - "3-4-4-3": three_four_four_three
@@ -69,23 +70,59 @@ fields:
     js show if: |
       val('use_template') === "template"
   - note: |
-      [FILE every_other_week.png]
+      [FILE every_other_week_monday.png, 100%]
       
 
     js show if: |
-      val('template_choice') === "every_other_week"
+      val('template_choice') === "every_other_week_monday"
   - note: |
-      ${ users[0] } [FILE mayablue.png, 20px]
+      [FILE every_other_week_saturday.png, 100%]
       
-      ${ other_parties[0] } [FILE plum.png, 20px]
+
     js show if: |
-      val('starting_parent') === "users0" && val('template_choice') === "every_other_week" 
+      val('template_choice') === "every_other_week_saturday"
   - note: |
-      ${ other_parties[0] } [FILE mayablue.png, 20px]
+      [FILE two_two_three.png, 100%]
       
-      ${ users[0] } [FILE plum.png, 20px]
+
     js show if: |
-      val('starting_parent') === "other_parties0" && val('template_choice') === "every_other_week" 
+      val('template_choice') === "two_two_three"
+  - note: |
+      [FILE two_two_five_five.png, 100%]
+      
+
+    js show if: |
+      val('template_choice') === "two_two_five_five"
+  - note: |
+      [FILE three_four_four_three.png, 100%]
+      
+
+    js show if: |
+      val('template_choice') === "three_four_four_three"
+  - note: |
+      [FILE every_weekend.png, 100%]
+      
+
+    js show if: |
+      val('template_choice') === "every_weekend"
+  - note: |
+      [FILE every_other_weekend.png, 100%]
+      
+
+    js show if: |
+      val('template_choice') === "every_other_weekend"
+  - note: |
+      ${ users[0] } [FILE purple.png, 20px]
+      
+      ${ other_parties[0] } [FILE green.png, 20px]
+    js show if: |
+      val('starting_parent') === "users0" && val('template_choice') != null
+  - note: |
+      ${ other_parties[0] } [FILE purple.png, 20px]
+      
+      ${ users[0] } [FILE green.png, 20px]
+    js show if: |
+      val('starting_parent') === "other_parties0" && val('template_choice') != null
 validation code: |
   if starting_parent == "users0":
     exchange_parent = "other_parties0"
@@ -250,7 +287,7 @@ code: |
   default_exchange_method = "Drop off"
   default_exchange_location = 'house'
 ---
-if: use_template == "template" and template_choice == "every_other_week"
+if: use_template == "template" and template_choice == "every_other_week_monday"
 variable name: exchanges
 use objects: objects
 data from code:
@@ -264,9 +301,53 @@ data from code:
       exchange_parent: | 
         other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       exchange_date: |
-        5
+        1
       exchange_time: |
-        default_exchange_time
+        "07:30:00"
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        'school'
+      add_pick_up_from_school: |
+        True
+      exchange_time2: |
+        "15:00:00"
+    - starting_parent: |
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      starting_date: |
+        1
+      exchange_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      exchange_date: |
+        8
+      exchange_time: |
+        "07:30:00"
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        "school"
+      add_pick_up_from_school: |
+        True
+      exchange_time2: |
+        "15:00:00"
+---
+if: use_template == "template" and template_choice == "every_other_week_saturday"
+variable name: exchanges
+use objects: objects
+data from code:
+  object: DAObject
+  module: docassemble.base.util
+  items:
+    - starting_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      starting_date: |
+        0 
+      exchange_parent: | 
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      exchange_date: |
+        6
+      exchange_time: |
+        "12:00:00"
       exchange_method: |
         default_exchange_method
       exchange_location: |
@@ -278,13 +359,13 @@ data from code:
     - starting_parent: |
         other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
-        5
+        6
       exchange_parent: |
         users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       exchange_date: |
-        12
+        13
       exchange_time: |
-        default_exchange_time
+        "12:00:00"
       exchange_method: |
         default_exchange_method
       exchange_location: |
@@ -314,11 +395,11 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        "school"
       add_pick_up_from_school: |
-        None
+        True
       exchange_time2: |
-        None
+        "15:00:00"
     - starting_parent: |
         other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
@@ -332,11 +413,11 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        "school"
       add_pick_up_from_school: |
-        None
+        True
       exchange_time2: |
-        None
+        "15:00:00"
     - starting_parent: |
         users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       starting_date: |
@@ -350,11 +431,11 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        "school"
       add_pick_up_from_school: |
-        None
+        True
       exchange_time2: |
-        None
+        "15:00:00"
     - starting_parent: |
         other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
@@ -368,11 +449,11 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        "school"
       add_pick_up_from_school: |
-        None
+        True
       exchange_time2: |
-        None
+        "15:00:00"
     - starting_parent: |
         users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       starting_date: |
@@ -386,11 +467,11 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        "school"
       add_pick_up_from_school: |
-        None
+        True
       exchange_time2: |
-        None
+        "15:00:00"
     - starting_parent: |
         other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
@@ -404,11 +485,11 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        "school"
       add_pick_up_from_school: |
-        None
+        True
       exchange_time2: |
-        None
+        "15:00:00"
 ---
 if: use_template == "template" and template_choice == "two_two_five_five"
 variable name: exchanges
@@ -584,11 +665,11 @@ data from code:
       exchange_parent: | 
         other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       exchange_date: |
-        1
+        0
       exchange_time: |
-        default_exchange_time
+        "17:00:00"
       exchange_method: |
-        default_exchange_method
+        "Drop off"
       exchange_location: |
         default_exchange_location
       add_pick_up_from_school: |
@@ -598,15 +679,15 @@ data from code:
     - starting_parent: |
         other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
-        1
+        0
       exchange_parent: |
         users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       exchange_date: |
         5
       exchange_time: |
-        default_exchange_time
+        "17:00:00"
       exchange_method: |
-        default_exchange_method
+        "Pick up"
       exchange_location: |
         default_exchange_location
       add_pick_up_from_school: |
@@ -622,9 +703,9 @@ data from code:
       exchange_date: |
         8
       exchange_time: |
-        default_exchange_time
+        "17:00:00"
       exchange_method: |
-        default_exchange_method
+        "Drop off"
       exchange_location: |
         default_exchange_location
       add_pick_up_from_school: |
@@ -640,9 +721,9 @@ data from code:
       exchange_date: |
         12
       exchange_time: |
-        default_exchange_time
+        "17:00:00"
       exchange_method: |
-        default_exchange_method
+        "Pick up"
       exchange_location: |
         default_exchange_location
       add_pick_up_from_school: |
@@ -760,7 +841,7 @@ code: |
         if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
           temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
       elif exchange.exchange_method == "Pick up":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + e(possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location) + "\n"
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location) + "\n"
       starting_weekly_list[int(exchange.exchange_date)] += temp_description
     elif int(exchange.starting_date) == 0:
       if exchange.instanceName == "exchanges[0]":
