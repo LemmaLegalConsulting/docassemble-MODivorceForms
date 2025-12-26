@@ -1,7 +1,7 @@
 modules:
   - .function_import
 ---
-mandatory: True
+mandatory: False
 code: |
   case.filed
   exchanges.gather()
@@ -16,9 +16,6 @@ code: |
 ---
 objects: 
   - exchanges: DAList.using(object_type=DAObject,there_are_any=True,complete_attribute="complete")
----
-include:
-  - shared.yml
 ---
 code: |
   exchanges[0].starting_date = "0"
@@ -1885,6 +1882,11 @@ fields:
     datatype: time
     inline width: 3em
     required: False
+---
+code: |
+  role_dictionary_full_name = dict()
+  role_dictionary_full_name["petitioner"]= petitioner.name.full()
+  role_dictionary_full_name["respondent"]= respondent.name.full()
 ---
 only sets: holidays_review
 if: holidays_default

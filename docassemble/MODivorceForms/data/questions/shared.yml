@@ -3,6 +3,7 @@ include:
   - docassemble.AssemblyLine:assembly_line.yml
   - docassemble.ALToolbox:al_income.yml
   - county.yml
+  - weeklydemo.yml
 ---
 modules:
   - .al_income
@@ -19,6 +20,18 @@ code: |
   if defined('visitation_supervisor') and hasattr(visitation_supervisor.name,"first"):
     temp_people_choices.append(visitation_supervisor)
   if defined('communications_other') and hasattr(communications_other.name,"first"):
+    temp_people_choices.append(communications_other)
+  parent_and_people_choices = temp_people_choices
+---
+code: |
+  temp_people_choices = list()
+  if hasattr(legal_custody_other.name,"first"):
+    temp_people_choices.append(legal_custody_other)
+  if hasattr(physical_custody_other.name,"first"):
+    temp_people_choices.append(physical_custody_other)
+  if hasattr(visitation_supervisor.name,"first"):
+    temp_people_choices.append(visitation_supervisor)
+  if hasattr(communications_other.name,"first"):
     temp_people_choices.append(communications_other)
   people_choices = temp_people_choices
 ---
@@ -106,6 +119,14 @@ fields:
     required: False
   - Case type description: case.type_description
     required: False
+---
+code: |
+  if minor_children:
+    case.type_code = "DI"
+    case.type_description = "Dissolution of Marriage with Children"
+  else:
+    case.type_code = "DH"
+    case.type_description = "Dissolution of Marriage without Children"
 ---
 id: Hearing date and time
 question: Hearing date and time
@@ -793,7 +814,7 @@ code: |
 sets:
   - children[i].name.first
 id: Children question
-question: ${ ordinal(i) } child
+question: ${ ordinal(i) | title_case } child
 subquestion: |
   % if i > 0:
   So far you have added:
@@ -839,7 +860,7 @@ question: Who ${ children[i].name_full() } lived with?
 fields:
   - Who has ${ children[i].name_full() } lived with in the previous 60 days?: children[i].lived_with
     datatype: object
-    choices: people_choices
+    choices: parent_and_people_choices
     disable others: True
   - code: |
       children[i].lived_with.name_fields()
@@ -858,6 +879,16 @@ fields:
 id: lived with other object
 objects: 
   - persons_lived_with: ALPeopleList.using(there_are_any=True)
+---
+sets: children[i].persons_lived_with[0].name.first
+code: |
+  children[i].persons_lived_with[0] = children[i].lived_with
+---
+code: |
+  for child in children:
+    if child.lived_with not in persons_lived_with.complete_elements():
+      persons_lived_with.append(child.lived_with)
+  persons_lived_with_preload = True
 ---
 id: lived with other
 reconsider:
@@ -881,6 +912,24 @@ fields:
       persons_lived_with[i].name_fields()
   - code: |
       persons_lived_with[i].address_fields()
+---
+sets: persons_lived_with[i].name.first
+id: who children lived with
+question: Who have the children lived with in the past 5 years?
+subquestion: |
+  You have already said that the children have lived with ${ comma_and_list(persons_lived_with.complete_elements()) }.
+
+fields:
+  - Existing person: persons_lived_with[i]
+    datatype: object
+    choices: parent_and_people_choices
+    disable others: True
+    exclude:
+     - persons_lived_with.complete_elements()
+  - code: |
+      persons_lived_with[i].name_fields()
+  - code: |
+      persons_lived_with[i].address.address_fields()
 ---
 id: persons lived with another
 question: Did the children live with anybody else during the last five years?
@@ -925,10 +974,11 @@ fields:
   - Who should have legal custody of ${ children[i].name_full() }?: children[i].legal_custody
     datatype: radio
     choices:
-      - ${ users[0] }
-      - ${ other_parties[0] }
+      - ${ petitioner }: petitioner
+      - ${ respondent }: respondent
       - Both spouses jointly: Joint
-      - Other     
+      - Third party: Third Party
+    default: ${ legal_custody }
 ---
 id: other legal custody
 reconsider:
@@ -959,16 +1009,128 @@ id: legal custody other object
 objects: 
   - children[i].legal_custody_other: ALIndividual
 ---
+id: follow up for third party legal custody
+reconsider: people_choices
+sets:
+ - legal_custody_other.name.first
+if: legal_custody == "Third Party"
+question: Sole Legal Custody to Third Party
+fields:
+  - Existing person: legal_custody_other
+    datatype: object
+    choices: people_choices
+    disable others: True
+  - code: |
+      legal_custody_other.name_fields()
+---
+id: legal custody third party object
+objects: 
+  - legal_custody_other: ALIndividual
+---
+id: legal_custody question
+question: Legal Custody
+subquestion: |
+  Info on Legal Custody
+fields:
+ - What would you like to ask the court to give you in terms of legal custody?: legal_custody
+   datatype: radio
+   choices:
+      - ${ petitioner }: petitioner
+      - ${ respondent }: respondent
+      - Both spouses jointly: Joint
+      - Third party: Third Party
+---
+id: follow up reason for sole legal custody
+if: legal_custody in ["petitioner", "respondent"]
+question: Reason for sole custody
+subquestion: |
+  Missouri Law requires a statement of the reasons for a request for no shared decision-making. You must enter a reason on this line.
+fields:
+  - no label: legal_custody_sole_explanation
+    datatype: area
+---
+id: physical_custody question
+question: Physical Custody
+subquestion: |
+  Info on Physical Custody
+fields:
+ - What would you like to ask the court to give you in terms of legal custody?: physical_custody
+   datatype: radio
+   choices:
+      - ${ petitioner }: petitioner
+      - ${ respondent }: respondent
+      - Both spouses jointly: Joint
+      - Third party: Third Party
+---
+if: physical_custody == "petitioner"
+id: follow up visitation question for sole physical_custody
+question: Visitation
+fields:
+  - Should visitation with ${ respondent } be supervised?: visitation
+    datatype: yesnoradio
+---
+if: physical_custody == "respondent"
+id: follow up visitation question for sole physical_custody
+question: Visitation
+fields:
+  - Should visitation with ${ petitioner } be supervised?: visitation
+    datatype: yesnoradio
+---
+id: follow up
+if: visitation
+reconsider: people_choices
+sets:
+ - visitation_supervisor.name.first
+question: Visitation
+subquestion: |
+  Who should supervise the visitation with ${ other_parties[0] }?
+fields:
+  - Existing person: visitation_supervisor
+    datatype: object
+    choices: people_choices
+    disable others: True
+  - code: |
+      visitation_supervisor.name_fields()
+---
+if: physical_custody in ["petitioner","respondent"] and visitation
+question: Reason for sole custody
+subquestion: |
+  Describe why
+fields:
+  - no label: physical_custody_sole_explanation
+    datatype: area
+---
+id: follow up for third party physical custody
+if: physical_custody == "Third Party"
+reconsider: people_choices
+sets:
+  - physical_custody_other.name.first
+question: Sole physical Custody to Third Party
+fields:
+  - Existing person: physical_custody_other
+    datatype: object
+    choices: people_choices
+    disable others: True
+  - code: |
+      physical_custody_other.name_fields()
+---
+objects: 
+  - physical_custody_other: ALIndividual
+---
+objects: 
+  - visitation_supervisor: ALIndividual
+---
 id: physical custody of child
 question: Physical custody of ${ children[i].name_full() } 
 fields:
   - Who should have physical custody of ${ children[i].name_full() }?: children[i].physical_custody
     datatype: radio
     choices:
-      - ${ users[0] }
-      - ${ other_parties[0] }
-      - Both spouses jointly
-      - Other
+      - ${ petitioner }: petitioner
+      - ${ respondent }: respondent
+      - Both spouses jointly: Joint
+      - Third party: Third Party
+    default: ${ physical_custody }
 ---
 id: other physical custody
 reconsider:
@@ -1082,23 +1244,61 @@ objects:
 ---
 id: Additional information about children
 question: Additional information about children
+continue button field: additional_children_information
 fields:
   - Do you know of anyone other than you or your spouse who has physical custody of any of the children or claims to have custody or visitation rights with respect to any of the children?: others_with_physical_custody
     datatype: yesnoradio
   - Do you have information about any other custody proceeding concerning any of the children pending in a court of this or any other state?: other_custody_proceeding
     datatype: yesnoradio
+    js show if:   |
+      val("others_with_physical_custody") === true || val("others_with_physical_custody") === false
   - Have you participated in other litigation concerning the custody of any of the children in this or any other state?: other_litigation
     datatype: yesnoradio
+    js show if:   |
+      val("other_custody_proceeding") === true || val("other_custody_proceeding") === false
   - Have any of the children been a victim of abuse or neglect?: abuse_or_neglect
     datatype: yesnoradio
+    js show if:   |
+      val("other_litigation") === true || val("other_litigation") === false
+  - Have any orders pertaining to any of the children been entered by the Family Support Division?: family_support_order
+    datatype: yesnoradio
+    js show if:   |
+      val("abuse_or_neglect") === true || val("abuse_or_neglect") === false
   - "Explain, including indicating style of related case/case number/court and whether case is pending or closed": related_case_explanation
     datatype: area
     js show if: |
-      val('others_with_physical_custody') || val('other_custody_proceeding') || val('other_litigation') || val('abuse_or_neglect')
-  - Have any orders pertaining to any of the children been entered by the Family Support Division?: family_support_order
+      (val("others_with_physical_custody") === true || val("others_with_physical_custody") === false) && (val("other_custody_proceeding") === true || val("other_custody_proceeding") === false) && (val("other_litigation") === true || val("other_litigation") === false) && (val("abuse_or_neglect") === true || val("abuse_or_neglect") === false) && (val("family_support_order") === true || val("family_support_order") === false) && (val('others_with_physical_custody') || val('other_custody_proceeding') || val('other_litigation') || val('abuse_or_neglect'))
+---
+id: Others with physical custody
+question: Others with physical custody
+fields:
+  - "Do you know of anyone other than you or your spouse who has physical custody of any of the children or claims to have custody or visitation rights with respect to any of the children?": others_with_physical_custody
     datatype: yesnoradio
+  - Explain: others_with_physical_custody_explanation
+    show if: others_with_physical_custody
+---
+id: Other custody proceeding
+question: Other custody proceeding?
+fields:
+  - Do you have information about any other custody proceeding concerning any of the children pending in a court of this or any other state?: other_custody_proceeding
+    datatype: yesnoradio
+  - Explain: other_custody_proceeding_explanation
+    show if: other_custody_proceeding
+---
+id: Other litigation
+question: Other litigation
+fields:
+  - Have you participated in other litigation concerning the custody of any of the children in this or any other state?: other_litigation
+    datatype: yesnoradio
+  - Explain: other_litigation_explanation
+    show if: other_litigation
+---
+id: maybe unnecessary question about welfare
+question: Welfare
+fields:
   - Have any of the children ever received welfare or Medicaid?: received_welfare
     datatype: yesnoradio
+
 ---
 
 ---
@@ -1142,30 +1342,6 @@ question: Did you live together as a couple in Missouri?
 fields:
   - no label: marriage.live_together_in_mo
     datatype: yesnoradio
----
-id: Others with physical custody
-question: Others with physical custody
-fields:
-  - "Do you know of anyone other than you or your spouse who has physical custody of any of the children or claims to have custody or visitation rights with respect to any of the children?": others_with_physical_custody
-    datatype: yesnoradio
-  - Explain: others_with_physical_custody_explanation
-    show if: others_with_physical_custody
----
-id: Other custody proceeding
-question: Other custody proceeding?
-fields:
-  - Do you have information about any other custody proceeding concerning any of the children pending in a court of this or any other state?: other_custody_proceeding
-    datatype: yesnoradio
-  - Explain: other_custody_proceeding_explanation
-    show if: other_custody_proceeding
----
-id: Other litigation
-question: Other litigation
-fields:
-  - Have you participated in other litigation concerning the custody of any of the children in this or any other state?: other_litigation
-    datatype: yesnoradio
-  - Explain: other_litigation_explanation
-    show if: other_litigation
 ---
 ## ASSETS ##
 
@@ -1646,6 +1822,13 @@ data:
   state_taxes: State taxes
   social_security: Social security
   medicare: Medicare
+---
+generic object: ALIndividual
+code: |
+  if x.has_self_employment_income:
+    x.monthly_gross_income = float(x.jobs.total(times_per_year=12)) + float(x.benefits.total(times_per_year=12)) + float(x.other_incomes.total(times_per_year=12)) + x.self_employment_income
+  else:
+    x.monthly_gross_income = float(x.jobs.total(times_per_year=12)) + float(x.benefits.total(times_per_year=12)) + float(x.other_incomes.total(times_per_year=12))
 ---
 ################################# PUBLIC BENEFITS ##############################
 comment: |
@@ -2302,7 +2485,7 @@ code: |
 id: extraordinary medical cost object
 generic object: ALIndividual
 objects:
-  - x.extraordinary_medical_costs: ALExpenseList.using(complete_attribute='value',there_is_another=False)
+  - x.extraordinary_medical_costs: ALExpenseList.using(complete_attribute='value')
 ---
 id: extraordinary medical costs
 generic object: ALIndividual
@@ -2339,7 +2522,7 @@ fields:
 id: extraordinary child rearing cost object
 generic object: ALIndividual
 objects:
-  - x.extraordinary_childrearing_costs: ALExpenseList.using(complete_attribute='value',there_is_another=False)
+  - x.extraordinary_childrearing_costs: ALExpenseList.using(complete_attribute='included_in_form_14')
 ---
 id: extraordinary childrearing costs
 generic object: ALIndividual
@@ -2409,6 +2592,25 @@ code: |
   x.maintenance_other_received = 0
   x.maintenance_other_paid = 0
 ---
+id: Child Care Expenses Responsibility
+question: |
+  Child Care Expenses
+fields:
+  - "How should work-related childcare expenses be handled?": pay_work_childcare_expenses
+    datatype: radio
+    choices:
+      - "There are no work-related child care costs incurred by the parents.": none
+      - "The work-related child care costs will be included in the child support calculation on the Form 14.": included_in_form14
+      - "Each parent will pay their own reasonable work-related child care expenses related to his or her employment.": pay_own
+      - "${ support_payer.name_full() } shall partially reimburse ${ support_recipient.name_full() } for all reasonable work-related child care expenses.": pay_percentage
+  - "What percentage of ${ possessify(support_recipient.name_full(), 'childcare costs') }should ${ support_payer.name_full() } reimburse?": pay_work_childcare_expenses_percentage
+    datatype: integer
+    min: 1
+    max: 100
+    show if:
+      variable: pay_work_childcare_expenses
+      is: pay_percentage
+---
 id: Work related childcare costs
 generic object: ALIndividual
 question: Work-Related Child Care Costs for ${ x.name_full() }
@@ -2420,6 +2622,28 @@ if: len(children) == 0
 generic object: ALIndividual
 code: |
   x.work_childcare_expenses = 0
+---
+id: medical insurance responsibility
+question: Parent Responsible for Medical Insurance
+fields:
+  - Who should maintain and pay the cost of medical insurance for the benefit of the children?: medical_insurance
+    datatype: radio
+    choices:
+      - ${ petitioner }: petitioner
+      - ${ respondent }: respondent
+      - Neither parent: none
+                      
+---
+id: dental insurance responsibility
+question: Parent Responsible for Dental Insurance
+fields:
+  - Who should maintain and pay the cost of dental insurance for the benefit of the children?: dental_insurance
+    datatype: radio
+    choices:
+      - ${ petitioner }: petitioner
+      - ${ respondent }: respondent
+      - Neither parent: none
+                      
 ---
 id: health insurance costs
 generic object: ALIndividual
@@ -3283,45 +3507,6 @@ columns:
       currency(row_item.monthly_payment) if defined("row_item.monthly_payment") else ""
 ---
 ## DECREE
-id: legal_custody question
-question: Legal Custody
-subquestion: |
-  Info on Legal Custody
-fields:
- - What would you like to ask the court to give you in terms of legal custody?: legal_custody
-   datatype: radio
-   choices:
-     - Joint
-     - Sole
-     - Third Party
----
-id: follow up reason for sole legal custody
-if: legal_custody == "Sole"
-question: Reason for sole custody
-subquestion: |
-  Missouri Law requires a statement of the reasons for a request for no shared decision-making. You must enter a reason on this line.
-fields:
-  - no label: legal_custody_sole_explanation
-    datatype: area
----
-id: follow up for third party legal custody
-reconsider: people_choices
-sets:
- - legal_custody_other.name.first
-if: legal_custody == "Third Party"
-question: Sole Legal Custody to Third Party
-fields:
-  - Existing person: legal_custody_other
-    datatype: object
-    choices: people_choices
-    disable others: True
-  - code: |
-      legal_custody_other.name_fields()
----
-id: legal custody third party object
-objects: 
-  - legal_custody_other: ALIndividual
----
 id: communications question
 question: Communication between parents
 subquestion: |
@@ -3357,69 +3542,6 @@ fields:
 id: object for communications third party
 objects: 
   - communications_other: ALIndividual
----
-id: physical_custody question
-question: Physical Custody
-subquestion: |
-  Info on Physical Custody
-fields:
- - What would you like to ask the court to give you in terms of legal custody?: physical_custody
-   datatype: radio
-   choices:
-     - Joint
-     - Sole
-     - Third Party
----
-if: physical_custody == "Sole"
-id: follow up visitation question for sole physical_custody
-question: Visitation
-fields:
-  - Should visitation with ${ other_parties[0] } be supervised?: visitation
-    datatype: yesnoradio
----
-id: follow up
-if: visitation
-reconsider: people_choices
-sets:
- - visitation_supervisor.name.first
-question: Visitation
-subquestion: |
-  Who should supervise the visitation with ${ other_parties[0] }?
-fields:
-  - Existing person: visitation_supervisor
-    datatype: object
-    choices: people_choices
-    disable others: True
-  - code: |
-      visitation_supervisor.name_fields()
----
-if: physical_custody == "Sole" and visitation
-question: Reason for sole custody
-subquestion: |
-  Describe why
-fields:
-  - no label: physical_custody_sole_explanation
-    datatype: area
----
-id: follow up for third party physical custody
-if: physical_custody == "Third Party"
-reconsider: people_choices
-sets:
-  - physical_custody_other.name.first
-question: Sole physical Custody to Third Party
-fields:
-  - Existing person: physical_custody_other
-    datatype: object
-    choices: people_choices
-    disable others: True
-  - code: |
-      physical_custody_other.name_fields()
----
-objects: 
-  - physical_custody_other: ALIndividual
----
-objects: 
-  - visitation_supervisor: ALIndividual
 ---
 ## MAINTENANCE ##
 id: maintenance to petitioner
@@ -3618,6 +3740,26 @@ code: |
 objects:
   - service: Thing
 ---
+sets: x.service_address.address
+id: service address
+generic object: ALIndividual
+question: Service address for ${ x.name_full() }
+fields:
+  - Address already provided: x.service_address
+    datatype: object_radio
+    choices: x.address
+    none of the above: A different address
+    disable others: True
+    default: x.address
+  - code: |
+      x.service_address.address_fields()
+---
+id: Respondent hours of employment
+generic object: ALIndividual
+question: What are the hours of employment for ${ x.name_full() }?
+fields:
+  - no label: x.hours_of_employment
+---
 id: service date
 question: Date of Service
 fields:
@@ -3701,7 +3843,7 @@ subquestion: |
   ${ action_button_html(url_action('review_certificate_of_dissolution_of_marri'), label='Edit answers', color='info') }
   
   
-  ${ al_user_bundle.download_list_html() }
+  ${ al_user_bundle.download_list_html(use_previously_cached_files=True, include_full_pdf=True) }
   
 
   ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
@@ -3714,8 +3856,8 @@ objects:
 ---
 # This isn't used because there is an objects block in main.yml
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, fee_waiver_attachment, judgment_attachment, petition_attachment, income_statement_attachment, property_statement_attachment, confidential_information_sheet_attachment, redaction_certification_attachment, service_by_mail_affidavit_attachment, service_by_mail_notice_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, fee_waiver_attachment, judgment_attachment, petition_attachment, income_statement_attachment, property_statement_attachment, confidential_information_sheet_attachment, redaction_certification_attachment, service_by_mail_affidavit_attachment, service_by_mail_notice_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, fee_waiver_attachment, judgment_attachment, petition_attachment, income_statement_attachment, property_statement_attachment, confidential_information_sheet_attachment, redaction_certification_attachment, service_by_mail_affidavit_attachment, service_by_mail_notice_attachment, parenting_plan_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, fee_waiver_attachment, judgment_attachment, petition_attachment, income_statement_attachment, property_statement_attachment, confidential_information_sheet_attachment, redaction_certification_attachment, service_by_mail_affidavit_attachment, service_by_mail_notice_attachment, parenting_plan_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---
 # Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
 # used for "preview" and "final" keys, and logic in the template checks the value of 

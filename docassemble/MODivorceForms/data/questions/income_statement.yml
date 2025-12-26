@@ -48,12 +48,6 @@ code: |
   test_screen
   mo_divorce_forms_download
 ---
-question: Test
-subquestion: |
-  ${ "{:.2f}".format(petitioner.other_incomes.total(source=['trust'], times_per_year=12)) } 
-  ${ "{:.2f}".format(petitioner.other_incomes.total(source=['dividends'], times_per_year=12)) } 
-continue button field: test_screen
----
 id: Statement of Income and Expenses object
 objects:
   - income_statement_attachment: ALDocument.using(title="Statement of Income and Expenses", filename="income_statement", has_addendum=False, )

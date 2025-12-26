@@ -163,7 +163,6 @@ code: |
   children[i].name.first
   children[i].lived_with.name.first
   children[i].address.address
-  children[i].active_duty
   children[i].birthdate
   children[i].ssn
   children[i].persons_lived_with.gather()
@@ -183,67 +182,6 @@ question: Is ${ children[i].name.full() } adopted by one or both parents?
 fields:
   - no label: children[i].adopted
     datatype: yesnoradio
----
-objects:
-  - persons_lived_with: ALPeopleList
----
-code: |
-  persons_lived_with.append(users[0])
-  persons_lived_with_preload = True
----
-sets: persons_lived_with[i].name.first
-id: who children lived with
-question: Who have the children lived with in the past 5 years?
-subquestion: |
-  You have already said that the children have lived with ${ comma_and_list(persons_lived_with.complete_elements()) }.
-
-fields:
-  - Existing person: persons_lived_with[i]
-    datatype: object
-    choices: people_choices
-    disable others: True
-    exclude:
-     - persons_lived_with.complete_elements()
-  - code: |
-      persons_lived_with[i].name_fields()
-  - code: |
-      persons_lived_with[i].address.address_fields()
----
-id: children lived with another
-question: Have the children lived with anybody else?
-subquestion: |
-  So far, you have mentioned ${ comma_and_list(persons_lived_with.complete_elements()) }.
-fields:
-  - Have the children lived with anybody else?: persons_lived_with.there_is_another
-    datatype: yesnoradio
----
-generic object: ALIndividual
-code: |
-  if x.has_self_employment_income:
-    x.monthly_gross_income = float(x.jobs.total(times_per_year=12)) + float(x.benefits.total(times_per_year=12)) + float(x.other_incomes.total(times_per_year=12)) + x.self_employment_income
-  else:
-    x.monthly_gross_income = float(x.jobs.total(times_per_year=12)) + float(x.benefits.total(times_per_year=12)) + float(x.other_incomes.total(times_per_year=12))
----
-## SERVICE
-sets: x.service_address.address
-id: service address
-generic object: ALIndividual
-question: Service address for ${ x.name_full() }
-fields:
-  - Address already provided: x.service_address
-    datatype: object_radio
-    choices: x.address
-    none of the above: A different address
-    disable others: True
-    default: x.address
-  - code: |
-      x.service_address.address_fields()
----
-id: Respondent hours of employment
-generic object: ALIndividual
-question: What are the hours of employment for ${ x.name_full() }?
-fields:
-  - no label: x.hours_of_employment
 ---
 id: Petition for Dissolution of Marriage object
 objects:
