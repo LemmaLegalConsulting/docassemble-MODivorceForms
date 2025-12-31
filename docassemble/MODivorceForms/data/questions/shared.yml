@@ -15,6 +15,8 @@ code: |
   temp_people_choices.append(other_parties[0])
   if defined('legal_custody_other') and hasattr(legal_custody_other.name,"first"):
     temp_people_choices.append(legal_custody_other)
+  if defined('parenting_plan_A_author_other') and hasattr(parenting_plan_A_author_other.name, "first"):
+    temp_people_choices.append(parenting_plan_A_author_other)
   if defined('physical_custody_other') and hasattr(physical_custody_other.name,"first"):
     temp_people_choices.append(physical_custody_other)
   if defined('visitation_supervisor') and hasattr(visitation_supervisor.name,"first"):
@@ -29,6 +31,8 @@ code: |
     temp_people_choices.append(legal_custody_other)
   if hasattr(physical_custody_other.name,"first"):
     temp_people_choices.append(physical_custody_other)
+  if defined('parenting_plan_A_author_other') and hasattr(parenting_plan_A_author_other.name, "first"):
+    temp_people_choices.append(parenting_plan_A_author_other)
   if hasattr(visitation_supervisor.name,"first"):
     temp_people_choices.append(visitation_supervisor)
   if hasattr(communications_other.name,"first"):
@@ -811,6 +815,27 @@ code: |
   children[i].birthdate
   children[i].complete = True
 ---
+id: children complete from petition
+code: |
+  children[i].name.first
+  children[i].lived_with.name.first
+  children[i].address.address
+  children[i].birthdate
+  children[i].ssn
+  children[i].persons_lived_with.gather()
+  if children[i].legal_custody == "Third Party":
+    children[i].legal_custody_other.name.first
+  if children[i].physical_custody == "Third Party":
+    children[i].physical_custody_other.name.first
+  if children[i].parents["Other"]:
+    children[i].other_parent.name.first
+  if children[i].birth_certificate["Other"]:
+    children[i].birth_certificate_other.name.first
+  children[i].adopted
+  children[i].tax_dependency_even
+  children[i].under_18_in_household
+  children[i].complete = True
+---
 sets:
   - children[i].name.first
 id: Children question
@@ -1170,6 +1195,22 @@ fields:
       - ${ other_parties[0] }
       - Other
     none of the above: False
+---
+id: tax dependenc of child
+question: Tax dependency ${ children[i].name_full() }
+subquestion: |
+  The Form 14 calculation assumes that the parent receiving support will claim the children as dependents. If the parent paying support is entitled to claim one or more of the children, then the Form 14 guidelines are unjust and inappropriate  and the second box in Paragraph 15 should be checked.
+fields:
+  - Who should claim ${ children[i].name_full() } as a tax dependent in even years?: children[i].tax_dependency_even
+    choices:
+      - ${ users[0] }
+      - ${ other_parties[0] }
+    default: ${ support_recipient }
+  - Who should claim ${ children[i].name_full() } as a tax dependent in odd years?: children[i].tax_dependency_odd
+    choices:
+      - ${ users[0] }
+      - ${ other_parties[0] }
+    default: ${ support_recipient }
 ---
 id: other parent
 reconsider:

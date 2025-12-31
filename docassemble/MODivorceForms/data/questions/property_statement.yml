@@ -3094,7 +3094,7 @@ attachment:
           ${ respondent.debts[14].description }
           % endif
       - "petitioner_lack_jurisdiction": ${ False } 
-      - "no_maintenance_by_respondent": ${ not is_maintenance_award or not maintenance_awarded_to == "petitioner" } 
+      - "no_maintenance_by_respondent": ${ not maintenance_awarded_to == "petitioner" } 
       - "respondent_maintenance": |
           % if maintenance_awarded_to == "petitioner":
           ${ maintenance_amount } 
@@ -3103,7 +3103,7 @@ attachment:
       - "petitioner_maintenance_modification_allowed": ${  maintenance_awarded_to == "petitioner" and maintenance_income_withholding } 
       - "petitioner_maintenance_no_modification": ${ maintenance_awarded_to == "petitioner" and not maintenance_income_withholding } 
       - "respondent_lack_jurisdiction": ${ not respondent.lives_in_missouri and not marriage.live_together_in_mo } 
-      - "no_maintenance_by_petitioner": ${ not is_maintenance_award or not maintenance_awarded_to == "respondent" } 
+      - "no_maintenance_by_petitioner": ${ not maintenance_awarded_to == "respondent" } 
       - "petitioner_maintenance": |
           % if maintenance_awarded_to == "respondent":
           ${ maintenance_amount }

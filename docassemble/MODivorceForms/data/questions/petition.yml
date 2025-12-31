@@ -159,24 +159,6 @@ fields:
 ---
 ## CHILDREN  
 ---
-code: |
-  children[i].name.first
-  children[i].lived_with.name.first
-  children[i].address.address
-  children[i].birthdate
-  children[i].ssn
-  children[i].persons_lived_with.gather()
-  if children[i].legal_custody == "Other":
-    children[i].legal_custody_other.name.first
-  if children[i].physical_custody == "Other":
-    children[i].physical_custody_other.name.first
-  if children[i].parents["Other"]:
-    children[i].other_parent.name.first
-  if children[i].birth_certificate["Other"]:
-    children[i].birth_certificate_other.name.first
-  children[i].adopted
-  children[i].complete = True
----
 id: adoption question
 question: Is ${ children[i].name.full() } adopted by one or both parents?
 fields:
@@ -322,206 +304,794 @@ attachment:
       - "noNeitherPregnant": ${ True } 
       - "numberOfChildrenAfterMarriageDate": ${  len([child for child in children if child.birthdate > marriage.recorded_date]) } 
       - "numberOfChildrenAdopted": ${ len([child for child in children if child.adopted == True]) } 
-      - "numberOfChildrenTogetherBeforeDateOfMarriage": ${ len([child for child in children if child.birthdate > marriage.recorded_date]) } 
+      - "numberOfChildrenTogetherBeforeDateOfMarriage": ${ len([child for child in children if child.birthdate < marriage.recorded_date]) } 
       - "numberOfChildrenBornToYouAndSomeoneOtherThanSpouseDuringMarriage": ${ 0 } 
       - "numberOfChildrenBornToSpouseWithSomeoneElseDuringMarriage": ${ 0 } 
       - "totalNumberOfChildren": ${ len(children) } 
-      - "childOneFirstName": ${ children[0].name.first } 
-      - "childOneMiddleName": ${ children[0].name.middle } 
-      - "childOneLastName": ${ children[0].name.last } 
-      - "childOneSuffixJrSrIII": ${ children[0].name.suffix } 
-      - "childOneSsnLastFour": ${ "{:.0f}".format(children[0].ssn) } 
-      - "childOneStreet": ${ children[0].address.line_one() } 
-      - "childOneCity": ${ children[0].address.city } 
-      - "childOneState": ${ children[0].address.state } 
-      - "childOneZip": ${ children[0].address.zip } 
-      - "childOneAge": ${ "round(date_difference(as_datetime(children[0].birthdate),today()).years,0)" } 
-      - "childOneMarriedOrNot": ${ children[0].special_factors['married'] } 
-      - "childOneActiveDutyOrNot": ${ children[0].special_factors['active_duty'] } 
-      - "childOneSelfSupportingOrNot": ${ children[0].special_factors['self_supporting'] } 
-      - "childOneAttendingHighSchoolOrNot": ${ children[0].special_factors['high_school'] } 
-      - "childOneAttendingCollegeOrVocSchool": ${ children[0].special_factors['college'] } 
-      - "childOneLivedWithFirstName": ${ children[0].lived_with[0].name.first } 
-      - "childOneLivedWithMiddleName": ${ children[0].lived_with[0].name.middle } 
-      - "childOneLivedWithLastName": ${ children[0].lived_with[0].name.last } 
-      - "childOneLivedWithSuffix": ${ children[0].lived_with[0].name.suffix } 
-      - "childOneLegalCustody1": ${ children[0].legal_custody == users[0].name.full() } 
-      - "childOneLegalCustody2": ${ children[0].legal_custody == other_parties[0].name.full() } 
-      - "childOneLegalCustody3": ${ children[0].legal_custody == "Joint" } 
-      - "childOneLegalCustody4": ${ children[0].legal_custody == "Other" } 
-      - "childOneLegalCustodyOtherPersonFirstName": ${ children[0].legal_custody_other[0].name.middle } 
-      - "childOneLegalCustodyOtherPersonMiddleName": ${ children[0].legal_custody_other[0].name.suffix } 
-      - "childOneLegalCustodyOtherPersonLastName": ${ children[0].legal_custody_other[0].name.first } 
-      - "childOneLegalCustodyOtherPersonSuffix": ${ children[0].legal_custody_other[0].name.last } 
-      - "childOnePhysicalCustody1": ${ children[0].physical_custody == users[0].name.full() } 
-      - "childOnePhysicalCustody2": ${ children[0].physical_custody == other_parties[0].name.full() } 
-      - "childOnePhysicalCustody3": ${ children[0].physical_custody == "Joint" } 
-      - "childOnePhysicalCustody4": ${ children[0].physical_custody == "Other" } 
-      - "childOnePhysicalCustodyOtherPersonMiddleName": ${ children[0].physical_custody_other[0].name.middle } 
-      - "childOnePhysicalCustodyOtherPersonLastName": ${ children[0].physical_custody_other[0].name.suffix } 
-      - "childOnePhysicalCustodySuffix": ${ children[0].physical_custody_other[0].name.last } 
-      - "childOnePhysicalCustodyOtherPersonFirstName": ${ children[0].physical_custody_other[0].name.first } 
-      - "childOneParentsMe": ${ children[0].parents[users[0].name.full()] } 
-      - "childOneParentsMySpouse": ${ children[0].parents[other_parties[0].name.full()] } 
-      - "childOneParentsOtherPerson": ${ children[0].parents['Other'] } 
-      - "childOneParentsOtherPersonFirstName": ${ children[0].parent_other[0].name.middle } 
-      - "childOneParentsOtherPersonMiddleName": ${ children[0].parent_other[0].name.suffix } 
-      - "childOneParentsOtherPersonLastName": ${ children[0].parent_other[0].name.first } 
-      - "childOneParentsOtherPersonSuffix": ${ children[0].parent_other[0].name.last } 
-      - "childOneBirthCertMe": ${ children[0].birth_certificate[users[0].name.full()] } 
-      - "childOneBirthCertSpouse": ${ children[0].birth_certificate[other_parties[0].name.full()] } 
-      - "childOneBirthCertOtherPerson": ${ children[0].birth_certificate['Other'] } 
-      - "childOneBirthCertOtherPersonFirstName": ${ children[0].birth_certificate_other[0].name.last } 
-      - "childOneBirthCertOtherPersonMiddleName": ${ children[0].birth_certificate_other[0].name.first } 
-      - "childOneBirthCertOtherPersonLastName": ${ children[0].birth_certificate_other[0].name.middle } 
-      - "childOneBirthCertOtherPersonSuffix": ${ children[0].birth_certificate_other[0].name.suffix } 
-      - "childTwoFirstName": ${ children[1].name.first } 
-      - "childTwoMiddleName": ${ children[1].name.middle } 
-      - "childTwoLastName": ${ children[1].name.last } 
-      - "childTwoSuffixJrSrIII": ${ children[1].name.suffix } 
-      - "childTwoSsnLastFour": ${ "{:.0f}".format(children[1].ssn) } 
-      - "childTwoStreet": ${ children[1].address.line_one() } 
-      - "childTwoCity": ${ children[1].address.city } 
-      - "childTwoState": ${ children[1].address.state } 
-      - "childTwoZip": ${ children[1].address.zip } 
-      - "childTwoAge": ${ "round(date_difference(as_datetime(children[1].birthdate),today()).years,0)" } 
-      - "childTwoMarriedOrNot": ${ children[1].special_factors['married'] } 
-      - "childTwoActiveDutyOrNot": ${ children[1].special_factors['active_duty'] } 
-      - "childTwoSelfSupportingOrNot": ${ children[1].special_factors['self_supporting'] } 
-      - "childTwoAttendingHighSchoolOrNot": ${ children[1].special_factors['high_school'] } 
-      - "childTwoAttendingCollegeOrVocSchool": ${ children[1].special_factors['college'] } 
-      - "childTwoLivedWithFirstName": ${ children[1].lived_with[0].name.first } 
-      - "childTwoLivedWithMiddleName": ${ children[1].lived_with[0].name.middle } 
-      - "childTwoLivedWithLastName": ${ children[1].lived_with[0].name.last } 
-      - "childTwoLivedWithSuffix": ${ children[1].lived_with[0].name.suffix } 
-      - "childTwoLegalCustody1": ${ children[1].legal_custody == users[0].name.full() } 
-      - "childTwoLegalCustody2": ${ children[1].legal_custody == other_parties[0].name.full() } 
-      - "childTwoLegalCustody3": ${ children[1].legal_custody == "Joint" } 
-      - "childTwoLegalCustody4": ${ children[1].legal_custody == "Other" } 
-      - "childTwoLegalCustodyOtherPersonMiddleName": ${ children[1].legal_custody_other[0].name.middle } 
-      - "childTwoLegalCustodyOtherPersonSuffix": ${ children[1].legal_custody_other[0].name.suffix } 
-      - "childTwoLegalCustodyOtherPersonFirstName": ${ children[1].legal_custody_other[0].name.first } 
-      - "childTwoLegalCustodyOtherPersonLastName": ${ children[1].legal_custody_other[0].name.last } 
-      - "childTwoPhysicalCustody1": ${ children[1].physical_custody == users[0].name.full() } 
-      - "childTwoPhysicalCustody2": ${ children[1].physical_custody == other_parties[0].name.full() } 
-      - "childTwoPhysicalCustody3": ${ children[1].physical_custody == "Joint" } 
-      - "childTwoPhysicalCustody4": ${ children[1].physical_custody == "Other" } 
-      - "childTwoPhysicalCustodyOtherPersonFirstName": ${ children[1].physical_custody_other[0].name.middle } 
-      - "childTwoPhysicalCustodyOtherPersonMiddleName": ${ children[1].physical_custody_other[0].name.suffix } 
-      - "childTwoPhysicalCustodyOtherPersonLastName": ${ children[1].physical_custody_other[0].name.last } 
-      - "childTwoPhysicalCustodyOtherPersonSuffix": ${ children[1].physical_custody_other[0].name.first } 
-      - "childTwoParentsMe": ${ children[1].parents[users[0].name.full()] } 
-      - "childTwoParentsMySpouse": ${ children[1].parents[other_parties[0].name.full()] } 
-      - "childTwoParentsOtherPerson": ${ children[1].parents['Other'] } 
-      - "childTwoParentsOtherPersonFirstName": ${ children[1].parent_other[0].name.middle } 
-      - "childTwoParentsOtherPersonMiddleName": ${ children[1].parent_other[0].name.suffix } 
-      - "childTwoParentsOtherPersonLastName": ${ children[1].parent_other[0].name.first } 
-      - "childTwoParentsOtherPersonSuffix": ${ children[1].parent_other[0].name.last } 
-      - "childTwoBirthCertMe": ${ children[1].birth_certificate[users[0].name.full()] } 
-      - "childTwoBirthCertSpouse": ${ children[1].birth_certificate[other_parties[0].name.full()] } 
-      - "childTwoBirthCertOtherPerson": ${ children[1].birth_certificate['Other'] } 
-      - "childTwoBirthCertOtherPersonFirstName": ${ children[1].birth_certificate_other[0].name.last } 
-      - "childTwoBirthCertOtherPersonLastName": ${ children[1].birth_certificate_other[0].name.first } 
-      - "childTwoBirthCertOtherPersonMiddleName": ${ children[1].birth_certificate_other[0].name.middle } 
-      - "childTwoBirthCertOtherPersonSuffix": ${ children[1].birth_certificate_other[0].name.suffix } 
-      - "childThreeFirstName": ${ children[2].name.first } 
-      - "childThreeMiddleName": ${ children[2].name.middle } 
-      - "childThreeLastName": ${ children[2].name.last } 
-      - "childThreeSuffixJrSrIII": ${ children[2].name.suffix } 
-      - "childThreeSsnLastFour": ${ "{:.0f}".format(children[2].ssn) } 
-      - "childThreeStreet": ${ children[2].address.line_one() } 
-      - "childThreeCity": ${ children[2].address.city } 
-      - "childThreeState": ${ children[2].address.state } 
-      - "childThreeZip": ${ children[2].address.zip } 
-      - "childThreeAge": ${ "round(date_difference(as_datetime(children[2].birthdate),today()).years,0)" } 
-      - "childThreeMarriedOrNot": ${ children[2].special_factors['married'] } 
-      - "childThreeActiveDutyOrNot": ${ children[2].special_factors['active_duty'] } 
-      - "childThreeSelfSupportingOrNot": ${ children[2].special_factors['self_supporting'] } 
-      - "childThreeAttendingHighSchoolOrNot": ${ children[2].special_factors['high_school'] } 
-      - "childThreeAttendingCollegeOrVocSchool": ${ children[2].special_factors['college'] } 
-      - "childThreeLivedWithFirstName": ${ children[2].lived_with[0].name.first } 
-      - "childThreeLivedWithMiddleName": ${ children[2].lived_with[0].name.middle } 
-      - "childThreeLivedWithLastName": ${ children[2].lived_with[0].name.last } 
-      - "childThreeLivedWithSuffix": ${ children[2].lived_with[0].name.suffix } 
-      - "childThreeLegalCustody1": ${ children[2].legal_custody == users[0].name.full() } 
-      - "childThreeLegalCustody2": ${ children[2].legal_custody == other_parties[0].name.full() } 
-      - "childThreeLegalCustody3": ${ children[2].legal_custody == "Joint" } 
-      - "childThreeLegalCustody4": ${ children[2].legal_custody == "Other" } 
-      - "childThreeLegalCustodyOtherPersonFirstName": ${ children[2].legal_custody_other[0].name.first } 
-      - "childThreeLegalCustodyOtherPersonMiddleName": ${ children[2].legal_custody_other[0].name.middle } 
-      - "childThreeLegalCustodyOtherPersonLastName": ${ children[2].legal_custody_other[0].name.last } 
-      - "childThreeLegalCustodyOtherPersonSuffix": ${ children[2].legal_custody_other[0].name.suffix } 
-      - "childThreePhysicalCustody1": ${ children[2].physical_custody == users[0].name.full() } 
-      - "childThreePhysicalCustody2": ${ children[2].physical_custody == other_parties[0].name.full() } 
-      - "childThreePhysicalCustody3": ${ children[2].physical_custody == "Joint" } 
-      - "childThreePhysicalCustody4": ${ children[2].physical_custody == "Other" } 
-      - "childThreePhysicalCustodyOtherPersonMiddleName": ${ children[2].physical_custody_other[0].name.middle } 
-      - "childThreePhysicalCustodyOtherPersonLastName": ${ children[2].physical_custody_other[0].name.last } 
-      - "childThreePhysicalCustodyOtherPersonSuffix": ${ children[2].physical_custody_other[0].name.suffix } 
-      - "childThreePhysicalCustodyOtherPersonFirstName": ${ children[2].physical_custody_other[0].name.first } 
-      - "childThreeParentsMe": ${ children[2].parents[users[0].name.full()] } 
-      - "childThreeParentsMySpouse": ${ children[2].parents[other_parties[0].name.full()] } 
-      - "childThreeParentsOtherPerson": ${ children[2].parents['Other'] } 
-      - "childThreeParentsOtherPersonFirstName": ${ children[2].parent_other[0].name.first } 
-      - "childThreeParentsOtherPersonMiddleName": ${ children[2].parent_other[0].name.middle } 
-      - "childThreeParentsOtherPersonLastName": ${ children[2].parent_other[0].name.last } 
-      - "childThreeParentsOtherPersonSuffix": ${ children[2].parent_other[0].name.suffix } 
-      - "childThreeBirthCertMe": ${ children[2].birth_certificate[users[0].name.full()] } 
-      - "childThreeBirthCertSpouse": ${ children[2].birth_certificate[other_parties[0].name.full()] } 
-      - "childThreeBirthCertOtherPerson": ${ children[2].birth_certificate['Other'] } 
-      - "childThreeBirthCertOtherPersonFirstName": ${ children[2].birth_certificate_other[0].name.first } 
-      - "childThreeBirthCertOtherPersonMiddleName": ${ children[2].birth_certificate_other[0].name.middle } 
-      - "childThreeBirthCertOtherPersonLastName": ${ children[2].birth_certificate_other[0].name.last } 
-      - "childThreeBirthCertOtherPersonSuffix": ${ children[2].birth_certificate_other[0].name.suffix } 
-      - "childFourMiddleName": ${ children[3].name.middle } 
-      - "childFourFirstName": ${ children[3].name.first } 
-      - "childFourLastName": ${ children[3].name.last } 
-      - "childFourSuffixJrSrIII": ${ children[3].name.suffix } 
-      - "childFourSsnLastFour": ${ "{:.0f}".format(children[3].ssn) } 
-      - "childFourStreet": ${ children[3].address.line_one() } 
-      - "childFourCity": ${ children[3].address.city } 
-      - "childFourState": ${ children[3].address.state } 
-      - "childFourZip": ${ children[3].address.zip } 
-      - "childFourAge": ${ "round(date_difference(as_datetime(children[3].birthdate),today()).years,0)" } 
-      - "childFourMarriedOrNot": ${ children[3].special_factors['married'] } 
-      - "childFourActiveDutyOrNot": ${ children[3].special_factors['active_duty'] } 
-      - "childFourSelfSupportingOrNot": ${ children[3].special_factors['self_supporting'] } 
-      - "childFourAttendingHighSchoolOrNot": ${ children[3].special_factors['high_school'] } 
-      - "childFourAttendingCollegeOrVocSchool": ${ children[3].special_factors['college'] } 
-      - "childFourLivedWithFirstName": ${ children[3].lived_with[0].name.first } 
-      - "childFourLivedWithMiddleName": ${ children[3].lived_with[0].name.middle } 
-      - "childFourLivedWithLastName": ${ children[3].lived_with[0].name.last } 
-      - "childFourLivedWithSuffix": ${ children[3].lived_with[0].name.suffix } 
-      - "childFourLegalCustody1": ${ children[3].legal_custody == users[0].name.full() } 
-      - "childFourLegalCustody2": ${ children[3].legal_custody == other_parties[0].name.full() } 
-      - "childFourLegalCustody3": ${ children[3].legal_custody == "Joint" } 
-      - "childFourLegalCustody4": ${ children[3].legal_custody == "Other" } 
-      - "childFourLegalCustodyOtherPersonFirstName": ${ children[3].legal_custody_other[0].name.first } 
-      - "childFourLegalCustodyOtherPersonMiddleName": ${ children[3].legal_custody_other[0].name.middle } 
-      - "childFourLegalCustodyOtherPersonLastName": ${ children[3].legal_custody_other[0].name.last } 
-      - "childFourLegalCustodyOtherPersonSuffix": ${ children[3].legal_custody_other[0].name.suffix } 
-      - "childFourPhysicalCustody1": ${ children[3].physical_custody == users[0].name.full() } 
-      - "childFourPhysicalCustody2": ${ children[3].physical_custody == other_parties[0].name.full() } 
-      - "childFourPhysicalCustody3": ${ children[3].physical_custody == "Joint" } 
-      - "childFourPhysicalCustody4": ${ children[3].physical_custody == "Other" } 
-      - "childFourPhysicalCustodyOtherPersonMiddleName": ${ children[3].physical_custody_other[0].name.middle } 
-      - "childFourPhysicalCustodyOtherPersonLastName": ${ children[3].physical_custody_other[0].name.last } 
-      - "childFourPhysicalCustodyOtherPersonSuffix": ${ children[3].physical_custody_other[0].name.suffix } 
-      - "childFourPhysicalCustodyOtherPersonFirstName": ${ children[3].physical_custody_other[0].name.first } 
-      - "childFourParentsMe": ${ children[3].parents[users[0].name.full()] } 
-      - "childFourParentsMySpouse": ${ children[3].parents[other_parties[0].name.full()] } 
-      - "childFourParentsOtherPerson": ${ children[3].parents['Other'] } 
-      - "childFourParentsOtherPersonFirstName": ${ children[3].parent_other[0].name.first } 
-      - "childFourParentsOtherPersonMiddleName": ${ children[3].parent_other[0].name.middle } 
-      - "childFourParentsOtherPersonLastName": ${ children[3].parent_other[0].name.last } 
-      - "childFourParentsOtherPersonSuffix": ${ children[3].parent_other[0].name.suffix } 
-      - "childFourBirthCertMe": ${ children[3].birth_certificate[users[0].name.full()] } 
-      - "childFourBirthCertSpouse": ${ children[3].birth_certificate[other_parties[0].name.full()] } 
-      - "childFourBirthCertOtherPerson": ${ children[3].birth_certificate['Other'] } 
-      - "childFourBirthCertOtherPersonFirstName": ${ children[3].birth_certificate_other[0].name.first } 
-      - "childFourBirthCertOtherPersonMiddleName": ${ children[3].birth_certificate_other[0].name.middle } 
-      - "childFourBirthCertOtherPersonLastName": ${ children[3].birth_certificate_other[0].name.last } 
-      - "childFourBirthCertOtherPersonSuffix": ${ children[3].birth_certificate_other[0].name.suffix } 
+      - "childOneFirstName": |
+          % if len(children) > 0:
+          ${ children[0].name.first }
+          % endif
+      - "childOneMiddleName": |
+          % if len(children) > 0:
+          ${ children[0].name.middle }
+          % endif
+      - "childOneLastName": |
+          % if len(children) > 0:
+          ${ children[0].name.last }
+          % endif
+      - "childOneSuffixJrSrIII": |
+          % if len(children) > 0:
+          ${ children[0].name.suffix }
+          % endif
+      - "childOneSsnLastFour": |
+          % if len(children) > 0:
+          ${ "{:.0f}".format(children[0].ssn) }
+          % endif
+      - "childOneStreet": |
+          % if len(children) > 0:
+          ${ children[0].address.line_one() }
+          % endif
+      - "childOneCity": |
+          % if len(children) > 0:
+          ${ children[0].address.city }
+          % endif
+      - "childOneState": |
+          % if len(children) > 0:
+          ${ children[0].address.state }
+          % endif
+      - "childOneZip": |
+          % if len(children) > 0:
+          ${ children[0].address.zip }
+          % endif
+      - "childOneAge": |
+          % if len(children) > 0:
+          ${ "{:.0f}".format(date_difference(as_datetime(children[0].birthdate),today())) }
+          % endif
+      - "childOneMarriedOrNot": |
+          % if len(children) > 0:
+          ${ children[0].special_factors["married"] }
+          % endif
+      - "childOneActiveDutyOrNot": |
+          % if len(children) > 0:
+          ${ children[0].special_factors["active_duty"] }
+          % endif
+      - "childOneSelfSupportingOrNot": |
+          % if len(children) > 0:
+          ${ children[0].special_factors["self_supporting"] }
+          % endif
+      - "childOneAttendingHighSchoolOrNot": |
+          % if len(children) > 0:
+          ${ children[0].special_factors["high_school"] }
+          % endif
+      - "childOneAttendingCollegeOrVocSchool": |
+          % if len(children) > 0:
+          ${ children[0].special_factors["college"] }
+          % endif
+      - "childOneLivedWithFirstName": |
+          % if len(children) > 0:
+          ${ children[0].lived_with.name.first }
+          % endif
+      - "childOneLivedWithMiddleName": |
+          % if len(children) > 0:
+          ${ children[0].lived_with.name.middle }
+          % endif
+      - "childOneLivedWithLastName": |
+          % if len(children) > 0:
+          ${ children[0].lived_with.name.last }
+          % endif
+      - "childOneLivedWithSuffix": |
+          % if len(children) > 0:
+          ${ children[0].lived_with.name.suffix }
+          % endif
+      - "childOneLegalCustody1": |
+          % if len(children) > 0:
+          ${ children[0].legal_custody == "petitioner" }
+          % endif
+      - "childOneLegalCustody2": |
+          % if len(children) > 0:
+          ${ children[0].legal_custody == "respondent" }
+          % endif
+      - "childOneLegalCustody3": |
+          % if len(children) > 0:
+          ${ children[0].legal_custody == "Joint" }
+          % endif
+      - "childOneLegalCustody4": |
+          % if len(children) > 0:
+          ${ children[0].legal_custody == "Third Party" }
+          % endif
+      - "childOneLegalCustodyOtherPersonFirstName": |
+          % if len(children) > 0:
+          ${ legal_custody_other.name.first }
+          % endif
+      - "childOneLegalCustodyOtherPersonMiddleName": |
+          % if len(children) > 0:
+          ${ legal_custody_other.name.middle }
+          % endif
+      - "childOneLegalCustodyOtherPersonLastName": |
+          % if len(children) > 0:
+          ${ legal_custody_other.name.last }
+          % endif
+      - "childOneLegalCustodyOtherPersonSuffix": |
+          % if len(children) > 0:
+          ${ legal_custody_other.name.suffix }
+          % endif
+      - "childOnePhysicalCustody1": |
+          % if len(children) > 0:
+          ${ children[0].physical_custody == "petitioner" }
+          % endif
+      - "childOnePhysicalCustody2": |
+          % if len(children) > 0:
+          ${ children[0].physical_custody == "respondent" }
+          % endif
+      - "childOnePhysicalCustody3": |
+          % if len(children) > 0:
+          ${ children[0].physical_custody == "Joint" }
+          % endif
+      - "childOnePhysicalCustody4": |
+          % if len(children) > 0:
+          ${ children[0].physical_custody == "Third Party" }
+          % endif
+      - "childOnePhysicalCustodyOtherPersonMiddleName": |
+          % if len(children) > 0:
+          ${ physical_custody_other.name.middle }
+          % endif
+      - "childOnePhysicalCustodyOtherPersonLastName": |
+          % if len(children) > 0:
+          ${ physical_custody_other.name.last }
+          % endif
+      - "childOnePhysicalCustodySuffix": |
+          % if len(children) > 0:
+          ${ physical_custody_other.name.suffix }
+          % endif
+      - "childOnePhysicalCustodyOtherPersonFirstName": |
+          % if len(children) > 0:
+          ${ physical_custody_other.name.first }
+          % endif
+      - "childOneParentsMe": |
+          % if len(children) > 0:
+          ${ children[0].parents[users[0].name.full()] }
+          % endif
+      - "childOneParentsMySpouse": |
+          % if len(children) > 0:
+          ${ children[0].parents[other_parties[0].name.full()] }
+          % endif
+      - "childOneParentsOtherPerson": |
+          % if len(children) > 0:
+          ${ children[0].parents["Other"] }
+          % endif
+      - "childOneParentsOtherPersonFirstName": |
+          % if len(children) > 0:
+          ${ children[0].parent_other.name.first }
+          % endif
+      - "childOneParentsOtherPersonMiddleName": |
+          % if len(children) > 0:
+          ${ children[0].parent_other.name.middle }
+          % endif
+      - "childOneParentsOtherPersonLastName": |
+          % if len(children) > 0:
+          ${ children[0].parent_other.name.last }
+          % endif
+      - "childOneParentsOtherPersonSuffix": |
+          % if len(children) > 0:
+          ${ children[0].parent_other.name.suffix }
+          % endif
+      - "childOneBirthCertMe": |
+          % if len(children) > 0:
+          ${ children[0].birth_certificate[users[0].name.full()] }
+          % endif
+      - "childOneBirthCertSpouse": |
+          % if len(children) > 0:
+          ${ children[0].birth_certificate[other_parties[0].name.full()] }
+          % endif
+      - "childOneBirthCertOtherPerson": |
+          % if len(children) > 0:
+          ${ children[0].birth_certificate["Other"] }
+          % endif
+      - "childOneBirthCertOtherPersonFirstName": |
+          % if len(children) > 0:
+          ${ children[0].birth_certificate_other.name.first }
+          % endif
+      - "childOneBirthCertOtherPersonMiddleName": |
+          % if len(children) > 0:
+          ${ children[0].birth_certificate_other.name.middle }
+          % endif
+      - "childOneBirthCertOtherPersonLastName": |
+          % if len(children) > 0:
+          ${ children[0].birth_certificate_other.name.last }
+          % endif
+      - "childOneBirthCertOtherPersonSuffix": |
+          % if len(children) > 0:
+          ${ children[0].birth_certificate_other.name.suffix }
+          % endif
+      - "childTwoFirstName": |
+          % if len(children) > 1:
+          ${ children[1].name.first }
+          % endif
+      - "childTwoMiddleName": |
+          % if len(children) > 1:
+          ${ children[1].name.middle }
+          % endif
+      - "childTwoLastName": |
+          % if len(children) > 1:
+          ${ children[1].name.last }
+          % endif
+      - "childTwoSuffixJrSrIII": |
+          % if len(children) > 1:
+          ${ children[1].name.suffix }
+          % endif
+      - "childTwoSsnLastFour": |
+          % if len(children) > 1:
+          ${ "{:.0f}".format(children[1].ssn) }
+          % endif
+      - "childTwoStreet": |
+          % if len(children) > 1:
+          ${ children[1].address.line_one() }
+          % endif
+      - "childTwoCity": |
+          % if len(children) > 1:
+          ${ children[1].address.city }
+          % endif
+      - "childTwoState": |
+          % if len(children) > 1:
+          ${ children[1].address.state }
+          % endif
+      - "childTwoZip": |
+          % if len(children) > 1:
+          ${ children[1].address.zip }
+          % endif
+      - "childTwoAge": |
+          % if len(children) > 1:
+          ${ "{:.0f}".format(date_difference(as_datetime(children[1].birthdate),today())) }
+          % endif
+      - "childTwoMarriedOrNot": |
+          % if len(children) > 1:
+          ${ children[1].special_factors["married"] }
+          % endif
+      - "childTwoActiveDutyOrNot": |
+          % if len(children) > 1:
+          ${ children[1].special_factors["active_duty"] }
+          % endif
+      - "childTwoSelfSupportingOrNot": |
+          % if len(children) > 1:
+          ${ children[1].special_factors["self_supporting"] }
+          % endif
+      - "childTwoAttendingHighSchoolOrNot": |
+          % if len(children) > 1:
+          ${ children[1].special_factors["high_school"] }
+          % endif
+      - "childTwoAttendingCollegeOrVocSchool": |
+          % if len(children) > 1:
+          ${ children[1].special_factors["college"] }
+          % endif
+      - "childTwoLivedWithFirstName": |
+          % if len(children) > 1:
+          ${ children[1].lived_with.name.first }
+          % endif
+      - "childTwoLivedWithMiddleName": |
+          % if len(children) > 1:
+          ${ children[1].lived_with.name.middle }
+          % endif
+      - "childTwoLivedWithLastName": |
+          % if len(children) > 1:
+          ${ children[1].lived_with.name.last }
+          % endif
+      - "childTwoLivedWithSuffix": |
+          % if len(children) > 1:
+          ${ children[1].lived_with.name.suffix }
+          % endif
+      - "childTwoLegalCustody1": |
+          % if len(children) > 1:
+          ${ children[1].legal_custody == "petitioner" }
+          % endif
+      - "childTwoLegalCustody2": |
+          % if len(children) > 1:
+          ${ children[1].legal_custody == "respondent" }
+          % endif
+      - "childTwoLegalCustody3": |
+          % if len(children) > 1:
+          ${ children[1].legal_custody == "Joint" }
+          % endif
+      - "childTwoLegalCustody4": |
+          % if len(children) > 1:
+          ${ children[1].legal_custody == "Third Party" }
+          % endif
+      - "childTwoLegalCustodyOtherPersonMiddleName": |
+          % if len(children) > 1:
+          ${ legal_custody_other.name.first }
+          % endif
+      - "childTwoLegalCustodyOtherPersonSuffix": |
+          % if len(children) > 1:
+          ${ legal_custody_other.name.middle }
+          % endif
+      - "childTwoLegalCustodyOtherPersonFirstName": |
+          % if len(children) > 1:
+          ${ legal_custody_other.name.last }
+          % endif
+      - "childTwoLegalCustodyOtherPersonLastName": |
+          % if len(children) > 1:
+          ${ legal_custody_other.name.suffix }
+          % endif
+      - "childTwoPhysicalCustody1": |
+          % if len(children) > 1:
+          ${ children[1].physical_custody == "petitioner" }
+          % endif
+      - "childTwoPhysicalCustody2": |
+          % if len(children) > 1:
+          ${ children[1].physical_custody == "respondent" }
+          % endif
+      - "childTwoPhysicalCustody3": |
+          % if len(children) > 1:
+          ${ children[1].physical_custody == "Joint" }
+          % endif
+      - "childTwoPhysicalCustody4": |
+          % if len(children) > 1:
+          ${ children[1].physical_custody == "Third Party" }
+          % endif
+      - "childTwoPhysicalCustodyOtherPersonFirstName": |
+          % if len(children) > 1:
+          ${ physical_custody_other.name.middle }
+          % endif
+      - "childTwoPhysicalCustodyOtherPersonMiddleName": |
+          % if len(children) > 1:
+          ${ physical_custody_other.name.last }
+          % endif
+      - "childTwoPhysicalCustodyOtherPersonLastName": |
+          % if len(children) > 1:
+          ${ physical_custody_other.name.suffix }
+          % endif
+      - "childTwoPhysicalCustodyOtherPersonSuffix": |
+          % if len(children) > 1:
+          ${ physical_custody_other.name.first }
+          % endif
+      - "childTwoParentsMe": |
+          % if len(children) > 1:
+          ${ children[1].parents[users[0].name.full()] }
+          % endif
+      - "childTwoParentsMySpouse": |
+          % if len(children) > 1:
+          ${ children[1].parents[other_parties[0].name.full()] }
+          % endif
+      - "childTwoParentsOtherPerson": |
+          % if len(children) > 1:
+          ${ children[1].parents["Other"] }
+          % endif
+      - "childTwoParentsOtherPersonFirstName": |
+          % if len(children) > 1:
+          ${ children[1].parent_other.name.first }
+          % endif
+      - "childTwoParentsOtherPersonMiddleName": |
+          % if len(children) > 1:
+          ${ children[1].parent_other.name.middle }
+          % endif
+      - "childTwoParentsOtherPersonLastName": |
+          % if len(children) > 1:
+          ${ children[1].parent_other.name.last }
+          % endif
+      - "childTwoParentsOtherPersonSuffix": |
+          % if len(children) > 1:
+          ${ children[1].parent_other.name.suffix }
+          % endif
+      - "childTwoBirthCertMe": |
+          % if len(children) > 1:
+          ${ children[1].birth_certificate[users[0].name.full()] }
+          % endif
+      - "childTwoBirthCertSpouse": |
+          % if len(children) > 1:
+          ${ children[1].birth_certificate[other_parties[0].name.full()] }
+          % endif
+      - "childTwoBirthCertOtherPerson": |
+          % if len(children) > 1:
+          ${ children[1].birth_certificate["Other"] }
+          % endif
+      - "childTwoBirthCertOtherPersonFirstName": |
+          % if len(children) > 1:
+          ${ children[1].birth_certificate_other.name.first }
+          % endif
+      - "childTwoBirthCertOtherPersonLastName": |
+          % if len(children) > 1:
+          ${ children[1].birth_certificate_other.name.last }
+          % endif
+      - "childTwoBirthCertOtherPersonMiddleName": |
+          % if len(children) > 1:
+          ${ children[1].birth_certificate_other.name.middle }
+          % endif
+      - "childTwoBirthCertOtherPersonSuffix": |
+          % if len(children) > 1:
+          ${ children[1].birth_certificate_other.name.suffix }
+          % endif
+      - "childThreeFirstName": |
+          % if len(children) > 2:
+          ${ children[2].name.first }
+          % endif
+      - "childThreeMiddleName": |
+          % if len(children) > 2:
+          ${ children[2].name.middle }
+          % endif
+      - "childThreeLastName": |
+          % if len(children) > 2:
+          ${ children[2].name.last }
+          % endif
+      - "childThreeSuffixJrSrIII": |
+          % if len(children) > 2:
+          ${ children[2].name.suffix }
+          % endif
+      - "childThreeSsnLastFour": |
+          % if len(children) > 2:
+          ${ "{:.0f}".format(children[2].ssn) }
+          % endif
+      - "childThreeStreet": |
+          % if len(children) > 2:
+          ${ children[2].address.line_one() }
+          % endif
+      - "childThreeCity": |
+          % if len(children) > 2:
+          ${ children[2].address.city }
+          % endif
+      - "childThreeState": |
+          % if len(children) > 2:
+          ${ children[2].address.state }
+          % endif
+      - "childThreeZip": |
+          % if len(children) > 2:
+          ${ children[2].address.zip }
+          % endif
+      - "childThreeAge": |
+          % if len(children) > 2:
+          ${ "{:.0f}".format(date_difference(as_datetime(children[2].birthdate),today())) }
+          % endif
+      - "childThreeMarriedOrNot": |
+          % if len(children) > 2:
+          ${ children[2].special_factors["married"] }
+          % endif
+      - "childThreeActiveDutyOrNot": |
+          % if len(children) > 2:
+          ${ children[2].special_factors["active_duty"] }
+          % endif
+      - "childThreeSelfSupportingOrNot": |
+          % if len(children) > 2:
+          ${ children[2].special_factors["self_supporting"] }
+          % endif
+      - "childThreeAttendingHighSchoolOrNot": |
+          % if len(children) > 2:
+          ${ children[2].special_factors["high_school"] }
+          % endif
+      - "childThreeAttendingCollegeOrVocSchool": |
+          % if len(children) > 2:
+          ${ children[2].special_factors["college"] }
+          % endif
+      - "childThreeLivedWithFirstName": |
+          % if len(children) > 2:
+          ${ children[2].lived_with.name.first }
+          % endif
+      - "childThreeLivedWithMiddleName": |
+          % if len(children) > 2:
+          ${ children[2].lived_with.name.middle }
+          % endif
+      - "childThreeLivedWithLastName": |
+          % if len(children) > 2:
+          ${ children[2].lived_with.name.last }
+          % endif
+      - "childThreeLivedWithSuffix": |
+          % if len(children) > 2:
+          ${ children[2].lived_with.name.suffix }
+          % endif
+      - "childThreeLegalCustody1": |
+          % if len(children) > 2:
+          ${ children[2].legal_custody == "petitioner" }
+          % endif
+      - "childThreeLegalCustody2": |
+          % if len(children) > 2:
+          ${ children[2].legal_custody == "respondent" }
+          % endif
+      - "childThreeLegalCustody3": |
+          % if len(children) > 2:
+          ${ children[2].legal_custody == "Joint" }
+          % endif
+      - "childThreeLegalCustody4": |
+          % if len(children) > 2:
+          ${ children[2].legal_custody == "Third Party" }
+          % endif
+      - "childThreeLegalCustodyOtherPersonFirstName": |
+          % if len(children) > 2:
+          ${ legal_custody_other.name.first }
+          % endif
+      - "childThreeLegalCustodyOtherPersonMiddleName": |
+          % if len(children) > 2:
+          ${ legal_custody_other.name.middle }
+          % endif
+      - "childThreeLegalCustodyOtherPersonLastName": |
+          % if len(children) > 2:
+          ${ legal_custody_other.name.last }
+          % endif
+      - "childThreeLegalCustodyOtherPersonSuffix": |
+          % if len(children) > 2:
+          ${ legal_custody_other.name.suffix }
+          % endif
+      - "childThreePhysicalCustody1": |
+          % if len(children) > 2:
+          ${ children[2].physical_custody == "petitioner" }
+          % endif
+      - "childThreePhysicalCustody2": |
+          % if len(children) > 2:
+          ${ children[2].physical_custody == "respondent" }
+          % endif
+      - "childThreePhysicalCustody3": |
+          % if len(children) > 2:
+          ${ children[2].physical_custody == "Joint" }
+          % endif
+      - "childThreePhysicalCustody4": |
+          % if len(children) > 2:
+          ${ children[2].physical_custody == "Third Party" }
+          % endif
+      - "childThreePhysicalCustodyOtherPersonMiddleName": |
+          % if len(children) > 2:
+          ${ physical_custody_other.name.middle }
+          % endif
+      - "childThreePhysicalCustodyOtherPersonLastName": |
+          % if len(children) > 2:
+          ${ physical_custody_other.name.last }
+          % endif
+      - "childThreePhysicalCustodyOtherPersonSuffix": |
+          % if len(children) > 2:
+          ${ physical_custody_other.name.suffix }
+          % endif
+      - "childThreePhysicalCustodyOtherPersonFirstName": |
+          % if len(children) > 2:
+          ${ physical_custody_other.name.first }
+          % endif
+      - "childThreeParentsMe": |
+          % if len(children) > 2:
+          ${ children[2].parents[users[0].name.full()] }
+          % endif
+      - "childThreeParentsMySpouse": |
+          % if len(children) > 2:
+          ${ children[2].parents[other_parties[0].name.full()] }
+          % endif
+      - "childThreeParentsOtherPerson": |
+          % if len(children) > 2:
+          ${ children[2].parents["Other"] }
+          % endif
+      - "childThreeParentsOtherPersonFirstName": |
+          % if len(children) > 2:
+          ${ children[2].parent_other.name.first }
+          % endif
+      - "childThreeParentsOtherPersonMiddleName": |
+          % if len(children) > 2:
+          ${ children[2].parent_other.name.middle }
+          % endif
+      - "childThreeParentsOtherPersonLastName": |
+          % if len(children) > 2:
+          ${ children[2].parent_other.name.last }
+          % endif
+      - "childThreeParentsOtherPersonSuffix": |
+          % if len(children) > 2:
+          ${ children[2].parent_other.name.suffix }
+          % endif
+      - "childThreeBirthCertMe": |
+          % if len(children) > 2:
+          ${ children[2].birth_certificate[users[0].name.full()] }
+          % endif
+      - "childThreeBirthCertSpouse": |
+          % if len(children) > 2:
+          ${ children[2].birth_certificate[other_parties[0].name.full()] }
+          % endif
+      - "childThreeBirthCertOtherPerson": |
+          % if len(children) > 2:
+          ${ children[2].birth_certificate["Other"] }
+          % endif
+      - "childThreeBirthCertOtherPersonFirstName": |
+          % if len(children) > 2:
+          ${ children[2].birth_certificate_other.name.first }
+          % endif
+      - "childThreeBirthCertOtherPersonMiddleName": |
+          % if len(children) > 2:
+          ${ children[2].birth_certificate_other.name.middle }
+          % endif
+      - "childThreeBirthCertOtherPersonLastName": |
+          % if len(children) > 2:
+          ${ children[2].birth_certificate_other.name.last }
+          % endif
+      - "childThreeBirthCertOtherPersonSuffix": |
+          % if len(children) > 2:
+          ${ children[2].birth_certificate_other.name.suffix }
+          % endif
+      - "childFourMiddleName": |
+          % if len(children) > 3:
+          ${ children[3].name.middle }
+          % endif
+      - "childFourFirstName": |
+          % if len(children) > 3:
+          ${ children[3].name.first }
+          % endif
+      - "childFourLastName": |
+          % if len(children) > 3:
+          ${ children[3].name.last }
+          % endif
+      - "childFourSuffixJrSrIII": |
+          % if len(children) > 3:
+          ${ children[3].name.suffix }
+          % endif
+      - "childFourSsnLastFour": |
+          % if len(children) > 3:
+          ${ "{:.0f}".format(children[3].ssn) }
+          % endif
+      - "childFourStreet": |
+          % if len(children) > 3:
+          ${ children[3].address.line_one() }
+          % endif
+      - "childFourCity": |
+          % if len(children) > 3:
+          ${ children[3].address.city }
+          % endif
+      - "childFourState": |
+          % if len(children) > 3:
+          ${ children[3].address.state }
+          % endif
+      - "childFourZip": |
+          % if len(children) > 3:
+          ${ children[3].address.zip }
+          % endif
+      - "childFourAge": |
+          % if len(children) > 3:
+          ${ "{:.0f}".format(date_difference(as_datetime(children[3].birthdate),today())) }
+          % endif
+      - "childFourMarriedOrNot": |
+          % if len(children) > 3:
+          ${ children[3].special_factors["married"] }
+          % endif
+      - "childFourActiveDutyOrNot": |
+          % if len(children) > 3:
+          ${ children[3].special_factors["active_duty"] }
+          % endif
+      - "childFourSelfSupportingOrNot": |
+          % if len(children) > 3:
+          ${ children[3].special_factors["self_supporting"] }
+          % endif
+      - "childFourAttendingHighSchoolOrNot": |
+          % if len(children) > 3:
+          ${ children[3].special_factors["high_school"] }
+          % endif
+      - "childFourAttendingCollegeOrVocSchool": |
+          % if len(children) > 3:
+          ${ children[3].special_factors["college"] }
+          % endif
+      - "childFourLivedWithFirstName": |
+          % if len(children) > 3:
+          ${ children[3].lived_with.name.first }
+          % endif
+      - "childFourLivedWithMiddleName": |
+          % if len(children) > 3:
+          ${ children[3].lived_with.name.middle }
+          % endif
+      - "childFourLivedWithLastName": |
+          % if len(children) > 3:
+          ${ children[3].lived_with.name.last }
+          % endif
+      - "childFourLivedWithSuffix": |
+          % if len(children) > 3:
+          ${ children[3].lived_with.name.suffix }
+          % endif
+      - "childFourLegalCustody1": |
+          % if len(children) > 3:
+          ${ children[3].legal_custody == "petitioner" }
+          % endif
+      - "childFourLegalCustody2": |
+          % if len(children) > 3:
+          ${ children[3].legal_custody == "respondent" }
+          % endif
+      - "childFourLegalCustody3": |
+          % if len(children) > 3:
+          ${ children[3].legal_custody == "Joint" }
+          % endif
+      - "childFourLegalCustody4": |
+          % if len(children) > 3:
+          ${ children[3].legal_custody == "Third Party" }
+          % endif
+      - "childFourLegalCustodyOtherPersonFirstName": |
+          % if len(children) > 3:
+          ${ legal_custody_other.name.first }
+          % endif
+      - "childFourLegalCustodyOtherPersonMiddleName": |
+          % if len(children) > 3:
+          ${ legal_custody_other.name.middle }
+          % endif
+      - "childFourLegalCustodyOtherPersonLastName": |
+          % if len(children) > 3:
+          ${ legal_custody_other.name.last }
+          % endif
+      - "childFourLegalCustodyOtherPersonSuffix": |
+          % if len(children) > 3:
+          ${ legal_custody_other.name.suffix }
+          % endif
+      - "childFourPhysicalCustody1": |
+          % if len(children) > 3:
+          ${ children[3].physical_custody == "petitioner" }
+          % endif
+      - "childFourPhysicalCustody2": |
+          % if len(children) > 3:
+          ${ children[3].physical_custody == "respondent" }
+          % endif
+      - "childFourPhysicalCustody3": |
+          % if len(children) > 3:
+          ${ children[3].physical_custody == "Joint" }
+          % endif
+      - "childFourPhysicalCustody4": |
+          % if len(children) > 3:
+          ${ children[3].physical_custody == "Third Party" }
+          % endif
+      - "childFourPhysicalCustodyOtherPersonMiddleName": |
+          % if len(children) > 3:
+          ${ physical_custody_other.name.middle }
+          % endif
+      - "childFourPhysicalCustodyOtherPersonLastName": |
+          % if len(children) > 3:
+          ${ physical_custody_other.name.last }
+          % endif
+      - "childFourPhysicalCustodyOtherPersonSuffix": |
+          % if len(children) > 3:
+          ${ physical_custody_other.name.suffix }
+          % endif
+      - "childFourPhysicalCustodyOtherPersonFirstName": |
+          % if len(children) > 3:
+          ${ physical_custody_other.name.first }
+          % endif
+      - "childFourParentsMe": |
+          % if len(children) > 3:
+          ${ children[3].parents[users[0].name.full()] }
+          % endif
+      - "childFourParentsMySpouse": |
+          % if len(children) > 3:
+          ${ children[3].parents[other_parties[0].name.full()] }
+          % endif
+      - "childFourParentsOtherPerson": |
+          % if len(children) > 3:
+          ${ children[3].parents["Other"] }
+          % endif
+      - "childFourParentsOtherPersonFirstName": |
+          % if len(children) > 3:
+          ${ children[3].parent_other.name.first }
+          % endif
+      - "childFourParentsOtherPersonMiddleName": |
+          % if len(children) > 3:
+          ${ children[3].parent_other.name.middle }
+          % endif
+      - "childFourParentsOtherPersonLastName": |
+          % if len(children) > 3:
+          ${ children[3].parent_other.name.last }
+          % endif
+      - "childFourParentsOtherPersonSuffix": |
+          % if len(children) > 3:
+          ${ children[3].parent_other.name.suffix }
+          % endif
+      - "childFourBirthCertMe": |
+          % if len(children) > 3:
+          ${ children[3].birth_certificate[users[0].name.full()] }
+          % endif
+      - "childFourBirthCertSpouse": |
+          % if len(children) > 3:
+          ${ children[3].birth_certificate[other_parties[0].name.full()] }
+          % endif
+      - "childFourBirthCertOtherPerson": |
+          % if len(children) > 3:
+          ${ children[3].birth_certificate["Other"] }
+          % endif
+      - "childFourBirthCertOtherPersonFirstName": |
+          % if len(children) > 3:
+          ${ children[3].birth_certificate_other.name.first }
+          % endif
+      - "childFourBirthCertOtherPersonMiddleName": |
+          % if len(children) > 3:
+          ${ children[3].birth_certificate_other.name.middle }
+          % endif
+      - "childFourBirthCertOtherPersonLastName": |
+          % if len(children) > 3:
+          ${ children[3].birth_certificate_other.name.last }
+          % endif
+      - "childFourBirthCertOtherPersonSuffix": |
+          % if len(children) > 3:
+          ${ children[3].birth_certificate_other.name.suffix }
+          % endif
       - "person1ChildrenLivedWithPast5YearsSuffix": ${ persons_lived_with[0].name.suffix } 
       - "person1ChildrenLivedWithPast5YearsFirstName": ${ persons_lived_with[0].name.first } 
       - "person1ChildrenLivedWithPast5YearsMiddleName": ${ persons_lived_with[0].name.middle } 

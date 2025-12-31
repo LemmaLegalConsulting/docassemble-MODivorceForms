@@ -141,12 +141,12 @@ attachment:
       - "line6cR": ${ "{:.2f}".format(respondent.health_insurance_costs) } 
       - "line6dP": ${ "{:.2f}".format(petitioner.extraordinary_medical_costs.total(times_per_year = 12)) } 
       - "line6dR": ${ "{:.2f}".format(respondent.extraordinary_medical_costs.total(times_per_year = 12)) } 
-      - "line6eP": ${ "{:.2f}".format(petitioner.extraordinary_childrearing_costs.total(times_per_year = 12)) } 
-      - "line6eR": ${ "{:.2f}".format(respondent.extraordinary_childrearing_costs.total(times_per_year = 12)) } 
+      - "line6eP": ${ "{:.2f}".format(sum([included_cost.total(times_per_year=12) for included_cost in petitioner.extraordinary_childrearing_costs if included_cost.included_in_form_14])) }
+      - "line6eR": ${ "{:.2f}".format(sum([included_cost.total(times_per_year=12) for included_cost in respondent.extraordinary_childrearing_costs if included_cost.included_in_form_14])) }
       - "ieOtherExpensesP": ${ "{:.2f}".format(petitioner.expenses.total(times_per_year = 12)) } 
       - "ieOtherExpensesR": ${ "{:.2f}".format(respondent.expenses.total(times_per_year = 12)) } 
-      - "ieTotalMonthlyExpensesR": ${ "{:.2f}".format(respondent.other_child_support_paid + respondent.maintenance_paid + respondent.maintenance_other_paid + respondent.work_childcare_expenses + respondent.health_insurance_costs + float(respondent.extraordinary_medical_costs.total(times_per_year = 12)) + float(respondent.extraordinary_childrearing_costs.total(times_per_year = 12)) + float(respondent.expenses.total(times_per_year = 12))) } 
-      - "ieTotalMonthlyExpensesP": ${ "{:.2f}".format(petitioner.other_child_support_paid + petitioner.maintenance_paid + petitioner.maintenance_other_paid + petitioner.work_childcare_expenses + petitioner.health_insurance_costs + float(petitioner.extraordinary_medical_costs.total(times_per_year = 12)) + float(petitioner.extraordinary_childrearing_costs.total(times_per_year = 12)) + float(petitioner.expenses.total(times_per_year = 12))) } 
+      - "ieTotalMonthlyExpensesR": ${ "{:.2f}".format(respondent.other_child_support_paid + respondent.maintenance_paid + respondent.maintenance_other_paid + respondent.work_childcare_expenses + respondent.health_insurance_costs + float(respondent.extraordinary_medical_costs.total(times_per_year = 12)) + float(sum([included_cost.total(times_per_year=12) for included_cost in respondent.extraordinary_childrearing_costs if included_cost.included_in_form_14])) + float(respondent.expenses.total(times_per_year = 12))) } 
+      - "ieTotalMonthlyExpensesP": ${ "{:.2f}".format(petitioner.other_child_support_paid + petitioner.maintenance_paid + petitioner.maintenance_other_paid + petitioner.work_childcare_expenses + petitioner.health_insurance_costs + float(petitioner.extraordinary_medical_costs.total(times_per_year = 12)) + float(sum([included_cost.total(times_per_year=12) for included_cost in petitioner.extraordinary_childrearing_costs if included_cost.included_in_form_14])) + float(petitioner.expenses.total(times_per_year = 12))) } 
       - "ieDateOfNotice": ${ service.date } 
       - "ieNameRow1": ${ people_served[0].name_full() } 
       - "ieServiceContactInformationRow1": ${ people_served[0].address.on_one_line() } 

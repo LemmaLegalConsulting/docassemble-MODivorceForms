@@ -85,10 +85,10 @@ code: |
   section_right_tool
   section_relief
   section_case_information
-  section_children
   section_user_info
   section_other_party
   section_marriage
+  section_children
   if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'income_statement_attachment' in doc_list_selected.true_values() or 'property_statement_attachment' in doc_list_selected.true_values() or 'petition_attachment' in doc_list_selected.true_values():
     section_income
   if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'income_statement_attachment' in doc_list_selected.true_values() or 'property_statement_attachment' in doc_list_selected.true_values():
@@ -96,6 +96,9 @@ code: |
   if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'property_statement_attachment' in doc_list_selected.true_values():
     section_assets
     section_debts
+  if minor_children:
+    form_14_calculations
+    use_presumed_child_support
   section_service
   interview_order_mo_divorce_forms = True
 ---
@@ -231,6 +234,8 @@ code: |
     elif physical_custody == "Third Party":
       physical_custody_other.name.first
     relief['child_support']
+    if parenting_plan_A_author["Other"]:
+      parenting_plan_A_author_other.name.first
     if communications["third_party"]:
       communications_other.name.first
     phone_contact
@@ -240,6 +245,7 @@ code: |
     if case.filed in ['user0_filed','not_filed']:
       exchanges.gather()
       biweekly_schedule_review
+      visitation_nights
       if not holidays_default:
         for key in holidays.keys():
           if holidays[key]['different']:
@@ -264,13 +270,15 @@ code: |
   
   
     if child_support != "none": # certificate_of_dissolution
-      child_support_location_of_payment
+      child_support_method_of_payment
+      child_support_start_date
 
     medical_insurance
     dental_insurance
     health_expenses_not_covered
   
   users[0].health_insurance_costs
+  pay_work_childcare_expenses 
   users[0].work_childcare_expenses
   users[0].extraordinary_medical_costs.gather()
   users[0].extraordinary_childrearing_costs.gather()
@@ -360,6 +368,7 @@ code: |
     for child in children: # answer
       child.birthdate
       child.ssn
+      child.under_18_in_household
     persons_lived_with_preload # petition
     persons_lived_with.gather()
     others_with_physical_custody
@@ -517,6 +526,7 @@ code: |
   if not al_user_bundle.generate_downloads_with_docx_task.ready():
     al_download_waiting_screen
   mo_divorce_forms_download
+
 ---
 include:
   - property_statement.yml
