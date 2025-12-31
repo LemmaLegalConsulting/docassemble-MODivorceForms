@@ -35,11 +35,6 @@ code: |
   mo_divorce_forms_download
 ---
 code: |
-  children[i].physical_custody
-  children[i].under_18_in_household
-  children[i].complete = True
----
-code: |
   marriage.dissolution_type = "Dissolution"
 ---
 id: children in household at separation

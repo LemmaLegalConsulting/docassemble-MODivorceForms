@@ -85,10 +85,10 @@ code: |
   section_right_tool
   section_relief
   section_case_information
-  section_children
   section_user_info
   section_other_party
   section_marriage
+  section_children
   if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'income_statement_attachment' in doc_list_selected.true_values() or 'property_statement_attachment' in doc_list_selected.true_values() or 'petition_attachment' in doc_list_selected.true_values():
     section_income
   if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'income_statement_attachment' in doc_list_selected.true_values() or 'property_statement_attachment' in doc_list_selected.true_values():
@@ -96,6 +96,9 @@ code: |
   if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'property_statement_attachment' in doc_list_selected.true_values():
     section_assets
     section_debts
+  if minor_children:
+    form_14_calculations
+    use_presumed_child_support
   section_service
   interview_order_mo_divorce_forms = True
 ---
@@ -213,6 +216,7 @@ code: |
     if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
       respondent.party_type_code # confidential_information_sheet
       respondent.party_type_description  
+  case.type_code
   section_case_information = True
 ---
 code: |  
@@ -220,29 +224,71 @@ code: |
 
   if minor_children or minor_children_before_marriage:
     presumption_video
-    if legal_custody == "Sole":
+    if legal_custody in ["petitioner","respondent"]:
       legal_custody_sole_explanation
     elif legal_custody == "Third Party":
       legal_custody_other.name.first
 
-    if physical_custody == "Sole" and visitation:
+    if physical_custody in ["petitioner","respondent"] and visitation:
       visitation_supervisor.name.first
     elif physical_custody == "Third Party":
       physical_custody_other.name.first
     relief['child_support']
+    if parenting_plan_A_author["Other"]:
+      parenting_plan_A_author_other.name.first
     if communications["third_party"]:
       communications_other.name.first
-    ask_about_dispute_resolution
-    
-    child_support # certificate_of_dissolution
-  
-    if case.filed in ['user0_filed']:
-      parenting_plan
+    phone_contact
+    vacation
+    location_of_exchange
+
+    if case.filed in ['user0_filed','not_filed']:
+      exchanges.gather()
+      biweekly_schedule_review
+      visitation_nights
+      if not holidays_default:
+        for key in holidays.keys():
+          if holidays[key]['different']:
+            holidays[key]['even_years']
+      holidays_review
+      other_holidays.gather()
+      role_dictionary_full_name
     elif case.filed in ['other_parties0_filed']:
-      agree_with_parenting_plan
+      if not agree_with_parenting_plan:
+        exchanges.gather()
+        biweekly_schedule_review
+        if not holidays_default:
+          for key in holidays.keys():
+            if holidays[key]['different']:
+              holidays[key]['even_years']
+        holidays_review
+        other_holidays.gather()
+        role_dictionary_full_name
+  
+    ask_about_dispute_resolution
+    domestic_violence
+  
+  
+    if child_support != "none": # certificate_of_dissolution
+      child_support_method_of_payment
+      child_support_start_date
+
+    medical_insurance
+    dental_insurance
+    health_expenses_not_covered
+  
+  users[0].health_insurance_costs
+  pay_work_childcare_expenses 
+  users[0].work_childcare_expenses
+  users[0].extraordinary_medical_costs.gather()
+  users[0].extraordinary_childrearing_costs.gather()
+  other_parties[0].health_insurance_costs
+  other_parties[0].work_childcare_expenses
+  other_parties[0].extraordinary_medical_costs.gather()
+  other_parties[0].extraordinary_childrearing_costs.gather()
+
   relief['maintenance']
   is_maintenance_currently_paid
-  is_additional_provisions
   if 'answer_attachment' in doc_list_selected.true_values():
     denials_exist
   section_children = True
@@ -300,6 +346,7 @@ code: |
   if minor_children or minor_children_before_marriage:
   #    # if others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect: # form_17
   #      related_case_explanation
+    additional_children_information
     received_welfare # form_17, petition
     if abuse_or_neglect: # petition
       abuse_or_neglect_explanation
@@ -321,6 +368,7 @@ code: |
     for child in children: # answer
       child.birthdate
       child.ssn
+      child.under_18_in_household
     persons_lived_with_preload # petition
     persons_lived_with.gather()
     others_with_physical_custody
@@ -375,19 +423,15 @@ code: |
     users[0].expenses.review_items
   users[0].maintenance_other_paid
   users[0].other_child_support_paid
-  users[0].extraordinary_medical_costs.gather()
-  users[0].extraordinary_childrearing_costs.gather()
   users[0].health_insurance_costs
   users[0].work_childcare_expenses
+  users[0].extraordinary_medical_costs.gather()
+  users[0].extraordinary_childrearing_costs.gather()
   other_parties[0].expenses.gather()
   if len(other_parties[0].expenses) > 0:
     other_parties[0].expenses.review_items
   other_parties[0].maintenance_other_paid
   other_parties[0].other_child_support_paid
-  other_parties[0].extraordinary_medical_costs.gather()
-  other_parties[0].extraordinary_childrearing_costs.gather()
-  other_parties[0].health_insurance_costs
-  other_parties[0].work_childcare_expenses
   section_expenses = True
 ---
 code: |     
@@ -430,6 +474,7 @@ code: |
   users[0].review_assets
   other_parties[0].assets.gathered
   other_parties[0].review_assets
+  is_additional_provisions
   section_assets = True
 ---
 code: |       
@@ -478,7 +523,10 @@ code: |
           "reached_interview_end": True,
       },
   )
+  if not al_user_bundle.generate_downloads_with_docx_task.ready():
+    al_download_waiting_screen
   mo_divorce_forms_download
+
 ---
 include:
   - property_statement.yml
@@ -773,6 +821,8 @@ code: |
     temp_doc_list_options.append({'value':'fee_waiver_attachment','label':'Fee waiver','default':True})
   temp_doc_list_options.append({'value':'confidential_information_sheet_attachment','label':'Confidential information sheet','default':True})   
   temp_doc_list_options.append({'value':'redaction_certification_attachment','label':'Redaction certification','default':True})   
+  if minor_children:
+    temp_doc_list_options.append({'value':'parenting_plan_attachment', 'label':'Parenting Plan', 'default':True})   
   doc_list_options = temp_doc_list_options
 ---
 id: document choice
@@ -1079,6 +1129,13 @@ code: |
   else:
     redaction_certification_attachment.enabled = False
 ---
+id: redaction_certification enabled block for main interview
+code: |
+  if "parenting_plan_attachment" in doc_list_selected.true_values():
+    parenting_plan_attachment.enabled = True
+  else:
+    parenting_plan_attachment.enabled = False
+---
 id: service_by_mail_notice enabled block for main interview
 code: |
   if case.filed in ["user0","not_filed"] and respondent.service_type == "mail":
@@ -1098,6 +1155,6 @@ code: |
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, parenting_plan_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, parenting_plan_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---
