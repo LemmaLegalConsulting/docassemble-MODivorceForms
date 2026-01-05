@@ -98,6 +98,11 @@ fields:
   - How many petitions have you filed in this case?: previous_petitions
     datatype: integer
     min: 1
+  - note: |
+      If you have not filed any petitions yet, you need to change your [answer](url_action('case.filed') about whether the case has been filed.
+    show if:
+      variable: previous_petitions
+      is: 0
 ---
 ---
 objects:
@@ -635,7 +640,7 @@ id: other children number
 generic object: ALIndividual
 question: Other children for ${ x.name_full() }
 fields:
-  - "How many other children does ${ x.name_full() } have?": x.other_children
+  - "How many other minor children does ${ x.name_full() } have?": x.other_children
     datatype: integer
     min: 0    
 ---
