@@ -3,7 +3,7 @@ include:
   - docassemble.AssemblyLine:assembly_line.yml
   - docassemble.ALToolbox:al_income.yml
   - county.yml
-  - weeklydemo.yml
+  - weekly_scheduler.yml
 ---
 modules:
   - .al_income
@@ -3889,7 +3889,7 @@ subquestion: |
   ${ action_button_html(url_action('review_certificate_of_dissolution_of_marri'), label='Edit answers', color='info') }
   
   
-  ${ al_user_bundle.download_list_html(use_previously_cached_files=True, include_full_pdf=True) }
+  ${ al_user_bundle.download_list_html(use_previously_cached_files=False, include_full_pdf=True) }
   
 
   ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }

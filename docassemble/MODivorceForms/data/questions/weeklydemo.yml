@@ -1,7 +1,7 @@
 modules:
   - .function_import
 ---
-mandatory: False
+mandatory: True
 code: |
   case.filed
   exchanges.gather()
@@ -13,6 +13,9 @@ code: |
   holidays_review
   other_holidays.gather()
   mo_divorce_forms_download
+---
+include:
+  - shared.yml
 ---
 objects: 
   - exchanges: DAList.using(object_type=DAObject,there_are_any=True,complete_attribute="complete")
