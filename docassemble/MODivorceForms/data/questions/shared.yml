@@ -2829,10 +2829,6 @@ edit:
   - value
 ---
 generic object: ALIndividual
-objects:
-  - x.assets: ALAssetList.using(auto_gather=False)
----
-generic object: ALIndividual
 code: |
   x.assets.clear()
   if len([re for re in real_estate if re.recommended_award == x.name.full()]) == 1:
@@ -2841,6 +2837,26 @@ code: |
     x.assets.appendObject()
     x.assets[-1].display_name = real_estate.display_name + " (" + str([asset for asset in real_estate if asset.recommended_award == x.name.full()]) + ")"
     x.assets[-1].market_value = real_estate.filter(recommended_award = x.name.full()).total()
+  x.assets.gathered = True
+---
+generic object: ALIndividual
+objects:
+  - x.assets: ALAssetList.using(auto_gather=False)
+---
+id: code to determine individual assets based on recommended award
+generic object: ALIndividual
+code: |
+  x.assets.clear()
+  for list in [real_estate,vehicles, bank_assets, securities, personal_goods, retirement_accounts, life_insurance, interests_in_trust, interest_in_contract, interest_in_litigation, farm, debts_owed_to_you, businesses, other_assets]:
+    for item in list:
+      if item.recommended_award == x.name.full():
+        x.assets.append(item)
+        x.assets[-1].list = list.display_name
+        if not defined('x.assets[-1].source'):
+          x.assets[-1].source = list.display_name
+        elif x.assets[-1].source == "other":
+          x.assets[-1].source = list.display_name + " other"
+          
   x.assets.gathered = True
 ---
 id: real_estate object

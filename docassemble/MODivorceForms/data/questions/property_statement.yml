@@ -794,23 +794,6 @@ code: |
   other_assets.other_display = "other assets"
   other_assets.display_name = "other assets"
 ---
-generic object: ALIndividual
-objects:
-  - x.assets: ALAssetList.using(auto_gather=False)
----
-id: code to determine individual assets based on recommended award
-generic object: ALIndividual
-code: |
-  x.assets.clear()
-  for list in [real_estate,vehicles, bank_assets, securities, personal_goods, retirement_accounts, life_insurance, interests_in_trust, interest_in_contract, interest_in_litigation, farm, debts_owed_to_you, businesses, other_assets]:
-    for item in list:
-      if item.recommended_award == x.name.full():
-        x.assets.append(item)
-        x.assets[-1].list = list.display_name
-        if not defined('x.assets[-1].source'):
-          x.assets[-1].source = list.display_name
-  x.assets.gathered = True
----
 id: populate debt list from debts in assets
 code: |
   secured_debts.clear()
