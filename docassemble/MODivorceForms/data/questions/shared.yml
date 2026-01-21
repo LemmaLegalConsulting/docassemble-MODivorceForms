@@ -104,6 +104,10 @@ fields:
       variable: previous_petitions
       is: 0
 ---
+variable name: var_doc_dict["previous_petitions"]
+data:
+  - petition_attachment
+  - answer_attachment
 ---
 objects:
   - case: Thing
@@ -173,8 +177,10 @@ fields:
     
 continue button field: case.name_asked
 ---
-code: |
-  test_default = "Test"
+variable name: var_doc_dict["case.name_asked"]
+data:
+  - confidential_information_sheet_attachment
+  - redaction_certification_attachment
 ---
 id: case.name_casenet_template
 template: case.name_casenet_template
@@ -207,6 +213,10 @@ fields:
 continue button field: case.matter_type_asked
 
 ---
+variable name: var_doc_dict["case.matter_type_asked"]
+data:
+  - confidential_information_sheet_attachment
+---
 id: case.matter_type_casenet_template
 template: case.matter_type_casenet_template
 subject: |
@@ -236,6 +246,9 @@ validation code: |
   if as_datetime(case.filing_date) > today() or as_datetime(case.filing_date) < as_datetime("1/1/1900"):
     validation_error("Please enter a realistic date in the past.")
 ---
+variable name: var_doc_dict["case.filing_date_asked"]
+data:
+  - confidential_information_sheet_attachment
 ---
 id: case.filing_date_casenet_template
 template: case.filing_date_casenet_template
@@ -262,6 +275,10 @@ fields:
 continue button field: case.judge_asked
 
 ---
+variable name: var_doc_dict["case.judge_asked"]
+data:
+  - fee_waiver_attachment
+---
 id: case.judge_casenet_template
 template: case.judge_casenet_template
 subject: |
@@ -285,6 +302,20 @@ fields:
     
 continue button field: case.docket_number_asked
 
+---
+variable name: var_doc_dict["case.docket_number"]
+data:
+  - petition_attachment
+  - answer_attachment
+  - parenting_plan_attachment
+  - notice_of_hearing_attachment
+  - certificate_of_dissolution_attachment
+  - judgment_attachment
+  - property_statement_attachment
+  - income_statement_attachment
+  - fee_waiver_attachment
+  - confidential_information_sheet_attachment
+  - redaction_certification_attachment
 ---
 id: case.docket_number_casenet_template
 template: case.docket_number_casenet_template
@@ -379,6 +410,16 @@ fields:
     maxlength: 4
     required: False
 ---
+generic object: ALIndividual
+variable name: var_doc_dict["users_ssn"]
+data:
+  - answer_attachment
+  - certificate_of_dissolution_attachment
+  - confidential_information_sheet_attachment
+  - judgment_attachment
+  - petition_attachment
+  - redaction_certification_attachment
+---
 id: users driver's license number
 question: Driver's license number for ${ users[0].name_full() }
 fields:
@@ -455,6 +496,14 @@ fields:
     maxlength: 40
     required: False
 ---
+generic object: ALIndividual
+variable name: var_doc_dict["users_birthdate"]
+data:
+  - certificate_of_dissolution_attachment
+  - confidential_information_sheet_attachment
+  - petition_attachment
+  - redaction_certification_attachment
+---
 id: education info
 generic object: ALIndividual
 question: Educational info for ${ x.name_full() } completed?
@@ -500,6 +549,13 @@ question: Military info for ${ x.name_full() }
 fields:  
   - Is ${ x.name_full() } active duty military?: x.active_duty
     datatype: yesnoradio
+---
+generic object: ALIndividual
+variable name: var_doc_dict["other_parties_active_duty"]
+data:
+  - answer_attachment
+  - judgment_attachment
+  - petition_attachment
 ---
 id: race
 generic object: ALIndividual
@@ -790,6 +846,10 @@ code: |
     other_parties[0].attorney.party_type_code = "ARES"
     other_parties[0].attorney.party_type_description = "Attorney for Respondent"
 ---
+variable name: var_doc_dict["petitioner.party_type_code"]
+data:
+  - confidential_information_sheet_attachment
+---
 code: |
   children[i].party_type_code = "CHLD"
   children[i].party_type_description = "Child"
@@ -883,6 +943,14 @@ fields:
       - This child is attending high school: high_school
       - This child is attending college or vocational school: college
 ---
+generic object: ALIndividual
+variable name: children[i].birthdate_in_documents
+data:
+  - answer_attachment
+  - confidential_information_sheet_attachment
+  - petition_attachment
+  - judgment_attachment
+---
 sets: children[i].lived_with.name.first
 id: who child lived with
 reconsider: people_choices
@@ -973,6 +1041,11 @@ fields:
   - no label: persons_lived_with.there_is_another
     datatype: yesnoradio
 ---
+variable name: var_doc_dict["persons_lived_with"]
+data:
+  - answer_attachment
+  - petition_attachment
+---
 id: lived with other object
 objects: 
   - children[i].persons_lived_with: ALPeopleList.using(ask_number=True,target_number=1)
@@ -1009,6 +1082,11 @@ fields:
       - Both spouses jointly: Joint
       - Third party: Third Party
     default: ${ legal_custody }
+---
+variable name: var_doc_dict["legal_custody"]
+data:
+  - petition_attachment
+  - parenting_plan_attachment
 ---
 id: other legal custody
 reconsider:
@@ -1315,6 +1393,11 @@ fields:
     js show if: |
       (val("others_with_physical_custody") === true || val("others_with_physical_custody") === false) && (val("other_custody_proceeding") === true || val("other_custody_proceeding") === false) && (val("other_litigation") === true || val("other_litigation") === false) && (val("abuse_or_neglect") === true || val("abuse_or_neglect") === false) && (val("family_support_order") === true || val("family_support_order") === false) && (val('others_with_physical_custody') || val('other_custody_proceeding') || val('other_litigation') || val('abuse_or_neglect'))
 ---
+variable name: var_doc_dict["additional_children_information"]
+data:
+  - petition_attachment
+  - judgment_attachment
+---
 id: Others with physical custody
 question: Others with physical custody
 fields:
@@ -1369,6 +1452,12 @@ validation code: |
   if as_datetime(marriage.recorded_date) > today() or as_datetime(marriage.recorded_date) < users[0].birthdate:
     validation_error("Please enter a date in the past that isn't before the date you were born.")
 ---
+variable name: var_doc_dict["marriage_info"]
+data:
+  - petition_attachment
+  - judgment_attachment
+  - certificate_of_dissolution_attachment
+---
 id: marriage object
 objects:
   - marriage: Thing
@@ -1396,6 +1485,11 @@ question: Cash on Hand
 fields:
   - How much cash do you have on hand?: users[0].cash
     datatype: currency
+
+---
+variable name: var_doc_dict["user_cash"]
+data:
+  - fee_waiver_attachment
 
 ---
 
@@ -1451,6 +1545,14 @@ id: jobs object
 generic object: ALIndividual
 objects:
   - x.jobs: ALItemizedJobList.using(complete_attribute='complete')
+---
+variable name: var_doc_dict["user_jobs"]
+data:
+  - fee_waiver_attachment
+  - petition_attachment
+  - income_statement_attachment
+  - parenting_plan_attachment
+  - form_14_attachment
 ---
 code: |
   users[0].jobs[i].is_hourly = False
@@ -1858,6 +1960,10 @@ question: Income for ${ other_parties[0].name_full() }
 fields:
   - Is ${ other_parties[0].name_full() } able to support themselves on their monthly income?: other_parties[0].self_supporting
     datatype: yesnomaybe
+---
+variable name: var_doc_dict["user_self_supporting"]
+data:
+  - petition_attachment
 ---
 variable name: job_items_names
 data:
@@ -2337,6 +2443,17 @@ fields:
 ---
 ############################# EXPENSES #############################
 ---
+variable name: var_doc_dict["user_expenses"]
+data:
+  - fee_waiver_attachment
+  - income_statement_attachment
+
+---
+variable name: var_doc_dict["other_party_expenses"]
+data:
+  - income_statement_attachment
+
+---
 id: expenses intro screen
 continue button field: expenses_intro_screen
 question: |
@@ -2533,6 +2650,21 @@ generic object: ALIndividual
 objects:
   - x.extraordinary_medical_costs: ALExpenseList.using(complete_attribute='value')
 ---
+variable name: var_doc_dict["user_child_expenses"]
+data:
+  - fee_waiver_attachment
+  - petition_attachment
+  - income_statement_attachment
+  - parenting_plan_attachment
+  - form_14_attachment
+---
+variable name: var_doc_dict["other_party_child_expenses"]
+data:
+  - petition_attachment
+  - income_statement_attachment
+  - parenting_plan_attachment
+  - form_14_attachment
+---
 id: extraordinary medical costs
 generic object: ALIndividual
 question: Extraordinary Medical Costs to be paid by ${ x.name_full() }
@@ -2656,6 +2788,7 @@ fields:
     show if:
       variable: pay_work_childcare_expenses
       is: pay_percentage
+
 ---
 id: Work related childcare costs
 generic object: ALIndividual
@@ -2664,7 +2797,7 @@ fields:
   - What are the monthly work-related child care expenses for ${ x.name_full() }?: x.work_childcare_expenses
     datatype: currency
 ---
-if: len(children) == 0
+if: len(children) == 0 or pay_work_childcare_expenses == "none"
 generic object: ALIndividual
 code: |
   x.work_childcare_expenses = 0
@@ -2866,6 +2999,13 @@ objects:
 code: |
   real_estate.there_is_another = False
 ---
+variable name: var_doc_dict["real_estate"]
+data:
+  - fee_waiver_attachment
+  - judgment_attachment
+  - property_statement_attachment
+
+---
 id: real_estate other display
 comment: |
   This keeps the text that may be changed near the top of the section.
@@ -2983,6 +3123,12 @@ content: |
 id: vehicles object
 objects:
   - vehicles: ALAssetList.using(complete_attribute='complete',there_is_another=False)
+---
+variable name: var_doc_dict["vehicles"]
+data:
+  - fee_waiver_attachment
+  - property_statement_attachment
+
 ---
 id: vehicles other display
 comment: |
@@ -3305,6 +3451,11 @@ validation code: |
 ### DEBTS
 objects: 
   - debts: ALAssetList.using(there_is_another=False,complete_attribute='complete')
+---
+variable name: var_doc_dict["debts"]
+data:
+  - property_statement_attachment
+
 ---
 generic object: ALIndividual
 objects:

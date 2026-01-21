@@ -89,13 +89,10 @@ code: |
   section_other_party
   section_marriage
   section_children
-  if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'income_statement_attachment' in doc_list_selected.true_values() or 'property_statement_attachment' in doc_list_selected.true_values() or 'petition_attachment' in doc_list_selected.true_values():
-    section_income
-  if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'income_statement_attachment' in doc_list_selected.true_values() or 'property_statement_attachment' in doc_list_selected.true_values():
-    section_expenses
-  if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'property_statement_attachment' in doc_list_selected.true_values():
-    section_assets
-    section_debts
+  section_income
+  section_expenses
+  section_assets
+  section_debts
   if minor_children:
     form_14_calculations
     use_presumed_child_support
@@ -179,50 +176,84 @@ code: |
     other_parties[0].prior_name.name.first
   section_relief = True
 ---
+objects:
+  - var_doc_dict: DADict
+---
+variable name: var_doc_dict[i]
+data:
+  - petition_attachment
+  - answer_attachment
+  - parenting_plan_attachment
+  - notice_of_hearing_attachment
+  - certificate_of_dissolution_attachment
+  - judgment_attachment
+  - property_statement_attachment
+  - income_statement_attachment
+  - fee_waiver_attachment
+  - confidential_information_sheet_attachment
+  - redaction_certification_attachment
+  - form_14_attachment
+---
+variable name: var_doc_dict["case.county"]
+data:
+  - petition_attachment
+  - answer_attachment
+  - parenting_plan_attachment
+  - notice_of_hearing_attachment
+  - certificate_of_dissolution_attachment
+  - judgment_attachment
+  - property_statement_attachment
+  - income_statement_attachment
+  - fee_waiver_attachment
+  - confidential_information_sheet_attachment
+  - redaction_certification_attachment
+---
 code: |    
   ## 3 Please enter your case information
   nav.set_section("case_information")   
   if case.filed in ["user0_filed", "other_parties0_filed"]:
     use_case_net_for_online_docket
-  case.county # property_statement, petition, notice_of_hearing, form_17, certificate_of_dissolution
-  case.court_name
+  if len(set(var_doc_dict["case.county"]) & set(doc_list_selected.true_values())) > 0:
+    case.county # property_statement, petition, notice_of_hearing, form_17, certificate_of_dissolution
+    case.court_name
+    case.circuit 
   if defined('case.photo_filename'):
     case.photo.filename
   if case.filed in ["user0_filed", "other_parties0_filed"]:
-    if 'answer_attachment' in doc_list_selected.true_values() or 'petition_attachment' in doc_list_selected.true_values():
+    if len(set(var_doc_dict["previous_petitions"]) & set(doc_list_selected.true_values())) > 0:
       previous_petitions # answer, petition
-    case.docket_number_asked
-    if 'confidential_information_sheet_attachment' in doc_list_selected.true_values() or 'redaction_certification_attachment' in doc_list_selected.true_values():
+    if len(set(var_doc_dict["case.docket_number"]) & set(doc_list_selected.true_values())) > 0:
+      case.docket_number_asked
+    if len(set(var_doc_dict["case.name_asked"]) & set(doc_list_selected.true_values())) > 0:
       case.name_asked
-    if 'fee_waiver_attachment' in doc_list_selected.true_values():
+    if len(set(var_doc_dict["case.judge_asked"]) & set(doc_list_selected.true_values())) > 0:
       case.judge_asked
-    if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
+    if len(set(var_doc_dict["case.filing_date_asked"]) & set(doc_list_selected.true_values())) > 0:
       case.filing_date_asked # petition
-    if 'fee_waiver_attachment' in doc_list_selected.true_values() or 'redaction_certification_attachment' in doc_list_selected.true_values():
-      case.circuit # form_17
-    notice_date # property_statement.yml
-    if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
-      case.matter_type # notice_of_hearing
-  if petitioner.attorney_involved: # petition, notice_of_hearing
-    petitioner.attorney.name.first # petition
-    if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
-      petitioner.attorney.party_type_code # confidential_information_sheet
-      petitioner.party_type_description 
-  if case.filed in ["user0_filed", "other_parties0_filed"]:
+    if len(set(var_doc_dict["notice_date"]) & set(doc_list_selected.true_values())) > 0:
+      notice_date # property_statement.yml
+    if len(set(var_doc_dict["case.matter_type"]) & set(doc_list_selected.true_values())) > 0:
+      case.matter_type_asked # notice_of_hearing
+  if len(set(var_doc_dict["petitioner.attorney_involved"]) & set(doc_list_selected.true_values())) > 0:
+    if petitioner.attorney_involved: # petition, notice_of_hearing
+      petitioner.attorney.name.first # petition
+  if len(set(var_doc_dict["petitioner.party_type_code"]) & set(doc_list_selected.true_values())) > 0:
+      if petitioner.attorney_involved:
+        petitioner.attorney.party_type_code # confidential_information_sheet
+      petitioner.party_type_description
+  if case.filed in ["user0_filed", "other_parties0_filed"] and len(set(var_doc_dict["respondent.attorney_involved"]) & set(doc_list_selected.true_values())) > 0:
     if respondent.attorney_involved:
       respondent.attorney.name.first
-      if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
-        respondent.attorney.party_type_code
-    if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
-      respondent.party_type_code # confidential_information_sheet
-      respondent.party_type_description  
+      respondent.attorney.party_type_code
+    respondent.party_type_code # confidential_information_sheet
+    respondent.party_type_description  
   case.type_code
   section_case_information = True
 ---
 code: |  
   nav.set_section("relief")
 
-  if minor_children or minor_children_before_marriage:
+  if minor_children and len(set(var_doc_dict["legal_custody"]) & set(doc_list_selected.true_values())) > 0:
     presumption_video
     if legal_custody in ["petitioner","respondent"]:
       legal_custody_sole_explanation
@@ -233,30 +264,22 @@ code: |
       visitation_supervisor.name.first
     elif physical_custody == "Third Party":
       physical_custody_other.name.first
-    relief['child_support']
-    if parenting_plan_A_author["Other"]:
-      parenting_plan_A_author_other.name.first
-    if communications["third_party"]:
-      communications_other.name.first
-    phone_contact
-    vacation
-    location_of_exchange
+    if legal_custody == "Third Party" or physical_custody == "Third Party":
+      third_party_custody_warning
+    else:
+      relief['child_support']
+      if parenting_plan_A_author["Other"]:
+        parenting_plan_A_author_other.name.first
+      if communications["third_party"]:
+        communications_other.name.first
+      phone_contact
+      vacation
+      location_of_exchange
 
-    if case.filed in ['user0_filed','not_filed']:
-      exchanges.gather()
-      biweekly_schedule_review
-      visitation_nights
-      if not holidays_default:
-        for key in holidays.keys():
-          if holidays[key]['different']:
-            holidays[key]['even_years']
-      holidays_review
-      other_holidays.gather()
-      role_dictionary_full_name
-    elif case.filed in ['other_parties0_filed']:
-      if not agree_with_parenting_plan:
+      if case.filed in ['user0_filed','not_filed']:
         exchanges.gather()
         biweekly_schedule_review
+        visitation_nights
         if not holidays_default:
           for key in holidays.keys():
             if holidays[key]['different']:
@@ -264,44 +287,54 @@ code: |
         holidays_review
         other_holidays.gather()
         role_dictionary_full_name
-  
-    ask_about_dispute_resolution
-    domestic_violence
-  
-  
-    if child_support != "none": # certificate_of_dissolution
-      child_support_method_of_payment
-      child_support_start_date
+      elif case.filed in ['other_parties0_filed']:
+        if not agree_with_parenting_plan:
+          exchanges.gather()
+          biweekly_schedule_review
+          if not holidays_default:
+            for key in holidays.keys():
+              if holidays[key]['different']:
+                holidays[key]['even_years']
+          holidays_review
+          other_holidays.gather()
+          role_dictionary_full_name
+    
+      ask_about_dispute_resolution
+      domestic_violence
+    
+    
+      if child_support != "none": # certificate_of_dissolution
+        child_support_method_of_payment
+        child_support_start_date
 
-    medical_insurance
-    dental_insurance
-    health_expenses_not_covered
+      medical_insurance
+      dental_insurance
+      health_expenses_not_covered
   
-  users[0].health_insurance_costs
-  pay_work_childcare_expenses 
-  users[0].work_childcare_expenses
-  users[0].extraordinary_medical_costs.gather()
-  users[0].extraordinary_childrearing_costs.gather()
-  other_parties[0].health_insurance_costs
-  other_parties[0].work_childcare_expenses
-  other_parties[0].extraordinary_medical_costs.gather()
-  other_parties[0].extraordinary_childrearing_costs.gather()
+  if len(set(var_doc_dict["pay_work_childcare_expenses"]) & set(doc_list_selected.true_values())) > 0:
+    users[0].health_insurance_costs
+    pay_work_childcare_expenses 
+    users[0].work_childcare_expenses
+    users[0].extraordinary_medical_costs.gather()
+    users[0].extraordinary_childrearing_costs.gather()
+    other_parties[0].health_insurance_costs
+    other_parties[0].work_childcare_expenses
+    other_parties[0].extraordinary_medical_costs.gather()
+    other_parties[0].extraordinary_childrearing_costs.gather()
 
-  relief['maintenance']
-  is_maintenance_currently_paid
+    relief['maintenance']
+    is_maintenance_currently_paid
   if 'answer_attachment' in doc_list_selected.true_values():
     denials_exist
   section_children = True
 ---
 code: |    
   nav.set_section("user_info")  
-
-  
-
   users[0].email
   users[0].phone_number
   users[0].birthdate
-  users[0].ssn
+  if len(set(var_doc_dict["users_ssn"]) & set(doc_list_selected.true_values())) > 0:
+    users[0].ssn
   if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
     users[0].gender # confidential_information_sheet
   users[0].pronouns
@@ -321,29 +354,30 @@ code: |
   other_parties[0].pronouns
   other_parties[0].email
   other_parties[0].phone_number
-  other_parties[0].active_duty
-  other_parties[0].birthdate
-  other_parties[0].ssn
+  if len(set(var_doc_dict["users_birthdate"]) & set(doc_list_selected.true_values())) > 0:
+    other_parties[0].birthdate
+  if len(set(var_doc_dict["users_ssn"]) & set(doc_list_selected.true_values())) > 0:
+    other_parties[0].ssn
   if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
     other_parties[0].race # certificate_of_dissolution
     other_parties[0].education_info
     other_parties[0].previously_married
-  other_parties[0].active_duty
+  if len(set(var_doc_dict["other_parties_active_duty"]) & set(doc_list_selected.true_values())) > 0:
+    other_parties[0].active_duty
   section_other_party = True
 ---
 code: |  
   nav.set_section('marriage')
-  marriage_info # certificate_of dissolution
-  if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
-    marriage.separation_date # certificate_of dissolution
-  if 'petition_attachment' in doc_list_selected.true_values():
+  
+  if len(set(var_doc_dict["marriage_info"]) & set(doc_list_selected.true_values())) > 0:
+    marriage_info # certificate_of dissolution
     marriage.address.county # petition
-  marriage.address.country
-  marriage.address.state
-  marriage.recorded_date
+    marriage.address.country
+    marriage.address.state
+    marriage.recorded_date
   marriage.separation_date
 
-  if minor_children or minor_children_before_marriage:
+  if minor_children and len(set(var_doc_dict["marriage_info"]) & set(doc_list_selected.true_values())) > 0:
   #    # if others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect: # form_17
   #      related_case_explanation
     additional_children_information
@@ -367,125 +401,136 @@ code: |
     children.gather()
     for child in children: # answer
       child.birthdate
-      child.ssn
       child.under_18_in_household
-    persons_lived_with_preload # petition
-    persons_lived_with.gather()
-    others_with_physical_custody
+      child.ssn
+    if len(set(var_doc_dict["persons_lived_with"]) & set(doc_list_selected.true_values())) > 0:
+      persons_lived_with_preload # petition
+      persons_lived_with.gather()
   section_marriage = True
 ---
 code: |    
   nav.set_section('income')
-  users[0].jobs.gather() # income_statement.yml, fee_waiver, form_17
-  if users[0].jobs.there_are_any or users[0].has_self_employment_income: # form_17
-    users[0].employer.name.text
-    users[0].employer.email # confidential information sheet order
-    users[0].employer.address.address
-  users[0].jobs.total(times_per_year = 12)
-  users[0].has_self_employment_income
-  users[0].benefits.gather()
-  if len(users[0].benefits) > 0:
-    users[0].benefits.review_items
-  users[0].other_incomes.gather()
-  if len(users[0].other_incomes) > 0:
-    users[0].other_incomes.review_items
-  users[0].maintenance_other_received
-  users[0].other_children
-  users[0].other_child_support_received
-  users[0].monthly_gross_income # property_statement
-  users[0].self_supporting # property_statement
-  other_parties[0].jobs.gather() # income_statement.yml, fee_waiver, form_17
-  if other_parties[0].jobs.there_are_any or other_parties[0].has_self_employment_income: # form_17
-    other_parties[0].employer.name.text
-    other_parties[0].employer.email # confidential information sheet order
-    other_parties[0].employer.address.address
-    if case.filed in ["user0_filed"]:   
-      other_parties[0].hours_of_employment
-  other_parties[0].jobs.total(times_per_year = 12)
-  other_parties[0].has_self_employment_income
-  other_parties[0].benefits.gather()
-  if len(other_parties[0].benefits) > 0:
-    other_parties[0].benefits.review_items
-  other_parties[0].other_incomes.gather()
-  if len(other_parties[0].other_incomes) > 0:
-    other_parties[0].other_incomes.review_items
-  other_parties[0].maintenance_other_received
-  other_parties[0].other_children
-  other_parties[0].other_child_support_received
-  other_parties[0].monthly_gross_income # property_statement
-  other_parties[0].self_supporting # property_statement
+  if len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0:
+    users[0].jobs.gather() # income_statement.yml, fee_waiver, form_17
+    if users[0].jobs.there_are_any or users[0].has_self_employment_income: # form_17
+      users[0].employer.name.text
+      users[0].employer.email # confidential information sheet order
+      users[0].employer.address.address
+    users[0].jobs.total(times_per_year = 12)
+    users[0].has_self_employment_income
+    users[0].benefits.gather()
+    if len(users[0].benefits) > 0:
+      users[0].benefits.review_items
+    users[0].other_incomes.gather()
+    if len(users[0].other_incomes) > 0:
+      users[0].other_incomes.review_items
+    users[0].maintenance_other_received
+    users[0].other_children
+    users[0].other_child_support_received
+    users[0].monthly_gross_income # property_statement
+    if len(set(var_doc_dict["user_self_supporting"]) & set(doc_list_selected.true_values())) > 0:
+      users[0].self_supporting # property_statement
+    other_parties[0].jobs.gather() # income_statement.yml, fee_waiver, form_17
+    if other_parties[0].jobs.there_are_any or other_parties[0].has_self_employment_income: # form_17
+      other_parties[0].employer.name.text
+      other_parties[0].employer.email # confidential information sheet order
+      other_parties[0].employer.address.address
+      if case.filed in ["user0_filed"]:   
+        other_parties[0].hours_of_employment
+    other_parties[0].jobs.total(times_per_year = 12)
+    other_parties[0].has_self_employment_income
+    other_parties[0].benefits.gather()
+    if len(other_parties[0].benefits) > 0:
+      other_parties[0].benefits.review_items
+    other_parties[0].other_incomes.gather()
+    if len(other_parties[0].other_incomes) > 0:
+      other_parties[0].other_incomes.review_items
+    other_parties[0].maintenance_other_received
+    other_parties[0].other_children
+    other_parties[0].other_child_support_received
+    other_parties[0].monthly_gross_income # property_statement
+    if len(set(var_doc_dict["user_self_supporting"]) & set(doc_list_selected.true_values())) > 0:
+      other_parties[0].self_supporting # property_statement
   section_income = True
 ---
 code: |    
   nav.set_section('expenses')
-  users[0].expenses.gather()
-  if len(users[0].expenses) > 0:
-    users[0].expenses.review_items
-  users[0].maintenance_other_paid
-  users[0].other_child_support_paid
-  users[0].health_insurance_costs
-  users[0].work_childcare_expenses
-  users[0].extraordinary_medical_costs.gather()
-  users[0].extraordinary_childrearing_costs.gather()
-  other_parties[0].expenses.gather()
-  if len(other_parties[0].expenses) > 0:
-    other_parties[0].expenses.review_items
-  other_parties[0].maintenance_other_paid
-  other_parties[0].other_child_support_paid
+  if len(set(var_doc_dict["user_expenses"]) & set(doc_list_selected.true_values())) > 0:
+    users[0].expenses.gather()
+    if len(users[0].expenses) > 0:
+      users[0].expenses.review_items
+  if len(set(var_doc_dict["user_child_expenses"]) & set(doc_list_selected.true_values())) > 0:
+    users[0].maintenance_other_paid
+    users[0].other_child_support_paid
+    users[0].health_insurance_costs
+    users[0].work_childcare_expenses
+    users[0].extraordinary_medical_costs.gather()
+    users[0].extraordinary_childrearing_costs.gather()
+  if len(set(var_doc_dict["other_party_expenses"]) & set(doc_list_selected.true_values())) > 0:
+    other_parties[0].expenses.gather()
+    if len(other_parties[0].expenses) > 0:
+      other_parties[0].expenses.review_items
+  if len(set(var_doc_dict["other_party_child_expenses"]) & set(doc_list_selected.true_values())) > 0:
+    other_parties[0].maintenance_other_paid
+    other_parties[0].other_child_support_paid
   section_expenses = True
 ---
 code: |     
   nav.set_section('assets')  
-  if 'fee_waiver_attachment' in doc_list_selected.true_values():
+  if len(set(var_doc_dict["user_cash"]) & set(doc_list_selected.true_values())) > 0:
     users[0].cash
-  real_estate.gather() # property_statement, fee_waiver
-  if len(real_estate.matches(source=['house'])) > 0:
-    assets_warning
-  if len(real_estate) > 0:
-    real_estate.review_items
-  if len(vehicles) > 0:
-    vehicles.review_items
-  if len(bank_assets) > 0:
-    bank_assets.review_items 
-  if len(securities) > 0:
-    securities.review_items 
-  if len(personal_goods) > 0:
-    personal_goods.review_items 
-  if len(retirement_accounts) > 0:
-    retirement_accounts.review_items 
-  there_are_any_screen
-  if len(life_insurance) > 0:
-    life_insurance.review_items 
-  if len(interests_in_trust) > 0:
-    interests_in_trust.review_items 
-  if len(interest_in_contract) > 0:
-    interest_in_contract.review_items 
-  if len(interest_in_litigation) > 0:
-    interest_in_litigation.review_items 
-  if len(farm) > 0:
-    farm.review_items 
-  if len(debts_owed_to_you) > 0:
-    debts_owed_to_you.review_items 
-  if len(businesses) > 0:
-    businesses.review_items 
-  if len(other_assets) > 0:
-    other_assets.review_items 
-  users[0].assets.gathered
-  users[0].review_assets
-  other_parties[0].assets.gathered
-  other_parties[0].review_assets
-  is_additional_provisions
+  if len(set(var_doc_dict["real_estate"]) & set(doc_list_selected.true_values())) > 0:
+    real_estate.gather() # property_statement, fee_waiver
+    if len(real_estate.matches(source=['house'])) > 0:
+      assets_warning
+    if len(real_estate) > 0:
+      real_estate.review_items
+  if len(set(var_doc_dict["vehicles"]) & set(doc_list_selected.true_values())) > 0:
+    if len(vehicles) > 0:
+      vehicles.review_items
+    if len(personal_goods) > 0:
+      personal_goods.review_items 
+    if len(bank_assets) > 0:
+      bank_assets.review_items 
+  if len(set(var_doc_dict["other_assets"]) & set(doc_list_selected.true_values())) > 0:
+    if len(securities) > 0:
+      securities.review_items 
+    if len(retirement_accounts) > 0:
+      retirement_accounts.review_items 
+    there_are_any_screen
+    if len(life_insurance) > 0:
+      life_insurance.review_items 
+    if len(interests_in_trust) > 0:
+      interests_in_trust.review_items 
+    if len(interest_in_contract) > 0:
+      interest_in_contract.review_items 
+    if len(interest_in_litigation) > 0:
+      interest_in_litigation.review_items 
+    if len(farm) > 0:
+      farm.review_items 
+    if len(debts_owed_to_you) > 0:
+      debts_owed_to_you.review_items 
+    if len(businesses) > 0:
+      businesses.review_items 
+    if len(other_assets) > 0:
+      other_assets.review_items 
+    users[0].assets.gathered
+    users[0].review_assets
+    other_parties[0].assets.gathered
+    other_parties[0].review_assets
+    is_additional_provisions
   section_assets = True
 ---
 code: |       
   nav.set_section('debts')
-  secured_debts.gathered
-  if len(debts) > 0:
-    debts.review_items
-  users[0].debts.gathered
-  users[0].review_debts
-  other_parties[0].debts.gathered
-  other_parties[0].review_debts
+  if len(set(var_doc_dict["other_assets"]) & set(doc_list_selected.true_values())) > 0:
+    secured_debts.gathered
+    if len(debts) > 0:
+      debts.review_items
+    users[0].debts.gathered
+    users[0].review_debts
+    other_parties[0].debts.gathered
+    other_parties[0].review_debts
   section_debts = True
 ---
 code: |     
@@ -540,6 +585,7 @@ include:
   - income_statement.yml
   - fee_waiver.yml
   - confidential_information_sheet.yml
+  - form_14.yml
 ---
 comment: |
   moved this from shared.yml because something in one of these documents in the include above must be making the al_toolbox.yml take precedence when it is in shared.yml
@@ -823,6 +869,7 @@ code: |
   temp_doc_list_options.append({'value':'redaction_certification_attachment','label':'Redaction certification','default':True})   
   if minor_children:
     temp_doc_list_options.append({'value':'parenting_plan_attachment', 'label':'Parenting Plan', 'default':True})   
+    temp_doc_list_options.append({'value':'form_14_attachment', 'label':'Form 14 only', 'default':False})   
   doc_list_options = temp_doc_list_options
 ---
 id: document choice
@@ -847,6 +894,7 @@ data:
   fee_waiver_attachment: Fee waiver
   confidential_information_sheet_attachment: Confidential information sheet
   redaction_certification_attachment: Redaction certification
+  form_14_attachment: Form 14
 ---
 id: set pregnant to false since kick out if pregnant
 generic object: ALIndividual
@@ -1150,11 +1198,18 @@ code: |
   else:
     service_by_mail_affidavit_attachment.enabled = False
 ---
+id: redaction_certification enabled block for main interview
+code: |
+  if "form_14_attachment" in doc_list_selected.true_values() and not "parenting_plan_attachment" in doc_list_selected.true_values():
+    form_14_attachment.enabled = True
+  else:
+    form_14_attachment.enabled = False
+---
 code: |
   document_list = doc_list_selected.true_values()
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, parenting_plan_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, parenting_plan_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, parenting_plan_attachment, form_14_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, parenting_plan_attachment, form_14_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---

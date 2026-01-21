@@ -63,6 +63,11 @@ id: securities object
 objects:
   - securities: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
+variable name: var_doc_dict["other_assets"]
+data:
+  - property_statement_attachment
+
+---
 id: securities other display
 comment: |
   This keeps the text that may be changed near the top of the section.

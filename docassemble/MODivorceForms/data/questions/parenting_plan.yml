@@ -289,13 +289,18 @@ code: |
   elif x.monthly_income_1 > 30000:
     x.support_obligation_2c2_income_index = 30000
   else:
-    x.support_obligation_2c2_income_index = x.monthly_income_1//50*50
+    x.support_obligation_2c2_income_index = (x.monthly_income_1+25)//50*50
   if x.other_children == 0:
     x.support_obligation_2c2 = 0
+  elif basic_child_support_schedule[str(x.other_children)][str("{:.0f}".format(x.support_obligation_2c2_income_index))]['poverty']:
+    x.support_obligation_2c2A = basic_child_support_schedule[str(x.other_children)][str("{:.0f}".format(x.support_obligation_2c2_income_index))]['obligation']
   else:
-    x.support_obligation_2c2 = basic_child_support_schedule[str(x.other_children)][str("{:.0f}".format(x.support_obligation_2c2_income_index))]
+    x.support_obligation_2c2 = basic_child_support_schedule[str(x.other_children)][str("{:.0f}".format(x.support_obligation_2c2_income_index))]['obligation']
   x.total_adjustment_2c = x.support_obligation_2c2 - x.other_child_support_received
-  x.adjusted_monthly_gross_income_3 = x.monthly_income_1 + x.maintenance_received + x.maintenance_other_received - x.other_child_support_paid - x.maintenance_paid - x.total_adjustment_2c
+  if (x.monthly_income_1 + x.maintenance_received + x.maintenance_other_received - x.other_child_support_paid - x.maintenance_paid - x.total_adjustment_2c) > 0:
+    x.adjusted_monthly_gross_income_3 = x.monthly_income_1 + x.maintenance_received + x.maintenance_other_received - x.other_child_support_paid - x.maintenance_paid - x.total_adjustment_2c
+  else:
+    x.adjusted_monthly_gross_income_3 = 0
   x.form_14_starting_calculations = True  
 ---
 code: |
@@ -318,11 +323,11 @@ code: |
   elif combined_adjusted_income_3 > 30000:
     combined_income_index = 30000
   else:
-    combined_income_index = combined_adjusted_income_3//50*50
+    combined_income_index = (combined_adjusted_income_3+25)//50*50
   if len(children) > 6:
-    basic_child_support_amount_5 = basic_child_support_schedule["6"][str("{:.0f}".format(combined_income_index))]
+    basic_child_support_amount_5 = basic_child_support_schedule["6"][str("{:.0f}".format(combined_income_index))]["obligation"]
   else:
-    basic_child_support_amount_5 = basic_child_support_schedule[str(len(children))][str("{:.0f}".format(combined_income_index))]
+    basic_child_support_amount_5 = basic_child_support_schedule[str(len(children))][str("{:.0f}".format(combined_income_index))]["obligation"]
   if support_recipient.adjusted_monthly_gross_income_3 < 1251:
     credit_subtract = 0
   elif support_recipient.adjusted_monthly_gross_income_3 > 3583:
@@ -380,32 +385,32 @@ code: |
   support_payer.visitation_adjustment_11 = basic_child_support_amount_5*support_payer.visitation_adjustment_11_percentage*.01
   support_payer.presumed_child_support_amount_12 = support_payer.support_obligation_9 - support_payer.childrearing_credit_10 - support_payer.visitation_adjustment_11
   if len(children) > 5:
-    basic_child_support_amount_5_6 = basic_child_support_schedule["6"][str("{:.0f}".format(combined_income_index))]
+    basic_child_support_amount_5_6 = basic_child_support_schedule["6"][str("{:.0f}".format(combined_income_index))]["obligation"]
     support_payer.presumed_child_support_amount_6_children = (basic_child_support_amount_5_6 + total_childrearing_costs_7) * support_payer.income_share_4 - support_payer.childrearing_credit_10 - (basic_child_support_amount_5_6) * support_payer.visitation_adjustment_11_percentage*.01
   else:
     support_payer.presumed_child_support_amount_6_children = None
   if len(children) > 4:
-    basic_child_support_amount_5_5 = basic_child_support_schedule["5"][str("{:.0f}".format(combined_income_index))]
+    basic_child_support_amount_5_5 = basic_child_support_schedule["5"][str("{:.0f}".format(combined_income_index))]["obligation"]
     support_payer.presumed_child_support_amount_5_children = (basic_child_support_amount_5_5 + total_childrearing_costs_7) * support_payer.income_share_4 - support_payer.childrearing_credit_10 - (basic_child_support_amount_5_5) * support_payer.visitation_adjustment_11_percentage*.01
   else:
     support_payer.presumed_child_support_amount_5_children = None
   if len(children) > 3:
-    basic_child_support_amount_5_4 = basic_child_support_schedule["4"][str("{:.0f}".format(combined_income_index))]
+    basic_child_support_amount_5_4 = basic_child_support_schedule["4"][str("{:.0f}".format(combined_income_index))]["obligation"]
     support_payer.presumed_child_support_amount_4_children = (basic_child_support_amount_5_4 + total_childrearing_costs_7) * support_payer.income_share_4 - support_payer.childrearing_credit_10 - (basic_child_support_amount_5_4) * support_payer.visitation_adjustment_11_percentage*.01
   else:
     support_payer.presumed_child_support_amount_4_children = None
   if len(children) > 2:
-    basic_child_support_amount_5_3 = basic_child_support_schedule["3"][str("{:.0f}".format(combined_income_index))]
+    basic_child_support_amount_5_3 = basic_child_support_schedule["3"][str("{:.0f}".format(combined_income_index))]["obligation"]
     support_payer.presumed_child_support_amount_3_children = (basic_child_support_amount_5_3 + total_childrearing_costs_7) * support_payer.income_share_4 - support_payer.childrearing_credit_10 - (basic_child_support_amount_5_3) * support_payer.visitation_adjustment_11_percentage*.01
   else:
     support_payer.presumed_child_support_amount_3_children = None
   if len(children) > 1:
-    basic_child_support_amount_5_2 = basic_child_support_schedule["2"][str("{:.0f}".format(combined_income_index))]
+    basic_child_support_amount_5_2 = basic_child_support_schedule["2"][str("{:.0f}".format(combined_income_index))]["obligation"]
     support_payer.presumed_child_support_amount_2_children = (basic_child_support_amount_5_2 + total_childrearing_costs_7) * support_payer.income_share_4 - support_payer.childrearing_credit_10 - (basic_child_support_amount_5_2) * support_payer.visitation_adjustment_11_percentage*.01
   else:
     support_payer.presumed_child_support_amount_2_children = None
   if len(children) > 0:
-    basic_child_support_amount_5_1 = basic_child_support_schedule["1"][str("{:.0f}".format(combined_income_index))]
+    basic_child_support_amount_5_1 = basic_child_support_schedule["1"][str("{:.0f}".format(combined_income_index))]["obligation"]
     support_payer.presumed_child_support_amount_1_children = (basic_child_support_amount_5_1 + total_childrearing_costs_7) - support_payer.childrearing_credit_10 - (basic_child_support_amount_5_1) * support_payer.visitation_adjustment_11_percentage*.01
   else:
     support_payer.presumed_child_support_amount_1_children = None
@@ -1246,13 +1251,13 @@ attachment:
       - "lineThreeColTwo": ${ "{:.2f}".format(support_payer.adjusted_monthly_gross_income_3) } 
       - "lineFourColOne": |
           % if support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3 > 0:
-          ${ "{:.2f}".format(support_recipient.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3)) } 
+          ${ "{:.1f}".format(support_recipient.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3)) } 
           % else:
           0
           % endif
       - "lineFourColTwo": |
           % if support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3 > 0:
-          ${ "{:.2f}".format(support_payer.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3)) } 
+          ${ "{:.1f}".format(support_payer.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3)) } 
           % else:
           0
           % endif
