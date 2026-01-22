@@ -93,13 +93,14 @@ code: |
   section_expenses
   section_assets
   section_debts
-  if minor_children:
+  if len(set(var_doc_dict["form_14_calculations"]) & set(doc_list_selected.true_values())) > 0:
     form_14_calculations
+  if len(set(var_doc_dict["use_presumed_child_support"]) & set(doc_list_selected.true_values())) > 0:
     use_presumed_child_support
   section_service
   interview_order_mo_divorce_forms = True
 ---
----
+id: right tool interview order
 code: |  
   ## 1 Is this the appropriate tool?
   if case_type == "Custody":
@@ -146,6 +147,7 @@ code: |
         respondent_jurisdiction_kickout  
   section_right_tool = True
 ---
+id: relief interview order
 code: |  
   users.gather()
   if users[0].has_prior_name:
@@ -176,38 +178,7 @@ code: |
     other_parties[0].prior_name.name.first
   section_relief = True
 ---
-objects:
-  - var_doc_dict: DADict
----
-variable name: var_doc_dict[i]
-data:
-  - petition_attachment
-  - answer_attachment
-  - parenting_plan_attachment
-  - notice_of_hearing_attachment
-  - certificate_of_dissolution_attachment
-  - judgment_attachment
-  - property_statement_attachment
-  - income_statement_attachment
-  - fee_waiver_attachment
-  - confidential_information_sheet_attachment
-  - redaction_certification_attachment
-  - form_14_attachment
----
-variable name: var_doc_dict["case.county"]
-data:
-  - petition_attachment
-  - answer_attachment
-  - parenting_plan_attachment
-  - notice_of_hearing_attachment
-  - certificate_of_dissolution_attachment
-  - judgment_attachment
-  - property_statement_attachment
-  - income_statement_attachment
-  - fee_waiver_attachment
-  - confidential_information_sheet_attachment
-  - redaction_certification_attachment
----
+id: case information interview order
 code: |    
   ## 3 Please enter your case information
   nav.set_section("case_information")   
@@ -250,23 +221,94 @@ code: |
   case.type_code
   section_case_information = True
 ---
+id: user info interview order
+code: |    
+  nav.set_section("user_info")  
+  users[0].email
+  users[0].phone_number
+  if len(set(var_doc_dict["users_birthdate"]) & set(doc_list_selected.true_values())) > 0:
+    users[0].birthdate
+  if len(set(var_doc_dict["users_ssn"]) & set(doc_list_selected.true_values())) > 0:
+    users[0].ssn
+  if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
+    users[0].gender # confidential_information_sheet
+  users[0].pronouns
+  if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
+    users[0].race # certificate_of_dissolution
+    users[0].education_info
+    users[0].previously_married
+    users[0].active_duty
+  if 'answer_attachment' in doc_list_selected.true_values() and users[0].active_duty:
+    waive_rights
+  section_user_info = True
+---
+id: other party info interview order
+code: |    
+  nav.set_section("other_party_info")  
+  if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
+    other_parties[0].gender # confidential_information_sheet
+  other_parties[0].pronouns
+  other_parties[0].email
+  other_parties[0].phone_number
+  if len(set(var_doc_dict["users_birthdate"]) & set(doc_list_selected.true_values())) > 0:
+    other_parties[0].birthdate
+  if len(set(var_doc_dict["users_ssn"]) & set(doc_list_selected.true_values())) > 0:
+    other_parties[0].ssn
+  if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
+    other_parties[0].race # certificate_of_dissolution
+    other_parties[0].education_info
+    other_parties[0].previously_married
+  if len(set(var_doc_dict["other_parties_active_duty"]) & set(doc_list_selected.true_values())) > 0:
+    other_parties[0].active_duty
+  section_other_party = True
+---
+id: marriage interview order
 code: |  
-  nav.set_section("relief")
+  nav.set_section('marriage')
+  
+  if len(set(var_doc_dict["marriage_info"]) & set(doc_list_selected.true_values())) > 0:
+    marriage_info # certificate_of dissolution
+    marriage.address.county # petition
+    marriage.address.country
+    marriage.address.state
+    marriage.recorded_date
+  if len(set(var_doc_dict["marriage.separation_date"]) & set(doc_list_selected.true_values())) > 0:
+    marriage.separation_date
 
+  if 'petition_attachment' in doc_list_selected.true_values():
+    if other_allegations_exist:
+      other_allegations # petition
+  
+  section_marriage = True
+---
+id: children interview order
+code: |  
+  nav.set_section("children")
+
+  ## We want to ask about legal custody first, if needed.
+  
   if minor_children and len(set(var_doc_dict["legal_custody"]) & set(doc_list_selected.true_values())) > 0:
     presumption_video
     if legal_custody in ["petitioner","respondent"]:
       legal_custody_sole_explanation
     elif legal_custody == "Third Party":
-      legal_custody_other.name.first
-
-    if physical_custody in ["petitioner","respondent"] and visitation:
-      visitation_supervisor.name.first
-    elif physical_custody == "Third Party":
-      physical_custody_other.name.first
-    if legal_custody == "Third Party" or physical_custody == "Third Party":
       third_party_custody_warning
-    else:
+
+    if legal_custody != "Third Party" and physical_custody in ["petitioner","respondent"] and visitation:
+      visitation_supervisor.name.first
+    elif legal_custody != "Third Party" and physical_custody == "Third Party":
+      third_party_custody_warning
+
+  if minor_children and len(set(var_doc_dict["children"]) & set(doc_list_selected.true_values())) > 0:
+    nav.set_section("children")
+    children.gather()
+    if len(set(var_doc_dict["persons_lived_with"]) & set(doc_list_selected.true_values())) > 0:
+      persons_lived_with_preload # petition
+      persons_lived_with.gather()
+  if len(set(var_doc_dict["children_number"]) & set(doc_list_selected.true_values())) > 0:
+    number_of_children
+
+  if minor_children and len(set(var_doc_dict["legal_custody"]) & set(doc_list_selected.true_values())) > 0 and legal_custody != "Third Party" and physical_custody != "Third Party":
       relief['child_support']
       if parenting_plan_A_author["Other"]:
         parenting_plan_A_author_other.name.first
@@ -326,56 +368,6 @@ code: |
     is_maintenance_currently_paid
   if 'answer_attachment' in doc_list_selected.true_values():
     denials_exist
-  section_children = True
----
-code: |    
-  nav.set_section("user_info")  
-  users[0].email
-  users[0].phone_number
-  users[0].birthdate
-  if len(set(var_doc_dict["users_ssn"]) & set(doc_list_selected.true_values())) > 0:
-    users[0].ssn
-  if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
-    users[0].gender # confidential_information_sheet
-  users[0].pronouns
-  if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
-    users[0].race # certificate_of_dissolution
-    users[0].education_info
-    users[0].previously_married
-    users[0].active_duty
-  if 'answer_attachment' in doc_list_selected.true_values() and users[0].active_duty:
-    waive_rights
-  section_user_info = True
----
-code: |    
-  nav.set_section("other_party_info")  
-  if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
-    other_parties[0].gender # confidential_information_sheet
-  other_parties[0].pronouns
-  other_parties[0].email
-  other_parties[0].phone_number
-  if len(set(var_doc_dict["users_birthdate"]) & set(doc_list_selected.true_values())) > 0:
-    other_parties[0].birthdate
-  if len(set(var_doc_dict["users_ssn"]) & set(doc_list_selected.true_values())) > 0:
-    other_parties[0].ssn
-  if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
-    other_parties[0].race # certificate_of_dissolution
-    other_parties[0].education_info
-    other_parties[0].previously_married
-  if len(set(var_doc_dict["other_parties_active_duty"]) & set(doc_list_selected.true_values())) > 0:
-    other_parties[0].active_duty
-  section_other_party = True
----
-code: |  
-  nav.set_section('marriage')
-  
-  if len(set(var_doc_dict["marriage_info"]) & set(doc_list_selected.true_values())) > 0:
-    marriage_info # certificate_of dissolution
-    marriage.address.county # petition
-    marriage.address.country
-    marriage.address.state
-    marriage.recorded_date
-  marriage.separation_date
 
   if minor_children and len(set(var_doc_dict["marriage_info"]) & set(doc_list_selected.true_values())) > 0:
   #    # if others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect: # form_17
@@ -391,22 +383,8 @@ code: |
     if others_with_physical_custody:
       others_with_physical_custody_explanation
     family_support_order
-
-  if 'petition_attachment' in doc_list_selected.true_values():
-    if other_allegations_exist:
-      other_allegations # petition
   
-  if minor_children or minor_children_before_marriage:
-    nav.set_section("children")
-    children.gather()
-    for child in children: # answer
-      child.birthdate
-      child.under_18_in_household
-      child.ssn
-    if len(set(var_doc_dict["persons_lived_with"]) & set(doc_list_selected.true_values())) > 0:
-      persons_lived_with_preload # petition
-      persons_lived_with.gather()
-  section_marriage = True
+  section_children = True
 ---
 code: |    
   nav.set_section('income')
@@ -475,6 +453,7 @@ code: |
     other_parties[0].other_child_support_paid
   section_expenses = True
 ---
+id: assets interview code
 code: |     
   nav.set_section('assets')  
   if len(set(var_doc_dict["user_cash"]) & set(doc_list_selected.true_values())) > 0:
@@ -521,6 +500,7 @@ code: |
     is_additional_provisions
   section_assets = True
 ---
+id: debts interview code
 code: |       
   nav.set_section('debts')
   if len(set(var_doc_dict["other_assets"]) & set(doc_list_selected.true_values())) > 0:
@@ -533,20 +513,41 @@ code: |
     other_parties[0].review_debts
   section_debts = True
 ---
+id: service interview code
 code: |     
   nav.set_section('service')
   if case.filed == "user0_filed" and respondent_served:
       served_information
   else:
     if case.filed in ["user0_filed", "not_filed"]:
-      respondent.service_type
-      people_served.gathered # notice_of_hearing
-      for people in people_served:
-        people.service_address.address
+      if respondent.service_type != "none":
+        people_served.gathered # notice_of_hearing
+        for people in people_served:
+          people.service_address.address
     filing_pleadings_video
   if 'redaction_certification_attachment' in doc_list_selected.true_values():
     al_court_bundle
   section_service = True
+---
+id: objects for dictionary that says which documents use the variable
+objects:
+  - var_doc_dict: DADict
+---
+id: default documents if variable is undefined
+variable name: var_doc_dict[i]
+data:
+  - petition_attachment
+  - answer_attachment
+  - parenting_plan_attachment
+  - notice_of_hearing_attachment
+  - certificate_of_dissolution_attachment
+  - judgment_attachment
+  - property_statement_attachment
+  - income_statement_attachment
+  - fee_waiver_attachment
+  - confidential_information_sheet_attachment
+  - redaction_certification_attachment
+  - form_14_attachment
 ---
 ###################### Main order ######################
 comment: |
@@ -752,6 +753,12 @@ event: respondent_jurisdiction_kickout
 question: No jurisdiction
 subquestion: |
   Missouri law requires that at least one party in the divorce live in Missouri for at least 90 days before filing divorce.  Since neither you nor your spouse has lived in Missouri for 90 days and you do not agree to the divorce in Missouri, you should find a lawyer to help you.
+---
+id: third party custody warning
+question: Third Party Custody
+subquestion: |
+  Third-party custody is a unique situation. We won't be able to help you fill out the court-required parenting plan, but we can help with everything else! At the end, we will provide you with all the necessary documents and a blank parenting plan for you to complete prior to filing with the court.
+continue button field: third_party_custody_warning
 ---
 id: waive_jurisdiction
 question: Jurisdiction in Missouri
@@ -1014,7 +1021,9 @@ question: Video on filing pleadings
 subquestion: |
   <iframe width="480" height="270" src="https://www.powtoon.com/embed/dvKxPdVmlhD/" frameborder="0" allowfullscreen></iframe>
 
+  % if defined('case.address.address'):
   Your courthouse is located at ${ case.address.on_one_line() }.
+  % endif
   
   Documents are filed with the Circuit Clerk’s office.
   

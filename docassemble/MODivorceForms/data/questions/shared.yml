@@ -342,6 +342,20 @@ id: code to set circuit from county_dictionary
 code: |
   case.circuit = county_dictionary[case.county]["circuit"]
 ---
+variable name: var_doc_dict["case.county"]
+data:
+  - petition_attachment
+  - answer_attachment
+  - parenting_plan_attachment
+  - notice_of_hearing_attachment
+  - certificate_of_dissolution_attachment
+  - judgment_attachment
+  - property_statement_attachment
+  - income_statement_attachment
+  - fee_waiver_attachment
+  - confidential_information_sheet_attachment
+  - redaction_certification_attachment
+---
 ## PARTIES ##
 
 
@@ -503,6 +517,7 @@ data:
   - confidential_information_sheet_attachment
   - petition_attachment
   - redaction_certification_attachment
+  - judgment_attachment
 ---
 id: education info
 generic object: ALIndividual
@@ -883,21 +898,23 @@ code: |
 id: children complete from petition
 code: |
   children[i].name.first
-  children[i].lived_with.name.first
-  children[i].address.address
-  children[i].birthdate
-  children[i].ssn
-  children[i].persons_lived_with.gather()
-  if children[i].legal_custody == "Third Party":
-    children[i].legal_custody_other.name.first
-  if children[i].physical_custody == "Third Party":
-    children[i].physical_custody_other.name.first
-  if children[i].parents["Other"]:
-    children[i].other_parent.name.first
-  if children[i].birth_certificate["Other"]:
-    children[i].birth_certificate_other.name.first
-  children[i].adopted
-  children[i].tax_dependency_even
+  if len(set(var_doc_dict["children_birthdate"]) & set(doc_list_selected.true_values())) > 0:
+    children[i].birthdate
+  if 'petition_attachment' in doc_list_selected.true_values():
+    children[i].lived_with.name.first
+    children[i].address.address
+    children[i].persons_lived_with.gather()
+    if children[i].legal_custody == "Third Party":
+      children[i].legal_custody_other.name.first
+    if children[i].physical_custody == "Third Party":
+      children[i].physical_custody_other.name.first
+    if children[i].parents["Other"]:
+      children[i].other_parent.name.first
+    if children[i].birth_certificate["Other"]:
+      children[i].birth_certificate_other.name.first
+    children[i].adopted
+  if 'parenting_plan_attachment' in doc_list_selected.true_values() and children[i].legal_custody != "Third Party" and children[i].physical_custody != "Third Party":
+    children[i].tax_dependency_even
   children[i].under_18_in_household
   children[i].complete = True
 ---
@@ -943,13 +960,29 @@ fields:
       - This child is attending high school: high_school
       - This child is attending college or vocational school: college
 ---
-generic object: ALIndividual
-variable name: children[i].birthdate_in_documents
+variable name: var_doc_dict["children"]
 data:
   - answer_attachment
+  - certificate_of_dissolution_attachment
   - confidential_information_sheet_attachment
   - petition_attachment
+  - income_statement_attachment
   - judgment_attachment
+  - parenting_plan_attachment
+---
+variable name: var_doc_dict["children_number"]
+data:
+  - form_14_attachment
+  - fee_waiver_attachment
+---
+question: How many minor children do you have with ${ other_parties[0] }?
+fields:
+  - Number of children: number_of_children
+    datatype: number
+---
+if: defined('children.gathered')
+code: |
+  number_of_children = len(children)
 ---
 sets: children[i].lived_with.name.first
 id: who child lived with
@@ -1147,6 +1180,11 @@ fields:
       - ${ respondent }: respondent
       - Both spouses jointly: Joint
       - Third party: Third Party
+ - note: |
+    Asking the court to give custody of your children to someone else is a difficult decision to make, and cases like this can be complicated to handle on your own. It's important to know your rights as a parent. Consider reaching out to a Missouri licensed attorney for legal advice on how to proceed.
+   show if:
+     variable: legal_custody
+     is: Third Party
 ---
 id: follow up reason for sole legal custody
 if: legal_custody in ["petitioner", "respondent"]
@@ -1471,6 +1509,13 @@ fields:
 validation code: |
   if as_datetime(marriage.separation_date) > today() or as_datetime(marriage.separation_date) < users[0].birthdate:
     validation_error("Please enter a date in the past that isn't before the date you were born.")
+---
+variable name: var_doc_dict["marriage.separation_date"]
+data:
+  - petition_attachment
+  - judgment_attachment
+  - certificate_of_dissolution_attachment
+
 ---
 id: marriage in missouri
 question: Did you live together as a couple in Missouri?
@@ -2672,7 +2717,7 @@ fields:
   - Are there any extraordinary medical costs to be paid by ${ x.name_full() }?: x.extraordinary_medical_costs.there_are_any
     datatype: yesnoradio
 ---
-if: len(children) == 0
+if: not minor_children
 generic object: ALIndividual
 code: |
   x.extraordinary_medical_costs.there_are_any = False
@@ -2709,7 +2754,7 @@ fields:
   - Are there any extraordinary childrearing costs to be paid by ${ x.name_full() }?: x.extraordinary_childrearing_costs.there_are_any
     datatype: yesnoradio
 ---
-if: len(children) == 0
+if: not minor_children
 generic object: ALIndividual
 code: |
   x.extraordinary_childrearing_costs.there_are_any = False
@@ -2721,7 +2766,7 @@ fields:
   - Description: x.extraordinary_childrearing_costs[i].description
   - Should this cost be included in Form 14?: x.extraordinary_childrearing_costs[i].included_in_form_14
     datatype: yesnoradio
-  - Amount of extraordinary medical cost: x.extraordinary_childrearing_costs[i].value
+  - Amount of extraordinary childrearing cost: x.extraordinary_childrearing_costs[i].value
     datatype: currency
     show if: x.extraordinary_childrearing_costs[i].included_in_form_14
   - Times per year pays this cost: x.extraordinary_childrearing_costs[i].times_per_year
@@ -2763,9 +2808,9 @@ fields:
   - How much does ${ x.name_full() } pay monthly in maintenance in other cases?: x.maintenance_other_paid
     datatype: currency
 ---
-id: set child support to 0 if no children
+id: set maintenance to 0 if not previosuly married
 generic object: ALIndividual
-if: not x.previously_married
+if: defined('x.previously_married') and not x.previously_married
 code: |
   x.maintenance_other_received = 0
   x.maintenance_other_paid = 0
@@ -2797,7 +2842,7 @@ fields:
   - What are the monthly work-related child care expenses for ${ x.name_full() }?: x.work_childcare_expenses
     datatype: currency
 ---
-if: len(children) == 0 or pay_work_childcare_expenses == "none"
+if: not minor_children or pay_work_childcare_expenses == "none"
 generic object: ALIndividual
 code: |
   x.work_childcare_expenses = 0
@@ -2831,7 +2876,8 @@ fields:
   - What are the monthly health insurance costs for ${ x.name_full() } for the children who are subjects of this proceeding?: x.health_insurance_costs
     datatype: currency
 ---
-if: len(children) == 0
+id: set children health insurance costs to 0 if no minor children
+if: not minor_children
 generic object: ALIndividual
 code: |
   x.health_insurance_costs = 0
@@ -3873,7 +3919,7 @@ code: |
   temp_child_support_choices = list()
   temp_child_support_choices.append({"petitioner":petitioner.name_full()})  
   temp_child_support_choices.append({"respondent":respondent.name_full()})
-  if physical_custody == "Third Party":
+  if defined('physical_custody') and physical_custody == "Third Party":
     temp_child_support_choices.append({"third_party":physical_custody_other.name_full()})
   temp_child_support_choices.append({"none":"No child support awarded"})
   child_support_choices = temp_child_support_choices
@@ -3953,6 +3999,7 @@ code: |
 objects:
   - service: Thing
 ---
+reconsider: x.address_choices
 sets: x.service_address.address
 id: service address
 generic object: ALIndividual
@@ -3960,12 +4007,20 @@ question: Service address for ${ x.name_full() }
 fields:
   - Address already provided: x.service_address
     datatype: object_radio
-    choices: x.address
+    choices: x.address_choices
     none of the above: A different address
     disable others: True
-    default: x.address
+    default: x.default_address
   - code: |
       x.service_address.address_fields()
+---
+id: address choices code
+generic object: ALIndividual
+code: |
+  x.address_choices = list()
+  x.address_choices.append(x.address)
+  if defined('x.employer.address.address'):
+    x.address_choices.append(x.employer.address)
 ---
 id: Respondent hours of employment
 generic object: ALIndividual
@@ -4016,6 +4071,11 @@ fields:
       - ${ other_parties[0].name_full() } should be served with a summons at their home: house
       - ${ other_parties[0].name_full() } should be served with a summons at their place of employment: work
       - ${ other_parties[0].name_full() } cannot be served in Missouri. Therefore, service by registered mail is requested. A copy of the Affidavit for Service by Mail is attached to this form. See Missouri Supreme Court Rule 54.12(b).: mail
+validation code: |
+  if other_parties[0].service_type == "work":
+    other_parties[0].default_address = other_parties[0].employer.address
+  else:
+    other_parties[0].default_address = other_parties[0].address
 ---
 id: people_served object
 objects: 

@@ -86,7 +86,7 @@ attachment:
       - "Respondents AddressTelephone": ${ respondent.address.block() + "\n" + showifdef('respondent.phone_number') } 
       - "Marital Status": "Married"
       - "If Married Spouses name": ${ other_parties[0].name_full() } 
-      - "Number of dependents": ${ len(children) } 
+      - "Number of dependents": ${ number_of_children } 
       - "Gross Salary": ${ "{:.2f}".format(float(users[0].jobs.total(times_per_year=12)) + users[0].self_employment_income,symbol='') } 
       - "Mortgage or Rent Payment Amount": ${ "{:.2f}".format(float(users[0].expenses.total(source=['rent'], times_per_year=12)) + sum([house.monthly_payment for house in users[0].debts.matches(source=['house'])]))  } 
       - "Mortgage": ${ len(users[0].debts.matches(source=['house'])) > 0 } 
