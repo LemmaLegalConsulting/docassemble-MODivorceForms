@@ -142,7 +142,7 @@ fields:
       - 9 am: 9
       - 10 am: 10
     show if: phone_contact
-  - What is the earliest that a child can be contacted on the phone?: phone_contact_pm
+  - What is the latest that a child can be contacted on the phone?: phone_contact_pm
     choices:
       - 6 pm: 6
       - 7 pm: 7
@@ -593,7 +593,11 @@ attachment:
           % endif
       - "pSixthChildsAge": |
           % if len(children) > 5:
-          ${ children[5].age }
+          % if date_difference(starting=children[5].birthdate,ending=today()).years > 1:
+          ${ "{:.0f}".format(date_difference(starting=children[5].birthdate,ending=today()).years) }
+          % else:
+          ${ date_difference(starting=children[5].birthdate, ending=today()).describe(specificity='month') }
+          % endif
           % endif
       - "pSixthChildFirstName": |
           % if len(children) > 5:

@@ -2764,6 +2764,8 @@ objects:
 id: extraordinary childrearing costs
 generic object: ALIndividual
 question: Extraordinary childrearing Costs to be paid by ${ x.name_full() }
+subquestion: |
+  Extraordinary childrearing costs can include things like school tuition, lessons, or extracurricular activities.
 fields:
   - Are there any extraordinary childrearing costs to be paid by ${ x.name_full() }?: x.extraordinary_childrearing_costs.there_are_any
     datatype: yesnoradio
@@ -2776,6 +2778,13 @@ code: |
 id: extraordinary childrearing cost information
 generic object: ALIndividual
 question: What is the ${ ordinal(i) } extraordinary childrearing cost to be paid by ${ x.name_full() }?
+subquestion: |
+  Extraordinary childrearing costs can include things like school tuition, lessons, or extracurricular activities.
+  
+  % if i > 0:
+  You have already told us about your ${ comma_and_list(cost.description for cost in x.extraordinary_childrearing_costs.complete_elements()) }.
+
+  % endif
 fields:
   - Description: x.extraordinary_childrearing_costs[i].description
   - Should this cost be included in Form 14?: x.extraordinary_childrearing_costs[i].included_in_form_14
@@ -2797,6 +2806,13 @@ fields:
 id: extraordinary childrearing costs is there another
 generic object: ALIndividual
 question: Extraordinary Childrearing Costs to be paid by ${ x.name_full() }
+subquestion: |
+  Extraordinary childrearing costs can include things like school tuition, lessons, or extracurricular activities.
+  
+  % if len(x.extraordinary_childrearing_costs.complete_elements()) > 0:
+  You have already told us about your ${ comma_and_list(cost.description for cost in x.extraordinary_childrearing_costs.complete_elements()) }.
+
+  % endif
 fields:
   - Are there any more extraordinary childrearing costs to be paid by ${ x.name_full() }?: x.extraordinary_childrearing_costs.there_is_another
     datatype: yesnoradio
