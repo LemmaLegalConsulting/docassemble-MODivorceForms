@@ -612,7 +612,6 @@ attachment:
       - "paSoleLegalCustPetitioner": ${ legal_custody == "petitioner" } 
       - "paSoleLegalCustRespondent": ${ legal_custody == "respondent" } 
       - "paSoleCustodyReason1": ${ legal_custody_sole_explanation } 
-      - "paSoleCustodyReason2": ${  } 
       - "paLegalCustodyThirdParty": ${ legal_custody == "third_party" } 
       - "paLegalCustThirdPartyFirstName": ${ legal_custody_other.name.first } 
       - "paLegalCustThirdPartyMiddleName": ${ legal_custody_other.name.middle } 
@@ -630,8 +629,6 @@ attachment:
       - "paCommunicationThirdPersonLastName": ${ communications_other.name.last } 
       - "paCommunicationThirdPersonSuffix": ${ communications_other.name.suffix } 
       - "paDisputeResolution1": ${ dispute_resolution } 
-      - "paDisputeResolution2": ${  } 
-      - "paDisputeResolution3": ${  } 
       - "paPhysicalCustodyJoint": ${ physical_custody == "Joint" } 
       - "paJointPhysCustAddressPetitioner": ${ physical_custody_address == "petitioner" } 
       - "paJointPhysCustAddressRespondent": ${ physical_custody_address == "respondent" } 
@@ -866,19 +863,15 @@ attachment:
       - "paVacationNone": ${ not vacation } 
       - "paVacationDesignated": ${ vacation } 
       - "paVacationWeeks": ${ vacation_weeks } 
-      - "paVacationInfo1": ${ vacation_info } 
-      - "paVacationInfo2": ${  } 
-      - "paVacationInfo3": ${  } 
+      - "paVacationInfo1": ${ vacation_invo } 
       - "paLocationExchangesSchool": ${ location_of_exchange == "school" } 
       - "paLocationExchangesSchoolNotInSession1": ${ location_of_exchange_school_not_in_session } 
-      - "paLocationExchangesSchoolNotInSession2": ${  } 
       - "paLocationExchangesResidence": ${ location_of_exchange in ["respondent_residence", "petitioner_residence"] } 
       - "paLocationExchangesResidencePetitioner": ${ location_of_exchange == "petitioner_residence" } 
       - "paLocationExchangesResidenceRespondent": ${ location_of_exchange == "respondent_residence" } 
       - "paLocationExchangesPickUp": ${ location_of_exchange == "pick_up" } 
       - "paLocationExchangesSpecific": ${ location_of_exchange == "specific" } 
       - "paLocationExchangesOther1": ${ location_of_exchange_specific_location } 
-      - "paLocationExchangesOther2": ${  } 
       - "paPhoneContactAm": ${ phone_contact_am } 
       - "paPhoneContactRestrictions": ${ phone_contact } 
       - "paPhoneContactPm": ${ phone_contact_pm } 
@@ -1305,7 +1298,6 @@ attachment:
       - "pbCourtOrderSupportYes": ${ use_presumed_child_support == "yes" } 
       - "pbCourtOrderSupportNo": ${ use_presumed_child_support == "no" } 
       - "pbPresumedUnjustDueTo": ${ use_presumed_child_support_explanation } 
-      - "pbPresumedUnjustDueTo2": ${  } 
       - "pbCourtOrderSupportSix": ${ len(children) > 5 } 
       - "pbCourtOrderSupportSixAmt": ${ "{:.2f}".format(basic_child_support_amount_5_6) } 
       - "pbCourtOrderSupportFiveAmt": ${ "{:.2f}".format(basic_child_support_amount_5_5) } 
@@ -1399,6 +1391,4 @@ attachment:
       - "pbMethodChildSupportAgreementDirectPayment": ${ child_support_method_of_payment == "no_agreement" and child_support_location_of_payment == "direct_payment" } 
       - "pbMethodChildSupportNotInBestInterestDirectPayment": ${ child_support_method_of_payment == "no_not_in_best_interest" and child_support_location_of_payment == "direct_payment" } 
       - "pbAdditionalProvisionsSupport1": ${ additional_provisions } 
-      - "pbAdditionalProvisionsSupport2": ${  } 
-      - "pbAdditionalProvisionsSupport3": ${  } 
 ---
