@@ -77,7 +77,7 @@ attachment:
   editable: False
   fields:
       - "Judicial Circuit Court Number": ${ case.circuit } 
-      - "COUNTY NAME": ${ case.county } 
+      - "COUNTY NAME": ${ nice_county_name(case) } 
       - "Judge or Division": ${ case.docket_number } 
       - "Case Number": ${ case.judge } 
       - "Petitioner Name": ${ petitioner.name_full() } 

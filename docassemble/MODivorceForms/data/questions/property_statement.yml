@@ -799,19 +799,6 @@ code: |
   other_assets.other_display = "other assets"
   other_assets.display_name = "other assets"
 ---
-id: populate debt list from debts in assets
-code: |
-  secured_debts.clear()
-  for list in [real_estate,vehicles, securities, personal_goods, farm, businesses, other_assets]:
-    for item in list:
-      if item.is_amount_owed and not item in secured_debts.complete_elements():
-        secured_debts.append(item)
-        item.already_included = True
-        secured_debts[-1].list = list.instanceName
-        if not defined('secured_debts[-1].source'):
-          secured_debts[-1].source = list.instanceName
-  secured_debts.gathered = True
----
 continue button field: preload_debts_test
 question: Test
 subquestion: |

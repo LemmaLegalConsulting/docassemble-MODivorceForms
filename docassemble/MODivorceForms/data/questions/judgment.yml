@@ -306,7 +306,7 @@ attachment:
       - "petitioner_resident_for_90 days": ${ petitioner.resident_for_90_days } 
       - "respondent_resident_for_90 days": ${ respondent.resident_for_90_days } 
       - "marriage_date": ${ format_date(marriage.recorded_date, format='M/d/yyyy') } 
-      - "marriage_address_county": ${ marriage.address.county } 
+      - "marriage_address_county": ${ nice_county_name(marriage.address) } 
       - "marriage_address_state": ${ state_name(marriage.address.state) } 
       - "marriage_date_last_resided": ${ format_date(marriage.separation_date, format='M/d/yyyy') } 
       - "petitioner_pregnant": ${ True } 

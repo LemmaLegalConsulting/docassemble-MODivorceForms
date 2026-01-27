@@ -105,7 +105,7 @@ attachment:
       - "users2_birthdate": ${ format_date(other_parties[0].birthdate, format='M/d/yyyy') } 
       - "users2_birthplace": ${ other_parties[0].birthplace } 
       - "marriage_address_city": ${ marriage.address.city } 
-      - "marriage_address_county": ${ marriage.address.county } 
+      - "marriage_address_county": ${ nice_county_name(marriage.address) } 
       - "marriage_address_state": ${ marriage.address.state } 
       - "marriage_date": ${ format_date(marriage.recorded_date, format='M/d/yyyy') } 
       - "is_users1_petitioner": ${ case.filed in ["user0_filed","not_filed"] } 

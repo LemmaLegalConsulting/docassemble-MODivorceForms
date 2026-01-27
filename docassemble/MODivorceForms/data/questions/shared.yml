@@ -7,6 +7,7 @@ include:
 ---
 modules:
   - .al_income
+  - docassemble.ALToolbox.misc
 ---
 id: list of previously entered people
 code: |
@@ -99,7 +100,7 @@ fields:
     datatype: integer
     min: 1
   - note: |
-      If you have not filed any petitions yet, you need to change your [answer](url_action('case.filed') about whether the case has been filed.
+      If you have not filed any petitions yet, you need to change your [answer](${ url_action('case.filed') }) about whether the case has been filed.
     show if:
       variable: previous_petitions
       is: 0
@@ -204,11 +205,11 @@ fields:
   - Case description: case.matter_type
     required: False
     choices:
-      - "FC Dissolution w/ children": dissolution_with
-      - "FC Dissolution w/o children": dissolution_without
-      - "Something else": other
+      - "FC Dissolution w/ children"
+      - "FC Dissolution w/o children"
+      - "Something else"
     default: |
-      ${ "dissolution_with" if minor_children else "dissolution_without" }
+      ${ "FC Dissolution w/ children" if minor_children else "FC Dissolution w/o children" }
     
 continue button field: case.matter_type_asked
 
@@ -3056,15 +3057,15 @@ id: code to determine individual assets based on recommended award
 generic object: ALIndividual
 code: |
   x.assets.clear()
-  for list in [real_estate,vehicles, bank_assets, securities, personal_goods, retirement_accounts, life_insurance, interests_in_trust, interest_in_contract, interest_in_litigation, farm, debts_owed_to_you, businesses, other_assets]:
-    for item in list:
+  for asset_list in [real_estate,vehicles, bank_assets, securities, personal_goods, retirement_accounts, life_insurance, interests_in_trust, interest_in_contract, interest_in_litigation, farm, debts_owed_to_you, businesses, other_assets]:
+    for item in asset_list:
       if item.recommended_award == x.name.full():
         x.assets.append(item)
-        x.assets[-1].list = list.display_name
+        x.assets[-1].list = asset_list.display_name
         if not defined('x.assets[-1].source'):
-          x.assets[-1].source = list.display_name
+          x.assets[-1].source = asset_list.display_name
         elif x.assets[-1].source == "other":
-          x.assets[-1].source = list.display_name + " other"
+          x.assets[-1].source = asset_list.display_name + " other"
           
   x.assets.gathered = True
 ---
@@ -3540,7 +3541,7 @@ objects:
 id: populate debt list from debts in assets
 code: |
   secured_debts.clear()
-  for list in [showifdef('real_estate'), showifdef('vehicles'), showifdef('securities'), showifdef('personal_goods'), showifdef('farm'), showifdef('businesses'), showifdef('other_assets')]:
+  for list in [real_estate,vehicles, securities, personal_goods, farm, businesses, other_assets]:
     for item in list:
       if item.is_amount_owed and not item in secured_debts.complete_elements():
         secured_debts.append(item)
@@ -3548,6 +3549,19 @@ code: |
         secured_debts[-1].list = list.instanceName
         if not defined('secured_debts[-1].source'):
           secured_debts[-1].source = list.instanceName
+  secured_debts.gathered = True
+---
+id: populate debt list from debts in assets
+code: |
+  secured_debts.clear()
+  for debt_list in [showifdef('real_estate'), showifdef('vehicles'), showifdef('securities'), showifdef('personal_goods'), showifdef('farm'), showifdef('businesses'), showifdef('other_assets')]:
+    for item in debt_list:
+      if item.is_amount_owed and not item in secured_debts.complete_elements():
+        secured_debts.append(item)
+        item.already_included = True
+        secured_debts[-1].list = debt_list.instanceName
+        if not defined('secured_debts[-1].source'):
+          secured_debts[-1].source = debt_list.instanceName
   secured_debts.gathered = True
 ---
 id: code to generate separate lists
@@ -4029,6 +4043,10 @@ code: |
 objects:
   - service: Thing
 ---
+generic object: ALIndividual
+objects:
+  - x.service_address: ALAddress
+---
 reconsider: x.address_choices
 sets: x.service_address.address
 id: service address
@@ -4091,16 +4109,25 @@ fields:
       - Serve by sheriff: sheriff
       - Serve by private process server: private
 ---
+code: |
+  temp_service_type_choices = list()
+  temp_service_type_choices.append({'label': other_parties[0].name_full()  + " has signed a verified Respondent’s Answer to Petition for Dissolution of Marriage, which is being filed with the Petition for Dissolution of Marriage. Therefore, do not issue a summons.","value":"none"})
+  if other_parties[0].address.state == "MO":
+    temp_service_type_choices.append({'label': other_parties[0].name_full() + " should be served with a summons at their home,","value":"home"})
+  if defined('other_parties[0].employer.address.address') and other_parties[0].employer.address.state == "MO":
+    temp_service_type_choices.append({'label': other_parties[0].name_full() + " should be served with a summons at their place of employment","value":"work"})
+  if other_parties[0].address.state != "MO" and (not defined('other_parties[0].employer.address.address') or other_parties[0].employer.address.state != "MO"):
+    temp_service_type_choices.append({'label': other_parties[0].name_full() + " cannot be served in Missouri. Therefore, service by registered mail is requested. A copy of the Affidavit for Service by Mail is attached to this form. See Missouri Supreme Court Rule 54.12(b).","value":"mail"})
+  service_type_choices = temp_service_type_choices
+---
+reconsider: service_type_choices
 id: method of service to respondent
 question: Service to ${ other_parties[0].name_full() }?
 fields:
   - How will you serve ${ other_parties[0].name_full() }?: other_parties[0].service_type
     datatype: radio
     choices:
-      - ${ other_parties[0].name_full() } has signed a verified Respondent’s Answer to Petition for Dissolution of Marriage, which is being filed with the Petition for Dissolution of Marriage. Therefore, do not issue a summons.: none
-      - ${ other_parties[0].name_full() } should be served with a summons at their home: house
-      - ${ other_parties[0].name_full() } should be served with a summons at their place of employment: work
-      - ${ other_parties[0].name_full() } cannot be served in Missouri. Therefore, service by registered mail is requested. A copy of the Affidavit for Service by Mail is attached to this form. See Missouri Supreme Court Rule 54.12(b).: mail
+      code: service_type_choices
 validation code: |
   if other_parties[0].service_type == "work":
     other_parties[0].default_address = other_parties[0].employer.address

@@ -205,19 +205,16 @@ code: |
       notice_date # property_statement.yml
     if len(set(var_doc_dict["case.matter_type"]) & set(doc_list_selected.true_values())) > 0:
       case.matter_type_asked # notice_of_hearing
-  if len(set(var_doc_dict["petitioner.attorney_involved"]) & set(doc_list_selected.true_values())) > 0:
-    if petitioner.attorney_involved: # petition, notice_of_hearing
-      petitioner.attorney.name.first # petition
-  if len(set(var_doc_dict["petitioner.party_type_code"]) & set(doc_list_selected.true_values())) > 0:
-      if petitioner.attorney_involved:
-        petitioner.attorney.party_type_code # confidential_information_sheet
-      petitioner.party_type_description
-  if case.filed in ["user0_filed", "other_parties0_filed"] and len(set(var_doc_dict["respondent.attorney_involved"]) & set(doc_list_selected.true_values())) > 0:
-    if respondent.attorney_involved:
-      respondent.attorney.name.first
-      respondent.attorney.party_type_code
-    respondent.party_type_code # confidential_information_sheet
-    respondent.party_type_description  
+  if petitioner.attorney_involved: # petition, notice_of_hearing
+    petitioner.attorney.name.first # petition
+  if petitioner.attorney_involved:
+    petitioner.attorney.party_type_code # confidential_information_sheet
+  petitioner.party_type_description
+  if respondent.attorney_involved:
+    respondent.attorney.name.first
+    respondent.attorney.party_type_code
+  respondent.party_type_code # confidential_information_sheet
+  respondent.party_type_description  
   case.type_code
   section_case_information = True
 ---
@@ -272,6 +269,9 @@ code: |
     marriage.address.country
     marriage.address.state
     marriage.recorded_date
+  if 'petition_attachment' in doc_list_selected.true_values():
+    if not respondent.address.state == "MO":
+      marriage.live_together_in_mo
   if len(set(var_doc_dict["marriage.separation_date"]) & set(doc_list_selected.true_values())) > 0:
     marriage.separation_date
 
@@ -1022,7 +1022,7 @@ subquestion: |
   <iframe width="480" height="270" src="https://www.powtoon.com/embed/dvKxPdVmlhD/" frameborder="0" allowfullscreen></iframe>
 
   % if defined('case.address.address'):
-  Your courthouse is located at ${ case.address.on_one_line() }.
+  Your courthouse is located at ${ case.address.on_one_line() } in ${ nice_county_name(case) }.
   % endif
   
   Documents are filed with the Circuit Clerk’s office.
@@ -1195,14 +1195,14 @@ code: |
 ---
 id: service_by_mail_notice enabled block for main interview
 code: |
-  if case.filed in ["user0","not_filed"] and respondent.service_type == "mail":
+  if case.filed in ['user0_filed','not_filed'] and respondent.service_type == "mail":
     service_by_mail_notice_attachment.enabled = True
   else:
     service_by_mail_notice_attachment.enabled = False
 ---
 id: service_by_mail_affidavit enabled block for main interview
 code: |
-  if case.filed in ["user0","not_filed"] and respondent.service_type == "mail":
+  if case.filed in ['user0_filed','not_filed'] and respondent.service_type == "mail":
     service_by_mail_affidavit_attachment.enabled = True
   else:
     service_by_mail_affidavit_attachment.enabled = False

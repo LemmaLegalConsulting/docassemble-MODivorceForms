@@ -290,7 +290,7 @@ attachment:
       - "respondentActiveDuty2": ${ not respondent.active_duty } 
       - "dateOfMarriage": ${ marriage.recorded_date } 
       - "locationMarriageLicenseState": ${ state_name(marriage.address.state) } 
-      - "locationMarriageLicenseCounty": ${ marriage.address.county } 
+      - "locationMarriageLicenseCounty": ${ nice_county_name(marriage.address) } 
       - "locationMarriageLicense1": ${ marriage.address.country == "US" } 
       - "locationMarriageLicense2": ${ marriage.address.country != "US" } 
       - "locationMarriageLicenseCountry": ${ marriage.address.country if marriage.address.country != "US" else ""  } 

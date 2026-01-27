@@ -282,7 +282,7 @@ fields:
     datatype: integer
     min: 0
     max: 365
-    default: 180
+    default: ${ support_payer.visitation_nights_default }
 ---
 id: form_14_starting calculations
 generic object: ALIndividual
