@@ -3025,7 +3025,7 @@ edit:
   - market_value
 
 ---
-id: generic table
+id: generic table for x.assets
 generic object: ALIndividual
 table: x.assets_table
 rows: x.assets
@@ -3035,19 +3035,7 @@ columns:
   - Market value: |
       currency(row_item.market_value) if defined("row_item.market_value") else ""
 edit:
-  - source
-  - value
----
-generic object: ALIndividual
-code: |
-  x.assets.clear()
-  if len([re for re in real_estate if re.recommended_award == x.name.full()]) == 1:
-    x.assets.append([asset for asset in real_estate if asset.recommended_award == x.name.full()][0])
-  elif len([asset for asset in real_estate if asset.recommended_award == x.name.full()]) > 1:
-    x.assets.appendObject()
-    x.assets[-1].display_name = real_estate.display_name + " (" + str([asset for asset in real_estate if asset.recommended_award == x.name.full()]) + ")"
-    x.assets[-1].market_value = real_estate.filter(recommended_award = x.name.full()).total()
-  x.assets.gathered = True
+  - market_value
 ---
 generic object: ALIndividual
 objects:
@@ -3633,9 +3621,6 @@ data: !!omap
   - student_loans: "Student loans"
   - other: "Other"
 ---
-code: |
-  debts.display_name = "Debt"
----
 id: debts there are any
 generic object: ALAssetList
 question: |
@@ -3661,6 +3646,8 @@ code: |
   debts[i].balance
   debts[i].complete = True
 ---
+id: individual debt information
+only sets: debts[i].balance
 question: | 
   Tell us about your ${ debts[i].display_name }
 subquestion: |
@@ -3723,6 +3710,9 @@ validation code: |
   elif debts[i].recommended_debt == "split":
     debts[i].user_percentage = float(debts[i].user_percentage_choice)/100
 ---
+code: |
+  debts.display_name = "Debt"
+---
 generic object: ALAsset
 question: Who should pay this debt?
 fields:
@@ -3782,7 +3772,7 @@ columns:
       currency(row_item.monthly_payment) if defined("row_item.monthly_payment") else ""
   - Debts to be paid by: row_item.recommended_debt if defined("row_item.recommended_debt") else ""
 edit:
-  - lender
+  - balance
 ---
 id: generic review
 generic object: ALIndividual

@@ -497,6 +497,7 @@ code: |
     users[0].review_assets
     other_parties[0].assets.gathered
     other_parties[0].review_assets
+    reconsider('users[0].assets.gathered')
     is_additional_provisions
   section_assets = True
 ---
@@ -511,6 +512,7 @@ code: |
     users[0].review_debts
     other_parties[0].debts.gathered
     other_parties[0].review_debts
+    reconsider('users[0].debts.gathered')
   section_debts = True
 ---
 id: service interview code
