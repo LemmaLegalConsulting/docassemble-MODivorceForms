@@ -282,22 +282,22 @@ fields:
     datatype: integer
     min: 0
     max: 365
-    default: ${ support_payer.visitation_nights_default }
+    default: ${ showifdef('support_payer.visitation_nights_default') }
 ---
 id: form_14_starting calculations
 generic object: ALIndividual
 code: |
   x.monthly_income_1 = float(x.jobs.total(times_per_year=12)) + x.self_employment_income + float(x.other_incomes.total(times_per_year = 12))
-  if x.monthly_income_1 < 1000:
-    x.support_obligation_2c2_income_index = 1000
+  if x.monthly_income_1 < 1300:
+    x.support_obligation_2c2_income_index = 1300
   elif x.monthly_income_1 > 30000:
-    x.support_obligation_2c2_income_index = 30000
+    x.support_obligation_2c2_income_index = 40000
   else:
     x.support_obligation_2c2_income_index = (x.monthly_income_1+25)//50*50
   if x.other_children == 0:
     x.support_obligation_2c2 = 0
   elif basic_child_support_schedule[str(x.other_children)][str("{:.0f}".format(x.support_obligation_2c2_income_index))]['poverty']:
-    x.support_obligation_2c2A = basic_child_support_schedule[str(x.other_children)][str("{:.0f}".format(x.support_obligation_2c2_income_index))]['obligation']
+    x.support_obligation_2c2 = basic_child_support_schedule[str(x.other_children)][str("{:.0f}".format(x.support_obligation_2c2_income_index))]['obligation']
   else:
     x.support_obligation_2c2 = basic_child_support_schedule[str(x.other_children)][str("{:.0f}".format(x.support_obligation_2c2_income_index))]['obligation']
   x.total_adjustment_2c = x.support_obligation_2c2 - x.other_child_support_received
