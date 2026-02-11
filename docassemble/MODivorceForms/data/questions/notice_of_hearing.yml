@@ -1,5 +1,3 @@
-include:
-  - shared.yml
 ---
 id: notice of hearing order
 mandatory: True

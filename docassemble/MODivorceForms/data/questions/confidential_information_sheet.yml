@@ -1,21 +1,3 @@
-include:
-  - shared.yml
----
-id: confidential information sheet order
-mandatory: True
-code: |
-  users[0].name.first
-  other_parties[0].name.first
-  petitioner.party_type_description
-  petitioner.attorney.party_type_code
-  petitioner.gender
-  petitioner.party_type_code
-  respondent.gender
-  respondent.party_type_code
-  respondent.party_type_description
-  respondent.attorney.party_type_code
-  users[0].employer.email
-  mo_divorce_forms_download
 ---
 generic object: ALIndividual
 question: Email for ${ x.employer.name.text }
@@ -39,9 +21,6 @@ objects:
 objects:
   - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, confidential_information_sheet_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
   - al_court_bundle: ALDocumentBundle.using(elements=[confidential_information_sheet_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
----
-code: |
-  confidential_information_sheet_attachment.enabled = True
 ---
 attachment:
   name: Confidential Case Filing Information Sheet - Domestic Relations Cases

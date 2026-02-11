@@ -39,6 +39,10 @@ code: |
     temp_people_choices.append(visitation_supervisor)
   if hasattr(communications_other.name,"first"):
     temp_people_choices.append(communications_other)
+  if defined('persons_lived_with'):
+    for person in persons_lived_with:
+      if person != users[0] and person != other_parties[0]:
+        temp_people_choices.append(person)
   people_choices = temp_people_choices
 ---
 
@@ -1687,6 +1691,9 @@ fields:
     datatype: integer
     min: 0
     max: 100
+    show if: 
+      variable: x.extraordinary_childrearing_costs[i].included_in_form_14
+      is: False
 ---
 id: extraordinary childrearing costs is there another
 generic object: ALIndividual
@@ -1998,6 +2005,21 @@ columns:
 edit:
   - market_value
 ---
+id: joint_debts table
+table: joint_debts.table
+rows: joint_debts
+columns:
+  - Description: |
+      row_item.loan_description
+  - Balance: |
+      currency(row_item.balance) if defined("row_item.balance") else ""
+  - Monthly payment: currency(row_item.monthly_payment)
+  - Security for debt: row_item.security
+  - Marital property?:  row_item.marital_property
+  - Debt assigned to: row_item.recommended_debt if row_item.recommended_debt != "split" else " ".join([row_item.recommended_debt, "{:.0%}".format(row_item.user_percentage)])
+edit:
+  - market_value
+---
 comment: |
   REAL ESTATE
   real_estate has subtypes and can have loans attached
@@ -2103,12 +2125,14 @@ fields:
       - Marital
       - Nonmarital
       - Both
-  - Party with possession of this property?: real_estate[i].has_possession
+  - note: |
+      ${ collapse_template(marital_property_template) }
+  - Who is living in the house?: real_estate[i].has_possession
     choices:
       - ${ petitioner.name.full() } 
       - ${ respondent.name.full() }
       - Other: other
-  - Recommended Award: real_estate[i].recommended_award
+  - Who do you think the house should go to?: real_estate[i].recommended_award
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
@@ -2124,14 +2148,15 @@ validation code: |
     real_estate[i].user_percentage = float(real_estate[i].user_percentage_choice)/100
   real_estate[i].description = real_estate[i].display_name + space('real_estate[i].address', prefix=' at ', suffix='')  + (" See attached legal description. " if real_estate[i].legal_description != "" else "")
   if real_estate[i].is_amount_owed:
-    real_estate[i].loan_description = "Mortgage for " + real_estate[i].display_name + space("real_estate[i].address", prefix=" at ", suffix="") 
+    real_estate[i].loan_description = space("real_estate[i].lender", prefix="", suffix=" ") + "Mortgage"
+    real_estate[i].security = real_estate[i].display_name + space("real_estate[i].address", prefix=" at ", suffix="") 
 ---
 id: marital_property_template
 template: marital_property_template
 subject: |
   What is marital and nonmarital property?
 content: |
-  Marital property is property acquired throughout the marriage together.  Nonmarital property is property acquired before the marriage or separately.
+  Marital property is property acquired during the mariage by either party together or separately. Nonmarital property is property acquired before the marriage or as a gift or inheritance.
 ---
 comment: |
   VEHICLES
@@ -2261,7 +2286,8 @@ validation code: |
     vehicles[i].user_percentage = float(vehicles[i].user_percentage_choice)/100
   vehicles[i].description = space('vehicles[i].year',prefix="", suffix=" ") + space('vehicles[i].make',prefix="", suffix=" ") + space('vehicles[i].model',prefix="", suffix=" ") + vehicles[i].display_name
   if vehicles[i].is_amount_owed:
-    vehicles[i].loan_description = "Loan for " + space('vehicles[i].year',prefix="", suffix=" ") + space('vehicles[i].make',prefix="", suffix=" ") + space('vehicles[i].model',prefix="", suffix=" ") + vehicles[i].display_name
+    vehicles[i].loan_description = space("vehicles[i].lender", prefix="", suffix=" ") + "Loan"
+    vehicles[i].security = space('vehicles[i].year',prefix="", suffix=" ") + space('vehicles[i].make',prefix="", suffix=" ") + space('vehicles[i].model',prefix="", suffix=" ") + vehicles[i].display_name
 ---
 comment: |
   SECURITIES
@@ -2386,7 +2412,8 @@ validation code: |
     securities[i].user_percentage = float(securities[i].user_percentage_choice)/100
   securities[i].description = space("securities[i].name", prefix="", suffix=" ") + securities[i].display_name 
   if securities[i].is_amount_owed:
-    securities[i].loan_description = "Loan for " + space("securities[i].name", prefix="", suffix=" ") + securities[i].display_name 
+    securities[i].loan_description = space("securities[i].lender", prefix="", suffix=" ") + "Loan"
+    securities[i].security = space("securities[i].name", prefix="", suffix=" ") + securities[i].display_name 
 ---
 comment: |
   PERSONAL GOODS
@@ -2509,7 +2536,8 @@ validation code: |
     personal_goods[i].user_percentage = float(personal_goods[i].user_percentage_choice)/100
   personal_goods[i].description = personal_goods[i].display_name
   if personal_goods[i].is_amount_owed:
-    personal_goods[i].loan_description = "Loan for " + personal_goods[i].display_name
+    personal_goods[i].loan_description = space("securities[i].lender", prefix="", suffix=" ") + "Loan"
+    personal_goods[i].security = personal_goods[i].display_name
 ---
 comment: |
   BANK ASSETS - no loans attached
@@ -2805,7 +2833,8 @@ validation code: |
   elif farm[i].is_amount_owed and farm[i].recommended_debt == "split":
     farm[i].user_percentage = float(farm[i].user_percentage_choice)/100
   if farm[i].is_amount_owed:
-    farm[i].loan_description = "Loan for " + farm[i].description
+    farm[i].loan_description = space("farm[i].lender", prefix="", suffix=" ") + "Loan"
+    farm[i].security = "farm[i].description"
 ---
 comment: |
   BUSINESSES
@@ -2897,7 +2926,8 @@ validation code: |
   elif businesses[i].is_amount_owed and businesses[i].recommended_debt == "split":
     businesses[i].user_percentage = float(businesses[i].user_percentage_choice)/100
   if businesses[i].is_amount_owed:
-    businesses[i].loan_description = "Loan for " + businesses[i].description
+    businesses[i].loan_description = space("businesses[i].lender", prefix="", suffix=" ") + "Loan"
+    businesses[i].security = businesses[i].description
 ---
 id: other_assets object
 objects:
@@ -2987,9 +3017,9 @@ validation code: |
   elif other_assets[i].is_amount_owed and other_assets[i].recommended_debt == "split":
     other_assets[i].user_percentage = float(other_assets[i].user_percentage_choice)/100
   if vehicles[i].is_amount_owed:
-    other_assets[i].loan_description = "Loan for " + other_assets[i].description
+    other_assets[i].loan_description = space("other_assets[i].lender", prefix="", suffix=" ") + "Loan"
+    other_assets[i].security =  other_assets[i].description
 ---
-
 id: life_insurance object
 objects:
   - life_insurance: ALAssetList.using(complete_attribute='complete',there_is_another=False)
@@ -3004,6 +3034,8 @@ code: |
   life_insurance.display_name = "life insurance policies"
 ---
 id: describe life_insurance
+comment: |
+  This doesn't define has_possession - the validation code sets it to owner.
 question: |
   Tell us about your ${ ordinal(i) } life insurance policy.
 subquestion: |
@@ -3056,6 +3088,7 @@ fields:
       - Other: other
 validation code: |
   life_insurance[i].description = space('life_insurance[i].name', prefix='',suffix=" ") + space('life_insurance[i].type', prefix='',suffix=" ") + " life insurance policy"
+  life_insurance[i].has_possession = life_insurance[i].owner
 ---
 id: life insurance table
 table: life_insurance.table
@@ -3136,6 +3169,7 @@ fields:
     required: False
 validation code: |
   interests_in_trust[i].description = space("interests_in_trust[i].name",prefix="", suffix=" ") + "Trust"
+  interests_in_trust[i].has_possession = interests_in_trust[i].trustee
 ---
 id: interests_in_trust table
 table: interests_in_trust.table
@@ -3206,6 +3240,10 @@ generic object: ALIndividual
 objects:
   - x.assets: ALAssetList.using(auto_gather=False)
 ---
+id: joint_assets object
+objects:
+  - joint_assets: ALAssetList.using(auto_gather=False,display_name="All assets")
+---
 comment:
   There are two kinds of ALAssetLists.  The first kind allows you to select the subtype of asset for that ALAssetList, which will be the attribute .source.  For example, real_estate could be a home or condominium, and vehicle  The second kind doesn't have any subtypes and won't have any .source attribute.  Creates an attribute "list" that is the assets name and defines source.
   
@@ -3216,16 +3254,32 @@ id: code to determine individual assets based on recommended award
 generic object: ALIndividual
 code: |
   x.assets.clear()
+  for item in joint_assets:
+    if item.recommended_award == x.name.full():
+      x.assets.append(item)
+  x.assets.gathered = True
+---
+code: |
+  joint_assets.clear()
   for asset_list in [real_estate,vehicles, bank_assets, securities, personal_goods, retirement_accounts, life_insurance, interests_in_trust, interest_in_contract, interest_in_litigation, farm, debts_owed_to_you, businesses, other_assets]:
     for item in asset_list:
-      if item.recommended_award == x.name.full():
-        x.assets.append(item)
-        if not defined('x.assets[-1].source'):
-          x.assets[-1].source = asset_list.instanceName
-        elif x.assets[-1].source == "other":
-          x.assets[-1].source = asset_list.instanceName + "_other"
-          
-  x.assets.gathered = True
+      joint_assets.append(item)
+      if not defined('joint_assets[-1].source'):
+        joint_assets[-1].source = asset_list.instanceName
+      elif joint_assets[-1].source == "other":
+        joint_assets[-1].source = asset_list.instanceName + "_other"
+  joint_assets.gathered = True
+---
+id: joint_assets review 
+question: All Assets
+subquestion: |
+
+  Tap Next if you don't have more to add.
+  
+  ${ joint_assets.table }
+  
+  ${  joint_assets.add_action() }
+continue button field:  joint_assets.review_items
 ---
 id: generic review
 generic object: ALIndividual
@@ -3390,6 +3444,18 @@ validation code: |
   elif debts[i].recommended_debt == "split":
     debts[i].user_percentage = float(debts[i].user_percentage_choice)/100
   debts[i].loan_description = space("debts[i].lender", prefix = "", suffix = " ") + debts[i].display_name
+  debts[i].security = "None"
+---
+id: backup code to set loan description and security for unsecured debts
+code: |
+  debts[i].loan_description = space("debts[i].lender", prefix = "", suffix = " ") + debts[i].display_name
+  debts[i].security = "None"
+---
+generic object: ALAsset
+id: loan description and security default code
+code: |
+  x.loan_description = space("x.lender", prefix="", suffix=" ") + "Loan"
+  x.security = x.description
 ---
 id: debts review
 question: Do you want to list any other debts?
@@ -3430,6 +3496,21 @@ edit:
 
 ## DEBT SPLIT ##
 ---
+id: joint_debts object
+objects:
+  - joint_debts: ALAssetList.using(auto_gather=False,display_name="All debts")
+---
+id: combine secured debts and debts
+code: |
+  joint_debts.clear()
+  for debt in secured_debts:
+    joint_debts.append(debt)
+    joint_debts[-1].loan_description = showifdef('debt.loan_description',debt.source)  
+  for debt in debts:
+    joint_debts.append(debt)
+    joint_debts[-1].loan_description = showifdef('debt.loan_description',debt.source)  
+  joint_debts.gathered = True
+---
 comment: |
   Both types of debts are then split between the parties.  An entire loan can be assigned to one person (in this case, the debt will be a soft copy to the attached asset) or can be split (a new asset will be created for both parties).
 id: individual debts object
@@ -3449,6 +3530,7 @@ code: |
       x.debts[-1].marital_property = debt.marital_property
       x.debts[-1].lender = showifdef('debt.lender')
       x.debts[-1].source = debt.source
+      x.debts[-1].security = debt.security
       x.debts[-1].loan_description = showifdef('debt.loan_description',debt.source)
       if x.instanceName == "users[0]":
         x.debts[-1].balance = debt.balance * debt.user_percentage
@@ -3465,6 +3547,7 @@ code: |
       x.debts[-1].lender = showifdef('debt.lender')
       x.debts[-1].display_name = showifdef('debt.display_name')
       x.debts[-1].source = debt.source
+      x.debts[-1].security = debt.security
       x.debts[-1].loan_description = showifdef('debt.loan_description',debt.source)
       if x.instanceName == "users[0]":
         x.debts[-1].balance = debt.balance * debt.user_percentage
@@ -3473,6 +3556,17 @@ code: |
         x.debts[-1].balance = debt.balance * (1 - debt.user_percentage)
         x.debts[-1].monthly_payment = debt.monthly_payment * (1 - debt.user_percentage)
   x.debts.gathered = True
+---
+id: joint_debts review 
+question: All Debts
+subquestion: |
+
+  Tap Next if you don't have more to add.
+  
+  ${ joint_debts.table }
+  
+  ${  joint_debts.add_action() }
+continue button field:  joint_debts.review_items
 ---
 id: generic review
 generic object: ALIndividual
@@ -4839,9 +4933,9 @@ code: |
   temp_service_type_choices = list()
   temp_service_type_choices.append({'label': other_parties[0].name_full()  + " has signed a verified Respondent’s Answer to Petition for Dissolution of Marriage, which is being filed with the Petition for Dissolution of Marriage. Therefore, do not issue a summons.","value":"none"})
   if other_parties[0].address.state == "MO":
-    temp_service_type_choices.append({'label': other_parties[0].name_full() + " should be served with a summons at their home,","value":"home"})
+    temp_service_type_choices.append({'label': other_parties[0].name_full() + " should be served with a summons at their home.","value":"home"})
   if defined('other_parties[0].employer.address.address') and other_parties[0].employer.address.state == "MO":
-    temp_service_type_choices.append({'label': other_parties[0].name_full() + " should be served with a summons at their place of employment","value":"work"})
+    temp_service_type_choices.append({'label': other_parties[0].name_full() + " should be served with a summons at their place of employment.","value":"work"})
   if other_parties[0].address.state != "MO" and (not defined('other_parties[0].employer.address.address') or other_parties[0].employer.address.state != "MO"):
     temp_service_type_choices.append({'label': other_parties[0].name_full() + " cannot be served in Missouri. Therefore, service by registered mail is requested. A copy of the Affidavit for Service by Mail is attached to this form. See Missouri Supreme Court Rule 54.12(b).","value":"mail"})
   service_type_choices = temp_service_type_choices
@@ -4904,7 +4998,7 @@ subquestion: |
   ${ action_button_html(url_action('review_certificate_of_dissolution_of_marri'), label='Edit answers', color='info') }
   
   
-  ${ al_user_bundle.download_list_html(use_previously_cached_files=False, include_full_pdf=True) }
+  ${ al_user_bundle.download_list_html(use_previously_cached_files=True, include_full_pdf=True) }
   
 
   ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }

@@ -1,7 +1,4 @@
 ---
-include:
-  - shared.yml
----
 mandatory: True
 code: |
   users[0].name.first

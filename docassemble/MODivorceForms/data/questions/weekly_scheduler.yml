@@ -1,0 +1,2228 @@
+modules:
+  - .function_import
+---
+mandatory: False
+code: |
+  case.filed
+  exchanges.gather()
+  biweekly_schedule_review
+  if not holidays_default:
+    for key in holidays.keys():
+      if holidays[key]['different']:
+        holidays[key]['even_years']
+  holidays_review
+  other_holidays.gather()
+  mo_divorce_forms_download
+---
+objects: 
+  - exchanges: DAList.using(object_type=DAObject,there_are_any=True,complete_attribute="complete")
+---
+code: |
+  exchanges[0].starting_date = "0"
+  exchanges[0].information
+  exchanges[0].complete = True
+---
+code: |
+  exchanges[i].starting_date = exchanges[i-1].exchange_date
+  exchanges[i].starting_parent = exchanges[i-1].exchange_parent
+  exchanges[i].exchange_parent = exchanges[i-1].starting_parent
+  exchanges[i].information
+  exchanges[i].complete = True
+---
+question: Do you want to add another exchange?
+subquestion: |
+  % if float(exchanges.complete_elements()[-1].exchange_date) < 13: 
+  If you say no, then ${ exchanges.complete_elements()[-1].exchange_parent } will be listed as having the children for the remainder of the biweekly schedule.
+  % endif
+fields:
+  - Add another exchange?: exchanges.there_is_another
+    datatype: yesnoradio
+---
+if: len(exchanges.complete_elements()) > 0 and exchanges.complete_elements()[-1].exchange_parent != exchanges[0].starting_parent
+code: |
+  exchanges.there_is_another = True
+---
+reconsider: remaining_days
+id: exchange intro
+question: Schedule for Exchange
+subquestion: |
+fields:
+  - "Who should have the child at the start of the schedule?": starting_parent
+    choices:
+      - ${ users[0].name.full() }: users0
+      - ${ other_parties[0].name.full() }: other_parties0
+  - Do you want to use a schedule template or build your own schedule?: use_template
+    choices:
+      - Use a template: template
+      - Build a schedule: build
+  - What template do you want to use?: template_choice
+    choices:
+      - "Every other week, exchange on Monday": every_other_week_monday
+      - "Every other week, exchange on Saturday": every_other_week_saturday
+      - "2-2-3": two_two_three
+      - "2-2-5-5": two_two_five_five
+      - "3-4-4-3": three_four_four_three
+      - "Every weekend": every_weekend
+      - "Every other weekend": every_other_weekend
+    js show if: |
+      val('use_template') === "template"
+  - note: |
+      [FILE every_other_week_monday.png, 100%]
+      
+
+    js show if: |
+      val('template_choice') === "every_other_week_monday"
+  - note: |
+      [FILE every_other_week_saturday.png, 100%]
+      
+
+    js show if: |
+      val('template_choice') === "every_other_week_saturday"
+  - note: |
+      [FILE two_two_three.png, 100%]
+      
+
+    js show if: |
+      val('template_choice') === "two_two_three"
+  - note: |
+      [FILE two_two_five_five.png, 100%]
+      
+
+    js show if: |
+      val('template_choice') === "two_two_five_five"
+  - note: |
+      [FILE three_four_four_three.png, 100%]
+      
+
+    js show if: |
+      val('template_choice') === "three_four_four_three"
+  - note: |
+      [FILE every_weekend.png, 100%]
+      
+
+    js show if: |
+      val('template_choice') === "every_weekend"
+  - note: |
+      [FILE every_other_weekend.png, 100%]
+      
+
+    js show if: |
+      val('template_choice') === "every_other_weekend"
+  - note: |
+      ${ users[0] } [FILE purple.png, 20px]
+      
+      ${ other_parties[0] } [FILE green.png, 20px]
+    js show if: |
+      val('starting_parent') === "users0" && val('template_choice') != null
+  - note: |
+      ${ other_parties[0] } [FILE purple.png, 20px]
+      
+      ${ users[0] } [FILE green.png, 20px]
+    js show if: |
+      val('starting_parent') === "other_parties0" && val('template_choice') != null
+validation code: |
+  if starting_parent == "users0":
+    exchange_parent = "other_parties0"
+  else:
+    exchange_parent = "users0"
+---
+question: Make your own schedule
+subquestion: |
+  Each exchange should be written on the Weekend and Weekday Exchange Schedule. The parents
+  shall have physical custody of the children as they agree. In the event they do not agree, then the
+  parents shall exchange the children as set forth in the residential schedules.
+
+  Each parent shall consider reasonable changes when requested by the other parent or the children.
+  If a significant change is made, either parent may reduce their agreement to writing. All changes are
+  unenforceable unless in writing and signed by both parents.
+
+
+fields:
+  - "Who should have the child at the start of the schedule?": exchanges[0].temp_starting_parent
+    choices:
+      - ${ users[0].name.full() }: "users0"
+      - ${ other_parties[0].name.full() }: "other_parties0"
+    default: starting_parent
+  - "What is the day of the first transfer?": exchanges[0].exchange_date
+    datatype: dropdown
+    code: |
+      remaining_days
+  - "What time?": exchanges[0].exchange_time
+    datatype: time
+  - "Should the child be dropped off or picked up?": exchanges[0].exchange_method
+    datatype: radio
+    choices:
+      -  Drop off: Drop off
+      -  Pick up: Pick up
+  - "Where should ${ users[0] } drop off the child?": exchanges[0].exchange_location
+    js show if: |
+      val('exchanges[0].exchange_method') === "Drop off" && val('exchanges[0].temp_starting_parent') == "users0"
+    choices:
+      - ${ other_parties[0].possessive('house') }: house
+      - School: school
+      - Other: other
+  - "Where should ${ other_parties[0] } drop off the child?": exchanges[0].exchange_location
+    js show if: |
+      val('exchanges[0].exchange_method') === "Drop off" && val('exchanges[0].temp_starting_parent') == "other_parties0"
+    choices:
+      - ${ users[0].possessive('house') }: house
+      - School: school
+      - Other: other
+  - "Where should ${ other_parties[0] } pick up the child?": exchanges[0].exchange_location
+    js show if: |
+      val('exchanges[0].exchange_method') === "Pick up" && val('exchanges[0].temp_starting_parent') == "users0"
+    choices:
+      - ${ users[0].possessive('house') }
+      - School
+      - Other
+  - "Where should ${ users[0] } pick up the child?": exchanges[0].exchange_location
+    js show if: |
+      val('exchanges[0].exchange_method') === "Pick up" && val('exchanges[0].temp_starting_parent') == "other_parties0"
+    choices:
+      - ${ other_parties[0].possessive('house') }
+      - School
+      - Other
+  - "Explain": exchanges[0].exchange_location_other
+    js show if: |
+      val('exchanges[0].exchange_location') === "Other"
+  - "Add pick up from school by ${ other_parties[0] }?": exchanges[0].add_pick_up_from_school
+    datatype: yesnoradio
+    js show if: |
+      val("exchanges[0].exchange_method") === "Drop off" && val("exchanges[0].exchange_location") === "school" && val('exchanges[0].temp_starting_parent') == "users0"
+  - "Add pick up from school by ${ users[0] }?": exchanges[0].add_pick_up_from_school
+    datatype: yesnoradio
+    js show if: |
+      val("exchanges[0].exchange_method") === "Drop off" && val("exchanges[0].exchange_location") === "school" && val('exchanges[0].temp_starting_parent') == "other_parties0"
+  - "What time?": exchanges[0].exchange_time2
+    datatype: time
+    js show if: |
+      val('exchanges[0].add_pick_up_from_school') === true
+continue button field: exchanges[0].information  
+validation code: |
+  if exchanges[0].temp_starting_parent == "users0":
+    exchanges[0].starting_parent = users[0].name.full()
+    exchanges[0].exchange_parent = other_parties[0].name.full()
+  elif exchanges[0].temp_starting_parent == "other_parties0":
+    exchanges[0].starting_parent = other_parties[0].name.full()
+    exchanges[0].exchange_parent = users[0].name.full()
+---
+
+reconsider: remaining_days
+id: exchange information other than intro
+question: Schedule for Exchange
+subquestion: |
+  ${ exchanges[i].starting_parent }
+fields:
+  - What is the day of the next transfer to ${ exchanges[i].exchange_parent }?: exchanges[i].exchange_date
+    datatype: dropdown
+    code: |
+      remaining_days
+  - What time?: exchanges[i].exchange_time
+    datatype: time
+  - Should ${ exchanges[i].starting_parent } drop off the child or should ${ exchanges[i].exchange_parent } pick up the child?: exchanges[i].exchange_method
+    datatype: radio
+    choices:
+      -  ${ exchanges[i].starting_parent } should drop off the child: Drop off
+      -  ${ exchanges[i].exchange_parent } should pick up the child: Pick up
+  - Where should ${ exchanges[i].starting_parent } drop off the child?: exchanges[i].exchange_location
+    js show if: |
+      val('exchanges[i].exchange_method') === "Drop off" 
+    choices:
+      - ${ possessify(exchanges[i].exchange_parent,'house') }: house
+      - School: school
+      - Other: other
+  - Where should ${ exchanges[i].exchange_parent } pick up the child?: exchanges[i].exchange_location
+    js show if: |
+      val('exchanges[i].exchange_method') === "Pick up"
+    choices:
+      - ${ possessify(exchanges[i].starting_parent,'house') }: house
+      - School: school
+      - Other: other
+  - Explain: exchanges[i].exchange_location_other
+    js show if: |
+      val('exchanges[i].exchange_location') === "other"
+  - Add pick up from school by ${ exchanges[i].exchange_parent } ?: exchanges[i].add_pick_up_from_school
+    datatype: yesnoradio
+    js show if: |
+      val("exchanges[i].exchange_method") === "Drop off" && val("exchanges[i].exchange_location") === "school"
+  - What time: exchanges[i].exchange_time2
+    datatype: time
+    js show if: |
+      val('exchanges[i].add_pick_up_from_school') === true
+continue button field: exchanges[i].information  
+
+---
+code: |
+  week_dict = {
+    0:"Sunday Week 1",
+    1:"Monday Week 1",
+    2:"Tuesday Week 1",
+    3:"Wednesday Week 1",
+    4:"Thursday Week 1",
+    5:"Friday Week 1",
+    6:"Saturday Week 1",
+    7:"Sunday Week 2",
+    8:"Monday Week 2",
+    9:"Tuesday Week 2",
+    10:"Wednesday Week 2",
+    11:"Thursday Week 2",
+    12:"Friday Week 2",
+    13:"Saturday Week 2",
+  }
+
+---
+id: remaining_days code
+code: |
+  temp_week_list_of_dicts = list()
+  for index in range(0,14):
+    if len(exchanges.complete_elements()) == 0 or index >= float(exchanges.complete_elements()[-1].exchange_date):
+      temp_week_list_of_dicts.append({index:week_dict[index]})
+  remaining_days = temp_week_list_of_dicts
+---
+code: |
+  default_exchange_time = "09:00:00"
+  default_exchange_method = "Drop off"
+  default_exchange_location = 'house'
+---
+if: use_template == "template" and template_choice == "every_other_week_monday"
+variable name: exchanges
+use objects: objects
+data from code:
+  object: DAObject
+  module: docassemble.base.util
+  items:
+    - starting_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      starting_date: |
+        0 
+      exchange_parent: | 
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      exchange_date: |
+        1
+      exchange_time: |
+        "07:30:00"
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        'school'
+      add_pick_up_from_school: |
+        True
+      exchange_time2: |
+        "15:00:00"
+    - starting_parent: |
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      starting_date: |
+        1
+      exchange_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      exchange_date: |
+        8
+      exchange_time: |
+        "07:30:00"
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        "school"
+      add_pick_up_from_school: |
+        True
+      exchange_time2: |
+        "15:00:00"
+---
+if: use_template == "template" and template_choice == "every_other_week_saturday"
+variable name: exchanges
+use objects: objects
+data from code:
+  object: DAObject
+  module: docassemble.base.util
+  items:
+    - starting_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      starting_date: |
+        0 
+      exchange_parent: | 
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      exchange_date: |
+        6
+      exchange_time: |
+        "12:00:00"
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      starting_date: |
+        6
+      exchange_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      exchange_date: |
+        13
+      exchange_time: |
+        "12:00:00"
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+---
+if: use_template == "template" and template_choice == "two_two_three"
+variable name: exchanges
+use objects: objects
+data from code:
+  object: DAObject
+  module: docassemble.base.util
+  items:
+    - starting_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      starting_date: |
+        0 
+      exchange_parent: | 
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      exchange_date: |
+        1
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        "school"
+      add_pick_up_from_school: |
+        True
+      exchange_time2: |
+        "15:00:00"
+    - starting_parent: |
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      starting_date: |
+        1
+      exchange_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      exchange_date: |
+        3
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        "school"
+      add_pick_up_from_school: |
+        True
+      exchange_time2: |
+        "15:00:00"
+    - starting_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      starting_date: |
+        3 
+      exchange_parent: | 
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      exchange_date: |
+        5
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        "school"
+      add_pick_up_from_school: |
+        True
+      exchange_time2: |
+        "15:00:00"
+    - starting_parent: |
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      starting_date: |
+        5
+      exchange_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      exchange_date: |
+        8
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        "school"
+      add_pick_up_from_school: |
+        True
+      exchange_time2: |
+        "15:00:00"
+    - starting_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      starting_date: |
+        8
+      exchange_parent: | 
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      exchange_date: |
+        10
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        "school"
+      add_pick_up_from_school: |
+        True
+      exchange_time2: |
+        "15:00:00"
+    - starting_parent: |
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      starting_date: |
+        10
+      exchange_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      exchange_date: |
+        12
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        "school"
+      add_pick_up_from_school: |
+        True
+      exchange_time2: |
+        "15:00:00"
+---
+if: use_template == "template" and template_choice == "two_two_five_five"
+variable name: exchanges
+use objects: objects
+data from code:
+  object: DAObject
+  module: docassemble.base.util
+  items:
+    - starting_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      starting_date: |
+        0 
+      exchange_parent: | 
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      exchange_date: |
+        3
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      starting_date: |
+        3
+      exchange_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      exchange_date: |
+        8
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      starting_date: |
+        8
+      exchange_parent: | 
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      exchange_date: |
+        10
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      starting_date: |
+        10
+      exchange_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      exchange_date: |
+        12
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+---
+if: use_template == "template" and template_choice == "three_four_four_three"
+variable name: exchanges
+use objects: objects
+data from code:
+  object: DAObject
+  module: docassemble.base.util
+  items:
+    - starting_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      starting_date: |
+        0 
+      exchange_parent: | 
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      exchange_date: |
+        0
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      starting_date: |
+        0
+      exchange_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      exchange_date: |
+        4
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      starting_date: |
+        4
+      exchange_parent: | 
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      exchange_date: |
+        7
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      starting_date: |
+        7
+      exchange_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      exchange_date: |
+        10
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+---
+if: use_template == "template" and template_choice == "every_weekend"
+variable name: exchanges
+use objects: objects
+data from code:
+  object: DAObject
+  module: docassemble.base.util
+  items:
+    - starting_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      starting_date: |
+        0 
+      exchange_parent: | 
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      exchange_date: |
+        0
+      exchange_time: |
+        "17:00:00"
+      exchange_method: |
+        "Drop off"
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      starting_date: |
+        0
+      exchange_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      exchange_date: |
+        5
+      exchange_time: |
+        "17:00:00"
+      exchange_method: |
+        "Pick up"
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      starting_date: |
+        5
+      exchange_parent: | 
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      exchange_date: |
+        7
+      exchange_time: |
+        "17:00:00"
+      exchange_method: |
+        "Drop off"
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      starting_date: |
+        7
+      exchange_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      exchange_date: |
+        12
+      exchange_time: |
+        "17:00:00"
+      exchange_method: |
+        "Pick up"
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+---
+if: use_template == "template" and template_choice == "every_other_weekend"
+variable name: exchanges
+use objects: objects
+data from code:
+  object: DAObject
+  module: docassemble.base.util
+  items:
+    - starting_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      starting_date: |
+        0 
+      exchange_parent: | 
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      exchange_date: |
+        0
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+    - starting_parent: |
+        other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
+      starting_date: |
+        0
+      exchange_parent: |
+        users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
+      exchange_date: |
+        12
+      exchange_time: |
+        default_exchange_time
+      exchange_method: |
+        default_exchange_method
+      exchange_location: |
+        default_exchange_location
+      add_pick_up_from_school: |
+        None
+      exchange_time2: |
+        None
+---
+id: calculates visitation nights
+generic object: ALIndividual
+code: |
+  x.visitation_nights_default = int(visitation_dictionary[x.name.full()]/14*365)
+
+---
+id: biweekly_schedule_review
+question: Weekday and Weekend Exchange Schedule
+subquestion: |
+  Enter the parent who is receiving custody and the specified time for each exchange.
+
+  Visitation nights based on this schedule (may be changed later)
+  
+   - Visitation nights for ${ users[0].name.full() }: ${ users[0].visitation_nights_default }
+   - Visitation nights for ${ other_parties[0].name.full() }: ${ other_parties[0].visitation_nights_default }
+fields:
+  - note: |
+      **Week 1**
+  - Sunday:  biweekly_schedule[0]
+    datatype: area
+    required: False
+  - Monday:  biweekly_schedule[1]
+    datatype: area
+    required: False
+  - Tuesday:  biweekly_schedule[2]
+    datatype: area
+    required: False
+  - Wednesday:  biweekly_schedule[3]
+    datatype: area
+    required: False
+  - Thursday:  biweekly_schedule[4]
+    datatype: area
+    required: False
+  - Friday:  biweekly_schedule[5]
+    datatype: area
+    required: False
+  - Saturday:  biweekly_schedule[6]
+    datatype: area
+    required: False
+  - note: |
+      **Week 2**
+  - Sunday:  biweekly_schedule[7]
+    datatype: area
+    required: False
+  - Monday:  biweekly_schedule[8]
+    datatype: area
+    required: False
+  - Tuesday:  biweekly_schedule[9]
+    datatype: area
+    required: False
+  - Wednesday:  biweekly_schedule[10]
+    datatype: area
+    required: False
+  - Thursday:  biweekly_schedule[11]
+    datatype: area
+    required: False
+  - Friday:  biweekly_schedule[12]
+    datatype: area
+    required: False
+  - Saturday:  biweekly_schedule[13]
+    datatype: area
+    required: False
+continue button field: biweekly_schedule_review
+---
+code: |
+  starting_weekly_list = list()
+  for index in range(0,14):
+    starting_weekly_list.append("")
+---
+reconsider: starting_weekly_list
+code: |
+  visitation_dictionary = dict()
+  visitation_dictionary[exchanges[0].starting_parent] = 0
+  visitation_dictionary[exchanges[0].exchange_parent] = 0
+  for exchange in exchanges.complete_elements():
+    if exchange.starting_date == exchange.exchange_date:
+      if exchange.exchange_method == "Drop off":
+        temp_description = str(format_time(exchange.exchange_time))  + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location)  + "\n"
+        if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
+          temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
+      elif exchange.exchange_method == "Pick up":
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location) + "\n"
+      if starting_weekly_list[int(exchange.exchange_date)] == "":
+        visitation_dictionary[exchange.exchange_parent] += 1
+      else:
+        visitation_dictionary[exchange.exchange_parent] += 1
+        visitation_dictionary[exchange.starting_parent] = visitation_dictionary[exchange.starting_parent] - 1
+      starting_weekly_list[int(exchange.exchange_date)] += temp_description
+    elif int(exchange.starting_date) == 0:
+      if exchange.instanceName == "exchanges[0]":
+        starting_date = int(exchange.starting_date)
+      else:
+        starting_date = int(exchange.starting_date)+1
+      for date in range(starting_date,(int(exchange.exchange_date))):
+        starting_weekly_list[date] = exchange.starting_parent
+        visitation_dictionary[exchange.starting_parent] += 1
+      if exchange.exchange_method == "Drop off":
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location)  + "\n"
+        if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
+          temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
+      elif exchange.exchange_method == "Pick up":
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location) + "\n"
+      if starting_weekly_list[int(exchange.exchange_date)] == "":
+        visitation_dictionary[exchange.exchange_parent] += 1
+      else:
+        visitation_dictionary[exchange.exchange_parent] += 1
+        visitation_dictionary[exchange.starting_parent] = visitation_dictionary[exchange.starting_parent] - 1
+      starting_weekly_list[int(exchange.exchange_date)] += temp_description
+    else:
+      for date in range(int(exchange.starting_date) + 1,(int(exchange.exchange_date))):
+        starting_weekly_list[date] = exchange.starting_parent
+        visitation_dictionary[exchange.starting_parent] += 1
+      if exchange.exchange_method == "Drop off":
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location)  + "\n"
+        if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
+          temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
+      elif exchange.exchange_method == "Pick up":
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location) + "\n"
+      if starting_weekly_list[int(exchange.exchange_date)] == "":
+        visitation_dictionary[exchange.exchange_parent] += 1
+      else:
+        visitation_dictionary[exchange.exchange_parent] += 1
+        visitation_dictionary[exchange.starting_parent] = visitation_dictionary[exchange.starting_parent] - 1
+      starting_weekly_list[int(exchange.exchange_date)] += temp_description
+  if exchanges.gathered and int(exchanges[-1].exchange_date) < 14:
+    for date_index in range(int(exchanges[-1].exchange_date) + 1,14):
+      starting_weekly_list[date_index] = exchanges[-1].exchange_parent
+      visitation_dictionary[exchanges[-1].exchange_parent] += 1
+  biweekly_schedule = starting_weekly_list
+---
+id: answer enabled block for main interview
+code: |
+  parenting_plan_attachment.enabled = True
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[parenting_plan_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[parenting_plan_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+---
+id: Parenting Plan object
+objects:
+  - parenting_plan_attachment: ALDocument.using(title="Parenting Plan", filename="Parenting_Plan", has_addendum=False, )
+---
+id: Parenting Plan attachment
+attachment:
+  name: Parenting Plan
+  filename: Parenting_Plan
+  variable name: parenting_plan_attachment[i]
+  skip undefined: True
+  pdf template file: parenting_plan.pdf
+  editable: False
+  fields:
+   - paScheduleWeekOneSunday: ${ biweekly_schedule[0] }
+   - paScheduleWeekOneMonday: ${ biweekly_schedule[1] }
+   - paScheduleWeekOneTuesday: ${ biweekly_schedule[2] }
+   - paScheduleWeekOneWednesday: ${ biweekly_schedule[3] }
+   - paScheduleWeekOneThursday: ${ biweekly_schedule[4] }
+   - paScheduleWeekOneFriday: ${ biweekly_schedule[5] }
+   - paScheduleWeekOneSaturday: ${ biweekly_schedule[6] }
+   - paScheduleWeekTwoSunday: ${ biweekly_schedule[7] }
+   - paScheduleWeekTwoMonday: ${ biweekly_schedule[8] }
+   - paScheduleWeekTwoTuesday: ${ biweekly_schedule[9] }
+   - paScheduleWeekTwoWednesday: ${ biweekly_schedule[10] }
+   - paScheduleWeekTwoThursday: ${ biweekly_schedule[11] }
+   - paScheduleWeekTwoFriday: ${ biweekly_schedule[12] }
+   - paScheduleWeekTwoSaturday: ${ biweekly_schedule[13] }
+   - paMLKdayEven: |
+       % if holidays["mlk"]["even_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["mlk"]["even_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paMLKdayOdd: |
+       % if holidays["mlk"]["odd_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["mlk"]["odd_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paMLKdayStartTime: |
+       % if defined('holidays["mlk"]["custody_from_time"]') and holidays["mlk"]["custody_from_time"] != "":
+       ${ format_time(holidays["mlk"]["custody_from_time"]) }
+       % endif
+   - paMLKdayEndTime: |
+       % if defined('holidays["mlk"]["custody_to_time"]') and holidays["mlk"]["custody_to_time"] != "":
+       ${ format_time(holidays["mlk"]["custody_to_time"]) }
+       % endif
+   - paPresidentsDayEven: |
+       % if holidays["president"]["even_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["president"]["even_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paPresidentsDayOdd: |
+       % if holidays["president"]["odd_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["president"]["odd_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paPresidentsDayStartTime: |
+       % if defined('holidays["president"]["custody_from_time"]') and holidays["president"]["custody_from_time"] != "":
+       ${ format_time(holidays["president"]["custody_from_time"]) }
+       % endif
+   - paPresidentsDayEndTime: |
+       % if defined('holidays["president"]["custody_to_time"]') and holidays["president"]["custody_to_time"] != "":
+       ${ format_time(holidays["president"]["custody_to_time"]) }
+       % endif
+   - paMemorialDayEven: |
+       % if holidays["memorial"]["even_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["memorial"]["even_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paMemorialDayOdd: |
+       % if holidays["memorial"]["odd_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["memorial"]["odd_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paMemorialDayStartTime: |
+       % if defined('holidays["memorial"]["custody_from_time"]') and holidays["memorial"]["custody_from_time"] != "":
+       ${ format_time(holidays["memorial"]["custody_from_time"]) }
+       % endif
+   - paMemorialDayEndTime: |
+       % if defined('holidays["memorial"]["custody_to_time"]') and holidays["memorial"]["custody_to_time"] != "":
+       ${ format_time(holidays["memorial"]["custody_to_time"]) }
+       % endif
+   - paIndependenceDayEven: |
+       % if holidays["independence"]["even_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["independence"]["even_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paIndependenceDayOdd: |
+       % if holidays["independence"]["odd_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["independence"]["odd_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paIndependenceDayStartTime: |
+       % if defined('holidays["independence"]["custody_from_time"]') and holidays["independence"]["custody_from_time"] != "":
+       ${ format_time(holidays["independence"]["custody_from_time"]) }
+       % endif 
+   - paIndependenceDayEndTime: |
+       % if defined('holidays["independence"]["custody_to_time"]') and holidays["independence"]["custody_to_time"] != "":
+       ${ format_time(holidays["independence"]["custody_to_time"]) }
+       % endif 
+   - paLaborDayEven: |
+       % if holidays["labor"]["even_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["labor"]["even_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paLaborDayOdd: |
+       % if holidays["labor"]["odd_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["labor"]["odd_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paLaborDayStartTime: |
+       % if defined('holidays["labor"]["custody_from_time"]') and holidays["labor"]["custody_from_time"] != "":
+       ${ format_time(holidays["labor"]["custody_from_time"]) }
+       % endif 
+   - paLaborDayEndTime: |
+       % if defined('holidays["labor"]["custody_to_time"]') and holidays["labor"]["custody_to_time"] != "":
+       ${ format_time(holidays["labor"]["custody_to_time"]) }
+       % endif 
+   - paThanksgivingEven: |
+       % if holidays["thanksgiving"]["even_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["thanksgiving"]["even_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paThanksgivingOdd: |
+       % if holidays["thanksgiving"]["odd_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["thanksgiving"]["odd_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paThanksgivingStartTime: |
+       % if defined('holidays["thanksgiving"]["custody_from_time"]') and holidays["thanksgiving"]["custody_from_time"] != "":
+       ${ format_time(holidays["thanksgiving"]["custody_from_time"]) }
+       % endif 
+   - paThanksgivingEndTime: |
+       % if defined('holidays["thanksgiving"]["custody_to_time"]') and holidays["thanksgiving"]["custody_to_time"] != "":
+       ${ format_time(holidays["thanksgiving"]["custody_to_time"]) }
+       % endif 
+   - paHalloweenEven: |
+       % if holidays["halloween"]["even_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["halloween"]["even_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paHalloweenOdd: |
+       % if holidays["halloween"]["odd_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["halloween"]["odd_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paHalloweenStartTime: |
+       % if defined('holidays["halloween"]["custody_from_time"]') and holidays["halloween"]["custody_from_time"] != "":
+       ${ format_time(holidays["halloween"]["custody_from_time"]) }
+       % endif 
+   - paHalloweenEndTime: |
+       % if defined('holidays["halloween"]["custody_to_time"]') and holidays["halloween"]["custody_to_time"] != "":
+       ${ format_time(holidays["halloween"]["custody_to_time"]) }
+       % endif 
+   - paChristmasEveEven: |
+       % if holidays["xmas_eve"]["even_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["xmas_eve"]["even_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paChristmasEveOdd: |
+       % if holidays["xmas_eve"]["odd_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["xmas_eve"]["odd_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paChristmasEveStartTime:  |
+       % if defined('holidays["xmas_eve"]["custody_from_time"]') and holidays["xmas_eve"]["custody_from_time"] != "":
+       ${ format_time(holidays["xmas_eve"]["custody_from_time"]) }
+       % endif 
+   - paChristmasEveEndTime: |
+       % if defined('holidays["xmas_eve"]["custody_to_time"]') and holidays["xmas_eve"]["custody_to_time"] != "":
+       ${ format_time(holidays["xmas_eve"]["custody_to_time"]) }
+       % endif 
+   - paChristmasDayEven: |
+       % if holidays["xmas_day"]["even_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["xmas_day"]["even_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paChristmasDayOdd: |
+       % if holidays["xmas_day"]["odd_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["xmas_day"]["odd_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paChristmasDayStartTime: |
+       % if defined('holidays["xmas_day"]["custody_from_time"]') and holidays["xmas_day"]["custody_from_time"] != "":
+       ${ format_time(holidays["xmas_day"]["custody_from_time"]) }
+       % endif 
+   - paChristmasDayEndTime: |
+       % if defined('holidays["xmas_day"]["custody_to_time"]') and holidays["xmas_day"]["custody_to_time"] != "":
+       ${ format_time(holidays["xmas_day"]["custody_to_time"]) }
+       % endif 
+   - paMothersDayEven: |
+       % if holidays["mother"]["even_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["mother"]["even_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paMothersDayOdd: |
+       % if holidays["mother"]["odd_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["mother"]["odd_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paMothersDayStartTime: |
+       % if defined('holidays["mother"]["custody_from_time"]') and holidays["mother"]["custody_from_time"] != "":
+       ${ format_time(holidays["mother"]["custody_from_time"]) }
+       % endif 
+   - paMothersDayEndTime: |
+       % if defined('holidays["mother"]["custody_to_time"]') and holidays["mother"]["custody_to_time"] != "":
+       ${ format_time(holidays["mother"]["custody_to_time"]) }
+       % endif 
+   - paFathersDayEven: |
+       % if holidays["father"]["even_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["father"]["even_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paFathersDayOdd: |
+       % if holidays["father"]["odd_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["father"]["odd_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paFathersDayStartTime: |
+       % if defined('holidays["father"]["custody_from_time"]') and holidays["father"]["custody_from_time"] != "":
+       ${ format_time(holidays["father"]["custody_from_time"]) }
+       % endif 
+   - paFathersDayEndTime: |
+       % if defined('holidays["father"]["custody_to_time"]') and holidays["father"]["custody_to_time"] != "":
+       ${ format_time(holidays["father"]["custody_to_time"]) }
+       % endif 
+   - paPetitionersBirthdayEven: |
+       % if holidays["petitioner_birthday"]["even_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["petitioner_birthday"]["even_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paPetitionersBirthdayOdd: |
+       % if holidays["petitioner_birthday"]["odd_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["petitioner_birthday"]["odd_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paPetitionersBirthdayStartTime: |
+       % if defined('holidays["petitioner_birthday"]["custody_from_time"]') and holidays["petitioner_birthday"]["custody_from_time"] != "":
+       ${ format_time(holidays["petitioner_birthday"]["custody_from_time"]) }
+       % endif 
+   - paPetitionersBirthdayEndTime: |
+       % if defined('holidays["petitioner_birthday"]["custody_to_time"]') and holidays["petitioner_birthday"]["custody_to_time"] != "":
+       ${ format_time(holidays["petitioner_birthday"]["custody_to_time"]) }
+       % endif 
+   - paRespondentsBirthdayEven: |
+       % if holidays["respondent_birthday"]["even_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["respondent_birthday"]["even_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paRespondentsBirthdayOdd: |
+       % if holidays["respondent_birthday"]["odd_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["respondent_birthday"]["odd_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paRespondentsBirthdayStartTime: |
+       % if defined('holidays["respondent_birthday"]["custody_from_time"]') and holidays["respondent_birthday"]["custody_from_time"] != "":
+       ${ format_time(holidays["respondent_birthday"]["custody_from_time"]) }
+       % endif 
+   - paRespondentsBirthdayEndTime: |
+       % if defined('holidays["respondent_birthday"]["custody_to_time"]') and holidays["respondent_birthday"]["custody_to_time"] != "":
+       ${ format_time(holidays["respondent_birthday"]["custody_to_time"]) }
+       % endif 
+   - paChildrensBirthdaysEven: |
+       % if holidays["children_birthday"]["even_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["children_birthday"]["even_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paChildrensBirthdaysOdd: |
+       % if holidays["children_birthday"]["odd_years"] == "petitioner":
+       ${ petitioner.name.first }
+       % elif holidays["children_birthday"]["odd_years"] == "respondent":
+       ${ respondent.name.first }
+       % endif
+   - paChildrensBirthdaysStartTime: |
+       % if defined('holidays["children_birthday"]["custody_from_time"]') and holidays["children_birthday"]["custody_from_time"] != "":
+       ${ format_time(holidays["children_birthday"]["custody_from_time"]) }
+       % endif 
+   - paChildrensBirthdayEndTime: |
+       % if defined('holidays["children_birthday"]["custody_to_time"]') and holidays["children_birthday"]["custody_to_time"] != "":
+       ${ format_time(holidays["children_birthday"]["custody_to_time"]) }
+       % endif 
+   - paOtherHolidays1: |
+       % if len(other_holidays) > 0:
+       ${ other_holidays[0].description }
+       % endif
+   - paOtherHolidays1Even: |
+       % if len(other_holidays) > 0:
+       % if other_holidays[0].even_years == "petitioner":
+       ${ petitioner.name.first }
+       % elif other_holidays[0].even_years == "respondent":
+       ${ respondent.name.first }
+       % endif
+       % endif
+   - paOtherHolidays1Odd: |
+       % if len(other_holidays) > 0:
+       % if other_holidays[0].odd_years == "petitioner":
+       ${ petitioner.name.first }
+       % elif other_holidays[0].odd_years == "respondent":
+       ${ respondent.name.first }
+       % endif
+       % endif
+   - paOtherHolidays1StartTime: |
+       % if len(other_holidays) > 0:
+       ${ format_time(other_holidays[0].custody_from_time) }
+       % endif
+   - paOtherHolidays1EndTime: |
+       % if len(other_holidays) > 0:
+       ${ format_time(other_holidays[0].custody_to_time) }
+       % endif
+   - paOtherHolidays2: |
+       % if len(other_holidays) > 1:
+       ${ other_holidays[1].description }
+       % endif
+   - paOtherHolidays2Even: |
+       % if len(other_holidays) > 1:
+       % if other_holidays[1].even_years == "petitioner":
+       ${ petitioner.name.first }
+       % elif other_holidays[1].even_years == "respondent":
+       ${ respondent.name.first }
+       % endif
+       % endif
+   - paOtherHolidays2Odd: |
+       % if len(other_holidays) > 1:
+       % if other_holidays[1].odd_years == "petitioner":
+       ${ petitioner.name.first }
+       % elif other_holidays[1].odd_years == "respondent":
+       ${ respondent.name.first }
+       % endif
+       % endif
+   - paOtherHolidays2StartTime: |
+       % if len(other_holidays) > 1:
+       ${ format_time(other_holidays[1].custody_from_time) }
+       % endif
+   - paOtherHolidays2EndTime: |
+       % if len(other_holidays) > 1:
+       ${ format_time(other_holidays[1].custody_to_time) }
+       % endif
+   - paOtherHolidays3: |
+       % if len(other_holidays) > 2:
+       ${ other_holidays[2].description }
+       % endif
+   - paOtherHolidays3Even: |
+       % if len(other_holidays) > 2:
+       % if other_holidays[2].even_years == "petitioner":
+       ${ petitioner.name.first }
+       % elif other_holidays[2].even_years == "respondent":
+       ${ respondent.name.first }
+       % endif
+       % endif
+   - paOtherHolidays3Odd: |
+       % if len(other_holidays) > 2:
+       % if other_holidays[2].odd_years == "petitioner":
+       ${ petitioner.name.first }
+       % elif other_holidays[2].odd_years == "respondent":
+       ${ respondent.name.first }
+       % endif
+       % endif
+   - paOtherHolidays3StartTime: |
+       % if len(other_holidays) > 2:
+       ${ format_time(other_holidays[2].custody_from_time) }
+       % endif
+   - paOtherHolidays3EndTime: |
+       % if len(other_holidays) > 2:
+       ${ format_time(other_holidays[2].custody_to_time) }
+       % endif
+   - paOtherHolidays4: |
+       % if len(other_holidays) > 3:
+       ${ other_holidays[3].description }
+       % endif
+   - paOtherHolidays4Even: |
+       % if len(other_holidays) > 3:
+       % if other_holidays[3].even_years == "petitioner":
+       ${ petitioner.name.first }
+       % elif other_holidays[3].even_years == "respondent":
+       ${ respondent.name.first }
+       % endif
+       % endif
+   - paOtherHoliday4Odd: |
+       % if len(other_holidays) > 3:
+       % if other_holidays[3].odd_years == "petitioner":
+       ${ petitioner.name.first }
+       % elif other_holidays[3].odd_years == "respondent":
+       ${ respondent.name.first }
+       % endif
+       % endif
+   - paOtherHolidays4StartTime: |
+       % if len(other_holidays) > 3:
+       ${ format_time(other_holidays[3].custody_from_time) }
+       % endif
+   - paOtherHolidays4EndTime: |
+       % if len(other_holidays) > 3:
+       ${ format_time(other_holidays[3].custody_to_time) }
+       % endif
+   - paOtherHolidays5: |
+       % if len(other_holidays) > 4:
+       ${ other_holidays[4].description }
+       % endif
+   - paOtherHolidays5Even: |
+       % if len(other_holidays) > 4:
+       % if other_holidays[4].even_years == "petitioner":
+       ${ petitioner.name.first }
+       % elif other_holidays[4].even_years == "respondent":
+       ${ respondent.name.first }
+       % endif
+       % endif
+   - paOtherHolidays5Odd: |
+       % if len(other_holidays) > 4:
+       % if other_holidays[4].odd_years == "petitioner":
+       ${ petitioner.name.first }
+       % elif other_holidays[4].odd_years == "respondent":
+       ${ respondent.name.first }
+       % endif
+       % endif
+   - paOtherHolidays5StartTime: |
+       % if len(other_holidays) > 4:
+       ${ format_time(other_holidays[4].custody_from_time) }
+       % endif
+   - paOtherHolidays5EndTime: |
+       % if len(other_holidays) > 4:
+       ${ format_time(other_holidays[4].custody_to_time) }
+       % endif
+   - paOtherHolidays6: |
+       % if len(other_holidays) > 5:
+       ${ other_holidays[5].description }
+       % endif
+   - paOtherHolidays6Even: |
+       % if len(other_holidays) > 5:
+       % if other_holidays[5].even_years == "petitioner":
+       ${ petitioner.name.first }
+       % elif other_holidays[5].even_years == "respondent":
+       ${ respondent.name.first }
+       % endif
+       % endif
+   - paOtherHolidays6Odd: |
+       % if len(other_holidays) > 5:
+       % if other_holidays[5].odd_years == "petitioner":
+       ${ petitioner.name.first }
+       % elif other_holidays[5].odd_years == "respondent":
+       ${ respondent.name.first }
+       % endif
+       % endif
+   - paOtherHolidays6StartTime: |
+       % if len(other_holidays) > 5:
+       ${ format_time(other_holidays[5].custody_from_time) }
+       % endif
+   - paOtherHolidays6EndTime: |
+       % if len(other_holidays) > 5:
+       ${ format_time(other_holidays[5].custody_to_time) }
+       % endif
+   - paOtherHolidays7: |
+       % if len(other_holidays) > 6:
+       ${ other_holidays[6].description }
+       % endif
+   - paOtherHolidays7Even: |
+       % if len(other_holidays) > 6:
+       % if other_holidays[6].even_years == "petitioner":
+       ${ petitioner.name.first }
+       % elif other_holidays[6].even_years == "respondent":
+       ${ respondent.name.first }
+       % endif
+       % endif
+   - paOtherHoliday7Odd: |
+       % if len(other_holidays) > 6:
+       % if other_holidays[6].odd_years == "petitioner":
+       ${ petitioner.name.first }
+       % elif other_holidays[6].odd_years == "respondent":
+       ${ respondent.name.first }
+       % endif
+       % endif
+   - paOtherHolidays7StartTime: |
+       % if len(other_holidays) > 6:
+       ${ format_time(other_holidays[6].custody_from_time) }
+       % endif
+   - paOtherHolidays7EndTime: |
+       % if len(other_holidays) > 6:
+       ${ format_time(other_holidays[6].custody_to_time) }
+       % endif
+---
+question: Holidays
+subquestion: |
+  A different schedule can apply on holidays. The times each parent will have with the children during the holidays are set forth on the Holiday Exchange Schedule.
+
+  Check the holidays where you want a different schedule to apply.
+  
+  
+fields:
+ - "Do you want to use a default alternating schedule that you can change?": holidays_default
+   datatype: yesnoradio
+ - "Martin Luther King Day": holidays['mlk']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "President’s Day": holidays['president']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Memorial Day": holidays['memorial']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Independence Day": holidays['independence']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Labor Day": holidays['labor']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Thanksgiving": holidays['thanksgiving']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Halloween": holidays['halloween']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Christmas Eve": holidays['xmas_eve']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Christmas Day": holidays['xmas_day']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Mother’s Day": holidays['mother']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Father’s Day": holidays['father']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Petitioner’s Birthday": holidays['petitioner_birthday']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Respondent’s Birthday": holidays['respondent_birthday']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Child(ren)'s Birthday": holidays['children_birthday']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+---
+variable name: holidays
+use objects: True
+data:
+  mlk:
+    description: "Martin Luther King Day"
+    even_default: petitioner
+    odd_default: respondent
+  president:
+    description: "President’s Day"
+    even_default: respondent
+    odd_default: petitioner
+  memorial:
+    description: "Memorial Day"
+    even_default: petitioner
+    odd_default: respondent
+  independence:
+    description: "Independence Day"
+    even_default: respondent
+    odd_default: petitioner
+  labor:
+    description: "Labor Day"
+    even_default: petitioner
+    odd_default: respondent
+  thanksgiving:
+    description: "Thanksgiving"
+    even_default: respondent
+    odd_default: petitioner
+  halloween:
+    description: "Halloween"
+    even_default: petitioner
+    odd_default: respondent
+  xmas_eve:
+    description: "Christmas Eve"
+    even_default: respondent
+    odd_default: petitioner
+  xmas_day:
+    description: "Christmas Day"
+    even_default: petitioner
+    odd_default: respondent
+  mother:
+    description: "Mother’s Day"
+    even_default: respondent
+    odd_default: petitioner
+  father:
+    description: "Father’s Day"
+    even_default: petitioner
+    odd_default: respondent
+  petitioner_birthday:
+    description: "Petitioner’s Birthday"
+    even_default: petitioner
+    odd_default: petitioner
+  respondent_birthday:
+    description: "Respondent’s Birthday"
+    even_default: respondent
+    odd_default: respondent
+  children_birthday:
+    description: "Child(ren)'s Birthday"
+    even_default: respondent
+    odd_default: petitioner
+---
+question: ${ holidays[i]["description"] }
+fields:
+  - Even Numbered Years: holidays[i]['even_years']
+    datatype: radio
+    choices:
+     - ${ petitioner.name.first }
+     - ${ respondent.name.first }
+  - Odd Numbered Years: holidays[i]['odd_years']
+    datatype: radio
+    choices:
+     - ${ petitioner.name.first }
+     - ${ respondent.name.first }
+  - Physical custody from time: holidays[i]["custody_from_time"]
+    datatype: time
+  - Physical custody to time: holidays[i]['custody_to_time']
+    datatype: time
+---
+objects: 
+  - other_holidays: DAList.using(object_type=DAObject, complete_attribute='complete')
+---
+question: Do you want to add any other holidays, including special holidays and occassions?
+fields:
+  - Other holidays: other_holidays.there_are_any
+    datatype: yesnoradio
+---
+question: Do you want to add any more holidays?
+fields:
+  - Other holidays: other_holidays.there_is_another
+    datatype: yesnoradio
+---
+question: Other holidays information
+subquestion: |
+  % if len(other_holidays.complete_elements()) > 0:
+  You have already mentioned:
+  % for other_holiday in other_holidays.complete_elements():
+  
+   - ${ other_holiday.description }
+  % endfor
+  % endif
+fields:
+ - Description: other_holidays[i].description
+ - Even Numbered Years: other_holidays[i].even_years
+   datatype: radio
+   choices:
+     - ${ petitioner.name.first }: petitioner
+     - ${ respondent.name.first }: respondent
+ - Odd Numbered Years: other_holidays[i].odd_years
+   datatype: radio
+   choices:
+     - ${ petitioner.name.first }: petitioner
+     - ${ respondent.name.first }: respondent
+ - Physical custody from: other_holidays[i].custody_from_time
+   datatype: time
+ - Physical custody to: other_holidays[i].custody_to_time
+   datatype: time
+continue button field: other_holidays[i].complete
+---
+only sets: holidays_review
+if: not holidays_default
+question: Holiday Exchange Schedule
+continue button field: holidays_review
+fields:
+  - note: |
+      Holiday |Eveb Years|Odd Years|From|To
+      --------|-------------------|------------------|----|--
+      ${ holidays["mlk"]["description"] } | [FIELD holidays["mlk"]["even_years"]] | [FIELD holidays["mlk"]["odd_years"]] | [FIELD holidays["mlk"]["custody_from_time"]] | [FIELD holidays["mlk"]["custody_to_time"]]
+      ${ holidays["president"]["description"] } | [FIELD holidays["president"]["even_years"]] | [FIELD holidays["president"]["odd_years"]] | [FIELD holidays["president"]["custody_from_time"]] | [FIELD holidays["president"]["custody_to_time"]]
+      ${ holidays["memorial"]["description"] } | [FIELD holidays["memorial"]["even_years"]] | [FIELD holidays["memorial"]["odd_years"]] | [FIELD holidays["memorial"]["custody_from_time"]] | [FIELD holidays["memorial"]["custody_to_time"]]
+      ${ holidays["independence"]["description"] } | [FIELD holidays["independence"]["even_years"]] | [FIELD holidays["independence"]["odd_years"]] | [FIELD holidays["independence"]["custody_from_time"]] | [FIELD holidays["independence"]["custody_to_time"]]
+      ${ holidays["labor"]["description"] } | [FIELD holidays["labor"]["even_years"]] | [FIELD holidays["labor"]["odd_years"]] | [FIELD holidays["labor"]["custody_from_time"]] | [FIELD holidays["labor"]["custody_to_time"]]
+      ${ holidays["halloween"]["description"] } | [FIELD holidays["halloween"]["even_years"]] | [FIELD holidays["halloween"]["odd_years"]] | [FIELD holidays["halloween"]["custody_from_time"]] | [FIELD holidays["halloween"]["custody_to_time"]]
+      ${ holidays["thanksgiving"]["description"] } | [FIELD holidays["thanksgiving"]["even_years"]] | [FIELD holidays["thanksgiving"]["odd_years"]] | [FIELD holidays["thanksgiving"]["custody_from_time"]] | [FIELD holidays["thanksgiving"]["custody_to_time"]]
+      ${ holidays["xmas_eve"]["description"] } | [FIELD holidays["xmas_eve"]["even_years"]] | [FIELD holidays["xmas_eve"]["odd_years"]] | [FIELD holidays["xmas_eve"]["custody_from_time"]] | [FIELD holidays["xmas_eve"]["custody_to_time"]]
+      ${ holidays["xmas_day"]["description"] } | [FIELD holidays["xmas_day"]["even_years"]] | [FIELD holidays["xmas_day"]["odd_years"]] | [FIELD holidays["xmas_day"]["custody_from_time"]] | [FIELD holidays["xmas_day"]["custody_to_time"]]
+      ${ holidays["mother"]["description"] } | [FIELD holidays["mother"]["even_years"]] | [FIELD holidays["mother"]["odd_years"]] | [FIELD holidays["mother"]["custody_from_time"]] | [FIELD holidays["mother"]["custody_to_time"]]
+      ${ holidays["father"]["description"] } | [FIELD holidays["father"]["even_years"]] | [FIELD holidays["father"]["odd_years"]] | [FIELD holidays["father"]["custody_from_time"]] | [FIELD holidays["father"]["custody_to_time"]]
+      ${ holidays["petitioner_birthday"]["description"] } | [FIELD holidays["petitioner_birthday"]["even_years"]] | [FIELD holidays["petitioner_birthday"]["odd_years"]] | [FIELD holidays["petitioner_birthday"]["custody_from_time"]] | [FIELD holidays["petitioner_birthday"]["custody_to_time"]]
+      ${ holidays["respondent_birthday"]["description"] } | [FIELD holidays["respondent_birthday"]["even_years"]] | [FIELD holidays["respondent_birthday"]["odd_years"]] | [FIELD holidays["respondent_birthday"]["custody_from_time"]] | [FIELD holidays["respondent_birthday"]["custody_to_time"]]
+      ${ holidays["children_birthday"]["description"] } | [FIELD holidays["children_birthday"]["even_years"]] | [FIELD holidays["children_birthday"]["odd_years"]] | [FIELD holidays["children_birthday"]["custody_from_time"]] | [FIELD holidays["children_birthday"]["custody_to_time"]]
+  - no label: holidays["mlk"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["mlk"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["mlk"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["mlk"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["president"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["president"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["president"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["president"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["memorial"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["memorial"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["memorial"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["memorial"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["independence"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["independence"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["independence"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["independence"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["labor"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["labor"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["labor"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["labor"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["thanksgiving"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["thanksgiving"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["thanksgiving"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["thanksgiving"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["halloween"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["halloween"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["halloween"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["halloween"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["xmas_eve"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["xmas_eve"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["xmas_eve"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["xmas_eve"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["xmas_day"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["xmas_day"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["xmas_day"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["xmas_day"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["mother"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["mother"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["mother"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["mother"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["father"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["father"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["father"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["father"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["petitioner_birthday"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["petitioner_birthday"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["petitioner_birthday"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["petitioner_birthday"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["respondent_birthday"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["respondent_birthday"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["respondent_birthday"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["respondent_birthday"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["children_birthday"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["children_birthday"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    required: False
+  - no label: holidays["children_birthday"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["children_birthday"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+---
+code: |
+  role_dictionary_full_name = dict()
+  role_dictionary_full_name["petitioner"]= petitioner.name.full()
+  role_dictionary_full_name["respondent"]= respondent.name.full()
+---
+only sets: holidays_review
+if: holidays_default
+question: Holiday Exchange Schedule
+continue button field: holidays_review
+fields:
+  - note: |
+      Holiday |Even Years|Odd Years|From|To
+      --------|-------------------|------------------|----|--
+      ${ holidays["mlk"]["description"] } | [FIELD holidays["mlk"]["even_years"]] | [FIELD holidays["mlk"]["odd_years"]] | [FIELD holidays["mlk"]["custody_from_time"]] | [FIELD holidays["mlk"]["custody_to_time"]]
+      ${ holidays["president"]["description"] } | [FIELD holidays["president"]["even_years"]] | [FIELD holidays["president"]["odd_years"]] | [FIELD holidays["president"]["custody_from_time"]] | [FIELD holidays["president"]["custody_to_time"]]
+      ${ holidays["memorial"]["description"] } | [FIELD holidays["memorial"]["even_years"]] | [FIELD holidays["memorial"]["odd_years"]] | [FIELD holidays["memorial"]["custody_from_time"]] | [FIELD holidays["memorial"]["custody_to_time"]]
+      ${ holidays["independence"]["description"] } | [FIELD holidays["independence"]["even_years"]] | [FIELD holidays["independence"]["odd_years"]] | [FIELD holidays["independence"]["custody_from_time"]] | [FIELD holidays["independence"]["custody_to_time"]]
+      ${ holidays["labor"]["description"] } | [FIELD holidays["labor"]["even_years"]] | [FIELD holidays["labor"]["odd_years"]] | [FIELD holidays["labor"]["custody_from_time"]] | [FIELD holidays["labor"]["custody_to_time"]]
+      ${ holidays["halloween"]["description"] } | [FIELD holidays["halloween"]["even_years"]] | [FIELD holidays["halloween"]["odd_years"]] | [FIELD holidays["halloween"]["custody_from_time"]] | [FIELD holidays["halloween"]["custody_to_time"]]
+      ${ holidays["thanksgiving"]["description"] } | [FIELD holidays["thanksgiving"]["even_years"]] | [FIELD holidays["thanksgiving"]["odd_years"]] | [FIELD holidays["thanksgiving"]["custody_from_time"]] | [FIELD holidays["thanksgiving"]["custody_to_time"]]
+      ${ holidays["xmas_eve"]["description"] } | [FIELD holidays["xmas_eve"]["even_years"]] | [FIELD holidays["xmas_eve"]["odd_years"]] | [FIELD holidays["xmas_eve"]["custody_from_time"]] | [FIELD holidays["xmas_eve"]["custody_to_time"]]
+      ${ holidays["xmas_day"]["description"] } | [FIELD holidays["xmas_day"]["even_years"]] | [FIELD holidays["xmas_day"]["odd_years"]] | [FIELD holidays["xmas_day"]["custody_from_time"]] | [FIELD holidays["xmas_day"]["custody_to_time"]]
+      ${ holidays["mother"]["description"] } | [FIELD holidays["mother"]["even_years"]] | [FIELD holidays["mother"]["odd_years"]] | [FIELD holidays["mother"]["custody_from_time"]] | [FIELD holidays["mother"]["custody_to_time"]]
+      ${ holidays["father"]["description"] } | [FIELD holidays["father"]["even_years"]] | [FIELD holidays["father"]["odd_years"]] | [FIELD holidays["father"]["custody_from_time"]] | [FIELD holidays["father"]["custody_to_time"]]
+      ${ holidays["petitioner_birthday"]["description"] } | [FIELD holidays["petitioner_birthday"]["even_years"]] | [FIELD holidays["petitioner_birthday"]["odd_years"]] | [FIELD holidays["petitioner_birthday"]["custody_from_time"]] | [FIELD holidays["petitioner_birthday"]["custody_to_time"]]
+      ${ holidays["respondent_birthday"]["description"] } | [FIELD holidays["respondent_birthday"]["even_years"]] | [FIELD holidays["respondent_birthday"]["odd_years"]] | [FIELD holidays["respondent_birthday"]["custody_from_time"]] | [FIELD holidays["respondent_birthday"]["custody_to_time"]]
+      ${ holidays["children_birthday"]["description"] } | [FIELD holidays["children_birthday"]["even_years"]] | [FIELD holidays["children_birthday"]["odd_years"]] | [FIELD holidays["children_birthday"]["custody_from_time"]] | [FIELD holidays["children_birthday"]["custody_to_time"]]
+  - no label: holidays["mlk"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["mlk"]["even_default"] } 
+  - no label: holidays["mlk"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["mlk"]["odd_default"] }
+  - no label: holidays["mlk"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["mlk"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["president"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["president"]["even_default"] }
+  - no label: holidays["president"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["president"]["odd_default"] }
+  - no label: holidays["president"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["president"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["memorial"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["memorial"]["even_default"] }
+  - no label: holidays["memorial"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["memorial"]["odd_default"] }
+  - no label: holidays["memorial"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["memorial"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["independence"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["independence"]["even_default"] }
+  - no label: holidays["independence"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["independence"]["odd_default"] }
+  - no label: holidays["independence"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["independence"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["labor"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["labor"]["even_default"] }
+  - no label: holidays["labor"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["labor"]["odd_default"] }
+  - no label: holidays["labor"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["labor"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["thanksgiving"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["thanksgiving"]["even_default"] }
+  - no label: holidays["thanksgiving"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["thanksgiving"]["odd_default"] }
+  - no label: holidays["thanksgiving"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["thanksgiving"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["halloween"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["halloween"]["even_default"] }
+  - no label: holidays["halloween"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["halloween"]["odd_default"] }
+  - no label: holidays["halloween"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["halloween"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["xmas_eve"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["xmas_eve"]["even_default"] }
+  - no label: holidays["xmas_eve"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["xmas_eve"]["odd_default"] }
+  - no label: holidays["xmas_eve"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["xmas_eve"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["xmas_day"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["xmas_day"]["even_default"] }
+  - no label: holidays["xmas_day"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["xmas_day"]["odd_default"] }
+  - no label: holidays["xmas_day"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["xmas_day"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["mother"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["mother"]["even_default"] }
+  - no label: holidays["mother"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["mother"]["odd_default"] }
+  - no label: holidays["mother"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["mother"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["father"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["father"]["even_default"] }
+  - no label: holidays["father"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["father"]["odd_default"] }
+  - no label: holidays["father"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["father"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["petitioner_birthday"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["petitioner_birthday"]["even_default"] }
+  - no label: holidays["petitioner_birthday"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["petitioner_birthday"]["odd_default"] }
+  - no label: holidays["petitioner_birthday"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["petitioner_birthday"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["respondent_birthday"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["respondent_birthday"]["even_default"] }
+  - no label: holidays["respondent_birthday"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["respondent_birthday"]["odd_default"] }
+  - no label: holidays["respondent_birthday"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["respondent_birthday"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["children_birthday"]["even_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["children_birthday"]["even_default"] }
+  - no label: holidays["children_birthday"]["odd_years"]
+    choices:
+      - ${ petitioner.name.first }: petitioner
+      - ${ respondent.name.first }: respondent
+    inline width: 3em
+    default: ${ holidays["children_birthday"]["odd_default"] }
+  - no label: holidays["children_birthday"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["children_birthday"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+---        
+        
+

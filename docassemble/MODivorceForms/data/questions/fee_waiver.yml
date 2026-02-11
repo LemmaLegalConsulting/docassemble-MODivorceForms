@@ -1,45 +1,4 @@
 ---
-include:
-  - shared.yml
----
-id: fee waiver order
-mandatory: True
-code: |
-  users[0].name.first
-  other_parties[0].name.first
-  case.circuit
-  case.county
-  case.docket_number
-  case.judge
-  petitioner.phone_number
-  respondent.phone_number
-  users[0].marital_status
-  children.gather()
-  users[0].expenses.gather()
-  users[0].jobs.gather()
-  users[0].self_employment_income
-  users[0].benefits.gather()
-  users[0].other_incomes.gather()
-  users[0].other_child_support_received
-  users[0].child_support_received
-  users[0].other_child_support_paid
-  users[0].child_support_paid
-  maintenance_to_petitioner_amount
-  maintenance_to_respondent_amount
-  users[0].maintenance_other_received
-  users[0].maintenance_received
-  users[0].maintenance_paid
-  users[0].maintenance_other_paid
-  debts.gather()
-  users[0].cash
-  vehicles.gather()
-  bank_assets.gather()
-  real_estate.gather()
-  personal_goods.gather()
-  users[0].assets.gathered
-  users[0].debts.gathered
-  mo_divorce_forms_download  
----
 id: Motion and Affidavit in Support of Request to Proceed As a Poor Person object
 objects:
   - fee_waiver_attachment: ALDocument.using(title="Motion and Affidavit in Support of Request to Proceed As a Poor Person", filename="fee_waiver", has_addendum=False, )
@@ -47,11 +6,6 @@ objects:
 id: Motion and Affidavit in Support of Request to Proceed As a Poor Person enabled
 code: |
   fee_waiver_attachment.enabled = True
----
-# Should be only used in interviews run from fee_waiver.yml, in an interview from main, the version from shared.yml will be lower because the block including fee_waiver is above it
-objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[fee_waiver_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[fee_waiver_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---
 id: Motion and Affidavit in Support of Request to Proceed As a Poor Person attachment
 attachment:

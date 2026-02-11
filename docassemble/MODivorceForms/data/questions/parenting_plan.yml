@@ -1083,7 +1083,7 @@ attachment:
       - "pbHealthExpensesNotCoveredNone": ${ health_expenses_not_covered == "none" } 
       - "pbUncoveredExtraMedParentPayingSupportAmt1": |
           % if len(support_payer.extraordinary_medical_costs) > 0:
-          ${ "{:.2f}".format(support_payer.extraordinary_medical_costs[0].total(times_per_year = 12)) }
+          ${ thousands(support_payer.extraordinary_medical_costs[0].total(times_per_year = 12), show_decimals=True) }
           % endif
       - "pbUncoveredExtraMedByParentPayingSupportForm141": |
           % if len(support_payer.extraordinary_medical_costs) > 0:
@@ -1091,7 +1091,7 @@ attachment:
           % endif
       - "pbUncoveredExtraMedParentPayingSupportAmt2": |
           % if len(support_payer.extraordinary_medical_costs) > 1:
-          ${ "{:.2f}".format(support_payer.extraordinary_medical_costs[1].total(times_per_year = 12)) }
+          ${ thousands(support_payer.extraordinary_medical_costs[1].total(times_per_year = 12), show_decimals=True) }
           % endif
       - "pbUncoveredExtraMedByParentPayingSupportForm142": |
           % if len(support_payer.extraordinary_medical_costs) > 1:
@@ -1099,16 +1099,16 @@ attachment:
           % endif
       - "pbUncoveredExtraMedParentPayingSupportAmt3": |
           % if len(support_payer.extraordinary_medical_costs) > 2:
-          ${ "{:.2f}".format(support_payer.extraordinary_medical_costs[2].total(times_per_year = 12)) }
+          ${ thousands(support_payer.extraordinary_medical_costs[2].total(times_per_year = 12), show_decimals=True) }
           % endif
       - "pbUncoveredExtraMedByParentPayingSupportForm143": |
           % if len(support_payer.extraordinary_medical_costs) > 2:
           ${ support_payer.extraordinary_medical_costs[2].description }
           % endif
-      - "pbUncoveredExtraMedParentPayingSupportForm14Total": ${ "{:.2f}".format(support_payer.extraordinary_medical_costs.total(times_per_year = 12)) } 
+      - "pbUncoveredExtraMedParentPayingSupportForm14Total": ${ thousands(support_payer.extraordinary_medical_costs.total(times_per_year = 12), show_decimals=True) } 
       - "pbUncoveredExtraMedParentReceivingSupportAmt1": |
           % if len(support_recipient.extraordinary_medical_costs) > 0:
-          ${ "{:.2f}".format(support_recipient.extraordinary_medical_costs[0].total(times_per_year = 12)) }
+          ${ thousands(support_recipient.extraordinary_medical_costs[0].total(times_per_year = 12), show_decimals=True) }
           % endif
       - "pbUncoveredExtraMedByParentReceivingSupportForm141": |
           % if len(support_recipient.extraordinary_medical_costs) > 0:
@@ -1116,7 +1116,7 @@ attachment:
           % endif
       - "pbUncoveredExtraMedParentReceivingSupportAmt2": |
           % if len(support_recipient.extraordinary_medical_costs) > 1:
-          ${ "{:.2f}".format(support_recipient.extraordinary_medical_costs[1].total(times_per_year = 12)) }
+          ${ thousands(support_recipient.extraordinary_medical_costs[1].total(times_per_year = 12), show_decimals=True) }
           % endif
       - "pbUncoveredExtraMedByParentReceivingSupportForm142": |
           % if len(support_recipient.extraordinary_medical_costs) > 1:
@@ -1124,13 +1124,13 @@ attachment:
           % endif
       - "pbUncoveredExtraMedParentReceivingSupportAmt3": |
           % if len(support_recipient.extraordinary_medical_costs) > 2:
-          ${ "{:.2f}".format(support_recipient.extraordinary_medical_costs[2].total(times_per_year = 12)) }
+          ${ thousands(support_recipient.extraordinary_medical_costs[2].total(times_per_year = 12), show_decimals=True) }
           % endif
       - "pbUncoveredExtraMedByParentReceivingSupportForm143": |
           % if len(support_recipient.extraordinary_medical_costs) > 2:
           ${ support_recipient.extraordinary_medical_costs[2].description }
           % endif
-      - "pbUncoveredExtraMedParentReceivingSupportForm14Total": ${ "{:.2f}".format(support_recipient.extraordinary_medical_costs.total(times_per_year = 12)) } 
+      - "pbUncoveredExtraMedParentReceivingSupportForm14Total": ${ thousands(support_recipient.extraordinary_medical_costs.total(times_per_year = 12), show_decimals=True) } 
       - "pbWrkRelatedCareParentReceivingSupport": ${ support_recipient.work_childcare_expenses } 
       - "pbWrkRelatedCareParentPayingSupport": ${ support_payer.work_childcare_expenses }
       - "pbWrkRelatedCareNone": ${ pay_work_childcare_expenses == "none" } 
@@ -1140,7 +1140,7 @@ attachment:
       - "pbWrkRelatedCarePercent": ${ pay_work_childcare_expenses_percentage } 
       - "pbExtraChildCostsParentPayingSupportAmt1": |
           % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 0:
-          ${ "{:.2f}".format([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14][0].total(times_per_year = 12)) }
+          ${ thousands([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14][0].total(times_per_year = 12), show_decimals=True) }
           % endif 
       - "pbExtraChildCostsParentPayingSupportForm141": |
           % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 0:
@@ -1148,7 +1148,7 @@ attachment:
           % endif 
       - "pbExtraChildCostsParentPayingSupportAmt2": |
           % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 1:
-          ${ "{:.2f}".format([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14][1].total(times_per_year = 12)) }
+          ${ thousands([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14][1].total(times_per_year = 12), show_decimals=True) }
           % endif 
       - "pbExtraChildCostsParentPayingSupportForm142": |
           % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 1:
@@ -1156,17 +1156,17 @@ attachment:
           % endif 
       - "pbExtraChildCostsParentPayingSupportAmt3": |
           % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 2:
-          ${ "{:.2f}".format([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14][2].total(times_per_year = 12)) }
+          ${ thousands([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14][2].total(times_per_year = 12), show_decimals=True) }
           % endif 
       - "pbExtraChildCostsParentPayingSupportForm143": |
           % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 2:
           ${ [included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14][2].description }
           % endif 
       - "pbExtraChildCostsParentPayingSupportTotalForm14": |
-          ${ "{:.2f}".format(sum([included_cost.total(times_per_year=12) for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14])) }
+          ${ thousands(sum([included_cost.total(times_per_year=12) for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]), show_decimals=True) }
       - "pbExtraChildCostsParentReceivingSupportAmt1": |
           % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 0:
-          ${ "{:.2f}".format([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14][0].total(times_per_year = 12)) }
+          ${ thousands([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14][0].total(times_per_year = 12), show_decimals=True) }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportForm141": |
           % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 0:
@@ -1174,7 +1174,7 @@ attachment:
           % endif 
       - "pbExtraChildCostsParentReceivingSupportAmt2": |
           % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 1:
-          ${ "{:.2f}".format([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14][1].total(times_per_year = 12)) }
+          ${ thousands([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14][1].total(times_per_year = 12), show_decimals=True) }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportForm142": |
           % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 1:
@@ -1182,14 +1182,14 @@ attachment:
           % endif 
       - "pbExtraChildCostsParentReceivingSupportAmt3": |
           % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 2:
-          ${ "{:.2f}".format([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14][2].total(times_per_year = 12)) }
+          ${ thousands([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14][2].total(times_per_year = 12), show_decimals=True) }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportForm143": |
           % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 2:
           ${ [included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14][2].description }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportTotalForm14": |
-          ${ "{:.2f}".format(sum([included_cost.total(times_per_year=12) for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14])) }          
+          ${ thousands(sum([included_cost.total(times_per_year=12) for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]), show_decimals=True) }          
       - "pbExtraChildCostsParentReceivingSupportPaysPercent1": |
           % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if not included_cost.included_in_form_14]) > 0:
           ${ "{:.0f}".format([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if not included_cost.included_in_form_14][0].percentage) }
@@ -1241,78 +1241,78 @@ attachment:
       - "pbParentPayingSupportForm14Respondent": ${ child_support in ["respondent"] } 
       - "pbParentPayingSupportForm14Petitioner": ${ child_support in ["petitioner", "none","third_party"] } 
       - "pbChildrenNumber": ${ len(children) } 
-      - "lineOneColOne": ${ "{:.2f}".format(support_recipient.monthly_income_1) } 
-      - "lineOneColTwo": ${ "{:.2f}".format(support_payer.monthly_income_1) } 
-      - "lineOneAColOne": ${ "{:.2f}".format(support_recipient.maintenance_received) } 
-      - "lineOneAColTwo": ${ "{:.2f}".format(support_payer.maintenance_received) } 
-      - "lineTwoAColOne": ${ "{:.2f}".format(support_recipient.maintenance_other_paid) } 
-      - "lineTwoAColTwo": ${ "{:.2f}".format(support_payer.maintenance_other_paid) } 
-      - "lineTwoBColOne": ${ "{:.2f}".format(support_recipient.maintenance_paid) } 
-      - "lineTwoBColTwo": ${ "{:.2f}".format(support_payer.maintenance_paid) } 
+      - "lineOneColOne": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) } 
+      - "lineOneColTwo": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) } 
+      - "lineOneAColOne": ${ "$" + thousands(support_recipient.maintenance_received, show_decimals=True) } 
+      - "lineOneAColTwo": ${ "$" + thousands(support_payer.maintenance_received, show_decimals=True) } 
+      - "lineTwoAColOne": ${ "$" + thousands(support_recipient.maintenance_other_paid, show_decimals=True) } 
+      - "lineTwoAColTwo": ${ "$" + thousands(support_payer.maintenance_other_paid, show_decimals=True) } 
+      - "lineTwoBColOne": ${ "$" + thousands(support_recipient.maintenance_paid, show_decimals=True) } 
+      - "lineTwoBColTwo": ${ "$" + thousands(support_payer.maintenance_paid, show_decimals=True) } 
       - "lineTwoCOneColOne": ${ support_recipient.other_children } 
       - "lineTwoCOneColTwo": ${ support_payer.other_children } 
-      - "lineTwoCTwoColOne": ${ "{:.2f}".format(support_recipient.support_obligation_2c2) } 
-      - "lineTwoCTwoColTwo": ${ "{:.2f}".format(support_payer.support_obligation_2c2) } 
-      - "lineTwoCThreeColOne": ${ "{:.2f}".format(support_recipient.other_child_support_received) } 
-      - "lineTwoCThreeColTwo": ${ "{:.2f}".format(support_payer.other_child_support_received) } 
-      - "lineTwoCTotalColOne": ${ "{:.2f}".format(support_recipient.total_adjustment_2c) } 
-      - "lineTwoCTotalColTwo": ${ "{:.2f}".format(support_payer.total_adjustment_2c) } 
-      - "lineThreeColThree": ${ "{:.2f}".format(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3) } 
-      - "lineThreeColOne": ${ "{:.2f}".format(support_recipient.adjusted_monthly_gross_income_3) } 
-      - "lineThreeColTwo": ${ "{:.2f}".format(support_payer.adjusted_monthly_gross_income_3) } 
+      - "lineTwoCTwoColOne": ${ "$" + thousands(support_recipient.support_obligation_2c2, show_decimals=True) } 
+      - "lineTwoCTwoColTwo": ${ "$" + thousands(support_payer.support_obligation_2c2, show_decimals=True) } 
+      - "lineTwoCThreeColOne": ${ "$" + thousands(support_recipient.other_child_support_received, show_decimals=True) } 
+      - "lineTwoCThreeColTwo": ${ "$" + thousands(support_payer.other_child_support_received, show_decimals=True) } 
+      - "lineTwoCTotalColOne": ${ "$" + thousands(support_recipient.total_adjustment_2c, show_decimals=True) } 
+      - "lineTwoCTotalColTwo": ${ "$" + thousands(support_payer.total_adjustment_2c, show_decimals=True) } 
+      - "lineThreeColThree": ${ "$" + thousands(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "lineThreeColOne": ${ "$" + thousands(support_recipient.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "lineThreeColTwo": ${ "$" + thousands(support_payer.adjusted_monthly_gross_income_3, show_decimals=True) } 
       - "lineFourColOne": |
           % if support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3 > 0:
-          ${ "{:.1f}".format(support_recipient.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3)) } 
+          ${ "$" + thousands(support_recipient.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3), show_decimals=True) } 
           % else:
           0
           % endif
       - "lineFourColTwo": |
           % if support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3 > 0:
-          ${ "{:.1f}".format(support_payer.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3)) } 
+          ${ "$" + thousands(support_payer.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3), show_decimals=True) } 
           % else:
           0
           % endif
-      - "lineFiveColThree": ${ "{:.2f}".format(basic_child_support_amount_5) } 
-      - "lineSixAOneColOne": ${ "{:.2f}".format(support_recipient.work_childcare_expenses) } 
-      - "lineSixATwoColOne": ${ "{:.2f}".format(support_recipient.childcare_tax_credit_6a2) } 
-      - "lineSixATotalColOne": ${ "{:.2f}".format(support_recipient.total_adjusted_child_care_costs_6a) } 
-      - "lineSixBColTwo": ${ "{:.2f}".format(support_payer.work_childcare_expenses) } 
-      - "lineSixCColOne": ${ "{:.2f}".format(support_recipient.health_insurance_costs) } 
-      - "lineSixCColTwo": ${ "{:.2f}".format(support_payer.health_insurance_costs) } 
-      - "lineSixDColOne": ${ "{:.2f}".format(support_recipient.extraordinary_medical_costs.total(times_per_year = 12)) } 
-      - "lineSixDColTwo": ${ "{:.2f}".format(support_payer.extraordinary_medical_costs.total(times_per_year = 12)) } 
-      - "lineSixEColOne": ${ "{:.2f}".format(sum([included_cost.total(times_per_year=12) for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14])) }  
-      - "lineSixEColTwo": ${ "{:.2f}".format(sum([included_cost.total(times_per_year=12) for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14])) }
-      - "lineSevenColTwo": ${ "{:.2f}".format(support_payer.total_childrearing_costs_7  ) } 
-      - "lineSevenColThree": ${ "{:.2f}".format(total_childrearing_costs_7) } 
-      - "lineSevenColOne": ${ "{:.2f}".format(support_recipient.total_childrearing_costs_7  ) } 
-      - "lineEightColThree": ${ "{:.2f}".format(combined_child_support_costs_8) } 
-      - "lineNineColTwo": ${ "{:.2f}".format(support_payer.support_obligation_9) } 
-      - "lineNineColOne": ${ "{:.2f}".format(support_recipient.support_obligation_9) } 
-      - "lineTenColTwo": ${ "{:.2f}".format(support_payer.childrearing_credit_10) } 
+      - "lineFiveColThree": ${ "$" + thousands(basic_child_support_amount_5, show_decimals=True) } 
+      - "lineSixAOneColOne": ${ "$" + thousands(support_recipient.work_childcare_expenses, show_decimals=True) } 
+      - "lineSixATwoColOne": ${ "$" + thousands(support_recipient.childcare_tax_credit_6a2, show_decimals=True) } 
+      - "lineSixATotalColOne": ${ "$" + thousands(support_recipient.total_adjusted_child_care_costs_6a, show_decimals=True) } 
+      - "lineSixBColTwo": ${ "$" + thousands(support_payer.work_childcare_expenses, show_decimals=True) } 
+      - "lineSixCColOne": ${ "$" + thousands(support_recipient.health_insurance_costs, show_decimals=True) } 
+      - "lineSixCColTwo": ${ "$" + thousands(support_payer.health_insurance_costs, show_decimals=True) } 
+      - "lineSixDColOne": ${ "$" + thousands(support_recipient.extraordinary_medical_costs.total(times_per_year = 12), show_decimals=True) } 
+      - "lineSixDColTwo": ${ "$" + thousands(support_payer.extraordinary_medical_costs.total(times_per_year = 12), show_decimals=True) } 
+      - "lineSixEColOne": ${ "$" + thousands(sum([included_cost.total(times_per_year=12) for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]), show_decimals=True) }  
+      - "lineSixEColTwo": ${ "$" + thousands(sum([included_cost.total(times_per_year=12) for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]), show_decimals=True) }
+      - "lineSevenColTwo": ${ "$" + thousands(support_payer.total_childrearing_costs_7  , show_decimals=True) } 
+      - "lineSevenColThree": ${ "$" + thousands(total_childrearing_costs_7, show_decimals=True) } 
+      - "lineSevenColOne": ${ "$" + thousands(support_recipient.total_childrearing_costs_7  , show_decimals=True) } 
+      - "lineEightColThree": ${ "$" + thousands(combined_child_support_costs_8, show_decimals=True) } 
+      - "lineNineColTwo": ${ "$" + thousands(support_payer.support_obligation_9, show_decimals=True) } 
+      - "lineNineColOne": ${ "$" + thousands(support_recipient.support_obligation_9, show_decimals=True) } 
+      - "lineTenColTwo": ${ "$" + thousands(support_payer.childrearing_credit_10, show_decimals=True) } 
       - "lineElevenPercent": ${ "{:.0f}".format(support_payer.visitation_adjustment_percentage_11) } 
-      - "lineElevenColTwo": ${ "{:.2f}".format(support_payer.visitation_adjustment_11) } 
-      - "lineTwelveColTwo": ${ "{:.2f}".format(support_payer.presumed_child_support_amount_12) }      
-      - "pbPresumedSupportSixKids": ${ "{:.2f}".format(basic_child_support_amount_5_6) } 
-      - "pbPresumedSupportFiveKids": ${ "{:.2f}".format(basic_child_support_amount_5_5) } 
-      - "pbPresumedSupportFourKids": ${ "{:.2f}".format(basic_child_support_amount_5_4) } 
-      - "pbPresumedSupportThreeKids": ${ "{:.2f}".format(basic_child_support_amount_5_3) } 
-      - "pbPresumedSupportTwoKids": ${ "{:.2f}".format(basic_child_support_amount_5_2) } 
-      - "pbPresumedSupportOneKid": ${ "{:.2f}".format(basic_child_support_amount_5_1) } 
+      - "lineElevenColTwo": ${ "$" + thousands(support_payer.visitation_adjustment_11, show_decimals=True) } 
+      - "lineTwelveColTwo": ${ "$" + thousands(support_payer.presumed_child_support_amount_12, show_decimals=True) }      
+      - "pbPresumedSupportSixKids": ${ thousands(basic_child_support_amount_5_6, show_decimals=True) } 
+      - "pbPresumedSupportFiveKids": ${ thousands(basic_child_support_amount_5_5, show_decimals=True) } 
+      - "pbPresumedSupportFourKids": ${ thousands(basic_child_support_amount_5_4, show_decimals=True) } 
+      - "pbPresumedSupportThreeKids": ${ thousands(basic_child_support_amount_5_3, show_decimals=True) } 
+      - "pbPresumedSupportTwoKids": ${ thousands(basic_child_support_amount_5_2, show_decimals=True) } 
+      - "pbPresumedSupportOneKid": ${ thousands(basic_child_support_amount_5_1, show_decimals=True) } 
       - "pbCourtOrderSupportYes": ${ use_presumed_child_support == "yes" } 
       - "pbCourtOrderSupportNo": ${ use_presumed_child_support == "no" } 
       - "pbPresumedUnjustDueTo": ${ use_presumed_child_support_explanation } 
       - "pbCourtOrderSupportSix": ${ len(children) > 5 } 
-      - "pbCourtOrderSupportSixAmt": ${ "{:.2f}".format(basic_child_support_amount_5_6) } 
-      - "pbCourtOrderSupportFiveAmt": ${ "{:.2f}".format(basic_child_support_amount_5_5) } 
+      - "pbCourtOrderSupportSixAmt": ${ thousands(basic_child_support_amount_5_6, show_decimals=True) } 
+      - "pbCourtOrderSupportFiveAmt": ${ thousands(basic_child_support_amount_5_5, show_decimals=True) } 
       - "pbCourtOrderSupportFive": ${ len(children) > 4 } 
-      - "pbCourtOrderSupportFourAmt": ${ "{:.2f}".format(basic_child_support_amount_5_4) } 
+      - "pbCourtOrderSupportFourAmt": ${ thousands(basic_child_support_amount_5_4, show_decimals=True) } 
       - "pbCourtOrderSupportFour": ${ len(children) > 3 } 
       - "pbCourtOrderSupportThree": ${ len(children) > 2 } 
-      - "pbCourtOrderSupportThreeAmt": ${ "{:.2f}".format(basic_child_support_amount_5_3) } 
-      - "pbCourtOrderSupportTwoAmt": ${ "{:.2f}".format(basic_child_support_amount_5_2) } 
+      - "pbCourtOrderSupportThreeAmt": ${ thousands(basic_child_support_amount_5_3, show_decimals=True) } 
+      - "pbCourtOrderSupportTwoAmt": ${ thousands(basic_child_support_amount_5_2, show_decimals=True) } 
       - "pbCourtOrderSupportTwo": ${ len(children) > 1 } 
-      - "pbCourtOrderSupportOneAmt": ${ "{:.2f}".format(basic_child_support_amount_5_1) } 
+      - "pbCourtOrderSupportOneAmt": ${ thousands(basic_child_support_amount_5_1, show_decimals=True) } 
       - "pbCourtOrderSupportOne": ${ len(children) > 0 } 
       - "pbSupportStartDateJudgment": ${ child_support_start_date == "judgment_date" } 
       - "pbSupportStartDateSpecific": ${ child_support_start_date == "specific_date" } 
