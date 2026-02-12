@@ -322,8 +322,8 @@ code: |
   else:
     support_payer.income_share_4 = 0
     support_recipient.income_share_4 = 0
-  if combined_adjusted_income_3 < 1000:
-    combined_income_index = 1000
+  if combined_adjusted_income_3 < 1300:
+    combined_income_index = 1300
   elif combined_adjusted_income_3 > 40000:
     combined_income_index = 40000
   else:

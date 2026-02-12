@@ -712,7 +712,7 @@ validation code: |
     x.resident_for_90_days = False
 ---
 generic object: ALIndividual
-question: Residence in ${ x.address.county }
+question: ${ "Your" if x.instanceName == "users[0]" else "Your spouse's" } residency in ${ x.address.county }
 fields:
   - How long ${ "have you" if x.instanceName == "users[0]" else "has your spouse" } lived in ${ x.address.county }?: x.county_length_of_residence_choice
     datatype: radio
@@ -736,10 +736,10 @@ fields:
       variable: x.county_length_of_residence_choice
       is: year
 validation code: |
-  if x.county_length_of_residence_choice == "less_than_4" and x.county_length_of_residence_days < 90:
-    x.resident_for_90_days = True
+  if x.county_length_of_residence_choice != "less_than_4" or x.county_length_of_residence_days >= 90:
+    x.county_resident_for_90_days = False
   else:
-    x.resident_for_90_days = False
+    x.county_resident_for_90_days = True
 ---
 id: other children number
 generic object: ALIndividual
@@ -948,7 +948,7 @@ code: |
     if children[i].birth_certificate["Other"]:
       children[i].birth_certificate_other.name.first
     children[i].adopted
-  if 'parenting_plan_attachment' in doc_list_selected.true_values() and children[i].legal_custody != "Third Party" and children[i].physical_custody != "Third Party":
+  if 'parenting_plan_attachment' in doc_list_selected.true_values() and legal_custody != "Third Party" and physical_custody != "Third Party":
     children[i].tax_dependency_even
   if len(set(var_doc_dict["under_18_in_household"]) & set(doc_list_selected.true_values())) > 0:
     children[i].under_18_in_household
@@ -1066,7 +1066,7 @@ code: |
 ---
 code: |
   for child in children:
-    if child.lived_with not in persons_lived_with.complete_elements():
+    if hasattr('child','lived_with') and child.lived_with not in persons_lived_with.complete_elements():
       persons_lived_with.append(child.lived_with)
   persons_lived_with_preload = True
 ---
