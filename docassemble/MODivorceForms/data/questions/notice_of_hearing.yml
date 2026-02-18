@@ -55,9 +55,9 @@ attachment:
       - "case_hearing_time_pm": ${ format_time(hearing_time,"a") == "PM" } 
       - "case_hearing_time": ${ format_time(hearing_time,"h:mm") } 
       - "users0_name_suffix": ${ users[0].name.suffix } 
-      - "users0_name_last": ${ users[0].name.last } 
+      - "users0_name_last": ${ users[0].name.first } 
       - "users0_name_middle": ${ users[0].name.middle } 
-      - "users0_name_first": ${ users[0].name.first } 
+      - "users0_name_first": ${ users[0].name.last } 
       - "users0_address_address": ${ users[0].address.address } 
       - "users0_address_zip": ${ users[0].address.city } 
       - "users0_address_state": ${ users[0].address.state } 

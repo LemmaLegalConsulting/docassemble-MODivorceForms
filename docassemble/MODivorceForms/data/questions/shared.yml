@@ -121,10 +121,8 @@ data:
 code: |
   if minor_children:
     case.type_code = "DI"
-    case.type_description = "Dissolution of Marriage with Children"
   else:
     case.type_code = "DH"
-    case.type_description = "Dissolution of Marriage without Children"
 ---
 id: Hearing date and time
 question: Hearing date and time
@@ -135,18 +133,6 @@ fields:
   - Hearing date: hearing_time
     required: False
     datatype: time
----
-id: Is Divorce Contested
-question: Do you believe your case will be uncontested?
-subquestion: |
-  In other words, do you and your spouse agree on how you will divide up property, debt, and/or parenting time?
-fields:
-  - My case is:: is_case_contested
-    datatype: radio
-    choices:
-      - Uncontested: uncontested
-      - Contested: contested
-      - I don't know: unknown
 ---
 id: case.name question
 question: Case information - Case Name
@@ -189,11 +175,16 @@ fields:
   - Case description: case.matter_type
     required: False
     choices:
-      - "FC Dissolution w/ children"
-      - "FC Dissolution w/o children"
+      - "Dissolution of Marriage with Children"
+      - "Dissolution of Marriage without Children"
       - "Something else"
     default: |
-      ${ "FC Dissolution w/ children" if minor_children else "FC Dissolution w/o children" }
+      ${ "Dissolution of Marriage with Children" if minor_children else "Dissolution of Marriage without Children" }
+  - Other case description: case.matter_type_other
+    required: False
+    show if:
+      variable: case.matter_type
+      is: Something else
     
 continue button field: case.matter_type_asked
 
@@ -308,8 +299,6 @@ subject: |
   How do I find the Case number on Case.net?
 content: | 
   The Case number is at the top of the screen, regardless of what tab you are in.
-
-  The first two digits are the year that the case is filed, followed by your court's Circuit Number.  After a hyphen, the code FC is for Family Court, and the remaining digits are a unique number for your case.
 
   [FILE ch_docket_number.png, 100%]
 
@@ -743,11 +732,24 @@ validation code: |
 ---
 id: other children number
 generic object: ALIndividual
-question: Other children for ${ x.name_full() }
+question: Other minor children for ${ x.name_full() }
 fields:
-  - "How many other minor children does ${ x.name_full() } have?": x.other_children
+  - "How many minor children does ${ x.name_full() } have with someone other than ${ x.spouse.name.full() }?": x.other_children
     datatype: integer
     min: 0    
+---
+id: spouse object
+generic object: ALIndividual
+objects:
+  - x.spouse: ALIndividual
+---
+id: code block to set spouse for generic object questions
+generic object: ALIndividual
+code: |
+  if x == users[0]:
+    x.spouse = other_parties[0]
+  else:
+    x.spouse = users[0] 
 ---
 if: not minor_children_before_marriage
 generic object: ALIndividual
@@ -772,14 +774,6 @@ fields:
   - Is an attorney helping ${ "you" if x.instanceName == "users[0]" else x }?:  x.attorney_involved
     datatype: yesnoradio
     required: False
-  - Is the attorney representing ${ "you" if x.instanceName == "users[0]" else x }?: x.type_of_assistance
-    datatype: radio
-    choices:
-      - Yes, the attorney is representing ${  "me" if x.instanceName == "users[0]" else x }: representation
-      - No, the attorney is only providing assistance preparing documents.: assistance
-    show if:
-      variable: x.attorney_involved
-      is: True
   - First name: x.attorney.name.first
     show if:
       variable: x.attorney_involved
@@ -850,30 +844,31 @@ content: |
 id: party type code
 code: |
   if case.filed in ["user0_filed", "not_filed"]:
-    if users[0].attorney_involved and users[0].type_of_assistance == "representation":
+    if users[0].attorney_involved:
       users[0].party_type_code = "PET"
       users[0].party_type_description = "Petitioner (with attorney)"
     else:
       users[0].party_type_code = "PETP"
       users[0].party_type_description = "Petitioner Acting Pro Se (with no attorney)"
   else:
-    if users[0].attorney_involved and users[0].type_of_assistance == "representation":
+    if users[0].attorney_involved:
       users[0].party_type_code = "RES"
       users[0].party_type_description = "Respondent (with attorney)"
     else:
       users[0].party_type_code = "RESP"
       users[0].party_type_description = "Respondent Acting Pro Se (with no attorney)"
 ---
+id: other party type code
 code: |
   if case.filed in ["other_parties0_filed"]:
-    if other_parties[0].attorney_involved and other_parties[0].type_of_assistance == "representation":
+    if other_parties[0].attorney_involved:
       other_parties[0].party_type_code = "PET"
       other_parties[0].party_type_description = "Petitioner (with attorney)"
     else:
       other_parties[0].party_type_code = "PETP"
       other_parties[0].party_type_description = "Petitioner Acting Pro Se (with no attorney)"
   else:
-    if other_parties[0].attorney_involved and other_parties[0].type_of_assistance == "representation":
+    if other_parties[0].attorney_involved:
       other_parties[0].party_type_code = "RES"
       other_parties[0].party_type_description = "Respondent (with attorney)"
     else:
@@ -1249,7 +1244,7 @@ question: Physical Custody
 subquestion: |
   Info on Physical Custody
 fields:
- - What would you like to ask the court to give you in terms of legal custody?: physical_custody
+ - What would you like to ask the court to give you in terms of physical custody?: physical_custody
    datatype: radio
    choices:
       - ${ petitioner }: petitioner
@@ -1257,28 +1252,20 @@ fields:
       - Both spouses jointly: Joint
       - Third party: Third Party
 ---
-if: physical_custody == "petitioner"
 id: follow up visitation question for sole physical_custody
 question: Visitation
 fields:
-  - Should visitation with ${ respondent } be supervised?: visitation
+  - Should visitation with ${ respondent if physical_custody == "petitioner" else petitioner } be supervised?: visitation
     datatype: yesnoradio
 ---
-if: physical_custody == "respondent"
-id: follow up visitation question for sole physical_custody
-question: Visitation
-fields:
-  - Should visitation with ${ petitioner } be supervised?: visitation
-    datatype: yesnoradio
----
-id: follow up
+id: visitation follow up
 if: visitation
 reconsider: people_choices
 sets:
  - visitation_supervisor.name.first
 question: Visitation
 subquestion: |
-  Who should supervise the visitation with ${ other_parties[0] }?
+  Who should supervise the visitation with ${ respondent if physical_custody == "petitioner" else petitioner  }?
 fields:
   - Existing person: visitation_supervisor
     datatype: object
@@ -1475,46 +1462,35 @@ fields:
     datatype: yesnoradio
     js show if:   |
       val("abuse_or_neglect") === true || val("abuse_or_neglect") === false
-  - "Explain, including indicating style of related case/case number/court and whether case is pending or closed": related_case_explanation
-    datatype: area
-    js show if: |
-      (val("others_with_physical_custody") === true || val("others_with_physical_custody") === false) && (val("other_custody_proceeding") === true || val("other_custody_proceeding") === false) && (val("other_litigation") === true || val("other_litigation") === false) && (val("abuse_or_neglect") === true || val("abuse_or_neglect") === false) && (val("family_support_order") === true || val("family_support_order") === false) && (val('others_with_physical_custody') || val('other_custody_proceeding') || val('other_litigation') || val('abuse_or_neglect'))
 ---
+id: single children explanation question
+question: Further information
+subquestion: |
+  You need to explain some of your answers in the petition:
+  
+  % if others_with_physical_custody:
+  You said than is someone other than you or your spouse who has physical custody of any of the children or claims to have custody or visitation rights with respect to any of the children.
+  % endif  
+  
+  % if other_custody_proceeding:
+  You said you have information about another custody proceeding concerning the children pending in a court of this or another state.
+  % endif
+  
+  % if other_litigation:
+  You said that there is other litigation concerning the custody of any of the children.
+  % endif
+  
+  % if abuse_or_neglect:
+  You said that at least one of the children has been a victim of abuse or neglect.
+  % endif
+fields:
+  - no label: children_explanation
+    datatype: area
+---  
 variable name: var_doc_dict["additional_children_information"]
 data:
   - petition_attachment
   - judgment_attachment
----
-id: Others with physical custody
-question: Others with physical custody
-fields:
-  - "Do you know of anyone other than you or your spouse who has physical custody of any of the children or claims to have custody or visitation rights with respect to any of the children?": others_with_physical_custody
-    datatype: yesnoradio
-  - Explain: others_with_physical_custody_explanation
-    show if: others_with_physical_custody
----
-id: Other custody proceeding
-question: Other custody proceeding?
-fields:
-  - Do you have information about any other custody proceeding concerning any of the children pending in a court of this or any other state?: other_custody_proceeding
-    datatype: yesnoradio
-  - Explain: other_custody_proceeding_explanation
-    show if: other_custody_proceeding
----
-id: Other litigation
-question: Other litigation
-fields:
-  - Have you participated in other litigation concerning the custody of any of the children in this or any other state?: other_litigation
-    datatype: yesnoradio
-  - Explain: other_litigation_explanation
-    show if: other_litigation
----
-id: maybe unnecessary question about welfare
-question: Welfare
-fields:
-  - Have any of the children ever received welfare or Medicaid?: received_welfare
-    datatype: yesnoradio
-
 ---
 ## CHILDREN RELIEF AND SUPPORT
 id: communications question
@@ -1613,9 +1589,15 @@ data:
   - parenting_plan_attachment
   - form_14_attachment
 ---
-id: extraordinary medical costs
+id: are there any extraordinary medical costs
 generic object: ALIndividual
 question: Extraordinary Medical Costs to be paid by ${ x.name_full() }
+subquestion: |
+  Extraordinary medical costs are predictable and recurring expenses for things like: dental treatment, orthodontic treatment, asthma treatment, and physical therapy.
+
+  % if x.spouse.extraordinary_medical_costs.has_been_gathered() and len(x.spouse.extraordinary_medical_costs) > 0:
+  You have already told us about ${ x.spouse } paying the following extraordinary medical costs: ${ comma_and_list([cost.description for cost in x.spouse.extraordinary_medical_costs.complete_elements()]) }
+  % endif
 fields:
   - Are there any extraordinary medical costs to be paid by ${ x.name_full() }?: x.extraordinary_medical_costs.there_are_any
     datatype: yesnoradio
@@ -1627,7 +1609,18 @@ code: |
 ---
 id: extraordinary medical cost information
 generic object: ALIndividual
-question: What is the ${ ordinal(i) } extraordinary medical cost to be paid by ${ x.name_full() }?
+question: |
+  What is the ${ ordinal(i) } extraordinary medical cost to be paid by ${ x.name_full() }?
+subquestion: |
+  Extraordinary medical costs are predictable and recurring expenses for things like: dental treatment, orthodontic treatment, asthma treatment, and physical therapy.
+  
+  % if x.spouse.extraordinary_medical_costs.has_been_gathered() and len(x.spouse.extraordinary_medical_costs) > 0:
+  You have already told us about ${ x.spouse } paying the following extraordinary medical costs: ${ comma_and_list([cost.description for cost in x.spouse.extraordinary_medical_costs.complete_elements()]) }
+  % endif
+  
+  % if len(x.extraordinary_medical_costs.complete_elements()) > 0:
+  You have told us that you are paying the following extraordinary medical costs: ${ comma_and_list([cost.description for cost in x.extraordinary_medical_costs.complete_elements()]) }
+  % endif
 fields:
   - Description: x.extraordinary_medical_costs[i].description
   - Amount of extraordinary medical cost: x.extraordinary_medical_costs[i].value
@@ -1641,6 +1634,14 @@ fields:
 id: extraordinary medical costs
 generic object: ALIndividual
 question: Extraordinary Medical Costs to be paid by ${ x.name_full() }
+subquestion: |
+  % if x.spouse.extraordinary_medical_costs.has_been_gathered() and len(x.spouse.extraordinary_medical_costs) > 0:
+  You have already told us about ${ x.spouse } paying the following extraordinary medical costs: ${ comma_and_list([cost.description for cost in x.spouse.extraordinary_medical_costs.complete_elements()]) }
+  % endif
+  
+  % if len(x.extraordinary_medical_costs.complete_elements()) > 0:
+  You have told us that you are paying the following extraordinary medical costs: ${ comma_and_list([cost.description for cost in x.extraordinary_medical_costs.complete_elements()]) }
+  % endif
 fields:
   - Are there any more extraordinary medical costs to be paid by ${ x.name_full() }?: x.extraordinary_medical_costs.there_is_another
     datatype: yesnoradio
@@ -1650,11 +1651,15 @@ generic object: ALIndividual
 objects:
   - x.extraordinary_childrearing_costs: ALExpenseList.using(complete_attribute='included_in_form_14')
 ---
-id: extraordinary childrearing costs
+id: extraordinary childrearing costs there are any
 generic object: ALIndividual
 question: Extraordinary childrearing Costs to be paid by ${ x.name_full() }
 subquestion: |
   Extraordinary childrearing costs can include things like school tuition, lessons, or extracurricular activities.
+
+  % if x.spouse.extraordinary_childrearing_costs.has_been_gathered() and len(x.spouse.extraordinary_childrearing_costs) > 0:
+  You have already told us about ${ x.spouse } paying the following extraordinary childrearing costs: ${ comma_and_list(cost.description for cost in x.spouse.extraordinary_childrearing_costs.complete_elements()) }
+  % endif
 fields:
   - Are there any extraordinary childrearing costs to be paid by ${ x.name_full() }?: x.extraordinary_childrearing_costs.there_are_any
     datatype: yesnoradio
@@ -1670,9 +1675,12 @@ question: What is the ${ ordinal(i) } extraordinary childrearing cost to be paid
 subquestion: |
   Extraordinary childrearing costs can include things like school tuition, lessons, or extracurricular activities.
   
+  % if x.spouse.extraordinary_childrearing_costs.has_been_gathered() and len(x.spouse.extraordinary_childrearing_costs) > 0:
+  You have already told us about ${ x.spouse } paying the following extraordinary childrearing costs: ${ comma_and_list(cost.description for cost in x.spouse.extraordinary_childrearing_costs.complete_elements()) }.
+  % endif
+
   % if i > 0:
   You have already told us about your ${ comma_and_list(cost.description for cost in x.extraordinary_childrearing_costs.complete_elements()) }.
-
   % endif
 fields:
   - Description: x.extraordinary_childrearing_costs[i].description
@@ -1701,9 +1709,12 @@ question: Extraordinary Childrearing Costs to be paid by ${ x.name_full() }
 subquestion: |
   Extraordinary childrearing costs can include things like school tuition, lessons, or extracurricular activities.
   
+  % if x.spouse.extraordinary_childrearing_costs.has_been_gathered() and len(x.spouse.extraordinary_childrearing_costs) > 0:
+  You have already told us about ${ x.spouse } paying the following extraordinary childrearing costs: ${ comma_and_list(cost.description for cost in x.spouse.extraordinary_childrearing_costs.complete_elements()) }
+  % endif
+
   % if len(x.extraordinary_childrearing_costs.complete_elements()) > 0:
   You have already told us about your ${ comma_and_list(cost.description for cost in x.extraordinary_childrearing_costs.complete_elements()) }.
-
   % endif
 fields:
   - Are there any more extraordinary childrearing costs to be paid by ${ x.name_full() }?: x.extraordinary_childrearing_costs.there_is_another
@@ -1723,9 +1734,20 @@ code: |
   x.other_child_support_received = 0
   x.other_child_support_paid = 0
 ---
+id: maintenance_template
+template: maintenance_template
+subject: |
+  What is maintenance?
+content: | 
+  Financial support of either spouse during and following dissolution of marriage proceedings. This financial support considers ONLY the financial needs of the spouse, separate from child support - as the case may be.
+
+---
 id: maintenance paid for other cases
 generic object: ALIndividual
-question: Maintenance ${ x.name_full() } pays in other cases
+question: |
+  Maintenance ${ x.name_full() } pays in other cases
+subquestion: |
+  ${ maintenance_template }
 fields:
   - How much does ${ x.name_full() } pay monthly in maintenance in other cases?: x.maintenance_other_paid
     datatype: currency
@@ -1755,11 +1777,33 @@ fields:
     show if:
       variable: pay_work_childcare_expenses
       is: pay_percentage
-
+---
+id: pay_work_childcare_expenses
+comment: |
+  This dictionary makes it easier to have review blocks
+variable name: pay_work_childcare_expenses_dictionary
+data:
+  none: "There are no work-related child care costs incurred by the parents."
+  included_in_form14: "The work-related child care costs will be included in the child support calculation on the Form 14."
+  pay_own: support_payer.name_full()  + " shall partially reimburse " + support_recipient.name_full() + " for all reasonable work-related child care expenses."
+  pay_percentage: support_payer.name_full() + " shall partially reimburse " + support_recipient.name_full() + " for all reasonable work-related child care expenses."
 ---
 id: Work related childcare costs
 generic object: ALIndividual
 question: Work-Related Child Care Costs for ${ x.name_full() }
+subquestion: |
+  % if x.spouse and defined('x.spouse.work_childcare_expenses'):
+  You have already told us ${ x.spouse } pays $${ thousands(x.spouse.work_childcare_expenses)} for work-related child care expenses.
+  % endif
+  % if defined('pay_work_childcare_expenses'):
+  You also said:
+  
+  % if pay_work_childcare_expenses == "pay_percentage":
+  { support_payer.name_full() } shall reimburse ${ support_recipient.name_full() } for %${ thousands(pay_work_childcare_expenses_percentage) } of all reasonable work-related child care expenses.
+  % else:
+  ${ pay_work_childcare_expenses_dictionary[pay_work_childcare_expenses] }
+  % endif
+  % endif
 fields:
   - What are the monthly work-related child care expenses for ${ x.name_full() }?: x.work_childcare_expenses
     datatype: currency
@@ -4537,6 +4581,8 @@ code: |
 id: maintenance received for other cases
 generic object: ALIndividual
 question: Maintenance paid to ${ x.name_full() } in other cases
+subquestion: |
+  ${ maintenance_template }
 fields:
   - How much does ${ x.name_full() } receive monthly in maintenance in other cases?: x.maintenance_other_received
     datatype: currency
@@ -4749,6 +4795,8 @@ code: |
 ## MAINTENANCE ##
 id: maintenance to petitioner
 question: Maintenance to ${ petitioner.name.full() }
+subquestion: |
+  ${ maintenance_template }
 fields:
   - Should ${ respondent.name.full() } pay maintenance to ${ petitioner.name.full() }?: maintenance_to_petitioner
     input type: radio                                                                       
@@ -4759,6 +4807,8 @@ fields:
 ---
 id: maintenance to respondent
 question: Maintenance to ${ respondent.name.full() }
+subquestion: |
+  ${ maintenance_template }
 fields:
   - Should ${ petitioner.name.full() } pay maintenance to ${ respondent.name.full() }?: maintenance_to_respondent
     choices:
@@ -4769,6 +4819,8 @@ fields:
 sets:
   - petitioner.maintenance_paid
 question: Maintenance to ${ respondent.name.full() }
+subquestion: |
+  ${ maintenance_template }
 fields:
   - How much?: maintenance_to_respondent_amount
     datatype: currency
@@ -4780,6 +4832,8 @@ validation code: |
 ---
 id: maintenance to petitioner amount
 question: Maintenance to ${ petitioner.name.full() }
+subquestion: |
+  ${ maintenance_template }
 fields:
   - How much?: maintenance_to_petitioner_amount
     datatype: currency
@@ -4790,6 +4844,8 @@ validation code: |
   respondent.maintenance_paid = maintenance_to_petitioner_amount
 ---
 question: Income Withholding
+subquestion: |
+  ${ maintenance_template }
 fields:
   - Should income withholding be prepared by the person receiving maintenance?: maintenance_income_withholding
     datatype: yesnoradio
@@ -4800,6 +4856,8 @@ fields:
 ---
 id: one maintenance award question
 question: Maintenance award
+subquestion: |
+  ${ maintenance_template }
 fields:
   - Should the court award maintenance to ${ petitioner.name_full() } or ${ respondent.name_full() }?: relief['maintenance']
     datatype: yesnoradio
@@ -4826,6 +4884,8 @@ id: maintenance currently paid question
 question: Current maintenance award
 subquestion: |
   If maintenance was awarded in a previous divorce, or earlier in the case, you can answer yes.  But in most cases there will not already be an award of maintenance.
+
+  ${ maintenance_template }
 fields:
   - Is any maintenance currently paid by ${ petitioner.name_full() } or ${ respondent.name_full() } to the other?: is_maintenance_currently_paid
     datatype: yesnoradio

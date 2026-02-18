@@ -12,9 +12,12 @@ fields:
   - Do you waive your rights pursuant to the Servicemembers Civil Relief Act of 2003?: waive_rights
     datatype: yesnoradio
 ---
+id: denials question for answer
 question: Denials
 subquestion: |
-  Any statement not specifically denied will be deemed admitted and you may not have the opportunity to disagree with this statement when the case is presented to the court.
+  Is there anything you disagree with on your spouses Petition for Dissolution of Marriage?
+  
+  Any statement that you do not specifically deny in your Answer to their Petition will be considered "admitted" by the court, and you may not have the opportunity to disagree with this statement later.
 fields:
   - Is there anything in the Petition that you deny?: denials_exist
     datatype: yesnoradio
@@ -313,10 +316,10 @@ attachment:
       - "raRequestReliefAwardMaintenanceToMe": ${ relief["maintenance_to_me"] } 
       - "raRequestReliefAwardMaintenanceToSpouse": ${ relief["maintenance_to_spouse"] } 
       - "raRequestReliefChangeName": ${ relief["change_name"] } 
-      - "raRequestReliefFormerSuffix": ${ respondent.prior_name.suffix if relief['change_name'] else ""  } 
-      - "raRequestReliefFormerFirstName": ${ respondent.prior_name.first if relief['change_name'] else "" } 
-      - "raRequestReliefFormerMiddleName": ${ respondent.prior_name.last if relief['change_name'] else "" } 
-      - "raRequestReliefFormerLastName": ${ respondent.prior_name.last if relief['change_name'] else ""  } 
+      - "raRequestReliefFormerSuffix": ${ respondent.prior_name.name.suffix if relief['change_name'] else ""  } 
+      - "raRequestReliefFormerFirstName": ${ respondent.prior_name.name.first if relief['change_name'] else "" } 
+      - "raRequestReliefFormerMiddleName": ${ respondent.prior_name.name.last if relief['change_name'] else "" } 
+      - "raRequestReliefFormerLastName": ${ respondent.prior_name.name.last if relief['change_name'] else ""  } 
       - "raRequestReliefOther": ${ relief["Other"] } 
       - "raRequestReliefOtherRequests1": ${ relief_other } 
       - "raDateOfNotice": ${ service.date } 

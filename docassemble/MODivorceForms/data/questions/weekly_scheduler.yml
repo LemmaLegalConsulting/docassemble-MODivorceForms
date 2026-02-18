@@ -60,8 +60,6 @@ fields:
       - "Every other week, exchange on Monday": every_other_week_monday
       - "Every other week, exchange on Saturday": every_other_week_saturday
       - "2-2-3": two_two_three
-      - "2-2-5-5": two_two_five_five
-      - "3-4-4-3": three_four_four_three
       - "Every weekend": every_weekend
       - "Every other weekend": every_other_weekend
     js show if: |

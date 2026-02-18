@@ -276,7 +276,13 @@ fields:
       The Form 14 calculation assumes that the parent receiving support will claim the children as dependents. If the parent paying support is entitled to claim one or more of the children, then the Form 14 guidelines are unjust and inappropriate and the second box in Paragraph 15 should be checked.
 ---
 id: visitation nights
-question: How many visitation nights does ${ support_payer } have?
+question: Overnights
+subquestion: |
+  % if defined('support_payer.visitation_nights_default'):
+  Based on the parenting plan you created: ${ support_payer } should have ${ support_payer.visitation_nights_default } overnights per year.
+  % else:
+  How many overnights per year does ${ support_payer } have?
+  % endif
 fields:
   - Visitation nights: visitation_nights
     datatype: integer
@@ -874,7 +880,7 @@ attachment:
       - "paLocationExchangesResidencePetitioner": ${ location_of_exchange == "petitioner_residence" } 
       - "paLocationExchangesResidenceRespondent": ${ location_of_exchange == "respondent_residence" } 
       - "paLocationExchangesPickUp": ${ location_of_exchange == "pick_up" } 
-      - "paLocationExchangesSpecific": ${ location_of_exchange == "specific" } 
+      - "paLocationExchangesSpecific": ${ location_of_exchange == "other" } 
       - "paLocationExchangesOther1": ${ location_of_exchange_specific_location } 
       - "paPhoneContactAm": ${ phone_contact_am } 
       - "paPhoneContactRestrictions": ${ phone_contact } 

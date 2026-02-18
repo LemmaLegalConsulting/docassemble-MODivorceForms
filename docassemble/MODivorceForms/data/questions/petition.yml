@@ -34,14 +34,6 @@ fields:
     default: False
 
 ---
-id: Abuse or neglect
-question: Abuse or neglect
-fields:
-  - Have any of the children been a victim of abuse or neglect?: abuse_or_neglect
-    datatype: yesnoradio
-  - Explain: abuse_or_neglect_explanation
-    show if: abuse_or_neglect
----
 id: Family support order
 question: Order by the Family Support Division
 fields:
@@ -177,14 +169,14 @@ attachment:
       - "didCoupleLiveInMissouri2": ${ not marriage.live_together_in_mo } 
       - "didCoupleLiveInMissouri3": ${ other_parties[0].address.state == "MO" } 
       - "respondentsEmploymentStatus1": ${ len(respondent.jobs) > 0 } 
-      - "respondentsEmploymentStatus2": ${ len(respondent.jobs) == 0 and respondent.has_self_employment_income == False} 
+      - "respondentsEmploymentStatus2": ${ respondent.jobs.there_are_any == False and respondent.has_self_employment_income == False} 
       - "respondentsEmploymentStatus3": ${ len(respondent.jobs) == 0 and respondent.has_self_employment_income } 
-      - "respondentsEmploymentStatus4": ${ respondent.jobs.there_are_any == None and respondent.has_self_employment_income == None } 
-      - "respondentEmployedOrSelfEmployed": ${ "Unknown" if respondent.jobs.there_are_any == None and respondent.has_self_employment_income == None else showifdef('respondent.employer.name.text') } 
-      - "respondentsEmploymentStreet": ${ "" if respondent.jobs.there_are_any == None and respondent.has_self_employment_income == None else respondent.employer.address.address } 
-      - "respondentsEmploymentState": ${ "" if respondent.jobs.there_are_any == None and respondent.has_self_employment_income == None else respondent.employer.address.state } 
-      - "respondentsEmploymentCity": ${ "" if respondent.jobs.there_are_any == None and respondent.has_self_employment_income == None else respondent.employer.address.city } 
-      - "respondentsEmploymentZip": ${ "" if respondent.jobs.there_are_any == None and respondent.has_self_employment_income == None else respondent.employer.address.zip } 
+      - "respondentsEmploymentStatus4": ${ not len(respondent.jobs) > 0 and not respondent.has_self_employment_income and not (respondent.jobs.there_are_any == False and respondent.has_self_employment_income == False)  } 
+      - "respondentEmployedOrSelfEmployed": ${ "Unknown" if not len(respondent.jobs) > 0 and not respondent.has_self_employment_income and not (respondent.jobs.there_are_any == False and respondent.has_self_employment_income == False) else showifdef('respondent.employer.name.text') } 
+      - "respondentsEmploymentStreet": ${ "" if not len(respondent.jobs) > 0 and not respondent.has_self_employment_income and not (respondent.jobs.there_are_any == False and respondent.has_self_employment_income == False) else respondent.employer.address.address } 
+      - "respondentsEmploymentState": ${ "" if not len(respondent.jobs) > 0 and not respondent.has_self_employment_income and not (respondent.jobs.there_are_any == False and respondent.has_self_employment_income == False) else respondent.employer.address.state } 
+      - "respondentsEmploymentCity": ${ "" if not len(respondent.jobs) > 0 and not respondent.has_self_employment_income and not (respondent.jobs.there_are_any == False and respondent.has_self_employment_income == False) else respondent.employer.address.city } 
+      - "respondentsEmploymentZip": ${ "" if not len(respondent.jobs) > 0 and not respondent.has_self_employment_income and not (respondent.jobs.there_are_any == False and respondent.has_self_employment_income == False) else respondent.employer.address.zip } 
       - "respondentsMonthlyGrossIncome": ${ round(respondent.monthly_gross_income,2) } 
       - "respondentSupportThemselves1": ${ respondent.self_supporting } 
       - "respondentSupportThemselves2": ${ respondent.self_supporting == False } 
@@ -249,7 +241,11 @@ attachment:
           % endif
       - "childOneAge": |
           % if len(children) > 0:
-          ${ "{:.0f}".format(date_difference(as_datetime(children[0].birthdate),today())) }
+          % if date_difference(starting=children[0].birthdate,ending=today()).years > 1:
+          ${ "{:.0f}".format(date_difference(starting=children[0].birthdate,ending=today()).years) }
+          % else:
+          ${ date_difference(starting=children[0].birthdate, ending=today()).describe(specificity='month') }
+          % endif
           % endif
       - "childOneMarriedOrNot": |
           % if len(children) > 0:
@@ -445,7 +441,11 @@ attachment:
           % endif
       - "childTwoAge": |
           % if len(children) > 1:
-          ${ "{:.0f}".format(date_difference(as_datetime(children[1].birthdate),today())) }
+          % if date_difference(starting=children[1].birthdate,ending=today()).years > 1:
+          ${ "{:.0f}".format(date_difference(starting=children[1].birthdate,ending=today()).years) }
+          % else:
+          ${ date_difference(starting=children[1].birthdate, ending=today()).describe(specificity='month') }
+          % endif
           % endif
       - "childTwoMarriedOrNot": |
           % if len(children) > 1:
@@ -641,7 +641,11 @@ attachment:
           % endif
       - "childThreeAge": |
           % if len(children) > 2:
-          ${ "{:.0f}".format(date_difference(as_datetime(children[2].birthdate),today())) }
+          % if date_difference(starting=children[2].birthdate,ending=today()).years > 1:
+          ${ "{:.0f}".format(date_difference(starting=children[2].birthdate,ending=today()).years) }
+          % else:
+          ${ date_difference(starting=children[2].birthdate, ending=today()).describe(specificity='month') }
+          % endif
           % endif
       - "childThreeMarriedOrNot": |
           % if len(children) > 2:
@@ -837,7 +841,11 @@ attachment:
           % endif
       - "childFourAge": |
           % if len(children) > 3:
-          ${ "{:.0f}".format(date_difference(as_datetime(children[3].birthdate),today())) }
+          % if date_difference(starting=children[3].birthdate,ending=today()).years > 1:
+          ${ "{:.0f}".format(date_difference(starting=children[3].birthdate,ending=today()).years) }
+          % else:
+          ${ date_difference(starting=children[3].birthdate, ending=today()).describe(specificity='month') }
+          % endif
           % endif
       - "childFourMarriedOrNot": |
           % if len(children) > 3:
@@ -1075,7 +1083,7 @@ attachment:
       - "participatedInOtherLitigationCustody2": ${ not other_litigation } 
       - "haveChildrenBeenVictimAbuseOrNeglect1": ${ abuse_or_neglect } 
       - "haveChildrenBeenVictimAbuseOrNeglect2": ${ not abuse_or_neglect } 
-      - "explanationIfAnsweredYesToFortyThroughFortyThree": ${ comma_and_list([others_with_physical_custody_explanation, other_custody_proceeding_explanation, other_litigation_explanation, related_case_explanation, abuse_or_neglect_explanation]) } 
+      - "explanationIfAnsweredYesToFortyThroughFortyThree": ${ children_explanation } 
       - "anyOrdersEnteredByFSD1": ${ family_support_order } 
       - "anyOrdersEnteredByFSD2": ${ not family_support_order } 
       - "areYouOrSpouseReceivingTanf1": ${ len(petitioner.benefits.matches(source=['tanf'])) > 0 or len(respondent.benefits.matches(source=['tanf'])) > 0 } 
@@ -1088,10 +1096,10 @@ attachment:
       - "requestReliefAwardMaintenanceToMe": ${ relief['maintenance'] and maintenance_awarded_to == "petitioner" } 
       - "requestReliefAwardMaintenanceToSpouse": ${ relief['maintenance'] and maintenance_awarded_to == "respondent" } 
       - "requestReliefChangeName": ${ relief['change_name'] } 
-      - "requestReliefFormerFirstName": ${ users[0].prior_name.first if relief['change_name'] else "" } 
-      - "requestReliefFormerMiddleName": ${ users[0].prior_name.middle if relief['change_name'] else "" } 
-      - "requestReliefFormerLastName": ${ users[0].prior_name.last if relief['change_name'] else "" } 
-      - "requestReliefFormerSuffix": ${ users[0].prior_name.suffix if relief['change_name'] else "" } 
+      - "requestReliefFormerFirstName": ${ users[0].prior_name.name.first if relief['change_name'] else "" } 
+      - "requestReliefFormerMiddleName": ${ users[0].prior_name.name.middle if relief['change_name'] else "" } 
+      - "requestReliefFormerLastName": ${ users[0].prior_name.name.last if relief['change_name'] else "" } 
+      - "requestReliefFormerSuffix": ${ users[0].prior_name.name.suffix if relief['change_name'] else "" } 
       - "requestReliefOther": ${ relief['other'] } 
       - "requestReliefOtherRequests": ${ relief_other } 
       - "serviceOnSpouse1": ${ other_parties[0].service_type == "none" } 
