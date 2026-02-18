@@ -1,44 +1,4 @@
----
-include:
-  - shared.yml
----
-id: answer order
-mandatory: True
-code: |
-  users[0].name.first
-  other_parties[0].name.first
-  respondent.name.first
-  respondent.address.address
-  if respondent.attorney_involved:
-    respondent.attorney.bar_number
-  respondent.email
-  respondent.attorney
-  respondent.phone_number
-  if respondent.has_prior_name:
-    respondent.prior_name.name.first
-  if respondent.active_duty:
-    waive_rights
-  respondent.ssn
-  service.date
-  case.county
-  case.docket_number
-  petitioner.name.first
-  petitioner.address.state
-  petitioner.ssn
-  if relief["other"]:
-    relief_other
-  others_with_physical_custody
-  if other_custody_proceeding:
-    other_custody_proceeding_explanation
-  other_litigation
-  previous_petitions
-  agree_with_parenting_plan 
-  for child in children:
-    child.birthdate
-    child.ssn
-  persons_lived_with.gather()
-  people_served.gathered
-  mo_divorce_forms_download
+
 ---
 id: Agree with Parenting Plan
 question: Agree with Parenting Plan
@@ -52,9 +12,12 @@ fields:
   - Do you waive your rights pursuant to the Servicemembers Civil Relief Act of 2003?: waive_rights
     datatype: yesnoradio
 ---
+id: denials question for answer
 question: Denials
 subquestion: |
-  Any statement not specifically denied will be deemed admitted and you may not have the opportunity to disagree with this statement when the case is presented to the court.
+  Is there anything you disagree with on your spouses Petition for Dissolution of Marriage?
+  
+  Any statement that you do not specifically deny in your Answer to their Petition will be considered "admitted" by the court, and you may not have the opportunity to disagree with this statement later.
 fields:
   - Is there anything in the Petition that you deny?: denials_exist
     datatype: yesnoradio
@@ -66,46 +29,23 @@ id: Respondent's Answer to Petition for Dissolution of Marriage object
 objects:
   - answer_attachment: ALDocument.using(title="Respondent's Answer to Petition for Dissolution of Marriage", filename="answer", has_addendum=False, )
 ---
-id: Respondent's Answer to Petition for Dissolution of Marriage enabled
-code: |
-  answer_attachment.enabled = True
----
-id: Respondent's Answer to Petition for Dissolution of Marriage attachment
 attachment:
-  name: Respondent's Answer to Petition for Dissolution of Marriage
   filename: answer
   variable name: answer_attachment[i]
   skip undefined: True
   pdf template file: answer.pdf
---- 
-objects:
-  - answer_attachment: ALDocument.using(title="Respondent's Answer to Petition for Dissolution of Marriage", filename="answer",  has_addendum=False, )
----
-code: |
-  answer.enabled = True
----
-# Bundles group the ALDocuments into separate downloads, such as for court and for the user
-objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
----
-attachment:
-  - filename: answer
-    variable name: answer_attachment[i]
-    skip undefined: True
-    pdf template file: answer.pdf
-    fields:
+  fields:
       - "countyList": ${ case.county } 
       - "petitionersFirstName": ${ petitioner.name.first } 
       - "petitionersMiddleName": ${ petitioner.name.middle } 
       - "petitionersLastName": ${ petitioner.name.last } 
-      - "petitionersSuffixJrSrIII": ${ petitioner.name.suffix } 
+      - "petitionersSuffixJrSrIII": ${ petitioner.address.state } 
       - "caseNumber": ${ case.docket_number } 
-      - "respondentsFirstName": ${ respondent.name.first } 
-      - "respondentsMiddleName": ${ respondent.name.middle } 
-      - "respondentsLastName": ${ respondent.name.last } 
+      - "respondentsFirstName": ${ respondent.name.last } 
+      - "respondentsMiddleName": ${ respondent.name.first } 
+      - "respondentsLastName": ${ respondent.name.middle } 
       - "respondentsSuffixJrSrIII": ${ respondent.name.suffix } 
-      - "divisionNumber": ${ "" } 
+      - "divisionNumber": ${ case.division_number } 
       - "raHowManyPetitions1": ${ previous_petitions == "1" } 
       - "raHowManyPetitions2": ${ previous_petitions == "2" } 
       - "raHowManyPetitions3": ${ previous_petitions == "3" } 
@@ -121,42 +61,174 @@ attachment:
       - "raRespondentActiveDutyOrNot2": ${ respondent.active_duty and waive_rights } 
       - "raRespondentActiveDutyOrNot3": ${ respondent.active_duty and not waive_rights } 
       - "raPetitionersSsnLastFour": ${ petitioner.ssn } 
-      - "raFirstChildFirstName": ${ children[0].name.first } 
-      - "raFirstChildMiddleName": ${ children[0].name.middle } 
-      - "raFirstChildLastName": ${ children[0].name.last } 
-      - "raFirstChildSuffix": ${ children[0].name.suffix } 
-      - "raFirstChildsAge": ${ date_difference(as_datetime(children[0].birthdate),today()).years } 
-      - "raLastFourSsnFirstChild": ${ children[0].ssn } 
-      - "raSecondChildFirstName": ${ children[1].name.first } 
-      - "raSecondChildMiddleName": ${ children[1].name.middle } 
-      - "raSecondChildAge": ${ date_difference(as_datetime(children[1].birthdate),today()).years } 
-      - "raLastFourSsnSecondChild": ${ children[1].ssn } 
-      - "raSecondChildLastName": ${ children[1].name.last } 
-      - "raSecondChildSuffix": ${ children[1].name.suffix } 
-      - "raThirdChildSuffix": ${ children[2].suffix } 
-      - "raThirdChildAge": ${ date_difference(as_datetime(children[2].name.suffix),today()).years } 
-      - "raLastFourSsnThirdChild": ${ children[2].ssn } 
-      - "raThirdChildFirstName": ${ children[2].name.first } 
-      - "raThirdChildMiddleName": ${ children[2].name.middle } 
-      - "raThirdChildLastName": ${ children[2].name.last } 
-      - "raFourthChildFirstName": ${ children[3].name.first } 
-      - "raFourthChildMiddleName": ${ children[3].name.middle } 
-      - "raFourthChildLastName": ${ children[3].name.last } 
-      - "raFourthChildSuffix": ${ children[3].name.suffix } 
-      - "raFourthChildAge": ${ date_difference(as_datetime(children[3].birthdate),today()).years } 
-      - "raLastFourSsnFourthChild": ${ children[3].ssn } 
-      - "raFifthChildFirstName": ${ children[4].name.first } 
-      - "raFifthChildSuffix": ${ children[4].name.suffix } 
-      - "raFifthChildAge": ${ date_difference(as_datetime(children[4].birthdate),today()).years } 
-      - "raLastFourSsnFifthChild": ${ children[4].ssn } 
-      - "raFifthChildMiddleName": ${ children[4].name.middle } 
-      - "raFifthChildLastName": ${ children[4].name.last } 
-      - "raSixthChildMiddleName": ${ children[5].name.middle } 
-      - "raSixthChildLastName": ${ children[5].name.last } 
-      - "raSixthChildSuffix": ${ children[5].name.suffix } 
-      - "raSixthChildAge": ${ date_difference(as_datetime(children[5].birthdate),today()).years } 
-      - "raLastFourSsnSixthChild": ${ children[5].ssn } 
-      - "raSixthChildFirstName": ${ children[5].name.first } 
+      - "raFirstChildFirstName": |
+          % if len(children) > 0:
+          ${ children[0].name.first }
+          % endif
+      - "raFirstChildMiddleName": |
+          % if len(children) > 0:
+          ${ children[0].name.middle }
+          % endif
+      - "raFirstChildLastName": |
+          % if len(children) > 0:
+          ${ children[0].name.last }
+          % endif
+      - "raFirstChildSuffix": |
+          % if len(children) > 0:
+          ${ children[0].name.suffix }
+          % endif
+      - "raFirstChildsAge": |
+          % if len(children) > 0:
+          % if date_difference(as_datetime(children[0].birthdate),today()).years >= 1:
+          ${ "{:.0f}".format(date_difference(as_datetime(children[0].birthdate),today()).years) }
+          % else:
+          ${ "{:.0f}".format(date_difference(as_datetime(children[0].birthdate),today()).months) + " months" }
+          % endif
+          % endif
+      - "raLastFourSsnFirstChild": |
+          % if len(children) > 0:
+          ${ "{:.0f}".format(children[0].ssn) }
+          % endif
+      - "raSecondChildFirstName": |
+          % if len(children) > 1:
+          ${ children[1].name.first }
+          % endif
+      - "raSecondChildMiddleName": |
+          % if len(children) > 1:
+          ${ children[1].name.middle }
+          % endif
+      - "raSecondChildAge": |
+          % if len(children) > 1:
+          % if date_difference(as_datetime(children[1].birthdate),today()).years >= 1:
+          ${ "{:.0f}".format(date_difference(as_datetime(children[1].birthdate),today()).years) }
+          % else:
+          ${ "{:.0f}".format(date_difference(as_datetime(children[1].birthdate),today()).months) + " months" }
+          % endif
+          % endif
+      - "raLastFourSsnSecondChild": |
+          % if len(children) > 1:
+          ${ "{:.0f}".format(children[1].ssn) }
+          % endif
+      - "raSecondChildLastName": |
+          % if len(children) > 1:
+          ${ children[1].name.last }
+          % endif
+      - "raSecondChildSuffix": |
+          % if len(children) > 1:
+          ${ children[1].name.suffix }
+          % endif
+      - "raThirdChildSuffix": |
+          % if len(children) > 2:
+          ${ children[2].name.suffix }
+          % endif
+      - "raThirdChildAge": |
+          % if len(children) > 2:
+          % if date_difference(as_datetime(children[2].birthdate),today()).years >= 1:
+          ${ "{:.0f}".format(date_difference(as_datetime(children[2].birthdate),today()).years) }
+          % else:
+          ${ "{:.0f}".format(date_difference(as_datetime(children[2].birthdate),today()).months) + " months" }
+          % endif
+          % endif
+      - "raLastFourSsnThirdChild": |
+          % if len(children) > 2:
+          ${ "{:.0f}".format(children[2].ssn) }
+          % endif
+      - "raThirdChildFirstName": |
+          % if len(children) > 2:
+          ${ children[2].name.first }
+          % endif
+      - "raThirdChildMiddleName": |
+          % if len(children) > 2:
+          ${ children[2].name.middle }
+          % endif
+      - "raThirdChildLastName": |
+          % if len(children) > 2:
+          ${ children[2].name.last }
+          % endif
+      - "raFourthChildFirstName": |
+          % if len(children) > 3:
+          ${ children[3].name.first }
+          % endif
+      - "raFourthChildMiddleName": |
+          % if len(children) > 3:
+          ${ children[3].name.middle }
+          % endif
+      - "raFourthChildLastName": |
+          % if len(children) > 3:
+          ${ children[3].name.last }
+          % endif
+      - "raFourthChildSuffix": |
+          % if len(children) > 3:
+          ${ children[3].name.suffix }
+          % endif
+      - "raFourthChildAge": |
+          % if len(children) > 3:
+          % if date_difference(as_datetime(children[3].birthdate),today()).years >= 1:
+          ${ "{:.0f}".format(date_difference(as_datetime(children[3].birthdate),today()).years) }
+          % else:
+          ${ "{:.0f}".format(date_difference(as_datetime(children[3].birthdate),today()).months) + " months" }
+          % endif
+          % endif
+      - "raLastFourSsnFourthChild": |
+          % if len(children) > 3:
+          ${ "{:.0f}".format(children[3].ssn) }
+          % endif
+      - "raFifthChildFirstName": |
+          % if len(children) > 4:
+          ${ children[4].name.first }
+          % endif
+      - "raFifthChildSuffix": |
+          % if len(children) > 4:
+          ${ children[4].name.suffix }
+          % endif
+      - "raFifthChildAge": |
+          % if len(children) > 4:
+          % if date_difference(as_datetime(children[4].birthdate),today()).years >= 1:
+          ${ "{:.0f}".format(date_difference(as_datetime(children[4].birthdate),today()).years) }
+          % else:
+          ${ "{:.0f}".format(date_difference(as_datetime(children[4].birthdate),today()).months) + " months" }
+          % endif
+          % endif
+      - "raLastFourSsnFifthChild": |
+          % if len(children) > 4:
+          ${ "{:.0f}".format(children[4].ssn) }
+          % endif
+      - "raFifthChildMiddleName": |
+          % if len(children) > 4:
+          ${ children[4].name.middle }
+          % endif
+      - "raFifthChildLastName": |
+          % if len(children) > 4:
+          ${ children[4].name.last }
+          % endif
+      - "raSixthChildMiddleName": |
+          % if len(children) > 5:
+          ${ children[5].name.middle }
+          % endif
+      - "raSixthChildLastName": |
+          % if len(children) > 5:
+          ${ children[5].name.last }
+          % endif
+      - "raSixthChildSuffix": |
+          % if len(children) > 5:
+          ${ children[5].name.suffix }
+          % endif
+      - "raSixthChildAge": |
+          % if len(children) > 5:
+          % if date_difference(as_datetime(children[5].birthdate),today()).years >= 1:
+          ${ "{:.0f}".format(date_difference(as_datetime(children[5].birthdate),today()).years) }
+          % else:
+          ${ "{:.0f}".format(date_difference(as_datetime(children[5].birthdate),today()).months) + " months" }
+          % endif
+          % endif
+      - "raLastFourSsnSixthChild": |
+          % if len(children) > 5:
+          ${ "{:.0f}".format(children[5].ssn) }
+          % endif
+      - "raSixthChildFirstName": |
+          % if len(children) > 5:
+          ${ children[5].name.first }
+          % endif
       - "raPerson1ChildrenLivedWithPast5YearsFirstName": ${ persons_lived_with[0].name.first } 
       - "raPerson1ChildrenLivedWithPast5YearsMiddleName": ${ persons_lived_with[0].name.middle } 
       - "raPerson1ChildrenLivedWithPast5YearsLastName": ${ persons_lived_with[0].name.last } 
@@ -165,22 +237,70 @@ attachment:
       - "raPerson1ChildrenLivedWithPast5YearsCity": ${ persons_lived_with[0].address.city } 
       - "raPerson1ChildrenLivedWithPast5YearsState": ${ persons_lived_with[0].address.state } 
       - "raPerson1ChildrenLivedWithPast5YearsZip": ${ persons_lived_with[0].address.zip } 
-      - "raPerson2ChildrenLivedWithPast5YearsFirstName": ${ persons_lived_with[1].name.first } 
-      - "raPerson2ChildrenLivedWithPast5YearsMiddleName": ${ persons_lived_with[1].name.middle } 
-      - "raPerson2ChildrenLivedWithPast5YearsLastName": ${ persons_lived_with[1].name.last } 
-      - "raPerson2ChildrenLivedWithPast5YearsSuffix": ${ persons_lived_with[1].name.suffix } 
-      - "raPerson2ChildrenLivedWithPast5YearsStreet": ${ persons_lived_with[1].address.address } 
-      - "raPerson2ChildrenLivedWithPast5YearsCity": ${ persons_lived_with[1].address.city } 
-      - "raPerson2ChildrenLivedWithPast5YearsState": ${ persons_lived_with[1].address.state } 
-      - "raPerson2ChildrenLivedWithPast5YearsZip": ${ persons_lived_with[1].address.zip } 
-      - "raPerson3ChildrenLivedWithPast5YearsFirstName": ${ persons_lived_with[2].name.first } 
-      - "raPerson3ChildrenLivedWithPast5YearsMiddleName": ${ persons_lived_with[2].name.middle } 
-      - "raPerson3ChildrenLivedWithPast5YearsLastName": ${ persons_lived_with[2].name.last } 
-      - "raPerson3ChildrenLivedWithPast5YearsSuffix": ${ persons_lived_with[2].name.suffix } 
-      - "raPerson3ChildrenLivedWithPast5YearsStreet": ${ persons_lived_with[2].address.address } 
-      - "raPerson3ChildrenLivedWithPast5YearsCity": ${ persons_lived_with[2].address.city } 
-      - "raPerson3ChildrenLivedWithPast5YearsState": ${ persons_lived_with[2].address.state } 
-      - "raPerson3ChildrenLivedWithPast5YearsZip": ${ persons_lived_with[2].address.zip } 
+      - "raPerson2ChildrenLivedWithPast5YearsFirstName": |
+          % if len(persons_lived_with) > 1:
+          ${ persons_lived_with[1].name.first }
+          % endif
+      - "raPerson2ChildrenLivedWithPast5YearsMiddleName": |
+          % if len(persons_lived_with) > 1:
+          ${ persons_lived_with[1].name.middle }
+          % endif
+      - "raPerson2ChildrenLivedWithPast5YearsLastName": |
+          % if len(persons_lived_with) > 1:
+          ${ persons_lived_with[1].name.last }
+          % endif
+      - "raPerson2ChildrenLivedWithPast5YearsSuffix": |
+          % if len(persons_lived_with) > 1:
+          ${ persons_lived_with[1].name.suffix }
+          % endif
+      - "raPerson2ChildrenLivedWithPast5YearsStreet": |
+          % if len(persons_lived_with) > 1:
+          ${ persons_lived_with[1].address.address }
+          % endif
+      - "raPerson2ChildrenLivedWithPast5YearsCity": |
+          % if len(persons_lived_with) > 1:
+          ${ persons_lived_with[1].address.city }
+          % endif
+      - "raPerson2ChildrenLivedWithPast5YearsState": |
+          % if len(persons_lived_with) > 1:
+          ${ persons_lived_with[1].address.state }
+          % endif
+      - "raPerson2ChildrenLivedWithPast5YearsZip": |
+          % if len(persons_lived_with) > 1:
+          ${ persons_lived_with[1].address.zip }
+          % endif
+      - "raPerson3ChildrenLivedWithPast5YearsFirstName": |
+          % if len(persons_lived_with) > 2:
+          ${ persons_lived_with[2].name.first }
+          % endif
+      - "raPerson3ChildrenLivedWithPast5YearsMiddleName": |
+          % if len(persons_lived_with) > 2:
+          ${ persons_lived_with[2].name.middle }
+          % endif
+      - "raPerson3ChildrenLivedWithPast5YearsLastName": |
+          % if len(persons_lived_with) > 2:
+          ${ persons_lived_with[2].name.last }
+          % endif
+      - "raPerson3ChildrenLivedWithPast5YearsSuffix": |
+          % if len(persons_lived_with) > 2:
+          ${ persons_lived_with[2].name.suffix }
+          % endif
+      - "raPerson3ChildrenLivedWithPast5YearsStreet": |
+          % if len(persons_lived_with) > 2:
+          ${ persons_lived_with[2].address.address }
+          % endif
+      - "raPerson3ChildrenLivedWithPast5YearsCity": |
+          % if len(persons_lived_with) > 2:
+          ${ persons_lived_with[2].address.city }
+          % endif
+      - "raPerson3ChildrenLivedWithPast5YearsState": |
+          % if len(persons_lived_with) > 2:
+          ${ persons_lived_with[2].address.state }
+          % endif
+      - "raPerson3ChildrenLivedWithPast5YearsZip": |
+          % if len(persons_lived_with) > 2:
+          ${ persons_lived_with[2].address.zip }
+          % endif
       - "raDoesAnyoneOtherThanYouOrSpouseHaveCustodyRights1": ${ others_with_physical_custody } 
       - "raDoesAnyoneOtherThanYouOrSpouseHaveCustodyRights2": ${ not others_with_physical_custody } 
       - "raOtherCustodyProceedingPending1": ${ other_custody_proceeding } 
@@ -189,28 +309,46 @@ attachment:
       - "raParticipatedInOtherLitigationCustody2": ${ not other_litigation } 
       - "raAgreeWithParentingPlanOrNot1": ${ agree_with_parenting_plan } 
       - "raAgreeWithParentingPlanOrNot2": ${ not agree_with_parenting_plan } 
-      - "raRequestReliefDissolution": ${ True } 
-      - "raRequestReliefCustody": ${ relief['custody'] } 
-      - "raRequestReliefSupportOfTheChildren": ${ relief['child_support'] } 
-      - "raRequestReliefDivideMaritalPropertyAndDebts": ${ relief['divide_property'] } 
-      - "raRequestReliefAwardMaintenanceToMe": ${ relief['maintenance_to_me'] } 
-      - "raRequestReliefAwardMaintenanceToSpouse": ${ relief['maintenance_to_spouse'] } 
-      - "raRequestReliefChangeName": ${ relief['change_name'] } 
-      - "raRequestReliefFormerSuffix": ${ respondent.prior_name.suffix if relief['change_name'] else ""  } 
-      - "raRequestReliefFormerFirstName": ${ respondent.prior_name.first if relief['change_name'] else "" } 
-      - "raRequestReliefFormerMiddleName": ${ respondent.prior_name.last if relief['change_name'] else "" } 
-      - "raRequestReliefFormerLastName": ${ respondent.prior_name.last if relief['change_name'] else ""  } 
-      - "raRequestReliefOther": ${ relief['other'] } 
+      - "raRequestReliefDissolution": ${ relief["dissolution"] } 
+      - "raRequestReliefCustody": ${ relief["custody"] } 
+      - "raRequestReliefSupportOfTheChildren": ${ relief["child_support"] } 
+      - "raRequestReliefDivideMaritalPropertyAndDebts": ${ relief["divide_property"] } 
+      - "raRequestReliefAwardMaintenanceToMe": ${ relief["maintenance_to_me"] } 
+      - "raRequestReliefAwardMaintenanceToSpouse": ${ relief["maintenance_to_spouse"] } 
+      - "raRequestReliefChangeName": ${ relief["change_name"] } 
+      - "raRequestReliefFormerSuffix": ${ respondent.prior_name.name.suffix if relief['change_name'] else ""  } 
+      - "raRequestReliefFormerFirstName": ${ respondent.prior_name.name.first if relief['change_name'] else "" } 
+      - "raRequestReliefFormerMiddleName": ${ respondent.prior_name.name.last if relief['change_name'] else "" } 
+      - "raRequestReliefFormerLastName": ${ respondent.prior_name.name.last if relief['change_name'] else ""  } 
+      - "raRequestReliefOther": ${ relief["Other"] } 
       - "raRequestReliefOtherRequests1": ${ relief_other } 
       - "raDateOfNotice": ${ service.date } 
       - "raNameRow1": ${ people_served[0].name_full() } 
       - "raServiceContactInformationRow1": ${ people_served[0].address.on_one_line() } 
-      - "raNameRow2": ${ people_served[1].name_full() } 
-      - "raServiceContactInformationRow2": ${ people_served[1].address.on_one_line() } 
-      - "raNameRow3": ${ people_served[2].name_full() } 
-      - "raServiceContactInformationRow3": ${ people_served[2].address.on_one_line() } 
-      - "raNameRow4": ${ people_served[3].name_full() } 
-      - "raServiceContactInformationRow4": ${ people_served[3].address.on_one_line() } 
+      - "raNameRow2": |
+          % if len(people_served) > 1:
+          ${ people_served[1].name_full() }
+          % endif
+      - "raServiceContactInformationRow2": |
+          % if len(people_served) > 1:
+          ${ people_served[1].address.on_one_line() }
+          % endif
+      - "raNameRow3": |
+          % if len(people_served) > 2:
+          ${ people_served[2].name_full() }
+          % endif
+      - "raServiceContactInformationRow3": |
+          % if len(people_served) > 2:
+          ${ people_served[2].address.on_one_line() }
+          % endif
+      - "raNameRow4": |
+          % if len(people_served) > 3:
+          ${ people_served[3].name_full() }
+          % endif
+      - "raServiceContactInformationRow4": |
+          % if len(people_served) > 3:
+          ${ people_served[3].address.on_one_line() }
+          % endif
       - "raRespondentsAttorneyCheckbox": ${ respondent.attorney.type_of_assistance == "assistance" } 
       - "raRespondentsMissouriBarNumber": ${ respondent.attorney.bar_number } 
       - "raRespondentsAttorneyName": ${ respondent.attorney.name.text } 
@@ -218,8 +356,7 @@ attachment:
       - "raRespondentsAttorneyCity": ${ respondent.attorney.address.city } 
       - "raRespondentsAttorneyState": ${ respondent.attorney.address.state } 
       - "raRespondentsAttorneyZip": ${ respondent.attorney.address.zip } 
-      - "raRespondentsAttorneyPhone": ${ respondent.attorney.phone } 
-      - "raRespondentsAttorneyFax": ${ "" } 
+      - "raRespondentsAttorneyPhone": ${ phone_number_formatted(respondent.attorney.phone_number) } 
+      - "raRespondentsAttorneyFax": ${ respondent.attorney.fax } 
       - "raRespondentsAttorneyEmail": ${ respondent.attorney.email } 
-
 ---

@@ -1,21 +1,3 @@
-include:
-  - shared.yml
----
-id: confidential information sheet order
-mandatory: True
-code: |
-  users[0].name.first
-  other_parties[0].name.first
-  petitioner.party_type_description
-  petitioner.attorney.party_type_code
-  petitioner.gender
-  petitioner.party_type_code
-  respondent.gender
-  respondent.party_type_code
-  respondent.party_type_description
-  respondent.attorney.party_type_code
-  users[0].employer.email
-  mo_divorce_forms_download
 ---
 generic object: ALIndividual
 question: Email for ${ x.employer.name.text }
@@ -40,9 +22,6 @@ objects:
   - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, confidential_information_sheet_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
   - al_court_bundle: ALDocumentBundle.using(elements=[confidential_information_sheet_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---
-code: |
-  confidential_information_sheet_attachment.enabled = True
----
 attachment:
   name: Confidential Case Filing Information Sheet - Domestic Relations Cases
   filename: confidential_information_sheet
@@ -53,11 +32,11 @@ attachment:
   fields:
       - "case_filing_date": ${ case.filing_date } 
       - "case_county": ${ case.county } 
-      - "case_case_name": ${ case.case_name } 
+      - "case_case_name": ${ case.name } 
       - "case_type_code": ${ case.type_code } 
-      - "case_type_description": ${ case.type_description } 
-      - "PETP": ${ petitioner.attorney_involved and petitioner.type_of_assistance == "representation" } 
-      - "PET": ${ not petitioner.attorney_involved or not petitioner.type_of_assistance == "representation" } 
+      - "case_type_description": ${ case.matter_type_other if case.matter_type == "Something else" else case.matter_type } 
+      - "PETP": ${ not petitioner.attorney_involved } 
+      - "PET": ${ petitioner.attorney_involved } 
       - "PET Other": ${ "" } 
       - "P_Party Type Code": ${ "" } 
       - "P_Party Type Description": ${ "" } 
@@ -98,8 +77,8 @@ attachment:
       - "P_Attorney Name": ${ petitioner.attorney } 
       - "P_Bar ID": ${ petitioner.attorney.bar_number } 
       - "P_Attorney Party Type Code": ${ petitioner.attorney.party_type_code } 
-      - "respondent_represented_no": ${ not respondent.attorney_involved or not respondent.type_of_assistance == "representation" } 
-      - "respondent_represented_yes": ${ respondent.attorney_involved and respondent.type_of_assistance == "representation" }
+      - "respondent_represented_no": ${ not respondent.attorney_involved } 
+      - "respondent_represented_yes": ${ respondent.attorney_involved }
       - "RES Other": ${ "" } 
       - "R_Party Type Code": ${ "" } 
       - "R_Party Type Description": ${ "" } 
@@ -552,13 +531,13 @@ attachment:
           ${ "{:.0f}".format(children[9].ssn) }
           % endif
       - "children_more_than_10": ${ len(children) > 10 } 
-      - "submitted_by": ${ submitted_by.name_full() } 
-      - "submitted_by_bar_number": ${ submitted_by.bar_number } 
-      - "submitted_by_address": ${ submitted_by.address } 
-      - "submitted_by_address_zip": ${ submitted_by.address.zip } 
-      - "submitted_by_address_city": ${ submitted_by.address.city } 
-      - "submitted_by_address_state": ${ submitted_by.address.state } 
-      - "submitted_by_phone": ${ phone_number_formatted(submitted_by.phone_number) } 
-      - "submitted_by_email": ${ submitted_by.email } 
+      - "submitted_by": ${ users[0].attorney.name_full() if users[0].attorney_involved else  users[0].name_full() } 
+      - "submitted_by_bar_number": ${ users[0].attorney.bar_number } 
+      - "submitted_by_address": ${  users[0].attorney.address if users[0].attorney_involved else users[0].address } 
+      - "submitted_by_address_zip": ${ users[0].attorney.address.zip if users[0].attorney_involved else users[0].address.zip } 
+      - "submitted_by_address_city": ${ users[0].attorney.address.city if users[0].attorney_involved else users[0].address.city } 
+      - "submitted_by_address_state": ${  users[0].attorney.address.state if users[0].attorney_involved else users[0].address.state } 
+      - "submitted_by_phone": ${ phone_number_formatted(users[0].attorney.phone_number if users[0].attorney_involved else users[0].phone_number) } 
+      - "submitted_by_email": ${ users[0].attorney.email if users[0].attorney_involved else users[0].email } 
 
 

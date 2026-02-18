@@ -1,39 +1,4 @@
 ---
-include:
-  - shared.yml
----
-id: certificate of dissolution order
-mandatory: True
-code: |
-  users[0].name.first
-  if users[0].has_prior_name:
-    users[0].prior_name.name.first
-  users[0].address.address
-  users[0].ssn
-  users[0].birthdate
-  users[0].race
-  users[0].education_elementary
-  users[0].previously_married
-  other_parties[0].name.first
-  if other_parties[0].has_prior_name:
-    other_parties[0].prior_name.name.first
-  other_parties[0].address.address
-  other_parties[0].ssn
-  other_parties[0].birthdate
-  other_parties[0].race
-  other_parties[0].education_elementary
-  other_parties[0].previously_married
-  marriage_info
-  marriage.separation_date
-  petitioner.attorney_involved
-  case.judgment_date
-  case.county
-  child_support
-  children.gather()
-  
-  
-  mo_divorce_forms_download
----
 code: |
   marriage.dissolution_type = "Dissolution"
 ---
@@ -63,15 +28,6 @@ fields:
 id: Certificate of dissolution of marriage object
 objects:
   - certificate_of_dissolution_attachment: ALDocument.using(title="Certificate of dissolution of marriage", filename="certificate_of_dissolution", has_addendum=False, )
----
-id: Certificate of dissolution of marriage enabled
-code: |
-  certificate_of_dissolution_attachment.enabled = True
----
-# Should be only used in interviews run from certificate_of_dissolution.yml, in an interview from main, the version from shared.yml will be lower because the block including certificate_of_dissolution.yml is above it
-objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, certificate_of_dissolution_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[certificate_of_dissolution_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---
 id: Certificate of dissolution of marriage attachment
 attachment:
@@ -105,7 +61,7 @@ attachment:
       - "users2_birthdate": ${ format_date(other_parties[0].birthdate, format='M/d/yyyy') } 
       - "users2_birthplace": ${ other_parties[0].birthplace } 
       - "marriage_address_city": ${ marriage.address.city } 
-      - "marriage_address_county": ${ marriage.address.county } 
+      - "marriage_address_county": ${ nice_county_name(marriage.address) } 
       - "marriage_address_state": ${ marriage.address.state } 
       - "marriage_date": ${ format_date(marriage.recorded_date, format='M/d/yyyy') } 
       - "is_users1_petitioner": ${ case.filed in ["user0_filed","not_filed"] } 

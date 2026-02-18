@@ -1,7 +1,4 @@
 ---
-include:
-  - shared.yml
----
 mandatory: True
 code: |
   users[0].name.first
@@ -38,7 +35,7 @@ attachment:
   editable: False
   fields:
     - "circuit_court": ${ case.circuit } 
-    - "county_name": ${ case.county } 
+    - "county_name": ${ nice_county_name(case) } 
     - "user1_name_full": ${ users[0].name_full() } 
     - "case_number": ${ case.docket_number } 
     - "case_type": ${ case.matter_type } 

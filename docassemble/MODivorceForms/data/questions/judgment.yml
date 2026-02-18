@@ -1,82 +1,4 @@
 ---
-include:
-  - shared.yml
----
-id: judgment order
-mandatory: True
-code: |
-  users[0].name.first
-  other_parties[0].name.first
-  petitioner.name.first
-  respondent.name.first
-  case.county
-  mo_divorce_forms_download
----
-comment: |
-  Only need to complete caption - rest of 
-  
-  if users[0].has_prior_name:
-    users[0].prior_name.name.first
-  users[0].address.address
-  users[0].ssn
-  users[0].phone_number
-  users[0].attorney_involved
-  users[0].resident_for_90_days
-  other_parties[0].name.first
-  if other_parties[0].has_prior_name:
-    other_parties[0].prior_name.name.first
-  other_parties[0].address.address
-  other_parties[0].ssn
-  other_parties[0].phone_number
-  other_parties[0].attorney_involved
-  other_parties[0].resident_for_90_days
-  marriage.address.county
-  marriage.address.state
-  marriage.separation_date
-  children.gather()
-  case.county
-  if guardian_ad_litem.exists:
-    guardian_ad_litem.name.first
-    guardian_ad_litem.address
-    guardian_ad_litem.phone_number
- 
-  petitioner.appears
-  respondent.appears
-  respondent.active_duty
-  if guardian_ad_litem.exists:
-    guardian_ad_litem.appears
-  third_party_appears
-  petitioner.submitted_cause
-  if legal_custody == "Sole":
-    legal_custody_sole_explanation
-  elif legal_custody == "Third Party":
-    legal_custody_other.name.first
-  if physical_custody == "Sole" and visitation:
-    visitation_supervisor.name.first
-  elif physical_custody == "Third Party":
-    physical_custody_other.name.first
-  if communications["third_party"]:
-    communications_other.name.first
-  child_custody_jurisdiction
-  child_support_additional_info
-  child_support_jurisdiction
-  legal_custody_jurisdiction_additional_info
-  if maintenance_to_petitioner == "ordered_to_pay":
-    maintenance_to_petitioner_amount
-    maintenance_to_petitioner_modifiable
-  if maintenance_to_respondent == "ordered_to_pay":
-    maintenance_to_respondent_amount
-    maintenance_to_respondent_modifiable
-  if maintenance_to_petitioner or maintenance_to_respondent: 
-    maintenance_income_withholding
-  separation_agreement
-  court_costs
-  other_orders_property.exists
-  other_orders.exists
-  attorney_fees
-  petitioner.name_change
-  respondent.name_change
----
 id: Court Appearance
 question: Court Appearance
 generic object: ALIndividual
@@ -276,11 +198,6 @@ id: Judgment and Decree of Dissolution of Marriage enabled
 code: |
   judgment_attachment.enabled = True
 ---
-# Should be only used in interviews run from judgment.yml, in an interview from main, the version from shared.yml will be lower because the block including judgment.yml is above it
-objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, judgment_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[judgment_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
----
 id: Judgment and Decree of Dissolution of Marriage attachment
 attachment:
   name: Judgment and Decree of Dissolution of Marriage
@@ -306,7 +223,7 @@ attachment:
       - "petitioner_resident_for_90 days": ${ petitioner.resident_for_90_days } 
       - "respondent_resident_for_90 days": ${ respondent.resident_for_90_days } 
       - "marriage_date": ${ format_date(marriage.recorded_date, format='M/d/yyyy') } 
-      - "marriage_address_county": ${ marriage.address.county } 
+      - "marriage_address_county": ${ nice_county_name(marriage.address) } 
       - "marriage_address_state": ${ state_name(marriage.address.state) } 
       - "marriage_date_last_resided": ${ format_date(marriage.separation_date, format='M/d/yyyy') } 
       - "petitioner_pregnant": ${ True } 

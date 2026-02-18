@@ -1,7 +1,7 @@
 modules:
   - .function_import
 ---
-mandatory: True
+mandatory: False
 code: |
   case.filed
   exchanges.gather()
@@ -13,9 +13,6 @@ code: |
   holidays_review
   other_holidays.gather()
   mo_divorce_forms_download
----
-include:
-  - shared.yml
 ---
 objects: 
   - exchanges: DAList.using(object_type=DAObject,there_are_any=True,complete_attribute="complete")
@@ -63,8 +60,6 @@ fields:
       - "Every other week, exchange on Monday": every_other_week_monday
       - "Every other week, exchange on Saturday": every_other_week_saturday
       - "2-2-3": two_two_three
-      - "2-2-5-5": two_two_five_five
-      - "3-4-4-3": three_four_four_three
       - "Every weekend": every_weekend
       - "Every other weekend": every_other_weekend
     js show if: |
@@ -205,7 +200,7 @@ validation code: |
   if exchanges[0].temp_starting_parent == "users0":
     exchanges[0].starting_parent = users[0].name.full()
     exchanges[0].exchange_parent = other_parties[0].name.full()
-  elif exchanges[0].starting_parent == "other_parties0":
+  elif exchanges[0].temp_starting_parent == "other_parties0":
     exchanges[0].starting_parent = other_parties[0].name.full()
     exchanges[0].exchange_parent = users[0].name.full()
 ---
@@ -701,7 +696,7 @@ data from code:
       exchange_parent: | 
         other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       exchange_date: |
-        8
+        7
       exchange_time: |
         "17:00:00"
       exchange_method: |
@@ -715,7 +710,7 @@ data from code:
     - starting_parent: |
         other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
-        8
+        7
       exchange_parent: |
         users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       exchange_date: |
@@ -745,7 +740,7 @@ data from code:
       exchange_parent: | 
         other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       exchange_date: |
-        1
+        0
       exchange_time: |
         default_exchange_time
       exchange_method: |
@@ -759,7 +754,7 @@ data from code:
     - starting_parent: |
         other_parties[0].name.full() if starting_parent == "users0" else users[0].name.full()
       starting_date: |
-        1
+        0
       exchange_parent: |
         users[0].name.full() if starting_parent == "users0" else other_parties[0].name.full()
       exchange_date: |
@@ -775,9 +770,21 @@ data from code:
       exchange_time2: |
         None
 ---
+id: calculates visitation nights
+generic object: ALIndividual
+code: |
+  x.visitation_nights_default = int(visitation_dictionary[x.name.full()]/14*365)
+
+---
+id: biweekly_schedule_review
 question: Weekday and Weekend Exchange Schedule
 subquestion: |
   Enter the parent who is receiving custody and the specified time for each exchange.
+
+  Visitation nights based on this schedule (may be changed later)
+  
+   - Visitation nights for ${ users[0].name.full() }: ${ users[0].visitation_nights_default }
+   - Visitation nights for ${ other_parties[0].name.full() }: ${ other_parties[0].visitation_nights_default }
 fields:
   - note: |
       **Week 1**
@@ -834,6 +841,9 @@ code: |
 ---
 reconsider: starting_weekly_list
 code: |
+  visitation_dictionary = dict()
+  visitation_dictionary[exchanges[0].starting_parent] = 0
+  visitation_dictionary[exchanges[0].exchange_parent] = 0
   for exchange in exchanges.complete_elements():
     if exchange.starting_date == exchange.exchange_date:
       if exchange.exchange_method == "Drop off":
@@ -842,6 +852,11 @@ code: |
           temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
       elif exchange.exchange_method == "Pick up":
         temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location) + "\n"
+      if starting_weekly_list[int(exchange.exchange_date)] == "":
+        visitation_dictionary[exchange.exchange_parent] += 1
+      else:
+        visitation_dictionary[exchange.exchange_parent] += 1
+        visitation_dictionary[exchange.starting_parent] = visitation_dictionary[exchange.starting_parent] - 1
       starting_weekly_list[int(exchange.exchange_date)] += temp_description
     elif int(exchange.starting_date) == 0:
       if exchange.instanceName == "exchanges[0]":
@@ -850,26 +865,39 @@ code: |
         starting_date = int(exchange.starting_date)+1
       for date in range(starting_date,(int(exchange.exchange_date))):
         starting_weekly_list[date] = exchange.starting_parent
+        visitation_dictionary[exchange.starting_parent] += 1
       if exchange.exchange_method == "Drop off":
         temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location)  + "\n"
         if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
           temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
       elif exchange.exchange_method == "Pick up":
         temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location) + "\n"
+      if starting_weekly_list[int(exchange.exchange_date)] == "":
+        visitation_dictionary[exchange.exchange_parent] += 1
+      else:
+        visitation_dictionary[exchange.exchange_parent] += 1
+        visitation_dictionary[exchange.starting_parent] = visitation_dictionary[exchange.starting_parent] - 1
       starting_weekly_list[int(exchange.exchange_date)] += temp_description
     else:
       for date in range(int(exchange.starting_date) + 1,(int(exchange.exchange_date))):
         starting_weekly_list[date] = exchange.starting_parent
+        visitation_dictionary[exchange.starting_parent] += 1
       if exchange.exchange_method == "Drop off":
         temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location)  + "\n"
         if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
           temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
       elif exchange.exchange_method == "Pick up":
         temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location) + "\n"
+      if starting_weekly_list[int(exchange.exchange_date)] == "":
+        visitation_dictionary[exchange.exchange_parent] += 1
+      else:
+        visitation_dictionary[exchange.exchange_parent] += 1
+        visitation_dictionary[exchange.starting_parent] = visitation_dictionary[exchange.starting_parent] - 1
       starting_weekly_list[int(exchange.exchange_date)] += temp_description
   if exchanges.gathered and int(exchanges[-1].exchange_date) < 14:
     for date_index in range(int(exchanges[-1].exchange_date) + 1,14):
       starting_weekly_list[date_index] = exchanges[-1].exchange_parent
+      visitation_dictionary[exchanges[-1].exchange_parent] += 1
   biweekly_schedule = starting_weekly_list
 ---
 id: answer enabled block for main interview

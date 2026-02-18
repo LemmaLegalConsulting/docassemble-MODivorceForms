@@ -1,65 +1,7 @@
 ---
-include:
-  - shared.yml
----
-id: income statement order
-mandatory: True
-code: |
-  users[0].name.first
-  other_parties[0].name.first
-  petitioner.name.first
-  if petitioner.address.state == "MO":
-    petitioner.address.county
-  respondent.name.first
-  if respondent.address.state == "MO":
-    respondent.address.county
-  petitioner.jobs.gather()
-  petitioner.benefits.gather()
-  petitioner.has_self_employment_income
-  petitioner.other_incomes.gather()
-  petitioner.maintenance_other_received
-  petitioner.other_child_support_received
-  petitioner.other_children
-  petitioner.other_child_support_paid
-  petitioner.maintenance_other_paid
-  petitioner.expenses.gather()
-  petitioner.extraordinary_medical_costs.gather()
-  petitioner.extraordinary_childrearing_costs.gather()
-  petitioner.health_insurance_costs
-  petitioner.work_childcare_expenses
-  maintenance_to_respondent_amount
-  maintenance_to_petitioner_amount
-  respondent.jobs.gather()
-  respondent.benefits.gather()
-  respondent.has_self_employment_income
-  respondent.other_incomes.gather()
-  respondent.maintenance_other_received
-  respondent.other_child_support_received
-  respondent.other_children
-  respondent.other_child_support_paid
-  respondent.maintenance_other_paid
-  respondent.expenses.gather()
-  respondent.extraordinary_medical_costs.gather()
-  respondent.extraordinary_childrearing_costs.gather()
-  respondent.health_insurance_costs
-  respondent.work_childcare_expenses
-  petitioner.jobs.total(times_per_year = 12)
-  respondent.self_employment_income
-  test_screen
-  mo_divorce_forms_download
----
 id: Statement of Income and Expenses object
 objects:
   - income_statement_attachment: ALDocument.using(title="Statement of Income and Expenses", filename="income_statement", has_addendum=False, )
----
-id: Statement of Income and Expenses enabled
-code: |
-  income_statement_attachment.enabled = True
----
-# Should be only used in interviews run from income_statement.yml, in an interview from main, the version from shared.yml will be lower because the block including income_statement is above it
-objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[income_statement_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[income_statement_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---
 id: Statement of Income and Expenses attachment
 attachment:
@@ -79,81 +21,99 @@ attachment:
       - "respondentsMiddleName": ${ respondent.name.middle } 
       - "respondentsLastName": ${ respondent.name.last } 
       - "respondentsSuffixJrSrIII": ${ respondent.name.suffix } 
-      - "ie1p": ${ "Unknown" if petitioner.jobs.there_are_any == None else "{:.2f}".format(petitioner.jobs.total(times_per_year = 12)) } 
-      - "ie1r": ${ "Unknown" if respondent.jobs.there_are_any == None else "{:.2f}".format(respondent.jobs.total(times_per_year = 12)) } 
-      - "ie2p": ${ "Unknown" if petitioner.has_self_employment_income == None else "{:.2f}".format(petitioner.self_employment_income) } 
-      - "ie2r": ${ "Unknown" if respondent.has_self_employment_income == None else"{:.2f}".format(respondent.self_employment_income) } 
-      - "ie3r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['social security'], times_per_year=12)) } 
-      - "ie3p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['social security'], times_per_year=12)) } 
-      - "ie4p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['retirement'], times_per_year=12)) } 
-      - "ie4r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['retirement'], times_per_year=12)) } 
-      - "ie5p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['pension'], times_per_year=12)) } 
-      - "ie5r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['pension'], times_per_year=12)) } 
-      - "ie6p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['interest'], times_per_year=12)) } 
-      - "ie6r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['interest'], times_per_year=12)) } 
-      - "ie7p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['trust'], times_per_year=12)) } 
-      - "ie7r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['trust'], times_per_year=12)) } 
-      - "ie8p": ${ "{:.2f}".format(petitioner.other_incomes.total(source=['dividends'], times_per_year=12)) } 
-      - "ie8r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['dividends'], times_per_year=12)) } 
-      - "ie9p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['unemployment income'], times_per_year=12)) } 
-      - "ie9r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['unemployment income'], times_per_year=12)) } 
-      - "ie10r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['severance'], times_per_year=12)) } 
-      - "ie10p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['severance'], times_per_year=12)) } 
-      - "ie11p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['worker comp'], times_per_year=12)) } 
-      - "ie11r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['worker comp'], times_per_year=12)) } 
-      - "ie12p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['disability_insurance'], times_per_year=12)) } 
-      - "ie12r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['disability_insurance'], times_per_year=12)) } 
-      - "ie13r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['veteran'], times_per_year=12)) } 
-      - "ie13p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['veteran'], times_per_year=12)) } 
-      - "ie14p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "{:.2f}".format(petitioner.other_incomes.total(source=['military'], times_per_year=12)) } 
-      - "ie14r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "{:.2f}".format(respondent.other_incomes.total(source=['military'], times_per_year=12)) } 
-      - "line1p": ${  "{:.2f}".format(float(petitioner.jobs.total(times_per_year=12)) + petitioner.self_employment_income + float(petitioner.other_incomes.total(times_per_year = 12))) } 
-      - "line1r": ${  "{:.2f}".format(float(respondent.jobs.total(times_per_year=12)) + respondent.self_employment_income + float(respondent.other_incomes.total(times_per_year = 12))) } 
-      - "ie16p": ${ "Unknown" if petitioner.benefits.there_are_any == None else "{:.2f}".format(petitioner.benefits.total(source=['ssi'], times_per_year=12)) } 
-      - "ie16r": ${ "Unknown" if respondent.benefits.there_are_any == None else "{:.2f}".format(respondent.benefits.total(source=['ssi'], times_per_year=12)) } 
-      - "ie17p": ${ "Unknown" if petitioner.benefits.there_are_any == None else "{:.2f}".format(petitioner.benefits.total(source=['tanf'], times_per_year=12)) } 
-      - "ie17r": ${ "Unknown" if respondent.benefits.there_are_any == None else "{:.2f}".format(respondent.benefits.total(source=['tanf'], times_per_year=12)) } 
-      - "ie18p": ${ "Unknown" if petitioner.benefits.there_are_any == None else "{:.2f}".format(petitioner.benefits.total(source=['medicaid'], times_per_year=12)) } 
-      - "ie18r": ${ "Unknown" if respondent.benefits.there_are_any == None else "{:.2f}".format(respondent.benefits.total(source=['medicaid'], times_per_year=12)) } 
-      - "ie19p": ${ "Unknown" if petitioner.benefits.there_are_any == None else "{:.2f}".format(petitioner.benefits.total(source=['food_stamps'], times_per_year=12)) } 
-      - "ie19r": ${ "Unknown" if respondent.benefits.there_are_any == None else "{:.2f}".format(respondent.benefits.total(source=['food_stamps'], times_per_year=12)) } 
+      - "ie1p": ${ "Unknown" if petitioner.jobs.there_are_any == None else "$" + thousands(petitioner.jobs.total(times_per_year = 12), show_decimals=True) } 
+      - "ie1r": ${ "Unknown" if respondent.jobs.there_are_any == None else "$" + thousands(respondent.jobs.total(times_per_year = 12), show_decimals=True) } 
+      - "ie2p": ${ "Unknown" if petitioner.has_self_employment_income == None else "$" + thousands(petitioner.self_employment_income, show_decimals=True) } 
+      - "ie2r": ${ "Unknown" if respondent.has_self_employment_income == None else "$" + thousands(respondent.self_employment_income, show_decimals=True) } 
+      - "ie3r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "$" + thousands(respondent.other_incomes.total(source=['social security'], times_per_year=12), show_decimals=True) } 
+      - "ie3p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "$" + thousands(petitioner.other_incomes.total(source=['social security'], times_per_year=12), show_decimals=True) } 
+      - "ie4p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "$" + thousands(petitioner.other_incomes.total(source=['retirement'], times_per_year=12), show_decimals=True) } 
+      - "ie4r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "$" + thousands(respondent.other_incomes.total(source=['retirement'], times_per_year=12), show_decimals=True) } 
+      - "ie5p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "$" + thousands(petitioner.other_incomes.total(source=['pension'], times_per_year=12), show_decimals=True) } 
+      - "ie5r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "$" + thousands(respondent.other_incomes.total(source=['pension'], times_per_year=12), show_decimals=True) } 
+      - "ie6p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "$" + thousands(petitioner.other_incomes.total(source=['interest'], times_per_year=12), show_decimals=True) } 
+      - "ie6r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "$" + thousands(respondent.other_incomes.total(source=['interest'], times_per_year=12), show_decimals=True) } 
+      - "ie7p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "$" + thousands(petitioner.other_incomes.total(source=['trust'], times_per_year=12), show_decimals=True) } 
+      - "ie7r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "$" + thousands(respondent.other_incomes.total(source=['trust'], times_per_year=12), show_decimals=True) } 
+      - "ie8p": ${ "$" + thousands(petitioner.other_incomes.total(source=['dividends'], times_per_year=12), show_decimals=True) } 
+      - "ie8r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "$" + thousands(respondent.other_incomes.total(source=['dividends'], times_per_year=12), show_decimals=True) } 
+      - "ie9p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "$" + thousands(petitioner.other_incomes.total(source=['unemployment income'], times_per_year=12), show_decimals=True) } 
+      - "ie9r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "$" + thousands(respondent.other_incomes.total(source=['unemployment income'], times_per_year=12), show_decimals=True) } 
+      - "ie10r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "$" + thousands(respondent.other_incomes.total(source=['severance'], times_per_year=12), show_decimals=True) } 
+      - "ie10p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "$" + thousands(petitioner.other_incomes.total(source=['severance'], times_per_year=12), show_decimals=True) } 
+      - "ie11p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "$" + thousands(petitioner.other_incomes.total(source=['worker comp'], times_per_year=12), show_decimals=True) } 
+      - "ie11r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "$" + thousands(respondent.other_incomes.total(source=['worker comp'], times_per_year=12), show_decimals=True) } 
+      - "ie12p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "$" + thousands(petitioner.other_incomes.total(source=['disability_insurance'], times_per_year=12), show_decimals=True) } 
+      - "ie12r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "$" + thousands(respondent.other_incomes.total(source=['disability_insurance'], times_per_year=12), show_decimals=True) } 
+      - "ie13r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "$" + thousands(respondent.other_incomes.total(source=['veteran'], times_per_year=12), show_decimals=True) } 
+      - "ie13p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "$" + thousands(petitioner.other_incomes.total(source=['veteran'], times_per_year=12), show_decimals=True) } 
+      - "ie14p": ${ "Unknown" if petitioner.other_incomes.there_are_any == None else "$" + thousands(petitioner.other_incomes.total(source=['military'], times_per_year=12), show_decimals=True) } 
+      - "ie14r": ${ "Unknown" if respondent.other_incomes.there_are_any == None else "$" + thousands(respondent.other_incomes.total(source=['military'], times_per_year=12), show_decimals=True) } 
+      - "line1p": ${  "$" + thousands(float(petitioner.jobs.total(times_per_year=12)) + petitioner.self_employment_income + float(petitioner.other_incomes.total(times_per_year = 12)), show_decimals=True) } 
+      - "line1r": ${  "$" + thousands(float(respondent.jobs.total(times_per_year=12)) + respondent.self_employment_income + float(respondent.other_incomes.total(times_per_year = 12)), show_decimals=True) } 
+      - "ie16p": ${ "Unknown" if petitioner.benefits.there_are_any == None else "$" + thousands(petitioner.benefits.total(source=['ssi'], times_per_year=12), show_decimals=True) } 
+      - "ie16r": ${ "Unknown" if respondent.benefits.there_are_any == None else "$" + thousands(respondent.benefits.total(source=['ssi'], times_per_year=12), show_decimals=True) } 
+      - "ie17p": ${ "Unknown" if petitioner.benefits.there_are_any == None else "$" + thousands(petitioner.benefits.total(source=['tanf'], times_per_year=12), show_decimals=True) } 
+      - "ie17r": ${ "Unknown" if respondent.benefits.there_are_any == None else "$" + thousands(respondent.benefits.total(source=['tanf'], times_per_year=12), show_decimals=True) } 
+      - "ie18p": ${ "Unknown" if petitioner.benefits.there_are_any == None else "$" + thousands(petitioner.benefits.total(source=['medicaid'], times_per_year=12), show_decimals=True) } 
+      - "ie18r": ${ "Unknown" if respondent.benefits.there_are_any == None else "$" + thousands(respondent.benefits.total(source=['medicaid'], times_per_year=12), show_decimals=True) } 
+      - "ie19p": ${ "Unknown" if petitioner.benefits.there_are_any == None else "$" + thousands(petitioner.benefits.total(source=['food_stamps'], times_per_year=12), show_decimals=True) } 
+      - "ie19r": ${ "Unknown" if respondent.benefits.there_are_any == None else "$" + thousands(respondent.benefits.total(source=['food_stamps'], times_per_year=12), show_decimals=True) } 
       - "line2c1p": ${ petitioner.other_children } 
       - "line2c1r": ${ respondent.other_children } 
-      - "line2c3p": ${ "{:.2f}".format(petitioner.other_child_support_received) } 
-      - "line2c3r": ${ "{:.2f}".format(respondent.other_child_support_received) } 
-      - "maintenanceP1": ${ "{:.2f}".format(petitioner.maintenance_received) } 
-      - "maintenanceR1": ${ "{:.2f}".format(respondent.maintenance_received) } 
-      - "maintenanceOtherP": ${ "{:.2f}".format(petitioner.maintenance_other_received) } 
-      - "maintenanceOtherR": ${ "{:.2f}".format(respondent.maintenance_other_received) } 
-      - "line1aP": ${ "{:.2f}".format(petitioner.maintenance_received + petitioner.maintenance_other_received) } 
-      - "line1aR": ${ "{:.2f}".format(respondent.maintenance_received + respondent.maintenance_other_received) } 
-      - "line2aP": ${ "{:.2f}".format(petitioner.other_child_support_paid) } 
-      - "line2aR": ${ "{:.2f}".format(respondent.other_child_support_paid) } 
-      - "maintenanceR2": ${ "{:.2f}".format(respondent.maintenance_paid) } 
-      - "maintenanceP2": ${ "{:.2f}".format(petitioner.maintenance_paid) } 
-      - "maintenanceOtherPaidP": ${ "{:.2f}".format(petitioner.maintenance_other_paid) } 
-      - "maintenanceOtherPaidR": ${ "{:.2f}".format(respondent.maintenance_other_paid) } 
-      - "line2bP": ${ "{:.2f}".format(petitioner.maintenance_paid + petitioner.maintenance_other_paid) } 
-      - "line2bR": ${ "{:.2f}".format(respondent.maintenance_paid + respondent.maintenance_other_paid) } 
-      - "line6abP": ${ "{:.2f}".format(petitioner.work_childcare_expenses) } 
-      - "line6abR": ${ "{:.2f}".format(respondent.work_childcare_expenses) } 
-      - "line6cP": ${ "{:.2f}".format(petitioner.health_insurance_costs) } 
-      - "line6cR": ${ "{:.2f}".format(respondent.health_insurance_costs) } 
-      - "line6dP": ${ "{:.2f}".format(petitioner.extraordinary_medical_costs.total(times_per_year = 12)) } 
-      - "line6dR": ${ "{:.2f}".format(respondent.extraordinary_medical_costs.total(times_per_year = 12)) } 
-      - "line6eP": ${ "{:.2f}".format(sum([included_cost.total(times_per_year=12) for included_cost in petitioner.extraordinary_childrearing_costs if included_cost.included_in_form_14])) }
-      - "line6eR": ${ "{:.2f}".format(sum([included_cost.total(times_per_year=12) for included_cost in respondent.extraordinary_childrearing_costs if included_cost.included_in_form_14])) }
-      - "ieOtherExpensesP": ${ "{:.2f}".format(petitioner.expenses.total(times_per_year = 12)) } 
-      - "ieOtherExpensesR": ${ "{:.2f}".format(respondent.expenses.total(times_per_year = 12)) } 
-      - "ieTotalMonthlyExpensesR": ${ "{:.2f}".format(respondent.other_child_support_paid + respondent.maintenance_paid + respondent.maintenance_other_paid + respondent.work_childcare_expenses + respondent.health_insurance_costs + float(respondent.extraordinary_medical_costs.total(times_per_year = 12)) + float(sum([included_cost.total(times_per_year=12) for included_cost in respondent.extraordinary_childrearing_costs if included_cost.included_in_form_14])) + float(respondent.expenses.total(times_per_year = 12))) } 
-      - "ieTotalMonthlyExpensesP": ${ "{:.2f}".format(petitioner.other_child_support_paid + petitioner.maintenance_paid + petitioner.maintenance_other_paid + petitioner.work_childcare_expenses + petitioner.health_insurance_costs + float(petitioner.extraordinary_medical_costs.total(times_per_year = 12)) + float(sum([included_cost.total(times_per_year=12) for included_cost in petitioner.extraordinary_childrearing_costs if included_cost.included_in_form_14])) + float(petitioner.expenses.total(times_per_year = 12))) } 
+      - "line2c3p": ${ "$" + thousands(petitioner.other_child_support_received, show_decimals=True) } 
+      - "line2c3r": ${ "$" + thousands(respondent.other_child_support_received, show_decimals=True) } 
+      - "maintenanceP1": ${ "$" + thousands(petitioner.maintenance_received, show_decimals=True) } 
+      - "maintenanceR1": ${ "$" + thousands(respondent.maintenance_received, show_decimals=True) } 
+      - "maintenanceOtherP": ${ "$" + thousands(petitioner.maintenance_other_received, show_decimals=True) } 
+      - "maintenanceOtherR": ${ "$" + thousands(respondent.maintenance_other_received, show_decimals=True) } 
+      - "line1aP": ${ "$" + thousands(petitioner.maintenance_received + petitioner.maintenance_other_received, show_decimals=True) } 
+      - "line1aR": ${ "$" + thousands(respondent.maintenance_received + respondent.maintenance_other_received, show_decimals=True) } 
+      - "line2aP": ${ "$" + thousands(petitioner.other_child_support_paid, show_decimals=True) } 
+      - "line2aR": ${ "$" + thousands(respondent.other_child_support_paid, show_decimals=True) } 
+      - "maintenanceR2": ${ "$" + thousands(respondent.maintenance_paid, show_decimals=True) } 
+      - "maintenanceP2": ${ "$" + thousands(petitioner.maintenance_paid, show_decimals=True) } 
+      - "maintenanceOtherPaidP": ${ "$" + thousands(petitioner.maintenance_other_paid, show_decimals=True) } 
+      - "maintenanceOtherPaidR": ${ "$" + thousands(respondent.maintenance_other_paid, show_decimals=True) } 
+      - "line2bP": ${ "$" + thousands(petitioner.maintenance_paid + petitioner.maintenance_other_paid, show_decimals=True) } 
+      - "line2bR": ${ "$" + thousands(respondent.maintenance_paid + respondent.maintenance_other_paid, show_decimals=True) } 
+      - "line6abP": ${ "$" + thousands(petitioner.work_childcare_expenses, show_decimals=True) } 
+      - "line6abR": ${ "$" + thousands(respondent.work_childcare_expenses, show_decimals=True) } 
+      - "line6cP": ${ "$" + thousands(petitioner.health_insurance_costs, show_decimals=True) } 
+      - "line6cR": ${ "$" + thousands(respondent.health_insurance_costs, show_decimals=True) } 
+      - "line6dP": ${ "$" + thousands(petitioner.extraordinary_medical_costs.total(times_per_year = 12), show_decimals=True) } 
+      - "line6dR": ${ "$" + thousands(respondent.extraordinary_medical_costs.total(times_per_year = 12), show_decimals=True) } 
+      - "line6eP": ${ "$" + thousands(sum([included_cost.total(times_per_year=12) for included_cost in petitioner.extraordinary_childrearing_costs if included_cost.included_in_form_14])) }
+      - "line6eR": ${ "$" + thousands(sum([included_cost.total(times_per_year=12) for included_cost in respondent.extraordinary_childrearing_costs if included_cost.included_in_form_14])) }
+      - "ieOtherExpensesP": ${ "$" + thousands(petitioner.expenses.total(times_per_year = 12), show_decimals=True) } 
+      - "ieOtherExpensesR": ${ "$" + thousands(respondent.expenses.total(times_per_year = 12), show_decimals=True) } 
+      - "ieTotalMonthlyExpensesR": ${ "$" + thousands(respondent.other_child_support_paid + respondent.maintenance_paid + respondent.maintenance_other_paid + respondent.work_childcare_expenses + respondent.health_insurance_costs + float(respondent.extraordinary_medical_costs.total(times_per_year = 12)) + float(sum([included_cost.total(times_per_year=12) for included_cost in respondent.extraordinary_childrearing_costs if included_cost.included_in_form_14])) + float(respondent.expenses.total(times_per_year = 12)), show_decimals=True) } 
+      - "ieTotalMonthlyExpensesP": ${ "$" + thousands(petitioner.other_child_support_paid + petitioner.maintenance_paid + petitioner.maintenance_other_paid + petitioner.work_childcare_expenses + petitioner.health_insurance_costs + float(petitioner.extraordinary_medical_costs.total(times_per_year = 12)) + float(sum([included_cost.total(times_per_year=12) for included_cost in petitioner.extraordinary_childrearing_costs if included_cost.included_in_form_14])) + float(petitioner.expenses.total(times_per_year = 12)), show_decimals=True) } 
       - "ieDateOfNotice": ${ service.date } 
       - "ieNameRow1": ${ people_served[0].name_full() } 
       - "ieServiceContactInformationRow1": ${ people_served[0].address.on_one_line() } 
-      - "ieNameRow2": ${ people_served[1].name_full() } 
-      - "ieServiceContactInformationRow2": ${ people_served[1].address.on_one_line() } 
-      - "ieNameRow3": ${ people_served[2].name_full() } 
-      - "ieServiceContactInformationRow3": ${ people_served[2].address.on_one_line() } 
-      - "ieNameRow4": ${ people_served[3].name_full() } 
-      - "ieServiceContactInformationRow4": ${ people_served[3].address.on_one_line() } 
+      - "ieNameRow2": |
+          % if len(people_served) > 1:
+          ${ people_served[1].name_full() } 
+          % endif
+      - "ieServiceContactInformationRow2": |
+          % if len(people_served) > 1:
+          ${ people_served[1].address.on_one_line() } 
+          % endif
+      - "ieNameRow3": |
+          % if len(people_served) > 1:
+          ${ people_served[2].name_full() } 
+          % endif
+      - "ieServiceContactInformationRow3": |
+          % if len(people_served) > 1:
+          ${ people_served[2].address.on_one_line() } 
+          % endif
+      - "ieNameRow4": |
+          % if len(people_served) > 1:
+          ${ people_served[3].name_full() } 
+          % endif
+      - "ieServiceContactInformationRow4": |
+          % if len(people_served) > 1:
+          ${ people_served[3].address.on_one_line() } 
+          % endif
 ---
