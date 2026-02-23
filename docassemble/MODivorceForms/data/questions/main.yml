@@ -834,7 +834,9 @@ fields:
     js show if:   |
       val("pregnant") === true 
 validation code: |
-  if minor_children or minor_children_before_marriage:
+  if not minor_children:
+    minor_children_before_marriage = False
+  if minor_children:
     children.there_are_any = True
   else:
     children.there_are_any = False
