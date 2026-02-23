@@ -1550,6 +1550,14 @@ validation code: |
   else:
     relief['child_support'] = True
 ---
+id: var_doc_dict child_support
+variable name: var_doc_dict["child support"]
+data:
+  - petition_attachment
+  - parenting_plan_attachment
+  - certificate_of_dissolution_attachment
+---
+id: child support options
 code: |
   temp_child_support_choices = list()
   temp_child_support_choices.append({"petitioner":petitioner.name_full()})  
@@ -1777,6 +1785,13 @@ fields:
     show if:
       variable: pay_work_childcare_expenses
       is: pay_percentage
+---
+variable name: var_doc_dict['pay_work_childcare_expenses']
+data:
+  - form_14_attachment
+  - income_statement_attachment
+  - petition_attachment
+  - parenting_plan_attachment
 ---
 id: pay_work_childcare_expenses
 comment: |

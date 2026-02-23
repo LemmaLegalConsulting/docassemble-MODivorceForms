@@ -1,27 +1,17 @@
 modules:
   - .function_import
 ---
-mandatory: False
-code: |
-  case.filed
-  exchanges.gather()
-  biweekly_schedule_review
-  if not holidays_default:
-    for key in holidays.keys():
-      if holidays[key]['different']:
-        holidays[key]['even_years']
-  holidays_review
-  other_holidays.gather()
-  mo_divorce_forms_download
----
+id: exchanges object
 objects: 
   - exchanges: DAList.using(object_type=DAObject,there_are_any=True,complete_attribute="complete")
 ---
+id: exchanges complete for first item
 code: |
   exchanges[0].starting_date = "0"
   exchanges[0].information
   exchanges[0].complete = True
 ---
+id: exchanges complete except for first item
 code: |
   exchanges[i].starting_date = exchanges[i-1].exchange_date
   exchanges[i].starting_parent = exchanges[i-1].exchange_parent
@@ -29,6 +19,7 @@ code: |
   exchanges[i].information
   exchanges[i].complete = True
 ---
+id: exchanges there is another
 question: Do you want to add another exchange?
 subquestion: |
   % if float(exchanges.complete_elements()[-1].exchange_date) < 13: 
@@ -124,6 +115,7 @@ validation code: |
   else:
     exchange_parent = "users0"
 ---
+id: schedule intro
 question: Make your own schedule
 subquestion: |
   Each exchange should be written on the Weekend and Weekday Exchange Schedule. The parents
@@ -250,6 +242,7 @@ fields:
 continue button field: exchanges[i].information  
 
 ---
+id: week_dict code
 code: |
   week_dict = {
     0:"Sunday Week 1",
@@ -277,11 +270,13 @@ code: |
       temp_week_list_of_dicts.append({index:week_dict[index]})
   remaining_days = temp_week_list_of_dicts
 ---
+id: exchanges default time and location
 code: |
   default_exchange_time = "09:00:00"
   default_exchange_method = "Drop off"
   default_exchange_location = 'house'
 ---
+id: schedule template every_other_week_monday
 if: use_template == "template" and template_choice == "every_other_week_monday"
 variable name: exchanges
 use objects: objects
@@ -326,6 +321,7 @@ data from code:
       exchange_time2: |
         "15:00:00"
 ---
+id: schedule template every_other_week_saturday
 if: use_template == "template" and template_choice == "every_other_week_saturday"
 variable name: exchanges
 use objects: objects
@@ -370,6 +366,7 @@ data from code:
       exchange_time2: |
         None
 ---
+id: schedule template two_two_three
 if: use_template == "template" and template_choice == "two_two_three"
 variable name: exchanges
 use objects: objects
@@ -486,6 +483,9 @@ data from code:
       exchange_time2: |
         "15:00:00"
 ---
+comment: |
+  Not used now
+id: schedule template two_two_five_five
 if: use_template == "template" and template_choice == "two_two_five_five"
 variable name: exchanges
 use objects: objects
@@ -566,6 +566,9 @@ data from code:
       exchange_time2: |
         None
 ---
+comment: |
+  Not used now
+id: schedule template three_four_four_three
 if: use_template == "template" and template_choice == "three_four_four_three"
 variable name: exchanges
 use objects: objects
@@ -646,6 +649,7 @@ data from code:
       exchange_time2: |
         None
 ---
+id: schedule template every_weekend
 if: use_template == "template" and template_choice == "every_weekend"
 variable name: exchanges
 use objects: objects
@@ -726,6 +730,7 @@ data from code:
       exchange_time2: |
         None
 ---
+id: schedule template every_other_weekend
 if: use_template == "template" and template_choice == "every_other_weekend"
 variable name: exchanges
 use objects: objects
@@ -834,11 +839,15 @@ fields:
     required: False
 continue button field: biweekly_schedule_review
 ---
+id: code to create list of empty strings
+comment: |
+  The code to create the schedule from the list of exchanges adds text to the existing string in the list (in order to accommodate more than one exchange in a day.)  This code creates an list of empty string
 code: |
   starting_weekly_list = list()
   for index in range(0,14):
     starting_weekly_list.append("")
 ---
+id: code to build weekly schedule
 reconsider: starting_weekly_list
 code: |
   visitation_dictionary = dict()
@@ -899,15 +908,6 @@ code: |
       starting_weekly_list[date_index] = exchanges[-1].exchange_parent
       visitation_dictionary[exchanges[-1].exchange_parent] += 1
   biweekly_schedule = starting_weekly_list
----
-id: answer enabled block for main interview
-code: |
-  parenting_plan_attachment.enabled = True
----
-# Bundles group the ALDocuments into separate downloads, such as for court and for the user
-objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[parenting_plan_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[parenting_plan_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---
 id: Parenting Plan object
 objects:
@@ -1413,6 +1413,7 @@ attachment:
        ${ format_time(other_holidays[6].custody_to_time) }
        % endif
 ---
+id: holidays intro
 question: Holidays
 subquestion: |
   A different schedule can apply on holidays. The times each parent will have with the children during the holidays are set forth on the Holiday Exchange Schedule.
@@ -1494,6 +1495,7 @@ fields:
      variable: holidays_default
      is: False
 ---
+id: holidays default objects
 variable name: holidays
 use objects: True
 data:
@@ -1554,6 +1556,7 @@ data:
     even_default: respondent
     odd_default: petitioner
 ---
+id: describe other holidays
 question: ${ holidays[i]["description"] }
 fields:
   - Even Numbered Years: holidays[i]['even_years']
@@ -1571,19 +1574,23 @@ fields:
   - Physical custody to time: holidays[i]['custody_to_time']
     datatype: time
 ---
+id: other holidays object
 objects: 
   - other_holidays: DAList.using(object_type=DAObject, complete_attribute='complete')
 ---
-question: Do you want to add any other holidays, including special holidays and occassions?
+id: other holidays there are any
+question: Do you want to add any other holidays, including special holidays and occasions?
 fields:
   - Other holidays: other_holidays.there_are_any
     datatype: yesnoradio
 ---
+id: other holidays there is another
 question: Do you want to add any more holidays?
 fields:
   - Other holidays: other_holidays.there_is_another
     datatype: yesnoradio
 ---
+id: Other holidays information
 question: Other holidays information
 subquestion: |
   % if len(other_holidays.complete_elements()) > 0:
@@ -1611,6 +1618,7 @@ fields:
    datatype: time
 continue button field: other_holidays[i].complete
 ---
+id: holiday review if not holidays_default
 only sets: holidays_review
 if: not holidays_default
 question: Holiday Exchange Schedule
@@ -1914,11 +1922,15 @@ fields:
     inline width: 3em
     required: False
 ---
+comment:  |
+  This seems like it may be a good idea to get rid of using the dynamic values, but it seems like it isn't being used right now.
+id: unused role dictionary
 code: |
   role_dictionary_full_name = dict()
   role_dictionary_full_name["petitioner"]= petitioner.name.full()
   role_dictionary_full_name["respondent"]= respondent.name.full()
 ---
+id: holidays_review if holidays_default
 only sets: holidays_review
 if: holidays_default
 question: Holiday Exchange Schedule
