@@ -1778,6 +1778,15 @@ fields:
       variable: pay_work_childcare_expenses
       is: pay_percentage
 ---
+variable name: var_doc_dict['pay_work_childcare_expenses']
+data:
+  - petition_attachment
+  - answer_attachment
+  - fee_waiver_attachment
+  - income_statement_attachment
+  - parenting_plan_attachment
+
+---
 id: pay_work_childcare_expenses
 comment: |
   This dictionary makes it easier to have review blocks
@@ -1838,6 +1847,8 @@ fields:
 id: health insurance costs
 generic object: ALIndividual
 question: Children Health Insurance Costs for ${ x.name_full() }
+subquestion: |
+  Health insurance for the children is determined by dividing the amount paid for insurance each month by the number of people covered.  Multiply that amount by the number of children covered.
 fields:
   - What are the monthly health insurance costs for ${ x.name_full() } for the children who are subjects of this proceeding?: x.health_insurance_costs
     datatype: currency

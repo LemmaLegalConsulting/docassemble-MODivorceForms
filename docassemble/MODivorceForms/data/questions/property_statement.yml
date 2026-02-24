@@ -1891,7 +1891,7 @@ attachment:
           % endif
       - "respondent_debt_type_2": |
           % if len(respondent.debts) > 1:
-          ${ "No security" if respondent.debts[1].security == "None" else respondent.debts[1].security  }
+          ${ respondent.debts[1].security  }
           % endif
       - "respondent_debt_marital_3": |
           % if len(respondent.debts) > 2:
