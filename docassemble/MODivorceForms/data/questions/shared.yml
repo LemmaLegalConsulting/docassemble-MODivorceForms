@@ -509,7 +509,7 @@ sets:
   - other_parties[0].address.address
   - other_parties[0].address.state
 id: Address other party
-question: What is your current spouse’s address?
+question: What is your current spouse’s last known address?
 fields:
   - code: |
       other_parties[0].address.address_fields(show_country=True,country_code="US")
