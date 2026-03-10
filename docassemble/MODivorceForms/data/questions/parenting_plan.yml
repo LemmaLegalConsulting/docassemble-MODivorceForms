@@ -191,24 +191,6 @@ fields:
       val('health_expenses_not_covered_reimburse') === true
       
 ---
-id: Child Care Expenses Responsibility
-question: Child Care Expenses
-fields:
-  - How should work-related childcare expenses be handled?: pay_work_childcare_expenses
-    datatype: radio
-    choices:
-      - There are no work-related child care costs incurred by the parents.: none
-      - The work-related child care costs will be included in the child support calculation on the Form 14.: included_in_form14
-      - Each parent will pay their own reasonable work-related child care expenses related to his or her employment.: pay_own
-      - ${ support_payer.name_full() } shall partially reimburse ${ support_recipient.name_full() } for all reasonable work-related child care expenses.: pay_percentage
-  - What percentage of ${ possessify(support_recipient.name_full(), 'childcare costs') }should ${ support_payer.name_full() } reimburse?: pay_work_childcare_expenses_percentage
-    datatype: integer
-    min: 1
-    max: 100
-    show if:
-      variable: pay_work_childcare_expenses
-      is: pay_percentage
----
 id: use presumed child support
 question:  Presumed Child Support amount
 subquestion: |

@@ -8,6 +8,11 @@ include:
 modules:
   - .al_income
   - docassemble.ALToolbox.misc
+  - .jod_functions
+  - .progressivedisclosure
+---
+features:
+  css: progressivedisclosure.css
 ---
 id: list of previously entered people
 code: |
@@ -483,6 +488,8 @@ fields:
     required: False
   - Email: x.email
     required: False
+validation code: |
+  validate_us_state(x.address)
 ---
 id: Phone and email generic
 generic object: ALIndividual
@@ -518,6 +525,8 @@ fields:
   - Email: other_parties[0].email
     required: False
     datatype: email
+validation code: |
+  validate_us_state(other_parties[0].address)
 ---
 template: state_mismatch_warning
 content: |
@@ -818,6 +827,11 @@ fields:
     show if:
       variable: x.attorney_involved
       is: True
+  - Country: x.attorney.address.country
+    required: False
+    show if:
+      variable: x.attorney_involved
+      is: True
   - Phone: x.attorney.phone_number
     required: False
     show if:
@@ -829,6 +843,8 @@ fields:
     show if:
       variable: x.attorney_involved
       is: True
+validation code: |
+  validate_us_state(x.attorney.address)
 ---
 id: attorney_casenet_template
 template: attorney_casenet_template
@@ -1023,6 +1039,10 @@ if: defined('children.gathered')
 code: |
   number_of_children = len(children)
 ---
+if: not minor_children
+code: |
+  number_of_children = 0
+---
 sets: children[i].lived_with.name.first
 id: who child lived with
 reconsider: people_choices
@@ -1036,6 +1056,7 @@ fields:
       children[i].lived_with.name_fields()
   - code: |
       children[i].lived_with.address_fields()
+
 ---
 objects:
   children[i].lived_with: ALIndividual
@@ -1087,6 +1108,8 @@ fields:
       persons_lived_with[i].name_fields()
   - code: |
       persons_lived_with[i].address_fields()
+validation code: |
+  validate_us_state(persons_lived_with[i].address)
 ---
 sets: persons_lived_with[i].name.first
 id: who children lived with
@@ -1105,6 +1128,8 @@ fields:
       persons_lived_with[i].name_fields()
   - code: |
       persons_lived_with[i].address.address_fields()
+validation code: |
+  validate_us_state(persons_lived_with[i].address)
 ---
 id: persons lived with another
 question: Did the children live with anybody else during the last five years?
@@ -1747,7 +1772,7 @@ generic object: ALIndividual
 question: |
   Maintenance ${ x.name_full() } pays in other cases
 subquestion: |
-  ${ maintenance_template }
+  ${ prog_disclose(maintenance_template) }
 fields:
   - How much does ${ x.name_full() } pay monthly in maintenance in other cases?: x.maintenance_other_paid
     datatype: currency
@@ -1816,6 +1841,10 @@ subquestion: |
 fields:
   - What are the monthly work-related child care expenses for ${ x.name_full() }?: x.work_childcare_expenses
     datatype: currency
+---
+if: not minor_children
+code: |
+  pay_work_childcare_expenses = "none"
 ---
 if: not minor_children or pay_work_childcare_expenses == "none"
 generic object: ALIndividual
@@ -3692,6 +3721,7 @@ fields:
   - Phone: other_parties[0].employer.phone_number
     show if: other_parties[0].has_self_employment_income
 validation code: |
+  validate_us_state(other_parties[0].employer.address)
   if not other_parties[0].has_self_employment_income:
     other_parties[0].self_employment_income = 0
     other_parties[0].self_employment_description = None
@@ -3831,6 +3861,8 @@ fields:
   - State: x.employer.address.state
   - Zip or postal code: x.employer.address.zip
   - Phone: x.employer.phone_number
+validation code: |
+  validate_us_state(x.employer.address)
 
 ---
 sets:
@@ -3853,6 +3885,8 @@ fields:
   - State: x.employer.address.state
   - Zip or postal code: x.employer.address.zip
   - Phone: x.employer.phone_number
+validation code: |
+  validate_us_state(x.employer.address)
 
 ---
 id: job complete
@@ -4593,7 +4627,7 @@ id: maintenance received for other cases
 generic object: ALIndividual
 question: Maintenance paid to ${ x.name_full() } in other cases
 subquestion: |
-  ${ maintenance_template }
+  ${ prog_disclose(maintenance_template) }
 fields:
   - How much does ${ x.name_full() } receive monthly in maintenance in other cases?: x.maintenance_other_received
     datatype: currency
@@ -4807,7 +4841,8 @@ code: |
 id: maintenance to petitioner
 question: Maintenance to ${ petitioner.name.full() }
 subquestion: |
-  ${ maintenance_template }
+  ${ prog_disclose(maintenance_template) }
+  
 fields:
   - Should ${ respondent.name.full() } pay maintenance to ${ petitioner.name.full() }?: maintenance_to_petitioner
     input type: radio                                                                       
@@ -4819,7 +4854,8 @@ fields:
 id: maintenance to respondent
 question: Maintenance to ${ respondent.name.full() }
 subquestion: |
-  ${ maintenance_template }
+  ${ prog_disclose(maintenance_template) }
+  
 fields:
   - Should ${ petitioner.name.full() } pay maintenance to ${ respondent.name.full() }?: maintenance_to_respondent
     choices:
@@ -4831,7 +4867,8 @@ sets:
   - petitioner.maintenance_paid
 question: Maintenance to ${ respondent.name.full() }
 subquestion: |
-  ${ maintenance_template }
+  ${ prog_disclose(maintenance_template) }
+  
 fields:
   - How much?: maintenance_to_respondent_amount
     datatype: currency
@@ -4844,7 +4881,8 @@ validation code: |
 id: maintenance to petitioner amount
 question: Maintenance to ${ petitioner.name.full() }
 subquestion: |
-  ${ maintenance_template }
+  ${ prog_disclose(maintenance_template) }
+  
 fields:
   - How much?: maintenance_to_petitioner_amount
     datatype: currency
@@ -4856,7 +4894,8 @@ validation code: |
 ---
 question: Income Withholding
 subquestion: |
-  ${ maintenance_template }
+  ${ prog_disclose(maintenance_template) }
+  
 fields:
   - Should income withholding be prepared by the person receiving maintenance?: maintenance_income_withholding
     datatype: yesnoradio
@@ -4868,7 +4907,8 @@ fields:
 id: one maintenance award question
 question: Maintenance award
 subquestion: |
-  ${ maintenance_template }
+  Maintenance is the financial support of either spouse during and following dissolution of marriage proceedings. This financial support considers ONLY the financial needs of the spouse, separate from child support - as the case may be.
+  
 fields:
   - Should the court award maintenance to ${ petitioner.name_full() } or ${ respondent.name_full() }?: relief['maintenance']
     datatype: yesnoradio
@@ -4894,9 +4934,10 @@ fields:
 id: maintenance currently paid question
 question: Current maintenance award
 subquestion: |
+  ${ prog_disclose(maintenance_template) }
+  
   If maintenance was awarded in a previous divorce, or earlier in the case, you can answer yes.  But in most cases there will not already be an award of maintenance.
 
-  ${ maintenance_template }
 fields:
   - Is any maintenance currently paid by ${ petitioner.name_full() } or ${ respondent.name_full() } to the other?: is_maintenance_currently_paid
     datatype: yesnoradio
@@ -4952,6 +4993,8 @@ fields:
     default: x.default_address
   - code: |
       x.service_address.address_fields()
+validation code: |
+  validate_us_state(x.service_address)
 ---
 id: address choices code
 generic object: ALIndividual
