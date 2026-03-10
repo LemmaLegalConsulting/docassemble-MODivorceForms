@@ -1443,7 +1443,7 @@ attachment:
           % endif
       - "petitioner_debt_type_1": |
           % if len(petitioner.debts) > 0:
-          ${ petitioner.debts[0].security }
+          ${ " None " if petitioner.debts[0].security == "None" else petitioner.debts[0].security  }
           % endif
       - "petitioner_debt_marital_2": |
           % if len(petitioner.debts) > 1:
@@ -1471,7 +1471,7 @@ attachment:
           % endif
       - "petitioner_debt_type_2": |
           % if len(petitioner.debts) > 1:
-          ${ petitioner.debts[1].security }
+          ${ " None " if petitioner.debts[1].security == "None" else petitioner.debts[1].security  }
           % endif
       - "petitioner_debt_marital_3": |
           % if len(petitioner.debts) > 2:
@@ -1499,7 +1499,7 @@ attachment:
           % endif
       - "petitioner_debt_type_3": |
           % if len(petitioner.debts) > 2:
-          ${ petitioner.debts[2].security }
+          ${ " None " if petitioner.debts[2].security == "None" else petitioner.debts[2].security  }
           % endif
       - "petitioner_debt_marital_4": |
           % if len(petitioner.debts) > 3:
@@ -1527,7 +1527,7 @@ attachment:
           % endif
       - "petitioner_debt_type_4": |
           % if len(petitioner.debts) > 3:
-          ${ petitioner.debts[3].security }
+          ${ " None " if petitioner.debts[3].security == "None" else petitioner.debts[3].security  }
           % endif
       - "petitioner_debt_marital_5": |
           % if len(petitioner.debts) > 4:
@@ -1555,7 +1555,7 @@ attachment:
           % endif
       - "petitioner_debt_type_5": |
           % if len(petitioner.debts) > 4:
-          ${ petitioner.debts[4].security }
+          ${ " None " if petitioner.debts[4].security == "None" else petitioner.debts[4].security  }
           % endif
       - "petitioner_debt_marital_6": |
           % if len(petitioner.debts) > 5:
@@ -1583,7 +1583,7 @@ attachment:
           % endif
       - "petitioner_debt_type_6": |
           % if len(petitioner.debts) > 5:
-          ${ petitioner.debts[5].security }
+          ${ " None " if petitioner.debts[5].security == "None" else petitioner.debts[5].security  }
           % endif
       - "petitioner_debt_marital_7": |
           % if len(petitioner.debts) > 6:
@@ -1611,7 +1611,7 @@ attachment:
           % endif
       - "petitioner_debt_type_7": |
           % if len(petitioner.debts) > 6:
-          ${ petitioner.debts[6].security }
+          ${ " None " if petitioner.debts[6].security == "None" else petitioner.debts[6].security  }
           % endif
       - "petitioner_debt_marital_8": |
           % if len(petitioner.debts) > 7:
@@ -1639,7 +1639,7 @@ attachment:
           % endif
       - "petitioner_debt_type_8": |
           % if len(petitioner.debts) > 7:
-          ${ petitioner.debts[7].security }
+          ${ " None " if petitioner.debts[7].security == "None" else petitioner.debts[7].security  }
           % endif
       - "petitioner_debt_marital_9": |
           % if len(petitioner.debts) > 8:
@@ -1667,7 +1667,7 @@ attachment:
           % endif
       - "petitioner_debt_type_9": |
           % if len(petitioner.debts) > 8:
-          ${ petitioner.debts[8].security }
+          ${ " None " if petitioner.debts[8].security == "None" else petitioner.debts[8].security  }
           % endif
       - "petitioner_debt_marital_10": |
           % if len(petitioner.debts) > 9:
@@ -1695,7 +1695,7 @@ attachment:
           % endif
       - "petitioner_debt_type_10": |
           % if len(petitioner.debts) > 9:
-          ${ petitioner.debts[9].security }
+          ${ " None " if petitioner.debts[9].security == "None" else petitioner.debts[9].security  }
           % endif
       - "petitioner_debt_marital_11": |
           % if len(petitioner.debts) > 10:
@@ -1723,7 +1723,7 @@ attachment:
           % endif
       - "petitioner_debt_type_11": |
           % if len(petitioner.debts) > 10:
-          ${ petitioner.debts[10].security }
+          ${ " None " if petitioner.debts[10].security == "None" else petitioner.debts[10].security  }
           % endif
       - "petitioner_debt_marital_12": |
           % if len(petitioner.debts) > 11:
@@ -1751,7 +1751,7 @@ attachment:
           % endif
       - "petitioner_debt_type_12": |
           % if len(petitioner.debts) > 11:
-          ${ petitioner.debts[11].security }
+          ${ " None " if petitioner.debts[11].security == "None" else petitioner.debts[11].security  }
           % endif
       - "petitioner_debt_marital_13": |
           % if len(petitioner.debts) > 12:
@@ -1779,7 +1779,7 @@ attachment:
           % endif
       - "petitioner_debt_type_13": |
           % if len(petitioner.debts) > 12:
-          ${ petitioner.debts[12].security }
+          ${ " None " if petitioner.debts[12].security == "None" else petitioner.debts[12].security  }
           % endif
       - "petitioner_debt_marital_14": |
           % if len(petitioner.debts) > 13:
@@ -1807,7 +1807,7 @@ attachment:
           % endif
       - "petitioner_debt_type_14": |
           % if len(petitioner.debts) > 13:
-          ${ petitioner.debts[13].security }
+          ${ " None " if petitioner.debts[13].security == "None" else petitioner.debts[0].security  }
           % endif
       - "petitioner_debt_marital_15": |
           % if len(petitioner.debts) > 14:
@@ -1835,7 +1835,7 @@ attachment:
           % endif
       - "petitioner_debt_type_15": |
           % if len(petitioner.debts) > 14:
-          ${ petitioner.debts[14].security }
+          ${ " None " if petitioner.debts[14].security == "None" else petitioner.debts[14].security  }
           % endif
       - "respondent_debt_marital_1": |
           % if len(respondent.debts) > 0:
@@ -1863,7 +1863,7 @@ attachment:
           % endif
       - "respondent_debt_type_1": |
           % if len(respondent.debts) > 0:
-          ${ respondent.debts[0].security }
+          ${ " None " if respondent.debts[0].security == "None" else respondent.debts[0].security  }
           % endif
       - "respondent_debt_marital_2": |
           % if len(respondent.debts) > 1:
@@ -1891,7 +1891,7 @@ attachment:
           % endif
       - "respondent_debt_type_2": |
           % if len(respondent.debts) > 1:
-          ${ "No security" if respondent.debts[1].security == "None" else respondent.debts[1].security  }
+          ${ " None " if respondent.debts[1].security == "None" else respondent.debts[1].security  }
           % endif
       - "respondent_debt_marital_3": |
           % if len(respondent.debts) > 2:
@@ -1919,7 +1919,7 @@ attachment:
           % endif
       - "respondent_debt_type_3": |
           % if len(respondent.debts) > 2:
-          ${ respondent.debts[2].security }
+          ${ " None " if respondent.debts[2].security == "None" else respondent.debts[2].security  }
           % endif
       - "respondent_debt_marital_4": |
           % if len(respondent.debts) > 3:
@@ -1947,7 +1947,7 @@ attachment:
           % endif
       - "respondent_debt_type_4": |
           % if len(respondent.debts) > 3:
-          ${ respondent.debts[3].security }
+          ${ " None " if respondent.debts[3].security == "None" else respondent.debts[3].security  }
           % endif
       - "respondent_debt_marital_5": |
           % if len(respondent.debts) > 4:
@@ -1975,7 +1975,7 @@ attachment:
           % endif
       - "respondent_debt_type_5": |
           % if len(respondent.debts) > 4:
-          ${ respondent.debts[4].security }
+          ${ " None " if respondent.debts[4].security == "None" else respondent.debts[4].security  }
           % endif
       - "respondent_debt_marital_6": |
           % if len(respondent.debts) > 5:
@@ -2003,7 +2003,7 @@ attachment:
           % endif
       - "respondent_debt_type_6": |
           % if len(respondent.debts) > 5:
-          ${ respondent.debts[5].security }
+          ${ " None " if respondent.debts[5].security == "None" else respondent.debts[5].security  }
           % endif
       - "respondent_debt_marital_7": |
           % if len(respondent.debts) > 6:
@@ -2031,7 +2031,7 @@ attachment:
           % endif
       - "respondent_debt_type_7": |
           % if len(respondent.debts) > 6:
-          ${ respondent.debts[6].security }
+          ${ " None " if respondent.debts[6].security == "None" else respondent.debts[6].security  }
           % endif
       - "respondent_debt_marital_8": |
           % if len(respondent.debts) > 7:
@@ -2059,7 +2059,7 @@ attachment:
           % endif
       - "respondent_debt_type_8": |
           % if len(respondent.debts) > 7:
-          ${ respondent.debts[7].security }
+          ${ " None " if respondent.debts[7].security == "None" else respondent.debts[7].security  }
           % endif
       - "respondent_debt_marital_9": |
           % if len(respondent.debts) > 8:
@@ -2087,7 +2087,7 @@ attachment:
           % endif
       - "respondent_debt_type_9": |
           % if len(respondent.debts) > 8:
-          ${ respondent.debts[8].security }
+          ${ " None " if respondent.debts[8].security == "None" else respondent.debts[8].security  }
           % endif
       - "respondent_debt_marital_10": |
           % if len(respondent.debts) > 9:
@@ -2115,7 +2115,7 @@ attachment:
           % endif
       - "respondent_debt_type_10": |
           % if len(respondent.debts) > 9:
-          ${ respondent.debts[9].security }
+          ${ " None " if respondent.debts[9].security == "None" else respondent.debts[9].security  }
           % endif
       - "respondent_debt_marital_11": |
           % if len(respondent.debts) > 10:
@@ -2143,7 +2143,7 @@ attachment:
           % endif
       - "respondent_debt_type_11": |
           % if len(respondent.debts) > 10:
-          ${ respondent.debts[10].security }
+          ${ " None " if respondent.debts[10].security == "None" else respondent.debts[10].security  }
           % endif
       - "respondent_debt_marital_12": |
           % if len(respondent.debts) > 11:
@@ -2171,7 +2171,7 @@ attachment:
           % endif
       - "respondent_debt_type_12": |
           % if len(respondent.debts) > 11:
-          ${ respondent.debts[11].security }
+          ${ " None " if respondent.debts[11].security == "None" else respondent.debts[11].security  }
           % endif
       - "respondent_debt_marital_13": |
           % if len(respondent.debts) > 12:
@@ -2199,7 +2199,7 @@ attachment:
           % endif
       - "respondent_debt_type_13": |
           % if len(respondent.debts) > 12:
-          ${ respondent.debts[12].security }
+          ${ " None " if respondent.debts[12].security == "None" else respondent.debts[12].security  }
           % endif
       - "respondent_debt_marital_14": |
           % if len(respondent.debts) > 13:
@@ -2227,7 +2227,7 @@ attachment:
           % endif
       - "respondent_debt_type_14": |
           % if len(respondent.debts) > 13:
-          ${ respondent.debts[13].security }
+          ${ " None " if respondent.debts[13].security == "None" else respondent.debts[13].security  }
           % endif
       - "respondent_debt_marital_15": |
           % if len(respondent.debts) > 14:
@@ -2255,7 +2255,7 @@ attachment:
           % endif
       - "respondent_debt_type_15": |
           % if len(respondent.debts) > 14:
-          ${ respondent.debts[14].security }
+          ${ " None " if respondent.debts[14].security == "None" else respondent.debts[10].security  }
           % endif
       - "petitioner_lack_jurisdiction": ${ False } 
       - "no_maintenance_by_respondent": ${ not relief['maintenance'] or not maintenance_awarded_to == "petitioner" } 

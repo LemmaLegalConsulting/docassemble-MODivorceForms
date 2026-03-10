@@ -834,7 +834,9 @@ fields:
     js show if:   |
       val("pregnant") === true 
 validation code: |
-  if minor_children or minor_children_before_marriage:
+  if not minor_children:
+    minor_children_before_marriage = False
+  if minor_children:
     children.there_are_any = True
   else:
     children.there_are_any = False
@@ -870,6 +872,194 @@ code: |
     temp_doc_list_options.append({'value':'parenting_plan_attachment', 'label':'Parenting Plan', 'default':True})   
     temp_doc_list_options.append({'value':'form_14_attachment', 'label':'Form 14 only', 'default':False})   
   doc_list_options = temp_doc_list_options
+---
+comment: |
+  variable name: doc_list_options
+  use objects: True
+  data: 
+  - label: Confidential Case Filing Information Sheet 
+    value: confidential_information_sheet_attachment
+    relevant: True
+    default: True
+    description: |
+       This confidential document is required and used to open a case in the courts' case management system. 
+  - label: Petition
+    value: petition_attachment
+    default: True
+    relevant: ${ case.filed in ["user0_filed","not_filed"] }
+    description: |
+       This **required document** starts your divorce within the court system. It informs the court what you are asking for - a legal divorce, and anything else including: child custody, child support, restoring your maiden name, etc.
+    sections:
+      - case_information: Is this the right tool for you?
+      - relief: Help provided
+      - user_info: Information about you
+      - other_party_info: Information about the other party  
+      - children: Children
+      - income: Income
+      - expenses: Expenses
+      - assets: Assets
+      - debts: Debts
+  - label: Answer
+    value: answer_attachment
+    relevant: ${ case.filed in ["other_parties0_filed"] }
+    default: True
+    description: |
+       This required document is a written response to your spouse's Petition for Dissolution of Marriage. This should be completed even if you agree on everything.
+    sections:
+      - case_information: Is this the right tool for you?
+      - relief: Help provided
+      - user_info: Information about you
+      - other_party_info: Information about the other party  
+      - children: Children
+      - income: Income
+      - expenses: Expenses
+      - assets: Assets
+      - debts: Debts
+  - label: Certificate of Dissolution of Marriage
+    value: certificate_of_dissolution_attachment
+    relevant: True
+    default: True
+    description: |
+       This required document is to be filled out by you and will be signed by the court when your divorce is final. It will be sent by the court to the county where you were married and will be put together with your marriage certificate for county record keeping.
+    sections:
+      - case_information: Is this the right tool for you?
+      - relief: Help provided
+      - user_info: Information about you
+      - other_party_info: Information about the other party  
+      - children: Children
+      - income: Income
+      - expenses: Expenses
+      - assets: Assets
+  - label: Statement of Income and Expenses
+    value: income_statement_attachment
+    relevant: True
+    default: True
+    description: |
+       This required document gives the court an idea of your total income and expenses from both you and your spouse to determine division of property and debts as well as maintenance (formerly known as alimony), and child support, if appropriate.
+    sections:
+      - case_information: Is this the right tool for you?
+      - relief: Help provided
+      - user_info: Information about you
+      - other_party_info: Information about the other party  
+      - children: Children
+      - income: Income
+      - expenses: Expenses
+      - assets: Assets
+  - label: Statement of Property and Debt 
+    value: property_statement_attachment
+    relevant: True
+    default: True
+    description: |
+      This required document lists all property & debt currently owned by you or your spouse. This includes property and debt you owned before the marriage, acquired separately, and together. The court uses this document to  determine a fair division of property and debt.
+    sections:
+      - case_information: Is this the right tool for you?
+      - relief: Help provided
+      - user_info: Information about you
+      - other_party_info: Information about the other party  
+      - children: Children
+      - income: Income
+      - expenses: Expenses
+      - assets: Assets
+  - label: Judgment and Decree of Dissolution of Marriage
+    value: judgment_attachment
+    relevant: True
+    default: True
+    description: |
+       This document is only for cases wherein both you and your spouse are in agreement on how everything will be divided. If accepted, the judge will sign this document, formally dissolving your marriage.
+    sections:
+      - case_information: Is this the right tool for you?
+      - relief: Help provided
+      - user_info: Information about you
+      - other_party_info: Information about the other party  
+      - children: Children
+      - income: Income
+      - expenses: Expenses
+      - assets: Assets
+  - label: Parenting Plan
+    value: parenting_plan_attachment
+    relevant: ${ minor_children }
+    default: True
+    description: |
+       This document outlines a specific plan for: custody, parenting time, decision making regarding the child/ren, and child support. This document is required if you and your spouse have children together.
+    sections:
+      - case_information: Is this the right tool for you?
+      - relief: Help provided
+      - user_info: Information about you
+      - other_party_info: Information about the other party  
+      - children: Children
+      - income: Income
+      - expenses: Expenses
+      - assets: Assets
+  - label: Notice of hearing
+    value: notice_of_hearing_attachment
+    relevant: True
+    default: True
+    description: |
+       This document will be completed by the court, providing the date of your hearing - where you will both be required to attend court.
+    sections:
+      - case_information: Is this the right tool for you?
+      - debts: Debts
+  - label: Answer
+    value: answer_attachment
+    relevant: ${ case.filed in ["other_parties0_filed"] }
+    default: True
+    description: |
+       This required document is a written response to your spouse's Petition for Dissolution of Marriage. This should be completed even if you agree on everything.
+    sections:
+      - case_information: Is this the right tool for you?
+      - relief: Help provided
+      - user_info: Information about you
+      - other_party_info: Information about the other party  
+      - children: Children
+      - income: Income
+      - expenses: Expenses
+      - assets: Assets
+      - debts: Debts
+  - label: Redaction Certification
+    value: redaction_certification_attachment
+    relevant: True
+    default: True
+    description: |
+       This required document acknowledges that you have redacted (or "removed") the necessary confidential information from all of your filings, pursuant to Rules 19.10, 55.025, or 84.15.
+    sections:
+      - case_information: Is this the right tool for you?
+      - relief: Help provided
+      - user_info: Information about you
+      - other_party_info: Information about the other party  
+      - children: Children
+      - income: Income
+      - expenses: Expenses
+      - assets: Assets
+  - label: Fee Waiver
+    value: fee_waiver_attachment
+    relevant: True
+    default: ${ case.filed in ["user0_filed","not_filed","unknown"] }
+    description: |
+       You may ask the court to waive the fees if you believe you are unable to pay them. This fee waiver will tell the court of your income and expenses, under oath, and the judge will decide whether the fees will be waived.
+    sections:
+      - case_information: Is this the right tool for you?
+      - relief: Help provided
+      - user_info: Information about you
+      - other_party_info: Information about the other party  
+      - children: Children
+      - income: Income
+      - expenses: Expenses
+      - assets: Assets
+  - label: Form 14 only
+    value: form_14_attachment
+    relevant: ${ minor_children }
+    default: False
+    description: |
+       Form 14 is a worksheet to determine child support and is included in the Parenting Plan. Only select this if you want to complete a Form 14 without the rest of the Parenting Plan
+    sections:
+      - case_information: Is this the right tool for you?
+      - relief: Help provided
+      - user_info: Information about you
+      - other_party_info: Information about the other party  
+      - children: Children
+      - income: Income
+      - expenses: Expenses
+      - assets: Assets
 ---
 id: document choice
 question: Documents you need
