@@ -39,11 +39,11 @@ attachment:
       - "petitionersFirstName": ${ petitioner.name.first } 
       - "petitionersMiddleName": ${ petitioner.name.middle } 
       - "petitionersLastName": ${ petitioner.name.last } 
-      - "petitionersSuffixJrSrIII": ${ petitioner.address.state } 
+      - "petitionersSuffixJrSrIII": ${ petitioner.name.suffix } 
       - "caseNumber": ${ case.docket_number } 
-      - "respondentsFirstName": ${ respondent.name.last } 
-      - "respondentsMiddleName": ${ respondent.name.first } 
-      - "respondentsLastName": ${ respondent.name.middle } 
+      - "respondentsFirstName": ${ respondent.name.first } 
+      - "respondentsMiddleName": ${ respondent.name.middle } 
+      - "respondentsLastName": ${ respondent.name.last } 
       - "respondentsSuffixJrSrIII": ${ respondent.name.suffix } 
       - "divisionNumber": ${ case.division_number } 
       - "raHowManyPetitions1": ${ previous_petitions == "1" } 
@@ -309,12 +309,12 @@ attachment:
       - "raParticipatedInOtherLitigationCustody2": ${ not other_litigation } 
       - "raAgreeWithParentingPlanOrNot1": ${ agree_with_parenting_plan } 
       - "raAgreeWithParentingPlanOrNot2": ${ not agree_with_parenting_plan } 
-      - "raRequestReliefDissolution": ${ relief["dissolution"] } 
+      - "raRequestReliefDissolution": ${ True } 
       - "raRequestReliefCustody": ${ relief["custody"] } 
       - "raRequestReliefSupportOfTheChildren": ${ relief["child_support"] } 
       - "raRequestReliefDivideMaritalPropertyAndDebts": ${ relief["divide_property"] } 
-      - "raRequestReliefAwardMaintenanceToMe": ${ relief["maintenance_to_me"] } 
-      - "raRequestReliefAwardMaintenanceToSpouse": ${ relief["maintenance_to_spouse"] } 
+      - "raRequestReliefAwardMaintenanceToMe": ${ relief["maintenance"] and maintenance_awarded_to == "respondent" } 
+      - "raRequestReliefAwardMaintenanceToSpouse": ${ relief["maintenance"] and maintenance_awarded_to == "petitioner" } 
       - "raRequestReliefChangeName": ${ relief["change_name"] } 
       - "raRequestReliefFormerSuffix": ${ respondent.prior_name.name.suffix if relief['change_name'] else ""  } 
       - "raRequestReliefFormerFirstName": ${ respondent.prior_name.name.first if relief['change_name'] else "" } 
@@ -324,14 +324,14 @@ attachment:
       - "raRequestReliefOtherRequests1": ${ relief_other } 
       - "raDateOfNotice": ${ service.date } 
       - "raNameRow1": ${ people_served[0].name_full() } 
-      - "raServiceContactInformationRow1": ${ people_served[0].address.on_one_line() } 
+      - "raServiceContactInformationRow1": ${ people_served[0].service_address_pdf }
       - "raNameRow2": |
           % if len(people_served) > 1:
           ${ people_served[1].name_full() }
           % endif
       - "raServiceContactInformationRow2": |
           % if len(people_served) > 1:
-          ${ people_served[1].address.on_one_line() }
+          ${ people_served[1].service_address }
           % endif
       - "raNameRow3": |
           % if len(people_served) > 2:
@@ -339,7 +339,7 @@ attachment:
           % endif
       - "raServiceContactInformationRow3": |
           % if len(people_served) > 2:
-          ${ people_served[2].address.on_one_line() }
+          ${ people_served[2].service_address }
           % endif
       - "raNameRow4": |
           % if len(people_served) > 3:
@@ -347,11 +347,11 @@ attachment:
           % endif
       - "raServiceContactInformationRow4": |
           % if len(people_served) > 3:
-          ${ people_served[3].address.on_one_line() }
+          ${ people_served[3].service_address }
           % endif
       - "raRespondentsAttorneyCheckbox": ${ respondent.attorney.type_of_assistance == "assistance" } 
       - "raRespondentsMissouriBarNumber": ${ respondent.attorney.bar_number } 
-      - "raRespondentsAttorneyName": ${ respondent.attorney.name.text } 
+      - "raRespondentsAttorneyName": ${ respondent.attorney.name } 
       - "raRespondentsAttorneyStreet": ${ respondent.attorney.address.address } 
       - "raRespondentsAttorneyCity": ${ respondent.attorney.address.city } 
       - "raRespondentsAttorneyState": ${ respondent.attorney.address.state } 

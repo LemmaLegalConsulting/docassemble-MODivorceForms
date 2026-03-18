@@ -37,6 +37,7 @@ attachment:
       - "petitioners_middle_name": ${ petitioner.name.middle } 
       - "petitioners_last_name": ${ petitioner.name.last } 
       - "petitioners_suffix": ${ petitioner.name.suffix } 
+      - "case_number": ${ case.docket_number }
       - "respondents_middle_name": ${ respondent.name.middle } 
       - "respondents_last_name": ${ respondent.name.last } 
       - "respondents_suffix": ${ respondent.name.suffix } 
@@ -2282,7 +2283,7 @@ attachment:
       - "oath_date": ${ notice_date } 
       - "party_service_1": ${ other_parties[0].name_full() } 
       - "party_service_address_1": |
-          ${ other_parties[0].address.on_one_line() }
+          ${ people_served[0].service_address_pdf }
       - "party_service_2": |
           % if len(other_parties) > 1:
           ${ other_parties[1].name_full() } 

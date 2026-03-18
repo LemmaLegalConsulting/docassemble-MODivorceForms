@@ -82,7 +82,9 @@ id: interview order certificate of dissolution of marriage
 code: |
   # Set the allowed courts for this interview
   allowed_courts = []
+  nav.set_section("right_tool") 
   section_right_tool
+  nav.set_section("relief") 
   section_relief
   section_case_information
   section_user_info
@@ -149,33 +151,17 @@ code: |
 ---
 id: relief interview order
 code: |  
+
   users.gather()
-  if users[0].has_prior_name:
-    users[0].prior_name.name.first
-  users[0].address.address # petition
-  users[0].address.county
-  if users[0].address.state == "MO":
-    users[0].mo_length_of_residence_choice
-  users[0].address.country
-  if 'petition_attachment' in doc_list_selected.true_values():
-    users[0].county_length_of_residence_choice
-  other_parties[0].address.address # petition
-  if other_parties[0].address.state == "MO":
-    other_parties[0].address.county
-  # other_parties[0].address.country
-  if 'petition_attachment' in doc_list_selected.true_values():
-    other_parties[0].mo_length_of_residence_choice
-    other_parties[0].county_length_of_residence_choice
   doc_list_selected
   doc_list_dictionary
-  relief['custody']
-  relief['change_name']
-  relief['divide_property']
-  relief['other']
+  if len(set(var_doc_dict["relief"]) & set(doc_list_selected.true_values())) > 0:
+    relief['custody']
+    relief['change_name']
+    relief['divide_property']
+    relief['other']
   
-  other_parties.gather()
-  if other_parties[0].has_prior_name:
-    other_parties[0].prior_name.name.first
+
   section_relief = True
 ---
 id: case information interview order
@@ -203,8 +189,8 @@ code: |
       case.filing_date_asked # petition
     if len(set(var_doc_dict["notice_date"]) & set(doc_list_selected.true_values())) > 0:
       notice_date # property_statement.yml
-    if len(set(var_doc_dict["case.matter_type"]) & set(doc_list_selected.true_values())) > 0:
-      case.matter_type_asked # notice_of_hearing
+  if len(set(var_doc_dict["case.matter_type"]) & set(doc_list_selected.true_values())) > 0:
+    case.matter_type_asked # notice_of_hearing
   if petitioner.attorney_involved: # petition, notice_of_hearing
     petitioner.attorney.name.first # petition
   if petitioner.attorney_involved:
@@ -221,6 +207,16 @@ code: |
 id: user info interview order
 code: |    
   nav.set_section("user_info")  
+  users.gather()
+  if users[0].has_prior_name:
+    users[0].prior_name.name.first
+  users[0].address.address # petition
+  users[0].address.county
+  if users[0].address.state == "MO":
+    users[0].mo_length_of_residence_choice
+  users[0].address.country
+  if 'petition_attachment' in doc_list_selected.true_values():
+    users[0].county_length_of_residence_choice
   users[0].email
   users[0].phone_number
   if len(set(var_doc_dict["users_birthdate"]) & set(doc_list_selected.true_values())) > 0:
@@ -242,7 +238,17 @@ code: |
 ---
 id: other party info interview order
 code: |    
+  other_parties.gather()
+  if other_parties[0].has_prior_name:
+    other_parties[0].prior_name.name.first
   nav.set_section("other_party_info")  
+  other_parties[0].address.address # petition
+  if other_parties[0].address.state == "MO":
+    other_parties[0].address.county
+  # other_parties[0].address.country
+  if 'petition_attachment' in doc_list_selected.true_values():
+    other_parties[0].mo_length_of_residence_choice
+    other_parties[0].county_length_of_residence_choice
   if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
     other_parties[0].gender # confidential_information_sheet
   other_parties[0].pronouns
@@ -309,8 +315,9 @@ code: |
   if len(set(var_doc_dict["children_number"]) & set(doc_list_selected.true_values())) > 0:
     number_of_children
 
+  relief['child_support']
+  child_support
   if minor_children and len(set(var_doc_dict["legal_custody"]) & set(doc_list_selected.true_values())) > 0 and legal_custody != "Third Party" and physical_custody != "Third Party":
-    relief['child_support']
     if parenting_plan_A_author["Other"]:
       parenting_plan_A_author_other.name.first
     if communications["third_party"]:
@@ -344,7 +351,6 @@ code: |
   
     ask_about_dispute_resolution
     domestic_violence
-  
   
     if child_support != "none": # certificate_of_dissolution
       child_support_method_of_payment
@@ -508,18 +514,21 @@ code: |
 id: service interview code
 code: |     
   nav.set_section('service')
-  if case.filed == "user0_filed" and respondent_served:
-      served_information
-  else:
-    if case.filed in ["user0_filed", "not_filed"]:
-      if respondent.service_type != "none":
-        people_served.gathered # notice_of_hearing
-        for people in people_served:
-          people.service_address.address
-    filing_pleadings_video
-  if 'redaction_certification_attachment' in doc_list_selected.true_values():
-    al_court_bundle
+  if len(set(var_doc_dict["service"]) & set(doc_list_selected.true_values())) > 0:
+    people_served.gathered
+    people_served[0].service_address_pdf
+  filing_pleadings_video
+  al_court_bundle
   section_service = True
+---
+id: documents with service
+variable name: var_doc_dict["service"]
+data:
+  - petition_attachment
+  - answer_attachment
+  - notice_of_hearing_attachment
+  - property_statement_attachment
+  - income_statement_attachment
 ---
 id: objects for dictionary that says which documents use the variable
 objects:
@@ -548,7 +557,6 @@ comment: |
 mandatory: True
 code: |
   enable_al_nav_sections
-  nav.set_section('case_information')
   al_intro_screen
   # mo_divorce_forms_intro
   interview_order_mo_divorce_forms
@@ -597,8 +605,25 @@ edit:
   - value
 ---
 code: |
-  enable_al_nav_sections = True
+  enable_al_nav_sections = False
 ---
+sections:
+  - right_tool: Is this the right tool for you?
+  - relief: Help provided
+  - provide_details: Answer questions
+    subsections:
+      - user_info: Information about you
+      - other_party_info: Information about the other party  
+      - children: Children
+      - case_information: Case information
+      - income: Income
+      - expenses: Expenses
+      - assets: Assets
+      - debts: Debts
+  - service: Service and Filing Documents
+  - review: Review your answers
+---
+reconsider: True
 variable name: al_nav_sections
 data:
   - case_information: Is this the right tool for you?
@@ -873,202 +898,212 @@ code: |
     temp_doc_list_options.append({'value':'form_14_attachment', 'label':'Form 14 only', 'default':False})   
   doc_list_options = temp_doc_list_options
 ---
-comment: |
-  variable name: doc_list_options
-  use objects: True
-  data: 
+variable name: doc_list_options
+use objects: True
+data: 
   - label: Confidential Case Filing Information Sheet 
     value: confidential_information_sheet_attachment
-    relevant: True
     default: True
-    description: |
+    help: |
        This confidential document is required and used to open a case in the courts' case management system. 
   - label: Petition
     value: petition_attachment
     default: True
-    relevant: ${ case.filed in ["user0_filed","not_filed"] }
-    description: |
+    help: |
        This **required document** starts your divorce within the court system. It informs the court what you are asking for - a legal divorce, and anything else including: child custody, child support, restoring your maiden name, etc.
-    sections:
-      - case_information: Is this the right tool for you?
-      - relief: Help provided
-      - user_info: Information about you
-      - other_party_info: Information about the other party  
-      - children: Children
-      - income: Income
-      - expenses: Expenses
-      - assets: Assets
-      - debts: Debts
   - label: Answer
     value: answer_attachment
-    relevant: ${ case.filed in ["other_parties0_filed"] }
-    default: True
-    description: |
+    default: ${ case.filed == "other_parties_filed"}
+    help: |
        This required document is a written response to your spouse's Petition for Dissolution of Marriage. This should be completed even if you agree on everything.
-    sections:
-      - case_information: Is this the right tool for you?
-      - relief: Help provided
-      - user_info: Information about you
-      - other_party_info: Information about the other party  
-      - children: Children
-      - income: Income
-      - expenses: Expenses
-      - assets: Assets
-      - debts: Debts
   - label: Certificate of Dissolution of Marriage
     value: certificate_of_dissolution_attachment
-    relevant: True
     default: True
-    description: |
+    help: |
        This required document is to be filled out by you and will be signed by the court when your divorce is final. It will be sent by the court to the county where you were married and will be put together with your marriage certificate for county record keeping.
-    sections:
-      - case_information: Is this the right tool for you?
-      - relief: Help provided
-      - user_info: Information about you
-      - other_party_info: Information about the other party  
-      - children: Children
-      - income: Income
-      - expenses: Expenses
-      - assets: Assets
   - label: Statement of Income and Expenses
     value: income_statement_attachment
-    relevant: True
     default: True
-    description: |
+    help: |
        This required document gives the court an idea of your total income and expenses from both you and your spouse to determine division of property and debts as well as maintenance (formerly known as alimony), and child support, if appropriate.
-    sections:
-      - case_information: Is this the right tool for you?
-      - relief: Help provided
-      - user_info: Information about you
-      - other_party_info: Information about the other party  
-      - children: Children
-      - income: Income
-      - expenses: Expenses
-      - assets: Assets
   - label: Statement of Property and Debt 
     value: property_statement_attachment
-    relevant: True
     default: True
-    description: |
+    help: |
       This required document lists all property & debt currently owned by you or your spouse. This includes property and debt you owned before the marriage, acquired separately, and together. The court uses this document to  determine a fair division of property and debt.
-    sections:
-      - case_information: Is this the right tool for you?
-      - relief: Help provided
-      - user_info: Information about you
-      - other_party_info: Information about the other party  
-      - children: Children
-      - income: Income
-      - expenses: Expenses
-      - assets: Assets
   - label: Judgment and Decree of Dissolution of Marriage
     value: judgment_attachment
-    relevant: True
     default: True
-    description: |
+    help: |
        This document is only for cases wherein both you and your spouse are in agreement on how everything will be divided. If accepted, the judge will sign this document, formally dissolving your marriage.
-    sections:
-      - case_information: Is this the right tool for you?
-      - relief: Help provided
-      - user_info: Information about you
-      - other_party_info: Information about the other party  
-      - children: Children
-      - income: Income
-      - expenses: Expenses
-      - assets: Assets
   - label: Parenting Plan
     value: parenting_plan_attachment
-    relevant: ${ minor_children }
     default: True
-    description: |
+    help: |
        This document outlines a specific plan for: custody, parenting time, decision making regarding the child/ren, and child support. This document is required if you and your spouse have children together.
-    sections:
-      - case_information: Is this the right tool for you?
-      - relief: Help provided
-      - user_info: Information about you
-      - other_party_info: Information about the other party  
-      - children: Children
-      - income: Income
-      - expenses: Expenses
-      - assets: Assets
   - label: Notice of hearing
     value: notice_of_hearing_attachment
-    relevant: True
     default: True
-    description: |
+    help: |
        This document will be completed by the court, providing the date of your hearing - where you will both be required to attend court.
-    sections:
-      - case_information: Is this the right tool for you?
-      - debts: Debts
   - label: Answer
     value: answer_attachment
-    relevant: ${ case.filed in ["other_parties0_filed"] }
     default: True
-    description: |
+    help: |
        This required document is a written response to your spouse's Petition for Dissolution of Marriage. This should be completed even if you agree on everything.
-    sections:
-      - case_information: Is this the right tool for you?
-      - relief: Help provided
-      - user_info: Information about you
-      - other_party_info: Information about the other party  
-      - children: Children
-      - income: Income
-      - expenses: Expenses
-      - assets: Assets
-      - debts: Debts
   - label: Redaction Certification
     value: redaction_certification_attachment
-    relevant: True
     default: True
-    description: |
+    help: |
        This required document acknowledges that you have redacted (or "removed") the necessary confidential information from all of your filings, pursuant to Rules 19.10, 55.025, or 84.15.
-    sections:
-      - case_information: Is this the right tool for you?
-      - relief: Help provided
-      - user_info: Information about you
-      - other_party_info: Information about the other party  
-      - children: Children
-      - income: Income
-      - expenses: Expenses
-      - assets: Assets
   - label: Fee Waiver
     value: fee_waiver_attachment
-    relevant: True
     default: ${ case.filed in ["user0_filed","not_filed","unknown"] }
-    description: |
+    help: |
        You may ask the court to waive the fees if you believe you are unable to pay them. This fee waiver will tell the court of your income and expenses, under oath, and the judge will decide whether the fees will be waived.
-    sections:
-      - case_information: Is this the right tool for you?
-      - relief: Help provided
-      - user_info: Information about you
-      - other_party_info: Information about the other party  
-      - children: Children
-      - income: Income
-      - expenses: Expenses
-      - assets: Assets
   - label: Form 14 only
     value: form_14_attachment
-    relevant: ${ minor_children }
     default: False
-    description: |
-       Form 14 is a worksheet to determine child support and is included in the Parenting Plan. Only select this if you want to complete a Form 14 without the rest of the Parenting Plan
-    sections:
-      - case_information: Is this the right tool for you?
-      - relief: Help provided
-      - user_info: Information about you
-      - other_party_info: Information about the other party  
-      - children: Children
-      - income: Income
-      - expenses: Expenses
-      - assets: Assets
+    help: |
+       Form 14 is a worksheet to determine child support and is included in the Parenting Plan. Only select this if you want to complete a Form 14 without the rest of the Parenting Plan.
 ---
 id: document choice
 question: Documents you need
 subquestion: |
+  Here are the documents you need as a ${ "Petitioner" if case.filed in ["user0_filed","not_filed"] else "Respondent" } in a ${ "Dissolution of Marriage with Children" if minor_children else "Dissolution of Marriage without Children"  }.
+
+  % if case.filed in ["user0_filed","not_filed"]:
+  "Petitioner" means the person who starts the case by filing a petition.  The other person is the "Respondent".
+  % else:
+  "Respondent" means the person who is responding to the person who started the case, called the "Petitioner".
+  % endif
 fields:
   - What documents do you want?: doc_list_selected
     datatype: checkboxes
     code: |
-      doc_list_options
+      doc_list_choices
+under: |
+  In addition to the documents you select above, 
+  
+   - A Next Steps document with instructions and guidance
+   - A Redaction Certification, which is required for any document filed in a case
+
+  % if case.filed in ["user0_filed","not_filed"] and other_parties[0].address.state != "MO":
+  You may also receive documents to help serve the other party because they do not live in Missouri.
+  % endif
+  
+---
+variable name: doc_list_options
+use objects: True
+data from code: 
+  - label: |
+      "Confidential Case Filing Information Sheet"
+    value: |
+      "confidential_information_sheet_attachment"
+    relevant: True
+    default: True
+    help: |
+      "This confidential document is required and used to open a case in the courts' case management system." 
+  - label: |
+      "Petition"
+    value: |
+      "petition_attachment"
+    default: True
+    relevant: case.filed in ["user0_filed","not_filed"]
+    help: |
+      "This **required document** starts your divorce within the court system. It informs the court what you are asking for - a legal divorce, and anything else including: child custody, child support, restoring your maiden name, etc."
+  - label: |
+      "Answer"
+    value: |
+      "answer_attachment"
+    relevant: case.filed in ["other_parties0_filed"]
+    default: True
+    help: |
+      "This required document is a written response to your spouse's Petition for Dissolution of Marriage. This should be completed even if you agree on everything."
+  - label: |
+      "Certificate of Dissolution of Marriage"
+    value: |
+      "certificate_of_dissolution_attachment"
+    relevant: True
+    default: True
+    help: |
+      "This required document is to be filled out by you and will be signed by the court when your divorce is final. It will be sent by the court to the county where you were married and will be put together with your marriage certificate for county record keeping."
+  - label: |
+      "Statement of Income and Expenses"
+    value: |
+      "income_statement_attachment"
+    relevant: True
+    default: True
+    help: |
+      "This required document gives the court an idea of your total income and expenses from both you and your spouse to determine division of property and debts as well as maintenance (formerly known as alimony), and child support, if appropriate."
+  - label: |
+      "Statement of Property and Debt"
+    value: |
+      "property_statement_attachment"
+    relevant: True
+    default: True
+    help: |
+      "This required document lists all property & debt currently owned by you or your spouse. This includes property and debt you owned before the marriage, acquired separately, and together. The court uses this document to  determine a fair division of property and debt."
+  - label: |
+      "Judgment and Decree of Dissolution of Marriage"
+    value: |
+      "judgment_attachment"
+    relevant: True
+    default: True
+    help: |
+      "This document is only for cases wherein both you and your spouse are in agreement on how everything will be divided. If accepted, the judge will sign this document, formally dissolving your marriage."
+  - label: |
+      "Parenting Plan"
+    value: |
+      "parenting_plan_attachment"
+    relevant: minor_children
+    default: True
+    help: |
+      "This document outlines a specific plan for: custody, parenting time, decision making regarding the child/ren, and child support. This document is required if you and your spouse have children together."
+  - label: |
+      "Notice of hearing"
+    value: |
+      "notice_of_hearing_attachment"
+    relevant: True
+    default: True
+    help: |
+      "This document will be completed by the court, providing the date of your hearing - where you will both be required to attend court."
+  - label: |
+      "Redaction Certification"
+    value: |
+      "redaction_certification_attachment"
+    relevant: False
+    default: True
+    help: |
+      "This required document acknowledges that you have redacted (or 'removed') the necessary confidential information from all of your filings, pursuant to Rules 19.10, 55.025, or 84.15."
+  - label: |
+      "Fee Waiver"
+    value: |
+      "fee_waiver_attachment"
+    relevant: True
+    default: True
+    help: |
+      "You may ask the court to waive the fees if you believe you are unable to pay them. This fee waiver will tell the court of your income and expenses, under oath, and the judge will decide whether the fees will be waived."
+  - label: |
+      "Form 14 only"
+    value: |
+      "form_14_attachment"
+    relevant: minor_children
+    default: False
+    help: |
+      "Form 14 is a worksheet to determine child support and is included in the Parenting Plan. Only select this if you want to complete a Form 14 without the rest of the Parenting Plan."
+---
+reconsider: doc_list_options
+code: |
+  temp_doc_list_choices = list()
+  for doc in doc_list_options:
+    if doc['relevant']:
+      temp_doc_list_choices.append({"label":doc['label'], "value":doc['value']})
+      if "default" in doc.keys():
+        temp_doc_list_choices[-1]["default"] = doc['default'] 
+      if "help" in doc.keys():
+        temp_doc_list_choices[-1]["help"] = doc['help']
+  doc_list_choices = temp_doc_list_choices
 ---
 variable name: doc_list_dictionary
 data:
@@ -1385,14 +1420,14 @@ code: |
 ---
 id: service_by_mail_notice enabled block for main interview
 code: |
-  if case.filed in ['user0_filed','not_filed'] and respondent.service_type == "mail":
+  if case.filed in ['not_filed'] and respondent.service_type == "mail":
     service_by_mail_notice_attachment.enabled = True
   else:
     service_by_mail_notice_attachment.enabled = False
 ---
 id: service_by_mail_affidavit enabled block for main interview
 code: |
-  if case.filed in ['user0_filed','not_filed'] and respondent.service_type == "mail":
+  if case.filed in ['not_filed'] and respondent.service_type == "mail":
     service_by_mail_affidavit_attachment.enabled = True
   else:
     service_by_mail_affidavit_attachment.enabled = False

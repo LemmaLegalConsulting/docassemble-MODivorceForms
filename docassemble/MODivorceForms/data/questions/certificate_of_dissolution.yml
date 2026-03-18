@@ -79,15 +79,15 @@ attachment:
       - "marriage_type_annulment_true": ${ False } 
       - "marriage_dissolved_date": ${ "" } 
       - "marriage_recorded_date": ${ "" } 
-      - "marriage_child_support_awarded_to_users1": ${ child_support == users[0].name.full() } 
-      - "marriage_number_children_awarded_users1": ${ len([item for item in children if item.physical_custody ==  users[0].name.full()]) } 
-      - "marriage_number_children_awarded_users2": ${ len([item for item in children if item.physical_custody ==  other_parties[0].name.full()]) } 
-      - "marriage_child_support_awarded_to_users2": ${ child_support == other_parties[0].name.full() } 
-      - "marriage_child_support_awarded_to_other": ${ child_support == "other" } 
-      - "marriage_number_children_awarded_joint": ${ len([item for item in children if item.physical_custody ==  "joint"]) } 
-      - "marriage_number_children_awarded_other": ${ len([item for item in children if item.physical_custody ==  "other"]) } 
-      - "marriage_number_children_awarded_no_children": ${ len(children) == 0 } 
-      - "marriage_child_support_awarded_to_none": ${ len(children) == 0 or child_support == "none" } 
+      - "marriage_child_support_awarded_to_users1": ${ "" } 
+      - "marriage_number_children_awarded_users1": ${ "" } 
+      - "marriage_number_children_awarded_users2": ${ "" } 
+      - "marriage_child_support_awarded_to_users2": ${ "" } 
+      - "marriage_child_support_awarded_to_other": ${ "" } 
+      - "marriage_number_children_awarded_joint": ${ "" } 
+      - "marriage_number_children_awarded_other": ${ "" } 
+      - "marriage_number_children_awarded_no_children": ${ "" } 
+      - "marriage_child_support_awarded_to_none": ${ "" } 
       - "marriage_decree_county": ${ case.county } 
       - "marriage_decree_court": ${ case.court } 
       - "marriage_decree_certifying_office": ${ case.certifying_office } 

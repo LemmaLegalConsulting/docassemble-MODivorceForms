@@ -1111,10 +1111,10 @@ attachment:
       - "serviceOnSpouse3": ${ other_parties[0].service_type == "work" } 
       - "serviceOnSpouseEmployersName": ${ respondent.employer.name.text if other_parties[0].service_type == "work" else "" } 
       - "serviceOnSpouseHoursOfEmployment": ${ respondent.hours_of_employment if other_parties[0].service_type == "work" else "" } 
-      - "serviceOnSpouseEmployersStreet": ${ respondent.employer.address.line_one() if other_parties[0].service_type == "work" else "" } 
-      - "serviceOnSpouseEmployersCity": ${ respondent.employer.address.city if other_parties[0].service_type == "work" else "" } 
-      - "serviceOnSpouseEmployersZip": ${ respondent.employer.address.zip if other_parties[0].service_type == "work" else "" } 
-      - "serviceOnSpouseEmployersState": ${ respondent.employer.address.state if other_parties[0].service_type == "work" else "" } 
+      - "serviceOnSpouseEmployersStreet": ${ respondent.service_address.line_one()if other_parties[0].service_type == "work" else "" } 
+      - "serviceOnSpouseEmployersCity": ${ respondent.service_address.city if other_parties[0].service_type == "work" else "" } 
+      - "serviceOnSpouseEmployersZip": ${ respondent.service_address.zip if other_parties[0].service_type == "work" else "" } 
+      - "serviceOnSpouseEmployersState": ${ respondent.service_address.state if other_parties[0].service_type == "work" else "" } 
       - "serviceOnSpouse4": ${ other_parties[0].service_type == "mail" } 
       - "ifYouOrSpouseReceiveTanf": ${ len(petitioner.benefits.matches(source=['tanf'])) > 0 or len(respondent.benefits.matches(source=['tanf'])) > 0  } 
       - "petitionersAttorneycCheckbox": ${ petitioner.attorney.assistance } 
