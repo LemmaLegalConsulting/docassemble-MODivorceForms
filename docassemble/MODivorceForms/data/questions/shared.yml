@@ -8,6 +8,11 @@ include:
 modules:
   - .al_income
   - docassemble.ALToolbox.misc
+  - .jod_functions
+  - .progressivedisclosure
+---
+features:
+  css: progressivedisclosure.css
 ---
 id: list of previously entered people
 code: |
@@ -331,26 +336,50 @@ data:
   - redaction_certification_attachment
 ---
 ## RELIEF ##
+id: relief object
 objects:
   - relief: DADict
 ---
+id: documents with relief
+variable name: var_doc_dict["relief"]
+data:
+  - petition_attachment
+  - answer_attachment
+
+---
+id: set relief ['divide_property']
 code: |
   relief['divide_property'] = True
 ---
 id: Relief Requested
-question: Other request for relief
+question: What do you want the court to do?
+subquestion: |
+  Part of ${ "an Answer" if case.filed == "other_parties0_filed" else "a Petition" } is saying what you want the court to do.  This is called the Relief that you request.
+
+  The ${ "Answer" if case.filed == "other_parties0_filed" else "Petition" } will ask for the standard request in a divorce, which includes
+
+   - Dissolving the marriage
+   - Dividing marital property and debt
+  % if minor_children:
+   - Granting custody
+   - Granting child support
+  % endif
+
+    You can also ask for the court to award Maintenance.  Maintenance is the financial support of either spouse during and following dissolution of marriage proceedings. This financial support considers ONLY the financial needs of the spouse, separate from child support - as the case may be.
+
+  We will ask about maintenance later.
+  
 fields:
+  - Do you want to change your name to your prior name?: relief['change_name']
+    datatype: yesnoradio
+    show if:
+      code: |
+        users[0].has_prior_name
   - Is there any other relief you want to request from the court?: relief['other']
     datatype: yesnoradio
   - Explain: relief_other
     show if: relief['other']
----
-if: users[0].has_prior_name
-question: Name Change
-fields:
-  - Do you want to change your name to your prior name?: relief['change_name']
-    datatype: yesnoradio
----    
+---  
 if: not users[0].has_prior_name
 code: |
   relief['change_name'] = False
@@ -483,6 +512,8 @@ fields:
     required: False
   - Email: x.email
     required: False
+validation code: |
+  validate_us_state(x.address)
 ---
 id: Phone and email generic
 generic object: ALIndividual
@@ -509,7 +540,7 @@ sets:
   - other_parties[0].address.address
   - other_parties[0].address.state
 id: Address other party
-question: What is your current spouse’s address?
+question: What is your current spouse’s last known address?
 fields:
   - code: |
       other_parties[0].address.address_fields(show_country=True,country_code="US")
@@ -518,6 +549,8 @@ fields:
   - Email: other_parties[0].email
     required: False
     datatype: email
+validation code: |
+  validate_us_state(other_parties[0].address)
 ---
 template: state_mismatch_warning
 content: |
@@ -818,6 +851,11 @@ fields:
     show if:
       variable: x.attorney_involved
       is: True
+  - Country: x.attorney.address.country
+    required: False
+    show if:
+      variable: x.attorney_involved
+      is: True
   - Phone: x.attorney.phone_number
     required: False
     show if:
@@ -829,6 +867,8 @@ fields:
     show if:
       variable: x.attorney_involved
       is: True
+validation code: |
+  validate_us_state(x.attorney.address)
 ---
 id: attorney_casenet_template
 template: attorney_casenet_template
@@ -1023,6 +1063,10 @@ if: defined('children.gathered')
 code: |
   number_of_children = len(children)
 ---
+if: not minor_children
+code: |
+  number_of_children = 0
+---
 sets: children[i].lived_with.name.first
 id: who child lived with
 reconsider: people_choices
@@ -1036,6 +1080,7 @@ fields:
       children[i].lived_with.name_fields()
   - code: |
       children[i].lived_with.address_fields()
+
 ---
 objects:
   children[i].lived_with: ALIndividual
@@ -1087,6 +1132,8 @@ fields:
       persons_lived_with[i].name_fields()
   - code: |
       persons_lived_with[i].address_fields()
+validation code: |
+  validate_us_state(persons_lived_with[i].address)
 ---
 sets: persons_lived_with[i].name.first
 id: who children lived with
@@ -1105,6 +1152,8 @@ fields:
       persons_lived_with[i].name_fields()
   - code: |
       persons_lived_with[i].address.address_fields()
+validation code: |
+  validate_us_state(persons_lived_with[i].address)
 ---
 id: persons lived with another
 question: Did the children live with anybody else during the last five years?
@@ -1755,17 +1804,10 @@ generic object: ALIndividual
 question: |
   Maintenance ${ x.name_full() } pays in other cases
 subquestion: |
-  ${ maintenance_template }
+  ${ prog_disclose(maintenance_template) }
 fields:
   - How much does ${ x.name_full() } pay monthly in maintenance in other cases?: x.maintenance_other_paid
     datatype: currency
----
-id: set maintenance to 0 if not previosuly married
-generic object: ALIndividual
-if: defined('x.previously_married') and not x.previously_married
-code: |
-  x.maintenance_other_received = 0
-  x.maintenance_other_paid = 0
 ---
 id: Child Care Expenses Responsibility
 question: |
@@ -1790,7 +1832,6 @@ variable name: var_doc_dict['pay_work_childcare_expenses']
 data:
   - form_14_attachment
   - income_statement_attachment
-  - petition_attachment
   - parenting_plan_attachment
 ---
 id: pay_work_childcare_expenses
@@ -1823,6 +1864,10 @@ fields:
   - What are the monthly work-related child care expenses for ${ x.name_full() }?: x.work_childcare_expenses
     datatype: currency
 ---
+if: not minor_children
+code: |
+  pay_work_childcare_expenses = "none"
+---
 if: not minor_children or pay_work_childcare_expenses == "none"
 generic object: ALIndividual
 code: |
@@ -1853,6 +1898,8 @@ fields:
 id: health insurance costs
 generic object: ALIndividual
 question: Children Health Insurance Costs for ${ x.name_full() }
+subquestion: |
+  Health insurance for the children is determined by dividing the amount paid for insurance each month by the number of people covered.  Multiply that amount by the number of children covered.
 fields:
   - What are the monthly health insurance costs for ${ x.name_full() } for the children who are subjects of this proceeding?: x.health_insurance_costs
     datatype: currency
@@ -3696,6 +3743,7 @@ fields:
   - Phone: other_parties[0].employer.phone_number
     show if: other_parties[0].has_self_employment_income
 validation code: |
+  validate_us_state(other_parties[0].employer.address)
   if not other_parties[0].has_self_employment_income:
     other_parties[0].self_employment_income = 0
     other_parties[0].self_employment_description = None
@@ -3835,6 +3883,8 @@ fields:
   - State: x.employer.address.state
   - Zip or postal code: x.employer.address.zip
   - Phone: x.employer.phone_number
+validation code: |
+  validate_us_state(x.employer.address)
 
 ---
 sets:
@@ -3857,6 +3907,8 @@ fields:
   - State: x.employer.address.state
   - Zip or postal code: x.employer.address.zip
   - Phone: x.employer.phone_number
+validation code: |
+  validate_us_state(x.employer.address)
 
 ---
 id: job complete
@@ -4597,10 +4649,18 @@ id: maintenance received for other cases
 generic object: ALIndividual
 question: Maintenance paid to ${ x.name_full() } in other cases
 subquestion: |
-  ${ maintenance_template }
+  ${ prog_disclose(maintenance_template) }
+  
 fields:
   - How much does ${ x.name_full() } receive monthly in maintenance in other cases?: x.maintenance_other_received
     datatype: currency
+---
+id: set maintenance to 0 if not previosuly married
+generic object: ALIndividual
+if: defined('x.previously_married') and not x.previously_married
+code: |
+  x.maintenance_other_received = 0
+  x.maintenance_other_paid = 0
 ---
 ############################# EXPENSES #############################
 ---
@@ -4811,7 +4871,8 @@ code: |
 id: maintenance to petitioner
 question: Maintenance to ${ petitioner.name.full() }
 subquestion: |
-  ${ maintenance_template }
+  ${ prog_disclose(maintenance_template) }
+  
 fields:
   - Should ${ respondent.name.full() } pay maintenance to ${ petitioner.name.full() }?: maintenance_to_petitioner
     input type: radio                                                                       
@@ -4823,7 +4884,8 @@ fields:
 id: maintenance to respondent
 question: Maintenance to ${ respondent.name.full() }
 subquestion: |
-  ${ maintenance_template }
+  ${ prog_disclose(maintenance_template) }
+  
 fields:
   - Should ${ petitioner.name.full() } pay maintenance to ${ respondent.name.full() }?: maintenance_to_respondent
     choices:
@@ -4835,7 +4897,8 @@ sets:
   - petitioner.maintenance_paid
 question: Maintenance to ${ respondent.name.full() }
 subquestion: |
-  ${ maintenance_template }
+  ${ prog_disclose(maintenance_template) }
+  
 fields:
   - How much?: maintenance_to_respondent_amount
     datatype: currency
@@ -4848,7 +4911,8 @@ validation code: |
 id: maintenance to petitioner amount
 question: Maintenance to ${ petitioner.name.full() }
 subquestion: |
-  ${ maintenance_template }
+  ${ prog_disclose(maintenance_template) }
+  
 fields:
   - How much?: maintenance_to_petitioner_amount
     datatype: currency
@@ -4860,7 +4924,8 @@ validation code: |
 ---
 question: Income Withholding
 subquestion: |
-  ${ maintenance_template }
+  ${ prog_disclose(maintenance_template) }
+  
 fields:
   - Should income withholding be prepared by the person receiving maintenance?: maintenance_income_withholding
     datatype: yesnoradio
@@ -4872,7 +4937,8 @@ fields:
 id: one maintenance award question
 question: Maintenance award
 subquestion: |
-  ${ maintenance_template }
+  Maintenance is the financial support of either spouse during and following dissolution of marriage proceedings. This financial support considers ONLY the financial needs of the spouse, separate from child support - as the case may be.
+  
 fields:
   - Should the court award maintenance to ${ petitioner.name_full() } or ${ respondent.name_full() }?: relief['maintenance']
     datatype: yesnoradio
@@ -4898,9 +4964,10 @@ fields:
 id: maintenance currently paid question
 question: Current maintenance award
 subquestion: |
+  ${ prog_disclose(maintenance_template) }
+  
   If maintenance was awarded in a previous divorce, or earlier in the case, you can answer yes.  But in most cases there will not already be an award of maintenance.
 
-  ${ maintenance_template }
 fields:
   - Is any maintenance currently paid by ${ petitioner.name_full() } or ${ respondent.name_full() } to the other?: is_maintenance_currently_paid
     datatype: yesnoradio
@@ -4935,81 +5002,12 @@ validation code: |
     respondent.maintenance_paid = 0
 ---
 ## SERVICE ##
-objects:
-  - service: Thing
----
-generic object: ALIndividual
-objects:
-  - x.service_address: ALAddress
----
-reconsider: x.address_choices
-sets: x.service_address.address
-id: service address
-generic object: ALIndividual
-question: Service address for ${ x.name_full() }
-fields:
-  - Address already provided: x.service_address
-    datatype: object_radio
-    choices: x.address_choices
-    none of the above: A different address
-    disable others: True
-    default: x.default_address
-  - code: |
-      x.service_address.address_fields()
----
-id: address choices code
-generic object: ALIndividual
-code: |
-  x.address_choices = list()
-  x.address_choices.append(x.address)
-  if defined('x.employer.address.address'):
-    x.address_choices.append(x.employer.address)
----
-id: Respondent hours of employment
-generic object: ALIndividual
-question: What are the hours of employment for ${ x.name_full() }?
-fields:
-  - no label: x.hours_of_employment
----
-id: service date
-question: Date of Service
-fields:
-  - Do you know when the documents will be filed?: fill_in_service_date
-    datatype: radio
-    choices:
-      - "Yes, and I'd like to fill it in now": yes
-      - "No, leave it blank and I will fill it in later": no 
-  - What date will the documents be served?: service.date
-    datatype: date
-    show if:
-      variable: fill_in_service_date
-      is: yes
-validation code: |
-  if fill_in_service_date == "yes" and as_datetime(service.date) < today():
-    validation_error("Please enter today's date or a date in the future.")
----
-id: Type of Service Question
-question: Type of Service
-fields: 
-  - Do you want to serve by publication or in person?: service_type
-    choices:
-      - Serve by publication: publication
-      - Serve in person: in_person
----
-id: Personal Service Question
-question: Type of Personal Service
-fields:
-  - Do you want to serve by sheriff or by private process server?: personal_service_type
-    choices:
-      - Serve by sheriff: sheriff
-      - Serve by private process server: private
----
 code: |
   temp_service_type_choices = list()
   temp_service_type_choices.append({'label': other_parties[0].name_full()  + " has signed a verified Respondent’s Answer to Petition for Dissolution of Marriage, which is being filed with the Petition for Dissolution of Marriage. Therefore, do not issue a summons.","value":"none"})
   if other_parties[0].address.state == "MO":
     temp_service_type_choices.append({'label': other_parties[0].name_full() + " should be served with a summons at their home.","value":"home"})
-  if defined('other_parties[0].employer.address.address') and other_parties[0].employer.address.state == "MO":
+  if (len(other_parties[0].jobs) > 0 or other_parties[0].has_self_employment_income) and other_parties[0].employer.address.state == "MO":
     temp_service_type_choices.append({'label': other_parties[0].name_full() + " should be served with a summons at their place of employment.","value":"work"})
   if other_parties[0].address.state != "MO" and (not defined('other_parties[0].employer.address.address') or other_parties[0].employer.address.state != "MO"):
     temp_service_type_choices.append({'label': other_parties[0].name_full() + " cannot be served in Missouri. Therefore, service by registered mail is requested. A copy of the Affidavit for Service by Mail is attached to this form. See Missouri Supreme Court Rule 54.12(b).","value":"mail"})
@@ -5023,36 +5021,47 @@ fields:
     datatype: radio
     choices:
       code: service_type_choices
-validation code: |
+---
+id: code to service address 
+code: |
   if other_parties[0].service_type == "work":
-    other_parties[0].default_address = other_parties[0].employer.address
+    other_parties[0].hours_of_employment
+    other_parties[0].service_address = other_parties[0].employer.address
+    other_parties[0].service_address_pdf = other_parties[0].employer.address.on_one_line()
+  elif other_parties[0].service_type in ['home','mail']:
+    other_parties[0].service_address = other_parties[0].address
+    other_parties[0].service_address_pdf = other_parties[0].address.on_one_line()
+  elif other_parties[0].service_type == "none":
+    other_parties[0].service_address_pdf = "Waiver of service"
   else:
-    other_parties[0].default_address = other_parties[0].address
+    other_parties[0].service_address_pdf = other_parties[0].address
+---
+id: Respondent hours of employment
+generic object: ALIndividual
+question: What are the hours of employment for ${ x.name_full() }?
+fields:
+  - no label: x.hours_of_employment
 ---
 id: default address for attorney
 generic object: ALIndividual
 code: |
-  x.attorney.default_address = x.attorney.address
+  x.attorney.service_address_pdf = "via the Missouri Court efiling system"
 ---
 id: people_served object
 objects: 
   - people_served: ALPeopleList.using(auto_gather=False)
 ---
-id: people_served code
+id: sets person served
 code: |
-  people_served.clear()
-  if users[0] == petitioner:
-    if respondent.attorney_involved:
-      people_served.append(respondent.attorney)
+  if case.filed == "not_filed":
+    people_served.append(other_parties[0])
+  else:
+    if other_parties[0].attorney_involved:
+      people_served.append(other_parties[0].attorney)
     else:
-      people_served.append(respondent)
-  elif users[0] == respondent:
-    if petitioner.attorney_involved:
-      people_served.append(petitioner.attorney)
-    else:
-      people_served.append(petitioner)
+      people_served.append(other_parties[0])
   people_served.gathered = True
----
+---  
 id: download MO divorce forms
 event: mo_divorce_forms_download
 question: |

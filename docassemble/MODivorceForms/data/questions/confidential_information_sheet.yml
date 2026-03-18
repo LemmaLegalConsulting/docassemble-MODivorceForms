@@ -30,7 +30,7 @@ attachment:
   pdf template file: confidential_information_sheet.pdf
   editable: False
   fields:
-      - "case_filing_date": ${ case.filing_date } 
+      - "case_filing_date": ${ today() } 
       - "case_county": ${ case.county } 
       - "case_case_name": ${ case.name } 
       - "case_type_code": ${ case.type_code } 
