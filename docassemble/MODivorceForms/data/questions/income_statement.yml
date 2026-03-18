@@ -13,6 +13,7 @@ attachment:
   editable: False
   fields:
       - "countyList": ${ case.county } 
+      - "case_number": ${ case.docket_number }
       - "petitionersSuffixJrSrIII": ${ petitioner.name.suffix } 
       - "petitionersFirstName": ${ petitioner.name.first } 
       - "petitionersMiddleName": ${ petitioner.name.middle } 
@@ -89,16 +90,16 @@ attachment:
       - "ieOtherExpensesR": ${ "$" + thousands(respondent.expenses.total(times_per_year = 12), show_decimals=True) } 
       - "ieTotalMonthlyExpensesR": ${ "$" + thousands(respondent.other_child_support_paid + respondent.maintenance_paid + respondent.maintenance_other_paid + respondent.work_childcare_expenses + respondent.health_insurance_costs + float(respondent.extraordinary_medical_costs.total(times_per_year = 12)) + float(sum([included_cost.total(times_per_year=12) for included_cost in respondent.extraordinary_childrearing_costs if included_cost.included_in_form_14])) + float(respondent.expenses.total(times_per_year = 12)), show_decimals=True) } 
       - "ieTotalMonthlyExpensesP": ${ "$" + thousands(petitioner.other_child_support_paid + petitioner.maintenance_paid + petitioner.maintenance_other_paid + petitioner.work_childcare_expenses + petitioner.health_insurance_costs + float(petitioner.extraordinary_medical_costs.total(times_per_year = 12)) + float(sum([included_cost.total(times_per_year=12) for included_cost in petitioner.extraordinary_childrearing_costs if included_cost.included_in_form_14])) + float(petitioner.expenses.total(times_per_year = 12)), show_decimals=True) } 
-      - "ieDateOfNotice": ${ service.date } 
+      - "ieDateOfNotice": ${ "" } 
       - "ieNameRow1": ${ people_served[0].name_full() } 
-      - "ieServiceContactInformationRow1": ${ people_served[0].address.on_one_line() } 
+      - "ieServiceContactInformationRow1": ${ people_served[0].service_address_pdf }
       - "ieNameRow2": |
           % if len(people_served) > 1:
           ${ people_served[1].name_full() } 
           % endif
       - "ieServiceContactInformationRow2": |
           % if len(people_served) > 1:
-          ${ people_served[1].address.on_one_line() } 
+          ${ people_served[1].service_address } 
           % endif
       - "ieNameRow3": |
           % if len(people_served) > 1:
@@ -106,7 +107,7 @@ attachment:
           % endif
       - "ieServiceContactInformationRow3": |
           % if len(people_served) > 1:
-          ${ people_served[2].address.on_one_line() } 
+          ${ people_served[2].service_address } 
           % endif
       - "ieNameRow4": |
           % if len(people_served) > 1:
@@ -114,6 +115,6 @@ attachment:
           % endif
       - "ieServiceContactInformationRow4": |
           % if len(people_served) > 1:
-          ${ people_served[3].address.on_one_line() } 
+          ${ people_served[3].service_address } 
           % endif
 ---
