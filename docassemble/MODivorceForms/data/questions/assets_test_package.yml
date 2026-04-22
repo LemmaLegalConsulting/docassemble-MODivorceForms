@@ -1,0 +1,214 @@
+features:
+  wide side by side: True
+---
+include:
+  - shared.yml
+---
+include:
+  - assets_data.yml
+  - choices_code.yml
+  - description_code.yml
+---
+objects:
+  - interview_data: DAStore
+---
+objects:
+  - assets_list: DAList.using(object_type=DAList, auto_gather=False, gathered=True)
+---
+code: |
+  assets_list.there_is_another = False
+---
+code: |
+  assets_list[i].there_is_another = False
+---
+code: |
+  manual_reset = True
+---
+mandatory: True
+code: |
+  assets_list
+  if not interview_data.defined("assets_data") or manual_reset:
+    assets_list.append(assets_starter, set_instance_name=True)
+    interview_data.set("assets_data", assets_list)
+  
+---
+code: |
+  if interview_data.defined("assets_data") and not manual_reset:
+    assets_list = interview_data.get("assets_data")
+---
+code: |
+  assets_edit = assets_list[-1]
+  
+---
+mandatory: True
+question: Assets
+subquestion: |
+
+  [Save edits to assets](${ url_action('save_assets') })
+
+  ${ assets_edit.table }
+---
+event: save_assets
+code: |
+  assets_list.append(assets_edit, set_instance_name=True)
+  interview_data.set('assets_data', assets_list)
+---
+id: asset question
+generic object: DAObject
+question: ${ x.variable }
+fields:
+  - Display name: x.display_name
+  - Does this type of asset have subtypes?: x.has_subtypes
+    datatype: yesnoradio
+  - note: |
+       ${ collapse_template(x.subtype_template_accordion) }
+       
+    show if: x.has_subtypes
+  - Can this type of asset be security for a loan?: x.may_have_loan
+    datatype: yesnoradio
+  - note: |
+      **Example loan description**:
+      % for tld in x.ld_list:
+      % if tld.type == "attribute":
+      % if tld.methods == "space":
+      ${ space(var_name="tld.example", prefix= tld.method_parameters['prefix'][1:-1], suffix= tld.method_parameters['suffix'][1:-1])}
+      % else:
+      ${ tld.example }
+      % endif
+      % else:
+      ${ tld.text[1:-1] }
+      % endif
+      % endfor      
+      
+      ${ collapse_template(x.loan_description_accordion) }
+
+      **Example security description**:
+      % for sd in x.sd_list:
+      % if sd.type == "attribute":
+      % if sd.methods == "space":
+      ${ space(var_name="sd.example", prefix= sd.method_parameters['prefix'][1:-1], suffix= sd.method_parameters['suffix'][1:-1])}
+      % else:
+      ${ sd.example }
+      % endif
+      % else:
+      ${ sd.text[-1:1] }
+      % endif
+      % endfor      
+      
+      ${ collapse_template(x.security_description_accordion) }
+
+    show if: x.may_have_loan
+  - Can the award of this asset be split?: x.may_split_award
+    datatype: yesnoradio
+  - note: |
+      **Example asset description**:
+      % for ad in x.description_list:
+      % if ad.type == "attribute":
+      % if ad.methods == "space":
+      ${ space(var_name="ad.example", prefix= ad.method_parameters['prefix'][1:-1], suffix= ad.method_parameters['suffix'][1:-1])}
+      % else:
+      ${ ad.example }
+      % endif
+      % else:
+      ${ ad.text[-1:1] }
+      % endif
+      % endfor      
+
+      ${ collapse_template(x.asset_description_accordion) }
+
+  - Use default attributes and labels?: x.has_default_attributes
+    datatype: yesnoradio
+  - note: |
+       ${ x.attributes_table }
+
+       ${ x.attributes.add_action() }
+    show if:
+      variable: x.has_default_attributes
+      is: False
+
+
+continue button field: x.assets_checkin
+---
+table: x.table
+generic object: DAList
+rows: x
+columns:
+  - Name: row_item.display_name
+  - Security?: output_checkbox(row_item.may_have_loan)
+  - Split award?: output_checkbox(row_item.may_split_award)
+  - Subtypes: comma_and_list(row_item.terms_ordered if row_item.has_subtypes else "No subtypes")
+  - Unique attributes: comma_and_list([it.label for it in row_item.attributes if not hasattr(it,"note") and it.field not in ["x[i].source","x[i].source_other","x[i].description", "x[i].market_value", "x[i].is_amount_owed", "x[i].lender", "x[i].balance", "x[i].monthly_payment", "x[i].recommended_debt", "x[i].user_percentage_choice", "x[i].user_percentage_other", "x[i].marital_property", "x[i].has_possession", "x[i].recommended_award", "x[i].award_percentage_choice", "x[i].award_percentage_other" ]])
+edit:
+  - assets_checkin
+delete buttons: False
+---
+########## TERMS ORDERED
+generic object: DAObject
+code: |
+  x.terms_ordered.there_is_another = False
+---
+generic object: DAObject
+template: x.subtype_template_accordion
+subject: Subtypes of ${ x.variable }
+content: |
+  ${ x.subtype_template }
+
+  
+  ${ x.terms_ordered.add_action() }
+---
+generic object: DAObject
+table: x.subtype_template
+rows: x.terms_ordered
+columns:
+  - Label: row_item
+  - Field: row_index
+edit: True
+allow reordering: True
+---
+generic object: DAObject
+id: terms_ordered edit
+question: Edit subtypes for ${ x.display_name }
+fields:
+  - Field: i
+  - Label: x.terms_ordered[i]
+list_collect: True
+---
+####### ATTRIBUTES
+id: attributes wuestion
+generic object: DAObject
+question: Attribute
+fields:
+  - Label: x.label
+  - Required: x.required
+    datatype: yesnoradio
+  - Datatype: x.datatype
+    required: False
+  - Code: x.code
+    required: False
+  - Example: x.example
+    required: False
+
+---
+id: attributes table
+generic object: DAObject
+table: x.attributes_table
+rows: x.attributes
+columns:
+  - Label: showifdef("row_item.label")
+  - Required: showifdef("row_item.required")
+  - Datatype: showifdef("row_item.datatype")
+  - Code: showifdef("row_item.code")
+  - Example: showifdef("row_item.example")
+allow reordering: True
+edit:
+  - label
+---
+id: attributes table
+generic object: DAObject
+table: x.attributes_table2
+rows: x.attributes
+columns:
+  - Label: row_item.label
+edit: True
+require gathered: False
+---

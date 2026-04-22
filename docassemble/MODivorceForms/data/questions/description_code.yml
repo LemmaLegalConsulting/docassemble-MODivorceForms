@@ -1,0 +1,441 @@
+
+generic object: DAObject
+objects:
+  - x.ld_list: DAList.using(auto_gather=False, description_type="Loan description")
+---
+generic object: DAObject
+objects:
+  - x.sd_list: DAList.using(auto_gather=False, description_type="Loan security description")
+---
+generic object: DAObject
+objects:
+  - x.description_list: DAList.using(auto_gather=False, description_type="Asset description")
+
+---
+generic object: DAObject
+code: |
+  if len(x.ld_list.complete_elements()) == 0 or manual_reset:
+    x.ld_list.question_code = list()
+    for ld in x.loan_description_code.split("+"):
+      x.ld_list.appendObject()
+      x.ld_list[-1].ld_code_parsed = ld.strip()
+      x.ld_list[-1].space_test = x.ld_list[-1].ld_code_parsed[:6]
+      if 'space(' == x.ld_list[-1].ld_code_parsed[:6]:
+        x.ld_list[-1].type = "attribute"
+        x.ld_list[-1].methods = "space"
+        x.ld_list[-1].temp_method = x.ld_list[-1].ld_code_parsed[7:-1].split(",")
+        x.ld_list[-1].attribute = x.ld_list[-1].temp_method[0][1:-1].split(".")[-1]
+        if "display_name" in x.ld_list[-1].attribute:
+          if len([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == "source"]) > 0:
+            x.ld_list[-1].example = str([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == "source"][0])
+          else:
+            x.ld_list[-1].example = ""
+        else:
+          if len([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == "source"]) > 0:
+            x.ld_list[-1].example = str([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == x.ld_list[-1].attribute][0])
+          else:
+            x.ld_list[-1].example = ""
+        x.ld_list[-1].initializeAttribute('method_parameters',DADict.using(auto_gather=False, gathered = True))
+        for parameter in x.ld_list[-1].temp_method[1:]:
+          x.ld_list[-1].temp_key = parameter.split("=")[0].strip()
+          x.ld_list[-1].temp_value = parameter.split("=")[1].strip()
+          x.ld_list[-1].method_parameters[x.ld_list[-1].temp_key] = x.ld_list[-1].temp_value
+      elif '.' in x.ld_list[-1].ld_code_parsed and " " not in x.ld_list[-1].ld_code_parsed:
+        x.ld_list[-1].type = "attribute"
+        x.ld_list[-1].methods = "none"
+        x.ld_list[-1].attribute = ld.split(".")[-1]
+        if "display_name" in x.ld_list[-1].attribute:
+          if len([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == "source"]) > 0:
+            x.ld_list[-1].example = str([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1]== "source"][0]) 
+          else:
+            x.ld_list[-1].example = ""
+        else:
+          if len([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == "source"]) > 0:
+            x.ld_list[-1].example = str([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1]== x.ld_list[-1].attribute][0])
+          else:
+            x.ld_list[-1].example = ""
+        x.ld_list[-1].initializeAttribute('method_parameters', DADict.using(object_type=DAObject, auto_gather=False, gathered = True))
+      else:
+        x.ld_list[-1].type = "text"
+        x.ld_list[-1].text = ld.strip()
+        x.ld_list[-1].initializeAttribute('method_parameters', DADict.using(object_type=DAObject, auto_gather=False, gathered = True))
+  x.ld_list.gathered = True
+---
+if: len(x.sd_list.complete_elements()) != 0
+generic object: DAObject
+code: |
+  x.sd_list.gathered = True
+---
+generic object: DAObject
+code: |
+  if len(x.sd_list.complete_elements()) == 0 or manual_reset:
+    x.sd_list.question_code = list()
+    for ld in x.security_description_code.split("+"):
+      x.sd_list.appendObject(DAObject)
+      x.sd_list[-1].ld_code_parsed = ld.strip()
+      x.sd_list[-1].space_test = x.sd_list[-1].ld_code_parsed[:6]
+      if 'space(' == x.sd_list[-1].ld_code_parsed[:6]:
+        x.sd_list[-1].type = "attribute"
+        x.sd_list[-1].methods = "space"
+        x.sd_list[-1].temp_method = x.sd_list[-1].ld_code_parsed[7:-1].split(",")
+        x.sd_list[-1].attribute = x.sd_list[-1].temp_method[0][1:-1].split(".")[-1]
+        if "display_name" in x.sd_list[-1].attribute:
+          if len([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == "source"]) > 0:
+            x.sd_list[-1].example = str([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == "source"][0])
+          else:
+            x.sd_list[-1].example = ""
+        else:
+          if len([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == "source"]) > 0:
+            x.sd_list[-1].example = str([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == x.sd_list[-1].attribute][0])
+          else:
+            x.sd_list[-1].example = ""
+        x.sd_list[-1].initializeAttribute('method_parameters',DADict.using(auto_gather=False, gathered = True))
+        for parameter in x.sd_list[-1].temp_method[1:]:
+          x.sd_list[-1].temp_key = parameter.split("=")[0].strip()
+          x.sd_list[-1].temp_value = parameter.split("=")[1].strip()
+          x.sd_list[-1].method_parameters[x.sd_list[-1].temp_key] = x.sd_list[-1].temp_value
+      elif '.' in x.sd_list[-1].ld_code_parsed and " " not in x.sd_list[-1].ld_code_parsed:
+        x.sd_list[-1].type = "attribute"
+        x.sd_list[-1].methods = "none"
+        x.sd_list[-1].attribute = ld.split(".")[-1]
+        if "display_name" in x.sd_list[-1].attribute:
+          if len([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == "source"]) > 0:
+            x.sd_list[-1].example = str([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1]== "source"][0]) 
+          else:
+            x.sd_list[-1].example = ""
+        else:
+          if len([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == "source"]) > 0:
+            x.sd_list[-1].example = str([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1]== x.sd_list[-1].attribute][0])
+          else:
+            x.sd_list[-1].example = ""
+        x.sd_list[-1].initializeAttribute('method_parameters', DADict.using(object_type=DAObject, auto_gather=False, gathered = True))
+      else:
+        x.sd_list[-1].type = "text"
+        x.sd_list[-1].text = sd.strip()
+        x.sd_list[-1].initializeAttribute('method_parameters', DADict.using(object_type=DAObject, auto_gather=False, gathered = True))
+  x.sd_list.gathered = True
+---
+if: len(x.description_list.complete_elements()) != 0
+generic object: DAObject
+code: |
+  x.description_list.gathered = True
+---
+generic object: DAObject
+code: |
+  if len(x.description_list.complete_elements()) == 0 or manual_reset:
+    x.description_list.question_code = list()
+    for dd in x.description_code.split("+"):
+      x.description_list.appendObject()
+      x.description_list[-1].ld_code_parsed = dd.strip()
+      x.description_list[-1].space_test = x.description_list[-1].ld_code_parsed[:6]
+      if 'space(' == x.description_list[-1].ld_code_parsed[:6]:
+        x.description_list[-1].type = "attribute"
+        x.description_list[-1].methods = "space"
+        x.description_list[-1].temp_method = x.description_list[-1].ld_code_parsed[7:-1].split(",")
+        x.description_list[-1].attribute = x.description_list[-1].temp_method[0][1:-1].split(".")[-1]
+        if "display_name" in x.description_list[-1].attribute:
+          if len([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == "source"]) > 0:
+            x.description_list[-1].example = str([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == "source"][0])
+          else:
+            x.description_list[-1].example = ""
+        else:
+          if len([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == "source"]) > 0:
+            x.description_list[-1].example = [ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == x.description_list[-1].attribute][0]
+          else:
+            x.description_list[-1].example = ""
+        x.description_list[-1].initializeAttribute('method_parameters',DADict.using(auto_gather=False, gathered = True))
+        for parameter in x.description_list[-1].temp_method[1:]:
+          x.description_list[-1].temp_key = parameter.split("=")[0].strip()
+          x.description_list[-1].temp_value = parameter.split("=")[1].strip()
+          x.description_list[-1].method_parameters[x.description_list[-1].temp_key] = x.description_list[-1].temp_value
+      elif '.' in x.description_list[-1].ld_code_parsed and " " not in x.description_list[-1].ld_code_parsed:
+        x.description_list[-1].type = "attribute"
+        x.description_list[-1].methods = "none"
+        x.description_list[-1].attribute = dd.split(".")[-1]
+        if "display_name" in x.description_list[-1].attribute:
+          if len([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == "source"]) > 0:
+            x.description_list[-1].example = str([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1]== "source"][0]) 
+          else:
+            x.description_list[-1].example = ""
+        else:
+          if len([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1] == "source"]) > 0:
+            x.description_list[-1].example = str([ex.example for ex in x.attributes if hasattr(ex,"example") and hasattr(ex,'field') and ex.field.split(".")[1]== x.description_list[-1].attribute][0])
+          else:
+            x.description_list[-1].example = ""
+        x.description_list[-1].initializeAttribute('method_parameters', DADict.using(object_type=DAObject, auto_gather=False, gathered = True))
+      else:
+        x.description_list[-1].type = "text"
+        x.description_list[-1].text = dd.strip()
+        x.description_list[-1].initializeAttribute('method_parameters', DADict.using(object_type=DAObject, auto_gather=False, gathered = True))
+  x.description_list.gathered = True
+---
+generic object: DAObject
+template: x.loan_description_accordion
+subject: Loan description assembly
+content: |
+  ${ x.ld_list.description_table}
+
+  ${ x.ld_list.add_action() }
+
+  
+---
+generic object: DAObject
+template: x.security_description_accordion
+subject: Security description assembly
+content: |
+  ${ x.sd_list.description_table}
+
+  ${ x.sd_list.add_action() }
+---
+generic object: DAObject
+template: x.asset_description_accordion
+subject: Asset description assembly
+content: |
+  ${ x.description_list.description_table}
+
+  ${ x.description_list.add_action() }
+---
+generic object: DAList
+table: x.description_table
+rows: x
+columns:
+  - Part: |
+      row_index
+  - Text: |
+      row_item.text if row_item.type == "text" else row_item.attribute
+  - Space: |
+      "NA" if row_item.type == "text" else "TEST"
+  - Prefix: |
+      "NA" if not hasattr(row_item, 'methods') or showifdef("row_item.methods") != "space" else showifdef("row_item.method_parameters['prefix'].type")  
+  - Suffix: |
+      "NA" if not hasattr(row_item, 'methods') or  showifdef("row_item.methods") != "space" else  showifdef("row_item.method_parameters['suffix'].type")  
+  - Example: |
+      row_item.text if row_item.type == "text" else showifdef('row_item.example')
+allow reordering: True
+confirm: True
+edit:
+  - type
+---
+
+generic object: DAObject
+question: Loan description type for ${ x.display_name }
+subquestion: |
+ [TARGET description_review_target]
+fields:
+  - Type: x.ld_list[i].type
+    choices:
+      - attribute
+      - text
+  - Text: x.ld_list[i].text 
+    show if:
+      variable: x.ld_list[i].type
+      is: text
+  - Attribute: x.ld_list[i].attribute
+    show if:
+      variable: x.ld_list[i].type
+      is: attribute
+    datatype: code
+    code: |
+      [att.field.split('.')[1] for att in x.attributes if not hasattr(att,'note')]
+  - Space: x.ld_list[i].methods
+    show if:
+      variable: x.ld_list[i].type
+      is: attribute
+    choices:
+      - space
+      - no space
+  - Prefix: x.ld_list[i].method_parameters['prefix']
+    show if:
+      variable: x.ld_list[i].methods
+      is: space
+  - Suffix: x.ld_list[i].method_parameters['suffix']
+    show if:
+      variable:  x.ld_list[i].methods
+      is: space
+  - Example: x.ld_list[i].example
+    show if:
+      variable:  x.ld_list[i].type
+      is: attribute
+check in: description_review_template
+---
+template: description_review_template
+content: |
+  This section lets you see how your updates will look in the whole description statement.<br><br>
+  % if action_argument('x.ld_list[i].type') == "attribute":
+  
+  The "example" for the attribute can be changed for testing in this interview.  The example is not used in the final interview or documents.<br><br>
+  % if action_argument('x.ld_list[i].methods') == "space":
+  
+  You can set it to add a space before or after an attribute.  The quotation marks are left in the fields and the example so it is easier to see when there is a space.  The quotation marks will not be in the final interview or documents.<br><br>
+  % endif
+  % elif action_argument('x.ld_list[i].type') == "text":
+
+  The text, in both the field and the example on this page, must have quotation marks so spaces before or after the text can be clearly shown.  In the examples on other pages, and in the final interview, these quotation marks won't be shown.<br><br>
+  % endif
+  
+  
+  % for ld in x.ld_list:
+  % if loop.index == i:
+  % if action_argument('x.ld_list[i].type') == "attribute":
+  % if action_argument('x.ld_list[i].methods') == "space":
+  **${ action_argument("x.ld_list[i].method_parameters['prefix']") }${ action_argument("x.ld_list[i].example") or "[BLANK]" }${ action_argument("x.ld_list[i].method_parameters['suffix']") }**\
+  % else:
+  **${ action_argument('x.ld_list[i].example') or "[BLANK]" }**\
+  % endif
+  % else:
+  **${ action_argument('x.ld_list[i].text') or "[BLANK]" }**\
+  % endif
+    % else:
+  % if ld.type == "attribute":
+  % if ld.methods == "space":
+  ${ space(str('ld.example'), prefix= ld.method_parameters['prefix'][1:-1], suffix= ld.method_parameters['suffix'][1:-1])}\
+  % else:
+  ${ ld.example }\
+  % endif
+  % else:
+  ${ ld.text }\
+  % endif
+  % endif
+  % endfor      
+
+target: description_review_target
+---
+generic object: DAObject
+question: Security description type for ${ x.display_name }
+subquestion: |
+ [TARGET security_description_review_target]
+fields:
+  - Type: x.sd_list[i].type
+    choices:
+      - attribute
+      - text
+  - Text: x.sd_list[i].text 
+    show if:
+      variable: x.sd_list[i].type
+      is: text
+  - Attribute: x.sd_list[i].attribute
+    show if:
+      variable: x.sd_list[i].type
+      is: attribute
+    datatype: code
+    code: |
+      [att.field.split('.')[1] for att in x.attributes if not hasattr(att,'note')]
+  - Space: x.sd_list[i].methods
+    show if:
+      variable: x.sd_list[i].type
+      is: attribute
+    choices:
+      - space
+      - no space
+  - Prefix: x.sd_list[i].method_parameters['prefix']
+    show if:
+      variable: x.sd_list[i].methods
+      is: space
+  - Suffix: x.sd_list[i].method_parameters['suffix']
+    show if:
+      variable:  x.sd_list[i].methods
+      is: space
+  - Example: x.sd_list[i].example
+    show if:
+      variable:  x.sd_list[i].type
+      is: attribute
+check in: security_description_review_template
+---
+template: security_description_review_template
+content: |
+  % for sd in x.sd_list:
+  % if loop.index == i:
+  % if action_argument('x.sd_list[i].type') == "attribute":
+  % if action_argument('x.sd_list[i].methods') == "space":
+  ${ action_argument("x.sd_list[i].method_parameters['prefix']")[1:-1] }${ action_argument("x.sd_list[i].example") or "[BLANK]" }${ action_argument("x.sd_list[i].method_parameters['suffix']")[1:-1] }\
+  % else:
+  ${ action_argument('x.sd_list[i].example') or "[BLANK]" }\
+  % endif
+  % else:
+  ${ action_argument('x.sd_list[i].text') or "[BLANK]" }\
+  % endif
+    % else:
+  % if sd.type == "attribute":
+  % if sd.methods == "space":
+  **${ space(str('sd.example'), prefix= sd.method_parameters['prefix'], suffix= sd.method_parameters['suffix'])}**\
+  % else:
+  **${ sd.example }**\
+  % endif
+  % else:
+  **${ sd.text }**\
+  % endif
+  % endif
+  % endfor      
+
+target: security_description_review_target
+---
+
+generic object: DAObject
+question: Asset description type for ${ x.display_name }
+subquestion: |
+ [TARGET asset_description_review_target]
+fields:
+  - Type: x.description_list[i].type
+    choices:
+      - attribute
+      - text
+  - Text: x.description_list[i].text 
+    show if:
+      variable: x.description_list[i].type
+      is: text
+  - Attribute: x.description_list[i].attribute
+    show if:
+      variable: x.description_list[i].type
+      is: attribute
+    datatype: code
+    code: |
+      [att.field.split('.')[1] for att in x.attributes if not hasattr(att,'note')]
+  - Space: x.description_list[i].methods
+    show if:
+      variable: x.description_list[i].type
+      is: attribute
+    choices:
+      - space
+      - no space
+  - Prefix: x.description_list[i].method_parameters['prefix']
+    show if:
+      variable: x.description_list[i].methods
+      is: space
+  - Suffix: x.description_list[i].method_parameters['suffix']
+    show if:
+      variable:  x.description_list[i].methods
+      is: space
+  - Example: x.description_list[i].example
+    show if:
+      variable:  x.description_list[i].type
+      is: attribute
+check in: asset_description_review_template
+---
+template: asset_description_review_template
+content: |
+  % for ad in x.description_list:
+  % if loop.index == i:
+  % if action_argument('x.description_list[i].type') == "attribute":
+  #% if action_argument('x.description_list[i].methods') == "space":
+  #${ action_argument("x.description_list[i].method_parameters['prefix']")[1:-1] }${ action_argument("x.description_list[i].example") or "[BLANK]" }${ action_argument("x.description_list[i].method_parameters['suffix']")[1:-1] }\
+  #% else:
+  #${ action_argument('x.description_list[i].example') or "[BLANK]" }\
+  #% endif
+  % else:
+  ${ action_argument('x.description_list[i].text') or "[BLANK]" }\
+  % endif
+    % else:
+  % if ad.type == "attribute":
+  % if ad.methods == "space":
+  **${ space(str('ad.example'), prefix= " " if ad.method_parameters['prefix'].type == "Space" else "" if ad.method_parameters['prefix'].type == "Nothing" else  ad.method_parameters['prefix'].type_other, suffix= " " if ad.method_parameters['suffix'].type == "Space" else "" if ad.method_parameters['suffix'].type == "Nothing" else ad.method_parameters['suffix'].type_other)}**\
+  % else:
+  **${ ad.example }**\
+  % endif
+  % else:
+  **${ ad.text }**\
+  % endif
+  % endif
+  % endfor      
+
+target: asset_description_review_target
+---

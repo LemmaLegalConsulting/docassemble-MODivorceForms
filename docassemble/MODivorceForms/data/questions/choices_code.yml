@@ -1,0 +1,79 @@
+
+id: set choices for asset
+generic object: ALAssetList
+code: |
+  x.asset_info_choices = list()
+  if x.has_default_attributes:
+    x.asset_info_choices.append(
+      {"field":"x[i].source", "label": "Type of asset", "code": "x.ordered"}
+      )
+    x.asset_info_choices.append(
+      {"field":"x[i].source_other", "label": "Other (explain)","show if":{"variable":"x.source","is":"other"}}
+      )
+    x.asset_info_choices.append(
+      {"field":"x[i].description", "label": "Description"}
+      )
+    x.asset_info_choices.append(
+      {"field":"x[i].market_value", "label": "What is its market value? How much would you get if you sold it?","datatype":"currency"}
+      )
+    if x.may_have_loan:
+      x.asset_info_choices.append(
+        {"label": "Is there an amount owed on this property?", "field": "x[i].is_amount_owed", "datatype": "yesnoradio"}
+        )
+      x.asset_info_choices.append(
+        {"label": "Who is the money owed to?", "field": "x[i].lender", "required": False, "show if": "x[i].is_amount_owed"}
+        )
+      x.asset_info_choices.append(
+        {"label": "Balance", "field": "x[i].balance", "datatype": "currency", "show if": "x[i].is_amount_owed"}
+        )
+      x.asset_info_choices.append(
+        {"label": "Monthly Payment", "field": "x[i].monthly_payment", "datatype": "currency", "show if": "x[i].is_amount_owed"}
+        )
+      x.asset_info_choices.append(
+        {"label": "Who should pay this debt?", "field": "x[i].recommended_debt", "show if": "x[i].is_amount_owed", "choices":[{"Petitioner":"petitioner"},{"Respondent":"respondent"},{"Split the debt":"split"}, {"Other":"other"}]}
+        )
+      x.asset_info_choices.append(
+        {"label": "How much should users[0].name.full()  pay?", "field": "x[i].user_percentage_choice", "choices":[{"50%": 50}, {"75%": 75}, {"25%": 25}, {"Other": "other"}], "show if":{"variable": "x[i].recommended_debt", "is": "split"}}
+        )
+      x.asset_info_choices.append(
+        {"label": "What percentage?", "field": "x[i].user_percentage_other", "datatype": "number", "min": 0, "max": 100, "show if":{"variable": "x[i].user_percentage_choice", "is": "other"}}
+        )
+    x.asset_info_choices.append(
+      {"field":"x[i].marital_property", "label": "Is this marital or nonmarital property?","choices":[{"Marital":"Marital"},{"Nonmarital":"Nonmarital"},{"Both":"Both"}]}
+      )
+    x.asset_info_choices.append(
+      {"note":"${ collapse_template(marital_property_template) }"}
+      )
+    x.asset_info_choices.append(
+      {"field":"x[i].has_possession", "label": "Who has possession?","choices":[{"Petitioner":"petitioner"},{"Respondent":"respondent"},{"Split the award":"split"},{"Other":"other"}]}
+      )
+
+    if x.may_split_award:
+      x.asset_info_choices.append(
+        {"field":"x[i].recommended_award", "label":"Recommended Award","choices":[{"Petitioner":"petitioner"},{"Respondent":"respondent"},{"Split the award":"split"},{"Other":"other"}]}
+        )
+      x.asset_info_choices.append(
+        {"label": "How much should users[0].name.full()  pay?", "field": "x[i].award_percentage_choice", "choices":[{"50%": 50}, {"75%": 75}, {"25%": 25}, {"Other": "other"}], "show if":{"variable": "x[i].recommended_award", "is": "split"}}
+        )
+      x.asset_info_choices.append(
+        {"label": "What percentage?", "field": "x[i].award_percentage_other", "datatype": "number", "min": 0, "max": 100, "show if":{"variable": "x[i].award_percentage_choice", "is": "other"}}
+        )
+    else:
+      x.asset_info_choices.append(
+        {"field":"x[i].recommended_award", "label":"Recommended Award","choices":[{"Petitioner":"petitioner"}, {"Respondent":"respondent"}, {"Other":"other"}]}  
+        )
+  else:
+    for index in range(0,len(x.attributes)):
+      temp_dict = dict()
+      for key in x.attributes[index].keys():
+        if key == "show if":
+          if isinstance(x.attributes[index][key],dict):
+            temp_dict[key] = dict()
+            temp_dict[key]["variable"] = x.attributes[index][key]["variable"]
+            temp_dict[key]["is"] = x.attributes[index][key]["is"]
+          else:
+            temp_dict[key] = x.attributes[index][key]
+        elif key != "example":
+          temp_dict[key] = x.attributes[index][key]
+      x.asset_info_choices.append(temp_dict)
+---

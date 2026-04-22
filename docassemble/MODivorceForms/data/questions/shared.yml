@@ -1990,7 +1990,7 @@ code: |
 id: ALAssetList selected values for there are any
 generic object: ALAssetList
 question: |
-  ${ x.display_name }
+  ${ x.display_name | title_case }
 subquestion: |   
   Do you or your spouse own any ${ x.display_name }?
 fields:
@@ -2228,7 +2228,13 @@ fields:
       - Both
   - note: |
       ${ collapse_template(marital_property_template) }
-  - Who is living in the house?: real_estate[i].has_possession
+  - Whose name is on the title?: real_estate[i].title
+    choices:
+      - ${ petitioner.name.full() } 
+      - ${ respondent.name.full() }
+      - ${ petitioner.name.full() } + ${ respondent.name.full() }
+      - Other: other
+  - Who is living in the ${ real_estate[i].display_name } ?: real_estate[i].has_possession
     choices:
       - ${ petitioner.name.full() } 
       - ${ respondent.name.full() }
@@ -2238,6 +2244,23 @@ fields:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
       - Other: other
+      - Split the award: split
+  - "How much should ${ users[0].name.full() } get?": real_estate[i].award_percentage_choice
+    choices:
+      - "50%": 50
+      - "75%": 75
+      - "25%": 25
+      - Other: other
+    show if:
+      variable: real_estate[i].recommended_award
+      is: split
+  - What percentage?: real_estate[i].award_percentage_other
+    datatype: number
+    min: 0
+    max: 100
+    show if:
+      variable: real_estate[i].award_percentage_choice
+      is: other
 validation code: |
   if real_estate[i].source != "other":
     real_estate[i].display_name = real_estate.terms_ordered.get(real_estate[i].source, real_estate[i].source)
@@ -2843,6 +2866,46 @@ fields:
     js show if:   |
       val("businesses.there_are_any") === true || val("businesses.there_are_any") === false
 continue button field: there_are_any_screen
+---
+
+comment: |
+  Some assets do not have subtypes, and the user just says whether there are any assets and then 
+id: multiple assets question
+question: Do you have any other assets?
+subquestion: |
+  Check any type of asset you may have.
+fields:
+  - Securities: securities.selected_types_set
+    datatype: yesnowide
+  - Retirement accounts: retirement_accounts.selected_types_set
+    datatype: yesnowide
+  - Life insurance: life_insurance.there_are_any
+    datatype: yesnowide
+  - Interests in trust: interests_in_trust.there_are_any
+    datatype: yesnowide
+  - Interest in contracts made and not performed: interest_in_contract.there_are_any
+    datatype: yesnowide
+  - Interest in pending litigation: interest_in_litigation.there_are_any
+    datatype: yesnowide
+  - Interest in farm equipment: farm.there_are_any
+    datatype: yesnowide
+  - Debts owed to you by others: debts_owed_to_you.there_are_any
+    datatype: yesnowide
+  - Interests in businesses: businesses.there_are_any
+    datatype: yesnowide
+  - Other assets: other_assets.there_are_any
+    datatype: yesnowide
+continue button field: there_are_any_screen
+---
+id: code to set securities.there_are_any
+if: not securities.selected_types_set
+code: |
+  securities.there_are_any = False
+---
+id: code to set retirement_accounts.there_are_any
+if: not retirement_accounts.selected_types_set
+code: |
+  retirement_accounts.there_are_any = False
 ---
 comment: |
   FARM
