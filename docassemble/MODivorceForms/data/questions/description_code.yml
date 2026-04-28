@@ -204,11 +204,11 @@ columns:
   - Text: |
       row_item.text if row_item.type == "text" else row_item.attribute
   - Space: |
-      "NA" if row_item.type == "text" else "TEST"
+      "NA" if row_item.type == "text" else showifdef("row_item.methods")
   - Prefix: |
-      "NA" if not hasattr(row_item, 'methods') or showifdef("row_item.methods") != "space" else showifdef("row_item.method_parameters['prefix'].type")  
+      "NA" if not hasattr(row_item, 'methods') or showifdef("row_item.methods") != "space" else showifdef("row_item.method_parameters['prefix']")  
   - Suffix: |
-      "NA" if not hasattr(row_item, 'methods') or  showifdef("row_item.methods") != "space" else  showifdef("row_item.method_parameters['suffix'].type")  
+      "NA" if not hasattr(row_item, 'methods') or  showifdef("row_item.methods") != "space" else  showifdef("row_item.method_parameters['suffix']")  
   - Example: |
       row_item.text if row_item.type == "text" else showifdef('row_item.example')
 allow reordering: True
@@ -427,7 +427,7 @@ content: |
     % else:
   % if ad.type == "attribute":
   % if ad.methods == "space":
-  **${ space(str('ad.example'), prefix= " " if ad.method_parameters['prefix'].type == "Space" else "" if ad.method_parameters['prefix'].type == "Nothing" else  ad.method_parameters['prefix'].type_other, suffix= " " if ad.method_parameters['suffix'].type == "Space" else "" if ad.method_parameters['suffix'].type == "Nothing" else ad.method_parameters['suffix'].type_other)}**\
+  **${ space(str('ad.example'), prefix= ad.method_parameters['prefix'], suffix= ad.method_parameters['suffix'])}**\
   % else:
   **${ ad.example }**\
   % endif

@@ -171,7 +171,7 @@ data:
           item:
             field: x[i].year
             required: False
-            example: 1998
+            example: "1998"
             label: Year
         - object: DAObject
           item:
@@ -189,7 +189,7 @@ data:
           item:
             field: x[i].vin
             required: False
-            example: 12345
+            example: "12345"
             label: VIN
         - object: DAObject
           item:
@@ -555,7 +555,7 @@ data:
             label: Bank or Institution
           - field: x[i].account_number
             required: False
-            example: 654321
+            example: "654321"
             label: Account number
           - label: What is its market value? How much would you get if you sold it?
             field: x[i].market_value
@@ -826,7 +826,7 @@ data:
       display_name: interest in a contract
       other_display: other interests in a contract
       has_subtypes: False
-      has_default_attributes: False
+      has_default_attributes: True
       may_have_loan: False
       may_split_award: True
       attributes:
@@ -875,7 +875,7 @@ data:
       display_name: lawsuits against anyone
       other_display: other lawsuits against anyone
       has_subtypes: False
-      has_default_attributes: False
+      has_default_attributes: True
       may_have_loan: False
       may_split_award: True
       attributes:
@@ -1013,7 +1013,7 @@ data:
       display_name: money owed to you
       other_display: other money owed to you
       has_subtypes: False
-      has_default_attributes: False
+      has_default_attributes: True
       may_have_loan: False
       may_split_award: True
       description_code: |

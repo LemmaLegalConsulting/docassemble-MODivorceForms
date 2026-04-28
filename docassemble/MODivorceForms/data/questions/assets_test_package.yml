@@ -22,7 +22,10 @@ code: |
   assets_list[i].there_is_another = False
 ---
 code: |
-  manual_reset = True
+  assets_edit.there_is_another = False
+---
+code: |
+  manual_reset = False
 ---
 mandatory: True
 code: |
@@ -37,8 +40,11 @@ code: |
     assets_list = interview_data.get("assets_data")
 ---
 code: |
-  assets_edit = assets_list[-1]
-  
+  assets_edit = assets_list[-1].copy_deep('assets_edit')
+
+---
+code: |
+  saved = False
 ---
 mandatory: True
 question: Assets
@@ -46,11 +52,14 @@ subquestion: |
 
   [Save edits to assets](${ url_action('save_assets') })
 
+  There are ${ len(assets_list.complete_elements()) } versions saved.
+
   ${ assets_edit.table }
 ---
 event: save_assets
 code: |
   assets_list.append(assets_edit, set_instance_name=True)
+  saved = True
   interview_data.set('assets_data', assets_list)
 ---
 id: asset question
@@ -58,6 +67,12 @@ generic object: DAObject
 question: ${ x.variable }
 fields:
   - Display name: x.display_name
+  - Notes: x.notes
+    datatype: area
+    required: False
+  - Explanation: x.explanation
+    datatype: area
+    required: False
   - Does this type of asset have subtypes?: x.has_subtypes
     datatype: yesnoradio
   - note: |
@@ -67,6 +82,7 @@ fields:
   - Can this type of asset be security for a loan?: x.may_have_loan
     datatype: yesnoradio
   - note: |
+      % if x.may_have_loan:
       **Example loan description**:
       % for tld in x.ld_list:
       % if tld.type == "attribute":
@@ -96,11 +112,13 @@ fields:
       % endfor      
       
       ${ collapse_template(x.security_description_accordion) }
+      % endif
 
     show if: x.may_have_loan
   - Can the award of this asset be split?: x.may_split_award
     datatype: yesnoradio
   - note: |
+      % if not x.has_default_attributes:
       **Example asset description**:
       % for ad in x.description_list:
       % if ad.type == "attribute":
@@ -115,6 +133,7 @@ fields:
       % endfor      
 
       ${ collapse_template(x.asset_description_accordion) }
+      % endif
 
   - Use default attributes and labels?: x.has_default_attributes
     datatype: yesnoradio
@@ -151,10 +170,12 @@ generic object: DAObject
 template: x.subtype_template_accordion
 subject: Subtypes of ${ x.variable }
 content: |
+  % if x.has_subtypes:
   ${ x.subtype_template }
 
   
   ${ x.terms_ordered.add_action() }
+  % endif
 ---
 generic object: DAObject
 table: x.subtype_template

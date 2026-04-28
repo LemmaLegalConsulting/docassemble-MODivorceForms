@@ -112,8 +112,6 @@ code: |
   if users[0].in_bankruptcy or other_parties[0].in_bankruptcy:
     bankruptcy_kickout
   children
-  if pregnant:
-    pregnant_exit
   if child_outside_marriage:
     child_outside_marriage_exit
   if minor_children_before_marriage:
@@ -832,7 +830,7 @@ continue button field: mediation_info
 id: Children kickout question
 question: Children
 fields:
-  - Do you and your spouse have children currently under the age of 18?: minor_children
+  - "Do you and your spouse have children, including adopted children?": minor_children
     datatype: yesnoradio
   - Do you and your spouse have any children that were born before your marriage?: minor_children_before_marriage
     datatype: yesnoradio
@@ -854,10 +852,6 @@ fields:
     datatype: yesnoradio
     js show if:   |
       val("child_outside_marriage") === true || val("child_outside_marriage") === false
-  - note: |
-      Pursuant to RSMo 452.305 & 452.310, the court will not be able to grant a divorce.  Please come back when either yourself or your spouse is no longer pregnant.
-    js show if:   |
-      val("pregnant") === true 
 validation code: |
   if not minor_children:
     minor_children_before_marriage = False
