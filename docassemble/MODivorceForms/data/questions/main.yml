@@ -726,7 +726,7 @@ subquestion: |
 ---
 question: Bankruptcy
 fields: 
-  - Are you or your spouse currently in a bankruptcy prooceeding?: in_bankruptcy
+  - Are you or your spouse currently in a bankruptcy proceeding?: in_bankruptcy
     datatype: yesnoradio
 ---
 code: |

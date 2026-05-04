@@ -122,7 +122,7 @@ fields:
     show if:
       variable: location_of_exchange
       is: school
-  - Where should the exchange occur?: location_of_exchange_specific_location
+  - "Where should the exchange occur?  (Please include the full address)": location_of_exchange_specific_location
     datatype: area
     show if:
       variable: location_of_exchange
@@ -194,13 +194,13 @@ fields:
 id: use presumed child support
 question:  Presumed Child Support amount
 subquestion: |
-  The presumed child support to be paid by ${ support_payer.name_full() } is ${ currency(support_payer.presumed_child_support_amount_12 if support_payer.presumed_child_support_amount_12 > 0 else 0 ) }.
+  Based on the information you provided, it looks like  ${ support_payer.name_full() } should pay ${ currency(support_payer.presumed_child_support_amount_12 if support_payer.presumed_child_support_amount_12 > 0 else 0 ) } in child support.
 fields:
-  - Should the court order the presumed monthly amount of child support?: use_presumed_child_support
+  - Should the court order this amount in monthly child support?: use_presumed_child_support
     datatype: radio
     choices:
-      - Yes. The court-ordered child support is the same as the presumed child support amount. The presumed child support amount as calculated herein is not rebutted as being unjust and inappropriate.: yes
-      - No. The court-ordered child support is different from the presumed child support amount in the Form 14. After consideration of all statutory and other relevant factors pursuant to §452.340.8, RSMo, the presumed child support amount is rebutted as unjust and inappropriate.: no
+      - Yes, this amount is correct.: yes
+      - No, the child support amount should be different than ${ currency(support_payer.presumed_child_support_amount_12 if support_payer.presumed_child_support_amount_12 > 0 else 0 ) }: no
   - Why is the presumed child support amount unjust and inappropriate?: use_presumed_child_support_explanation
     show if: 
       variable: use_presumed_child_support
@@ -255,7 +255,7 @@ fields:
       - ${ support_recipient.name_full() }
       - ${ support_payer.name_full() }
   - note: |
-      The Form 14 calculation assumes that the parent receiving support will claim the children as dependents. If the parent paying support is entitled to claim one or more of the children, then the Form 14 guidelines are unjust and inappropriate and the second box in Paragraph 15 should be checked.
+      The child support form (Form 14) usually expects the parent who receives support to claim the children on their taxes every year. If you want the parent who pays support to claim one or more of the children at any time, that’s okay. Just know there will be a checkbox on your papers that says “The Form 14 guidelines are unjust and inappropriate,” which means you chose a different option.
 ---
 id: visitation nights
 question: Overnights

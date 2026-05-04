@@ -454,6 +454,19 @@ fields:
   - Does the other party have a prior name?: other_parties[0].has_prior_name
     datatype: yesnoradio
 ---
+id: spouse object
+generic object: ALIndividual
+objects:
+  - x.spouse: ALIndividual
+---
+id: code block to set spouse for generic object questions
+generic object: ALIndividual
+code: |
+  if x == users[0]:
+    x.spouse = other_parties[0]
+  else:
+    x.spouse = users[0] 
+---
 sets:
  - x.prior_name.name.first
 id: prior name
@@ -475,6 +488,15 @@ fields:
   - Last 4 digits of ${ "your social security number." if x.instanceName == "users[0]" else x.pronoun_possessive("social security number.") }: x.ssn
     maxlength: 4
     required: False
+  - "I do not know ${ x.pronoun_possessive('social security number.') }": x.ssn_unknown
+    datatype: yesno
+    disable others: True
+    show if:
+      code: |
+        x.instanceName != "users[0]"
+validation code: |
+  if x.instanceName != "users[0]" and x.ssn_unknown:
+    x.ssn = "Unknown"
 ---
 generic object: ALIndividual
 variable name: var_doc_dict["users_ssn"]
@@ -671,14 +693,17 @@ generic object: ALIndividual
 question: Previous marriages for ${ x.name_full() }
 fields:  
   - Previously married?: x.previously_married
-    datatype: yesnoradio
+    datatype: yesnomaybe
   - Number of previous marriages: x.number_of_marriages
     datatype: number
     show if: x.previously_married
+    required: False
   - Date Last Marriage Ended: x.last_marriage_end_date
     datatype: date
+    required: False
     show if: x.previously_married
   - How Last Marriage Ended: x.last_marriage_end
+    required: False
     datatype: dropdown
     choices:
       - Death
@@ -687,7 +712,7 @@ fields:
 validation code: |
   if x.previously_married == False:
     x.number_of_marriages = 0
-  if x.previously_married and (as_datetime(x.last_marriage_end_date) > today() or as_datetime(x.last_marriage_end_date) < as_datetime(users[0].birthdate)):
+  if x.previously_married and x.last_marriage_end_date != "" and (as_datetime(x.last_marriage_end_date) > today() or as_datetime(x.last_marriage_end_date) < as_datetime(users[0].birthdate)):
     validation_error("Please enter a date in the past that isn't before the date you were born.")
 ---
 generic object: ALIndividual
@@ -763,32 +788,6 @@ validation code: |
   else:
     x.county_resident_for_90_days = True
 ---
-id: other children number
-generic object: ALIndividual
-question: Other minor children for ${ x.name_full() }
-fields:
-  - "How many minor children does ${ x.name_full() } have with someone other than ${ x.spouse.name.full() }?": x.other_children
-    datatype: integer
-    min: 0    
----
-id: spouse object
-generic object: ALIndividual
-objects:
-  - x.spouse: ALIndividual
----
-id: code block to set spouse for generic object questions
-generic object: ALIndividual
-code: |
-  if x == users[0]:
-    x.spouse = other_parties[0]
-  else:
-    x.spouse = users[0] 
----
-if: not minor_children_before_marriage
-generic object: ALIndividual
-code: |
-  x.other_children = 0
----
 ## ATTORNEY
 generic object: ALIndividual
 objects:
@@ -807,24 +806,8 @@ fields:
   - Is an attorney helping ${ "you" if x.instanceName == "users[0]" else x }?:  x.attorney_involved
     datatype: yesnoradio
     required: False
-  - First name: x.attorney.name.first
-    show if:
-      variable: x.attorney_involved
-      is: True
-  - Middle name: x.attorney.name.middle
-    show if:
-      variable: x.attorney_involved
-      is: True
-    required: False
-  - Last name: x.attorney.name.last
-    show if:
-      variable: x.attorney_involved
-      is: True
-  - Suffix: x.attorney.name.suffix
-    show if:
-      variable: x.attorney_involved
-      is: True
-    required: False
+  - code: |
+      x.attorney.name_fields(show_if="x.attorney_involved")
   - Bar number: x.attorney.bar_number
     required: False
     show if:
@@ -973,7 +956,6 @@ code: |
   if 'petition_attachment' in doc_list_selected.true_values():
     children[i].lived_with.name.first
     children[i].address.address
-    children[i].persons_lived_with.gather()
     if children[i].legal_custody == "Third Party":
       children[i].legal_custody_other.name.first
     if children[i].physical_custody == "Third Party":
@@ -1009,10 +991,7 @@ fields:
 sets: children[i].address.address
 id: sets child's address to lived with address
 code: |
-  if children[i].lived_with == users[0]:
-    children[i].address = users[0].address
-  elif children[i].lived_with == other_parties[0]:
-    children[i].address = other_parties[0].address
+ children[i].address = children[i].lived_with.address
 ---
 id: additional child information
 question: Additional information about ${ children[i].name_full() }
@@ -1067,6 +1046,8 @@ if: not minor_children
 code: |
   number_of_children = 0
 ---
+comment: |
+  The petition requires you to put the primary person that the child has in the last 60 days.  
 sets: children[i].lived_with.name.first
 id: who child lived with
 reconsider: people_choices
@@ -1100,47 +1081,21 @@ id: lived with other object
 objects: 
   - persons_lived_with: ALPeopleList.using(there_are_any=True)
 ---
-sets: children[i].persons_lived_with[0].name.first
-code: |
-  children[i].persons_lived_with[0] = children[i].lived_with
----
+id: add persons children lived with to whol list
 code: |
   for child in children:
-    if hasattr('child','lived_with') and child.lived_with not in persons_lived_with.complete_elements():
+    if defined('child.lived_with') and child.lived_with not in persons_lived_with.complete_elements():
       persons_lived_with.append(child.lived_with)
   persons_lived_with_preload = True
----
-id: lived with other
-reconsider:
-  - people_choices
-
-sets:
-  - persons_lived_with[i].name.first
-  - persons_lived_with[i].name.last
-  - persons_lived_with[i].name.middle
-  - persons_lived_with[i].name.suffix
-
-question: |
-  Who have the children lived with for the last 5 years?
-
-fields:
-  - Existing person: persons_lived_with[i]
-    datatype: object
-    choices: people_choices
-    disable others: True
-  - code: |
-      persons_lived_with[i].name_fields()
-  - code: |
-      persons_lived_with[i].address_fields()
-validation code: |
-  validate_us_state(persons_lived_with[i].address)
 ---
 sets: persons_lived_with[i].name.first
 id: who children lived with
 question: Who have the children lived with in the past 5 years?
 subquestion: |
+  % if len(persons_lived_with.complete_elements()) > 0:
   You have already said that the children have lived with ${ comma_and_list(persons_lived_with.complete_elements()) }.
-
+  % endif
+  
 fields:
   - Existing person: persons_lived_with[i]
     datatype: object
@@ -1171,31 +1126,6 @@ variable name: var_doc_dict["persons_lived_with"]
 data:
   - answer_attachment
   - petition_attachment
----
-id: lived with other object
-objects: 
-  - children[i].persons_lived_with: ALPeopleList.using(ask_number=True,target_number=1)
----
-id: lived with other
-reconsider:
-  - people_choices
-
-sets:
-  - children[i].persons_lived_with[j].name.first
-  - children[i].persons_lived_with[j].name.last
-  - children[i].persons_lived_with[j].name.middle
-  - children[i].persons_lived_with[j].name.suffix
-
-question: |
-  Who has ${ children[i].name_full() } lived with for the last 60 days?
-
-fields:
-  - Existing person: children[i].persons_lived_with[j]
-    datatype: object
-    choices: people_choices
-    disable others: True
-  - code: |
-      children[i].persons_lived_with[j].name_fields()
 ---
 id: legal custody of child
 question: Legal custody of ${ children[i].name_full() }
@@ -1264,15 +1194,15 @@ objects:
 id: legal_custody question
 question: Legal Custody
 subquestion: |
-  Info on Legal Custody
+  Legal custody refers to decision-making authority related to health, education, and general welfare of the children.
 fields:
  - What would you like to ask the court to give you in terms of legal custody?: legal_custody
    datatype: radio
    choices:
-      - ${ petitioner }: petitioner
-      - ${ respondent }: respondent
-      - Both spouses jointly: Joint
-      - Third party: Third Party
+      - "Sole legal custody to ${ petitioner } (${ petitioner } makes all decisions for children)": petitioner
+      - "Sole legal custody to ${ respondent } (${ respondent } makes all decisions for children)": respondent
+      - "Both spouses jointly (decisions are made together)": Joint
+      - "Third party (someone else with custody of the children makes decisions)": Third Party
  - note: |
     Asking the court to give custody of your children to someone else is a difficult decision to make, and cases like this can be complicated to handle on your own. It's important to know your rights as a parent. Consider reaching out to a Missouri licensed attorney for legal advice on how to proceed.
    show if:
@@ -1291,15 +1221,15 @@ fields:
 id: physical_custody question
 question: Physical Custody
 subquestion: |
-  Info on Physical Custody
+  Physical custody refers to the time spent with each parent.
 fields:
  - What would you like to ask the court to give you in terms of physical custody?: physical_custody
    datatype: radio
    choices:
-      - ${ petitioner }: petitioner
-      - ${ respondent }: respondent
-      - Both spouses jointly: Joint
-      - Third party: Third Party
+      - "Sole physical custody to ${ petitioner }: (${ petitioner } has the kids in their custody 100% of the time with possible supervised visitation to ${ respondent })": petitioner
+      - "Sole physical custody to ${ respondent }: (${ respondent } has the kids in their custody 100% of the time with possible supervised visitation to ${ petitioner })": respondent
+      - "Both spouses jointly (both parents have some time with the kids without supervision)": Joint
+      - "Third party (someone else has custody of the kids)": Third Party
 ---
 id: follow up visitation question for sole physical_custody
 question: Visitation
@@ -1488,6 +1418,19 @@ fields:
 id: birth certificate other object
 objects: 
   - children[i].birth_certificate_other: ALIndividual
+---
+id: other children number
+generic object: ALIndividual
+question: Other minor children for ${ x.name_full() }
+fields:
+  - "How many minor children does ${ x.name_full() } have with someone other than ${ x.spouse.name.full() }?": x.other_children
+    datatype: integer
+    min: 0    
+---
+if: not minor_children_before_marriage
+generic object: ALIndividual
+code: |
+  x.other_children = 0
 ---
 id: Additional information about children
 question: Additional information about children
@@ -1741,7 +1684,7 @@ subquestion: |
   % endif
 fields:
   - Description: x.extraordinary_childrearing_costs[i].description
-  - Should this cost be included in Form 14?: x.extraordinary_childrearing_costs[i].included_in_form_14
+  - "Do you want to include this in the child support calculation?": x.extraordinary_childrearing_costs[i].included_in_form_14
     datatype: yesnoradio
   - Amount of extraordinary childrearing cost: x.extraordinary_childrearing_costs[i].value
     datatype: currency
@@ -1841,7 +1784,7 @@ variable name: pay_work_childcare_expenses_dictionary
 data:
   none: "There are no work-related child care costs incurred by the parents."
   included_in_form14: "The work-related child care costs will be included in the child support calculation on the Form 14."
-  pay_own: support_payer.name_full()  + " shall partially reimburse " + support_recipient.name_full() + " for all reasonable work-related child care expenses."
+  pay_own: "Each parent will pay their own reasonable work-related child care expenses related to his or her employment."
   pay_percentage: support_payer.name_full() + " shall partially reimburse " + support_recipient.name_full() + " for all reasonable work-related child care expenses."
 ---
 id: Work related childcare costs
@@ -1855,7 +1798,7 @@ subquestion: |
   You also said:
   
   % if pay_work_childcare_expenses == "pay_percentage":
-  { support_payer.name_full() } shall reimburse ${ support_recipient.name_full() } for %${ thousands(pay_work_childcare_expenses_percentage) } of all reasonable work-related child care expenses.
+  ${ support_payer.name_full() } shall reimburse ${ support_recipient.name_full() } for ${ thousands(pay_work_childcare_expenses_percentage) }% of all reasonable work-related child care expenses.
   % else:
   ${ pay_work_childcare_expenses_dictionary[pay_work_childcare_expenses] }
   % endif
@@ -1900,6 +1843,10 @@ generic object: ALIndividual
 question: Children Health Insurance Costs for ${ x.name_full() }
 subquestion: |
   Health insurance for the children is determined by dividing the amount paid for insurance each month by the number of people covered.  Multiply that amount by the number of children covered.
+
+  For example,
+
+  [FILE insurance_cost_example.png,100%]
 fields:
   - What are the monthly health insurance costs for ${ x.name_full() } for the children who are subjects of this proceeding?: x.health_insurance_costs
     datatype: currency
@@ -2064,7 +2011,7 @@ fields:
 ---
 id: generic review ALIncomeList
 generic object: ALIncomeList
-question: Do you want to list any other ${ x.display_name }?
+question: Do you want to list ${ x.display_name }?
 subquestion: |
 
   Tap Next if you don't have more to add.
@@ -3918,9 +3865,9 @@ question: |
   Tell us about your main employer.
   % elif x.has_self_employment_income:
   Describe your self employment and provide the address for your self employment.
+  % endif
   % else:
   Tell us about the main employer for ${ other_parties[0].name_full() }.
-  % endif
   % endif
 fields:
   - field: x.employer.name.text
@@ -3946,6 +3893,7 @@ fields:
   - State: x.employer.address.state
   - Zip or postal code: x.employer.address.zip
   - Phone: x.employer.phone_number
+    required: False
 validation code: |
   validate_us_state(x.employer.address)
 
@@ -4405,7 +4353,7 @@ fields:
     default: 12
     code: |
       times_per_year_list
-  - Amount of income: x.benefits[i].value
+  - Amount: x.benefits[i].value
     datatype: currency
 validation code: |
   if x.benefits[i].source != "other":
@@ -4830,6 +4778,25 @@ fields:
     datatype: checkboxes
     code: |
       x.expenses_ordered
+---
+#expenses
+id: expenses types
+question: |
+  What kind of expenses does ${ other_parties[0].name_full() } have?
+subquestion: |
+  You can look back 12 months for these expenses. That will give an accurate picture of how much the expenses really are.
+  
+fields:
+  - no label: other_parties[0].expenses.selected_types
+    datatype: checkboxes
+    code: |
+      other_parties[0].expenses_ordered
+  - "I do not know about the expenses of ${ other_parties[0] }.": other_parties[0].expenses_unknown
+    datatype: yesnowide
+    disable others: True
+validation code: |
+  if other_parties[0].expenses_unknown:
+    other_parties[0].expenses.there_are_any = None
 
 ---
 id: ALExpense complete
@@ -4842,7 +4809,7 @@ id: expense information
 generic object: ALIndividual
 reconsider: x.expenses[i].display_name
 question: |
-  Tell us about your ${ x.expenses[i].display_name.lower() }
+  Tell us about ${ x.expenses[i].display_name.lower() }
 subquestion: |
   **Tip**: You can look back 12 months for this expense. That will give an accurate picture of how much the expense really is.
 fields: 
@@ -5012,17 +4979,6 @@ fields:
       - ${ petitioner.name_full() } should be paid maintenance by ${ respondent.name_full() }: petitioner
       - ${ respondent.name_full() } should be paid maintenance by ${ petitioner.name_full() }: respondent
     datatype: radio
-  - How much per month?: maintenance_amount
-    datatype: currency
-    js show if: |
-      val('maintenance_awarded_to') === "petitioner" || val('maintenance_awarded_to') === "respondent"
-  - Should income withholding be prepared by the person receiving maintenance?: maintenance_income_withholding
-    datatype: yesnoradio
-    js show if: |
-      val('maintenance_amount') != null
-  - Reason income withholding shall not issue: maintenance_income_withholding_reason
-    js show if: |
-      val('maintenance_income_withholding') === false
 ---
 id: maintenance currently paid question
 question: Current maintenance award

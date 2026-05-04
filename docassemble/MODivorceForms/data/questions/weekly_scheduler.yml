@@ -172,9 +172,9 @@ fields:
       - ${ other_parties[0].possessive('house') }
       - School
       - Other
-  - "Explain": exchanges[0].exchange_location_other
+  - "Where should the exchange occur? (Please include the full address)": exchanges[0].exchange_location_other
     js show if: |
-      val('exchanges[0].exchange_location') === "Other"
+      val('exchanges[0].exchange_location') === "other"
   - "Add pick up from school by ${ other_parties[0] }?": exchanges[0].add_pick_up_from_school
     datatype: yesnoradio
     js show if: |
@@ -297,7 +297,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        'school'
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         True
       exchange_time2: |
@@ -315,7 +315,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        "school"
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         True
       exchange_time2: |
@@ -342,7 +342,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         None
       exchange_time2: |
@@ -360,7 +360,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         None
       exchange_time2: |
@@ -387,7 +387,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        "school"
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         True
       exchange_time2: |
@@ -405,7 +405,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        "school"
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         True
       exchange_time2: |
@@ -423,7 +423,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        "school"
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         True
       exchange_time2: |
@@ -441,7 +441,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        "school"
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         True
       exchange_time2: |
@@ -459,7 +459,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        "school"
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         True
       exchange_time2: |
@@ -477,7 +477,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        "school"
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         True
       exchange_time2: |
@@ -506,7 +506,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         None
       exchange_time2: |
@@ -524,7 +524,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         None
       exchange_time2: |
@@ -542,7 +542,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         None
       exchange_time2: |
@@ -560,7 +560,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         None
       exchange_time2: |
@@ -589,7 +589,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         None
       exchange_time2: |
@@ -607,7 +607,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         None
       exchange_time2: |
@@ -625,7 +625,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         None
       exchange_time2: |
@@ -643,7 +643,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         None
       exchange_time2: |
@@ -670,7 +670,7 @@ data from code:
       exchange_method: |
         "Drop off"
       exchange_location: |
-        default_exchange_location
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         None
       exchange_time2: |
@@ -688,7 +688,7 @@ data from code:
       exchange_method: |
         "Pick up"
       exchange_location: |
-        default_exchange_location
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         None
       exchange_time2: |
@@ -706,7 +706,7 @@ data from code:
       exchange_method: |
         "Drop off"
       exchange_location: |
-        default_exchange_location
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         None
       exchange_time2: |
@@ -724,7 +724,7 @@ data from code:
       exchange_method: |
         "Pick up"
       exchange_location: |
-        default_exchange_location
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         None
       exchange_time2: |
@@ -751,7 +751,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         None
       exchange_time2: |
@@ -769,7 +769,7 @@ data from code:
       exchange_method: |
         default_exchange_method
       exchange_location: |
-        default_exchange_location
+        location_of_exchange_specific_location if location_of_exchange == "other" else location_of_exchange
       add_pick_up_from_school: |
         None
       exchange_time2: |
@@ -856,11 +856,11 @@ code: |
   for exchange in exchanges.complete_elements():
     if exchange.starting_date == exchange.exchange_date:
       if exchange.exchange_method == "Drop off":
-        temp_description = str(format_time(exchange.exchange_time))  + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location)  + "\n"
+        temp_description = str(format_time(exchange.exchange_time))  + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location_other if exchange.exchange_location == "other" else exchange.exchange_location)  + "\n"
         if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
           temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
       elif exchange.exchange_method == "Pick up":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location) + "\n"
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location_other if exchange.exchange_location == "other" else  exchange.exchange_location) + "\n"
       if starting_weekly_list[int(exchange.exchange_date)] == "":
         visitation_dictionary[exchange.exchange_parent] += 1
       else:
@@ -876,11 +876,11 @@ code: |
         starting_weekly_list[date] = exchange.starting_parent
         visitation_dictionary[exchange.starting_parent] += 1
       if exchange.exchange_method == "Drop off":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location)  + "\n"
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location_other if exchange.exchange_location == "other" else  exchange.exchange_location)  + "\n"
         if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
           temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
       elif exchange.exchange_method == "Pick up":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location) + "\n"
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location_other if exchange.exchange_location == "other" else  exchange.exchange_location) + "\n"
       if starting_weekly_list[int(exchange.exchange_date)] == "":
         visitation_dictionary[exchange.exchange_parent] += 1
       else:
@@ -892,11 +892,11 @@ code: |
         starting_weekly_list[date] = exchange.starting_parent
         visitation_dictionary[exchange.starting_parent] += 1
       if exchange.exchange_method == "Drop off":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location)  + "\n"
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location_other if exchange.exchange_location == "other" else exchange.exchange_location)  + "\n"
         if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
           temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
       elif exchange.exchange_method == "Pick up":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location) + "\n"
+        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location_other if exchange.exchange_location == "other" else  exchange.exchange_location) + "\n"
       if starting_weekly_list[int(exchange.exchange_date)] == "":
         visitation_dictionary[exchange.exchange_parent] += 1
       else:
