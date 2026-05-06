@@ -1537,10 +1537,11 @@ validation code: |
   elif child_support in ["respondent"]:
     support_recipient = respondent
     support_payer = petitioner  
-  if child_support == "none":
-    relief['child_support'] = False
-  else:
-    relief['child_support'] = True
+  if len(set(var_doc_dict["relief"]) & set(doc_list_selected.true_values())) > 0:
+    if child_support == "none":
+      relief['child_support'] = False
+    else:
+      relief['child_support'] = True
 ---
 id: var_doc_dict child_support
 variable name: var_doc_dict["child support"]
