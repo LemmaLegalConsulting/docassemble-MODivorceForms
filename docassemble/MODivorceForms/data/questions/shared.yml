@@ -1812,7 +1812,8 @@ if: not minor_children
 code: |
   pay_work_childcare_expenses = "none"
 ---
-if: not minor_children or pay_work_childcare_expenses == "none"
+id: set work_childcare_expenses to zero
+if: not minor_children or pay_work_childcare_expenses in ["pay_own","none","pay_percentage"]
 generic object: ALIndividual
 code: |
   x.work_childcare_expenses = 0
