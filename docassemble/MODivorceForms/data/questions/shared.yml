@@ -14,6 +14,43 @@ modules:
 features:
   css: progressivedisclosure.css
 ---
+code: |
+  var_doc_dict["previous_petitions"]
+  var_doc_dict["case.matter_type_asked"]
+  var_doc_dict["case.name_asked"]
+  var_doc_dict["case.filing_date_asked"]
+  var_doc_dict["case.judge_asked"]
+  var_doc_dict["case.docket_number"]
+  var_doc_dict["case.county"]
+  var_doc_dict["relief"]
+  var_doc_dict["users_ssn"]
+  var_doc_dict["users_birthdate"]
+  var_doc_dict["other_parties_active_duty"]
+  var_doc_dict["petitioner.party_type_code"]
+  var_doc_dict["children"]
+  var_doc_dict["children_number"]
+  var_doc_dict["children_birthdate"]
+  var_doc_dict["under_18_in_household"]
+  var_doc_dict["persons_lived_with"]
+  var_doc_dict["legal_custody"]
+  var_doc_dict["additional_children_information"]
+  var_doc_dict["child support"]
+  var_doc_dict["user_child_expenses"]
+  var_doc_dict["other_party_child_expenses"]
+  var_doc_dict['pay_work_childcare_expenses']
+  var_doc_dict["marriage_info"]
+  var_doc_dict["marriage.separation_date"]
+  var_doc_dict["user_cash"]
+  var_doc_dict["real_estate"]
+  var_doc_dict["vehicles"]
+  var_doc_dict["other_assets"]
+  var_doc_dict["debts"]
+  var_doc_dict["user_jobs"]
+  var_doc_dict["user_self_supporting"]
+  var_doc_dict["user_expenses"]
+  var_doc_dict["other_party_expenses"]
+  var_doc_dict_loaded = True
+---
 id: list of previously entered people
 code: |
   temp_people_choices = list()
@@ -345,7 +382,6 @@ variable name: var_doc_dict["relief"]
 data:
   - petition_attachment
   - answer_attachment
-
 ---
 id: set relief ['divide_property']
 code: |
@@ -498,7 +534,6 @@ validation code: |
   if x.instanceName != "users[0]" and x.ssn_unknown:
     x.ssn = "Unknown"
 ---
-generic object: ALIndividual
 variable name: var_doc_dict["users_ssn"]
 data:
   - answer_attachment
@@ -588,7 +623,6 @@ fields:
     maxlength: 40
     required: False
 ---
-generic object: ALIndividual
 variable name: var_doc_dict["users_birthdate"]
 data:
   - certificate_of_dissolution_attachment
@@ -643,7 +677,6 @@ fields:
   - Is ${ x.name_full() } active duty military?: x.active_duty
     datatype: yesnoradio
 ---
-generic object: ALIndividual
 variable name: var_doc_dict["other_parties_active_duty"]
 data:
   - answer_attachment
@@ -2377,7 +2410,6 @@ variable name: var_doc_dict["other_assets"]
 data:
   - property_statement_attachment
   - fee_waiver_attachment
-
 ---
 id: securities other display
 comment: |
@@ -3451,7 +3483,6 @@ objects:
 variable name: var_doc_dict["debts"]
 data:
   - property_statement_attachment
-
 ---
 id: debts terms_ordered
 # "!!omap" makes these terms ordered
@@ -4681,12 +4712,10 @@ variable name: var_doc_dict["user_expenses"]
 data:
   - fee_waiver_attachment
   - income_statement_attachment
-
 ---
 variable name: var_doc_dict["other_party_expenses"]
 data:
   - income_statement_attachment
-
 ---
 id: expenses intro screen
 continue button field: expenses_intro_screen

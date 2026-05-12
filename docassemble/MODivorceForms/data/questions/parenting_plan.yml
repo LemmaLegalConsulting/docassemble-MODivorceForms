@@ -154,13 +154,19 @@ validation code: |
      default_exchange_time = time_of_exchange
      default_exchange_location = "school"
      default_add_pick_up_from_school = add_pick_up
-     default_exchange_time2 = time_of_exchange2
+     if add_pick_up:
+       default_exchange_time2 = time_of_exchange2
+     else:
+       default_exchange_time2 = None
    if location_of_exchange == "other":
      default_exchange_method = "Drop off"
      default_exchange_time = time_of_exchange
      default_exchange_location = default_exchange_location_other
      default_add_pick_up_from_school = add_pick_up
-     default_exchange_time2 = time_of_exchange2
+     if add_pick_up:
+       default_exchange_time2 = time_of_exchange2
+     else:
+       default_exchange_time2 = None
    if location_of_exchange == "petitioner_residence":
      default_exchange_method = "petitioner_residence"
      default_exchange_time = time_of_exchange

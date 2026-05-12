@@ -82,6 +82,7 @@ id: interview order certificate of dissolution of marriage
 code: |
   # Set the allowed courts for this interview
   allowed_courts = []
+  var_doc_dict_loaded
   nav.set_section("right_tool") 
   section_right_tool
   nav.set_section("relief") 
@@ -383,7 +384,7 @@ code: |
     if abuse_or_neglect or other_custody_proceeding or other_litigation or others_with_physical_custody:
       children_explanation
     family_support_order
-  
+  children_review
   section_children = True
 ---
 code: |    
