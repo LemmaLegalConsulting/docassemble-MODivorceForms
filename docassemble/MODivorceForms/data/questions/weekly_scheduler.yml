@@ -189,6 +189,8 @@ fields:
       val('exchanges[0].add_pick_up_from_school') === true
 continue button field: exchanges[0].information  
 validation code: |
+  if exchanges[0].exchange_date in ["0","6","7","13"] and exchanges[0].exchange_location == "school":
+    validation_error("You cannot pick school as the exchange location on the weekend.  If you really want to exchange at school on the weekend, pick Other and add in school.")
   if exchanges[0].temp_starting_parent == "users0":
     exchanges[0].starting_parent = users[0].name.full()
     exchanges[0].exchange_parent = other_parties[0].name.full()
@@ -240,6 +242,9 @@ fields:
     js show if: |
       val('exchanges[i].add_pick_up_from_school') === true
 continue button field: exchanges[i].information  
+validation code: |
+  if exchanges[i].exchange_date in ["0","6","7","13"] and exchanges[i].exchange_location == "school":
+    validation_error("You cannot pick school as the exchange location on the weekend.  If you really want to exchange at school on the weekend, pick Other and add in school.")
 
 ---
 id: week_dict code
@@ -865,10 +870,13 @@ code: |
           temp_description = str(format_time(exchange.exchange_time))  + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house')) + "\n"  
         elif exchange.starting_parent == respondent.name.full():
           temp_description = str(format_time(exchange.exchange_time))  + " " + exchange.exchange_parent + " pickss up children at " + (possessify(exchange.starting_parent, 'house')) + "\n"  
-      elif exchange.exchange_method == "Drop off":
-        temp_description = str(format_time(exchange.exchange_time))  + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location_other if exchange.exchange_location == "other" else exchange.exchange_location)  + "\n"
-        if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
-          temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
+      elif exchange.exchange_method == "Drop off":    
+        if exchange.exchange_location == "school":
+          temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + ("school" if not exchange.exchange_date in [0, 6, 7, 13] else location_of_exchange_school_not_in_session)  + "\n"
+          if exchange.add_pick_up_from_school:
+            temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + ("school" if not exchange.exchange_date in [0, 6, 7, 13] else location_of_exchange_school_not_in_session) + "\n"
+        else:
+          temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location_other if exchange.exchange_location == "other" else  exchange.exchange_location)  + "\n"
       elif exchange.exchange_method == "Pick up":
         temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location_other if exchange.exchange_location == "other" else  exchange.exchange_location) + "\n"
       if starting_weekly_list[int(exchange.exchange_date)] == "":
@@ -896,9 +904,12 @@ code: |
         elif exchange.starting_parent == respondent.name.full():
           temp_description = str(format_time(exchange.exchange_time))  + " " + exchange.exchange_parent + " pickss up children at " + (possessify(exchange.starting_parent, 'house')) + "\n"  
       elif exchange.exchange_method == "Drop off":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location_other if exchange.exchange_location == "other" else  exchange.exchange_location)  + "\n"
-        if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
-          temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
+        if exchange.exchange_location == "school":
+          temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + ("school" if not exchange.exchange_date in [0, 6, 7, 13] else location_of_exchange_school_not_in_session)  + "\n"
+          if exchange.add_pick_up_from_school:
+            temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + ("school" if not exchange.exchange_date in [0, 6, 7, 13] else location_of_exchange_school_not_in_session) + "\n"
+        else:
+          temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location_other if exchange.exchange_location == "other" else  exchange.exchange_location)  + "\n"
       elif exchange.exchange_method == "Pick up":
         temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location_other if exchange.exchange_location == "other" else  exchange.exchange_location) + "\n"
       if starting_weekly_list[int(exchange.exchange_date)] == "":
@@ -922,9 +933,12 @@ code: |
         elif exchange.starting_parent == respondent.name.full():
           temp_description = str(format_time(exchange.exchange_time))  + " " + exchange.exchange_parent + " pickss up children at " + (possessify(exchange.starting_parent, 'house')) + "\n"  
       elif exchange.exchange_method == "Drop off":
-        temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location_other if exchange.exchange_location == "other" else exchange.exchange_location)  + "\n"
-        if exchange.exchange_location == "school" and exchange.add_pick_up_from_school:
-          temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + exchange.exchange_location + "\n"
+        if exchange.exchange_location == "school":
+          temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + ("school" if not exchange.exchange_date in [0, 6, 7, 13] else location_of_exchange_school_not_in_session)  + "\n"
+          if exchange.add_pick_up_from_school:
+            temp_description += str(format_time(exchange.exchange_time2)) + " " + exchange.exchange_parent + " picks up children from " + ("school" if not exchange.exchange_date in [0, 6, 7, 13] else location_of_exchange_school_not_in_session) + "\n"
+        else:
+          temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location_other if exchange.exchange_location == "other" else  exchange.exchange_location)  + "\n"
       elif exchange.exchange_method == "Pick up":
         temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children from " + (possessify(exchange.starting_parent, 'house') if exchange.exchange_location == "house" else exchange.exchange_location_other if exchange.exchange_location == "other" else  exchange.exchange_location) + "\n"
       if starting_weekly_list[int(exchange.exchange_date)] == "":
