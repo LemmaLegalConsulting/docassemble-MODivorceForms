@@ -54,6 +54,12 @@ subquestion: |
 
   There are ${ len(assets_list.complete_elements()) } versions saved.
 
+  Changes
+  % for assets_list_change in assets_list_changes:
+  ${ assets_list_change }
+
+  % endfor
+
   ${ assets_edit.table }
 ---
 event: save_assets
@@ -61,6 +67,28 @@ code: |
   assets_list.append(assets_edit, set_instance_name=True)
   saved = True
   interview_data.set('assets_data', assets_list)
+---
+objects:
+  - assets_list_changes: DAList.using(object_type=DAObject, auto_gather=False)
+---
+code: |
+  asset_index = 0
+  for asset in assets_list[-1]:
+    assets_list_changes.appendObject(DAObject)
+    assets_list_changes[-1].name = asset.name
+    assets_list_changes[-1].changes = list()
+    for att in ['description_code', 'loan_description_code', 'security_description_code', 'display_name', 'other_display', 'has_default_attributes', 'has_subtypes', 'may_split_award', 'may_have_loan','attributes','terms_ordered']:
+      if hasattr(asset,att) and hasattr(assets_starter[asset_index],att):
+        if getattr(asset,att) != getattr(assets_starter[asset_index],att):
+          assets_list_changes[-1].changes.append({att:{'old': getattr(assets_starter[asset_index],att),'new':getattr(asset,att)}})
+      elif hasattr(asset,att) and not hasattr(assets_starter[asset_index],att):  
+        assets_list_changes[-1].changes.append({att:{'old': "None",'new':getattr(asset,att)}})
+      elif not hasattr(asset,att) and hasattr(assets_starter[asset_index],att):
+        assets_list_changes[-1].changes.append({att:{'old': getattr(assets_starter[asset_index],att),'new':"None"}})
+    asset_index += 1
+  assets_list_changes.gathered = True
+        
+  assets_list_changes.gathered = True
 ---
 id: asset question
 generic object: DAObject

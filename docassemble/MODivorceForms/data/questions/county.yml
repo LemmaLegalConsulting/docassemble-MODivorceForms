@@ -38,6 +38,7 @@ question: |
 fields:
   - County: x.county_selected
 ---
+reconsider: county_dictionary
 id: what court are you in
 question: |
   ${ "In what county do you want to file the petition?" if case.filed == "not_filed" else "What county is the court case in?" }
@@ -141,7 +142,15 @@ code: |
 ---
 question: Select Court
 subquestion: |
-  There is more than one court in your county.  Select the court that your case is in.
+  % if case.county == "Jackson County":
+  Jackson County residents can file and continue their case at either courthouse without restriction. People normally just pick the one closest to them.
+  % elif case.county == "Jasper County":
+  Jasper County residents can file at either courthouse but may be assigned to a different courthouse after filing.
+  % elif case.county == "Marion County":
+  Marion County I accepts filings from residents of the cities of Round Grove, Union, Warren, Fabius, Liberty, and South River.
+  
+  Marion County II covers the cities of Miller and Mason
+  % endif
 fields:
   - Court: selected_court
     datatype: radio
@@ -491,13 +500,6 @@ data:
     legal_aid_program: |
       Mid-Missouri Legal Services
     courts: 
-      - name: Callaway County Courthouse
-        address: 10 E. 5th Street
-        city: Fulton
-        state: MISSOURI
-        zip: 65251
-        schedule: |
-          8 a.m. to 5 p.m. Monday through Friday, excluding state holidays 
       - name: Callaway County Justice Center
         address: 5 E. 2nd Street
         city: Fulton
@@ -670,20 +672,14 @@ data:
     legal_aid_program: |
       Legal Services of Southern Missouri
     courts: 
-      - name: Christian County Circuit Court Building
-        address: 102 W. Walnut Street
-        city: Ozark
-        state: MISSOURI
-        zip: 65721
-        phone: (417) 582-5120
-        rules: https://www.courts.mo.gov/file.jsp?id=3732
-        website: https://courts.christiancountymo.gov/
-        photo: Christian.jpeg
       - name: Christian County Justice Center
         address: 110 W. Elm Street
         city: Ozark
         state: MISSOURI
         zip: 65721
+        rules: https://www.courts.mo.gov/file.jsp?id=3732
+        website: https://courts.christiancountymo.gov/
+        photo: Christian.jpeg
         schedule: |
           8 a.m. to 4:30 p.m. Monday through Friday, excluding state holidays 
   Clark County:
