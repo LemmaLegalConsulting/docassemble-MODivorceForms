@@ -4270,10 +4270,10 @@ id: x.benefits terms_ordered
 generic object: ALIndividual
 variable name: x.benefits.terms_ordered
 data: !!omap
-  - food_stamps: "Food stamps"
+  - food_stamps: "Food stamps (SNAP Benefits)"
   - medicaid: "Medicaid"
   - ssi: "SSI (Supplemental Security Income)" 
-  - tanf: "Temporary Assistance to Needy Families"
+  - tanf: "Temporary Assistance for Needy Families"
 ---
 id: x.benefits other display
 generic object: ALIndividual
@@ -4313,6 +4313,15 @@ code: |
     x.there_are_any = True
   else:
     x.there_are_any = False
+---
+id: selected types sets there_are_any
+generic object: ALIncomeList
+code: |
+  if not other_parties[0].expenses_unknown and other_parties[0].expenses.selected_types.any_true():
+    other_parties[0].expenses.move_checks_to_list(selected_terms=other_parties[0].expenses.terms_ordered, set_other=True)
+    other_parties[0].expenses.there_are_any = True
+  else:
+    other_parties[0].expenses.there_are_any = False
 ---
 id: are there public benefits
 generic object: ALIndividual
@@ -4825,9 +4834,7 @@ fields:
   - "I do not know about the expenses of ${ other_parties[0] }.": other_parties[0].expenses_unknown
     datatype: yesnowide
     disable others: True
-validation code: |
-  if other_parties[0].expenses_unknown:
-    other_parties[0].expenses.there_are_any = None
+
 
 ---
 id: ALExpense complete

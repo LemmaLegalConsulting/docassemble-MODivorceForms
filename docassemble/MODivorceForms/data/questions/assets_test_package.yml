@@ -4,6 +4,9 @@ features:
 include:
   - shared.yml
 ---
+imports:
+  - yaml
+---
 include:
   - assets_data.yml
   - choices_code.yml
@@ -54,13 +57,31 @@ subquestion: |
 
   There are ${ len(assets_list.complete_elements()) } versions saved.
 
+
   Changes
   % for assets_list_change in assets_list_changes:
+  % if len(assets_list_change.changes) > 0:
   ${ assets_list_change }
+
+  % for change in assets_list_change.changes:
+  New: change['new'] 
+  Old: change['old'] 
 
   % endfor
 
+  % endif
+  % endfor
+
   ${ assets_edit.table }
+attachment:
+  name: Test
+  filename: field_list_download
+  raw: True
+  content file: yaml_test.md
+---
+---
+code: |
+  yaml_data = yaml.dump(assets_list[-1], default_flow_style=False)
 ---
 event: save_assets
 code: |
@@ -72,12 +93,15 @@ objects:
   - assets_list_changes: DAList.using(object_type=DAObject, auto_gather=False)
 ---
 code: |
+  assets_list_test_number = 1
+---
+code: |
   asset_index = 0
-  for asset in assets_list[-1]:
+  for asset in assets_list[assets_list_test_number]:
     assets_list_changes.appendObject(DAObject)
     assets_list_changes[-1].name = asset.name
     assets_list_changes[-1].changes = list()
-    for att in ['description_code', 'loan_description_code', 'security_description_code', 'display_name', 'other_display', 'has_default_attributes', 'has_subtypes', 'may_split_award', 'may_have_loan','attributes','terms_ordered']:
+    for att in ['description_code', 'loan_description_code', 'security_description_code', 'display_name', 'other_display', 'has_default_attributes', 'has_subtypes', 'may_split_award', 'may_have_loan']:
       if hasattr(asset,att) and hasattr(assets_starter[asset_index],att):
         if getattr(asset,att) != getattr(assets_starter[asset_index],att):
           assets_list_changes[-1].changes.append({att:{'old': getattr(assets_starter[asset_index],att),'new':getattr(asset,att)}})
@@ -85,10 +109,31 @@ code: |
         assets_list_changes[-1].changes.append({att:{'old': "None",'new':getattr(asset,att)}})
       elif not hasattr(asset,att) and hasattr(assets_starter[asset_index],att):
         assets_list_changes[-1].changes.append({att:{'old': getattr(assets_starter[asset_index],att),'new':"None"}})
+    if hasattr(asset,'attributes') and hasattr(assets_starter[asset_index],'attributes'):
+      for attribute in getattr(asset,'attributes'):
+        for starter_attribute in getattr(assets_starter[asset_index],'attributes'):
+          if hasattr(attribute,"field") and hasattr(starter_attribute,"field") and attribute.field == starter_attribute.field:
+            for attribute_attribute in ["required", "example", "label", "datatype", "code"]:
+              if hasattr(attribute, attribute_attribute) and hasattr(starter_attribute, attribute_attribute):
+                if getattr(attribute, attribute_attribute) != getattr(starter_attribute, attribute_attribute):
+                  assets_list_changes[-1].changes.append({attribute.field + " " + attribute_attribute:{'old': getattr(starter_attribute, attribute_attribute),'new':getattr(attribute, attribute_attribute)}})
+              elif not hasattr(attribute, attribute_attribute) and hasattr(starter_attribute, attribute_attribute):
+                assets_list_changes[-1].changes.append({attribute.field + " " + attribute_attribute:{'old': getattr(starter_attribute, attribute_attribute),'new': "Deleted" }})
+              elif hasattr(attribute, attribute_attribute) and not hasattr(starter_attribute, attribute_attribute):
+                assets_list_changes[-1].changes.append({attribute.field + " " + attribute_attribute:{'old': "No attribute",'new':getattr(attribute, attribute_attribute)}})
+    if hasattr(asset,'terms_ordered') and hasattr(assets_starter[asset_index],'terms_ordered'):
+      for key in getattr(asset,'terms_ordered').keys():
+        if key in getattr(assets_starter[asset_index],'terms_ordered').keys():
+          if getattr(asset,'terms_ordered')[key] != getattr(assets_starter[asset_index],'terms_ordered')[key]:
+            assets_list_changes[-1].changes.append({ "terms_ordered  " + key:{'old': getattr(assets_starter[asset_index],'terms_ordered')[key],'new':getattr(asset,'terms_ordered')[key]}})
+        else:
+          assets_list_changes[-1].changes.append({ "terms_ordered  " + key:{'old': "No term",'new':getattr(asset,'terms_ordered')[key]}})
+      for key in getattr(assets_starter[asset_index],'terms_ordered').keys():
+        if key not in getattr(asset,'terms_ordered').keys():
+          assets_list_changes[-1].changes.append({"terms_ordered  " + key:{'old': getattr(assets_starter[asset_index],'terms_ordered')[key],'new': "Deleted"}})
     asset_index += 1
   assets_list_changes.gathered = True
-        
-  assets_list_changes.gathered = True
+
 ---
 id: asset question
 generic object: DAObject

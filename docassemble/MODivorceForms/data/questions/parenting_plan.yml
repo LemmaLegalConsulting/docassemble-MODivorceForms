@@ -246,13 +246,35 @@ fields:
 id: use presumed child support
 question:  Presumed Child Support amount
 subquestion: |
-  Based on the information you provided, it looks like  ${ support_payer.name_full() } should pay ${ currency(support_payer.presumed_child_support_amount_12 if support_payer.presumed_child_support_amount_12 > 0 else 0 ) } in child support.
+  Based on the information you provided, it looks like  ${ support_payer.name_full() } should pay the following in child support.  
+
+  % if number_of_children > 5:
+   - Six or more children - ${ currency(support_payer.presumed_child_support_amount_12_6 if support_payer.presumed_child_support_amount_12_6 > 0 else 0 ) }
+  
+  % endif
+  % if number_of_children > 4:
+   - Five children - ${ currency(support_payer.presumed_child_support_amount_12_5 if support_payer.presumed_child_support_amount_12_5 > 0 else 0 ) }
+  
+  % endif
+  % if number_of_children > 3:
+   - Four children - ${ currency(support_payer.presumed_child_support_amount_12_4 if support_payer.presumed_child_support_amount_12_4 > 0 else 0 ) }
+  
+  % endif
+  % if number_of_children > 2:
+   - Three children - ${ currency(support_payer.presumed_child_support_amount_12_3 if support_payer.presumed_child_support_amount_12_3 > 0 else 0 ) }
+  
+  % endif
+  % if number_of_children > 1:
+   - Two children - ${ currency(support_payer.presumed_child_support_amount_12_2 if support_payer.presumed_child_support_amount_12_2 > 0 else 0 ) }
+  
+  % endif
+   - One child - ${ currency(support_payer.presumed_child_support_amount_12 if support_payer.presumed_child_support_amount_12 > 0 else 0 ) }
 fields:
   - Should the court order this amount in monthly child support?: use_presumed_child_support
     datatype: radio
     choices:
       - Yes, this amount is correct.: yes
-      - No, the child support amount should be different than ${ currency(support_payer.presumed_child_support_amount_12 if support_payer.presumed_child_support_amount_12 > 0 else 0 ) }: no
+      - No, the child support amount should be different than the amount${ "s" if number_of_children > 1 else "" } above.: no
   - Why is the presumed child support amount unjust and inappropriate?: use_presumed_child_support_explanation
     show if: 
       variable: use_presumed_child_support
@@ -368,10 +390,17 @@ code: |
     combined_income_index = 40000
   else:
     combined_income_index = (combined_adjusted_income_3+25)//50*50
-  if number_of_children > 6:
-    basic_child_support_amount_5 = basic_child_support_schedule["6"][str("{:.0f}".format(combined_income_index))]["obligation"]
-  else:
-    basic_child_support_amount_5 = basic_child_support_schedule[str("{:.0f}".format(number_of_children))][str("{:.0f}".format(combined_income_index))]["obligation"]
+  if number_of_children > 5:
+    basic_child_support_amount_5_6 = basic_child_support_schedule["6"][str("{:.0f}".format(combined_income_index))]["obligation"]
+  if number_of_children > 4:
+    basic_child_support_amount_5_5 = basic_child_support_schedule["5"][str("{:.0f}".format(combined_income_index))]["obligation"]
+  if number_of_children > 3:
+    basic_child_support_amount_5_4 = basic_child_support_schedule["4"][str("{:.0f}".format(combined_income_index))]["obligation"]
+  if number_of_children > 2:
+    basic_child_support_amount_5_3 = basic_child_support_schedule["3"][str("{:.0f}".format(combined_income_index))]["obligation"]
+  if number_of_children > 1:
+    basic_child_support_amount_5_2 = basic_child_support_schedule["2"][str("{:.0f}".format(combined_income_index))]["obligation"]
+  basic_child_support_amount_5 = basic_child_support_schedule["1"][str("{:.0f}".format(combined_income_index))]["obligation"]
   if support_recipient.adjusted_monthly_gross_income_3 < 1251:
     credit_subtract = 0
   elif support_recipient.adjusted_monthly_gross_income_3 > 3583:
@@ -392,8 +421,38 @@ code: |
   support_recipient.total_childrearing_costs_7 =  support_recipient.total_adjusted_child_care_costs_6a + support_recipient.health_insurance_costs + float(support_recipient.extraordinary_medical_costs.total(times_per_year=12)) + float(sum([cost.total(times_per_year=12) for cost in support_recipient.extraordinary_childrearing_costs if cost.included_in_form_14]))
   support_payer.total_childrearing_costs_7  = support_payer.work_childcare_expenses + support_payer.health_insurance_costs + float(support_payer.extraordinary_medical_costs.total(times_per_year=12)) + float(sum([cost.total(times_per_year=12) for cost in support_payer.extraordinary_childrearing_costs if cost.included_in_form_14]))
   total_childrearing_costs_7 = support_recipient.total_childrearing_costs_7 + support_payer.total_childrearing_costs_7
+  if number_of_children > 5:
+    combined_child_support_costs_8_6 = basic_child_support_amount_5_6 + total_childrearing_costs_7
+  if number_of_children > 4:
+    combined_child_support_costs_8_5 = basic_child_support_amount_5_5 + total_childrearing_costs_7
+  if number_of_children > 3:
+    combined_child_support_costs_8_4 = basic_child_support_amount_5_4 + total_childrearing_costs_7
+  if number_of_children > 2:
+    combined_child_support_costs_8_3 = basic_child_support_amount_5_3 + total_childrearing_costs_7
+  if number_of_children > 1:
+    combined_child_support_costs_8_2 = basic_child_support_amount_5_2 + total_childrearing_costs_7
   combined_child_support_costs_8 = basic_child_support_amount_5 + total_childrearing_costs_7
+  if number_of_children > 5:
+    support_payer.support_obligation_9_6 = combined_child_support_costs_8_6 * support_payer.income_share_4
+  if number_of_children > 4:
+    support_payer.support_obligation_9_5 = combined_child_support_costs_8_5 * support_payer.income_share_4
+  if number_of_children > 3:
+    support_payer.support_obligation_9_4 = combined_child_support_costs_8_4 * support_payer.income_share_4
+  if number_of_children > 2:
+    support_payer.support_obligation_9_3 = combined_child_support_costs_8_3 * support_payer.income_share_4
+  if number_of_children > 1:
+    support_payer.support_obligation_9_2 = combined_child_support_costs_8_2 * support_payer.income_share_4
   support_payer.support_obligation_9 = combined_child_support_costs_8 * support_payer.income_share_4
+  if number_of_children > 5:
+    support_recipient.support_obligation_9_6 = combined_child_support_costs_8_6 * support_recipient.income_share_4
+  if number_of_children > 4:
+    support_recipient.support_obligation_9_5 = combined_child_support_costs_8_5 * support_recipient.income_share_4
+  if number_of_children > 3:
+    support_recipient.support_obligation_9_4 = combined_child_support_costs_8_4 * support_recipient.income_share_4
+  if number_of_children > 2:
+    support_recipient.support_obligation_9_3 = combined_child_support_costs_8_3 * support_recipient.income_share_4
+  if number_of_children > 1:
+    support_recipient.support_obligation_9_2 = combined_child_support_costs_8_2 * support_recipient.income_share_4
   support_recipient.support_obligation_9 = combined_child_support_costs_8 * support_recipient.income_share_4
   support_payer.childrearing_credit_10 = support_payer.total_childrearing_costs_7
   if visitation_nights < 36:
@@ -433,35 +492,39 @@ code: |
   else:
     support_payer.visitation_adjustment_11_percentage = 33
   support_payer.visitation_adjustment_11 = basic_child_support_amount_5*support_payer.visitation_adjustment_11_percentage*.01
+  if number_of_children > 5:
+    support_payer.presumed_child_support_amount_12_6 = support_payer.support_obligation_9_6 - support_payer.childrearing_credit_10 - support_payer.visitation_adjustment_11
+  if number_of_children > 4:
+    support_payer.presumed_child_support_amount_12_5 = support_payer.support_obligation_9_5 - support_payer.childrearing_credit_10 - support_payer.visitation_adjustment_11
+  if number_of_children > 3:
+    support_payer.presumed_child_support_amount_12_4 = support_payer.support_obligation_9_4 - support_payer.childrearing_credit_10 - support_payer.visitation_adjustment_11
+  if number_of_children > 2:
+    support_payer.presumed_child_support_amount_12_3 = support_payer.support_obligation_9_3 - support_payer.childrearing_credit_10 - support_payer.visitation_adjustment_11
+  if number_of_children > 1:
+    support_payer.presumed_child_support_amount_12_2 = support_payer.support_obligation_9_2 - support_payer.childrearing_credit_10 - support_payer.visitation_adjustment_11
   support_payer.presumed_child_support_amount_12 = support_payer.support_obligation_9 - support_payer.childrearing_credit_10 - support_payer.visitation_adjustment_11
   if number_of_children > 5:
-    basic_child_support_amount_5_6 = basic_child_support_schedule["6"][str("{:.0f}".format(combined_income_index))]["obligation"]
     support_payer.presumed_child_support_amount_6_children = (basic_child_support_amount_5_6 + total_childrearing_costs_7) * support_payer.income_share_4 - support_payer.childrearing_credit_10 - (basic_child_support_amount_5_6) * support_payer.visitation_adjustment_11_percentage*.01
   else:
     support_payer.presumed_child_support_amount_6_children = None
   if number_of_children > 4:
-    basic_child_support_amount_5_5 = basic_child_support_schedule["5"][str("{:.0f}".format(combined_income_index))]["obligation"]
     support_payer.presumed_child_support_amount_5_children = (basic_child_support_amount_5_5 + total_childrearing_costs_7) * support_payer.income_share_4 - support_payer.childrearing_credit_10 - (basic_child_support_amount_5_5) * support_payer.visitation_adjustment_11_percentage*.01
   else:
     support_payer.presumed_child_support_amount_5_children = None
   if number_of_children > 3:
-    basic_child_support_amount_5_4 = basic_child_support_schedule["4"][str("{:.0f}".format(combined_income_index))]["obligation"]
     support_payer.presumed_child_support_amount_4_children = (basic_child_support_amount_5_4 + total_childrearing_costs_7) * support_payer.income_share_4 - support_payer.childrearing_credit_10 - (basic_child_support_amount_5_4) * support_payer.visitation_adjustment_11_percentage*.01
   else:
     support_payer.presumed_child_support_amount_4_children = None
   if number_of_children > 2:
-    basic_child_support_amount_5_3 = basic_child_support_schedule["3"][str("{:.0f}".format(combined_income_index))]["obligation"]
     support_payer.presumed_child_support_amount_3_children = (basic_child_support_amount_5_3 + total_childrearing_costs_7) * support_payer.income_share_4 - support_payer.childrearing_credit_10 - (basic_child_support_amount_5_3) * support_payer.visitation_adjustment_11_percentage*.01
   else:
     support_payer.presumed_child_support_amount_3_children = None
   if number_of_children > 1:
-    basic_child_support_amount_5_2 = basic_child_support_schedule["2"][str("{:.0f}".format(combined_income_index))]["obligation"]
     support_payer.presumed_child_support_amount_2_children = (basic_child_support_amount_5_2 + total_childrearing_costs_7) * support_payer.income_share_4 - support_payer.childrearing_credit_10 - (basic_child_support_amount_5_2) * support_payer.visitation_adjustment_11_percentage*.01
   else:
     support_payer.presumed_child_support_amount_2_children = None
   if number_of_children > 0:
-    basic_child_support_amount_5_1 = basic_child_support_schedule["1"][str("{:.0f}".format(combined_income_index))]["obligation"]
-    support_payer.presumed_child_support_amount_1_children = (basic_child_support_amount_5_1 + total_childrearing_costs_7) - support_payer.childrearing_credit_10 - (basic_child_support_amount_5_1) * support_payer.visitation_adjustment_11_percentage*.01
+    support_payer.presumed_child_support_amount_1_children = (basic_child_support_amount_5 + total_childrearing_costs_7) - support_payer.childrearing_credit_10 - (basic_child_support_amount_5) * support_payer.visitation_adjustment_11_percentage*.01
   else:
     support_payer.presumed_child_support_amount_1_children = None
   form_14_calculations = True
@@ -1117,9 +1180,9 @@ attachment:
       - "pbHealthExpensesNotCoveredReceiverWithReimburse": ${ health_expenses_not_covered_reimburse and health_expenses_not_covered == "support_recipient" } 
       - "pbHealthExpensesNotCoveredPayorWithReimburse": ${ health_expenses_not_covered_reimburse and health_expenses_not_covered == "support_payer" } 
       - "pbHealthExpensesNotCoveredReimbursePercent": ${ "{:.0f}".format(health_expenses_not_covered_reimburse_percentage) } 
-      - "pbHealthExpensesNotCoveredNoReimburse": ${ not health_expenses_not_covered_reimburse and health_insurance in ["support_recipient","support_payer"] } 
-      - "pbHealthExpensesNotCoveredReceiverNoReimburse": ${ not health_expenses_not_covered_reimburse and health_insurance == "support_recipient" } 
-      - "pbHealthExpensesNotCoveredPayorNoReimburse": ${ not health_expenses_not_covered_reimburse and health_insurance == "support_payer" } 
+      - "pbHealthExpensesNotCoveredNoReimburse": ${ not health_expenses_not_covered_reimburse and health_expenses_not_covered in ["support_recipient","support_payer"] } 
+      - "pbHealthExpensesNotCoveredReceiverNoReimburse": ${ not health_expenses_not_covered_reimburse and health_expenses_not_covered == "support_recipient" } 
+      - "pbHealthExpensesNotCoveredPayorNoReimburse": ${ not health_expenses_not_covered_reimburse and health_expenses_not_covered == "support_payer" } 
       - "pbHealthExpensesNotCoveredNone": ${ health_expenses_not_covered == "none" } 
       - "pbUncoveredExtraMedParentPayingSupportAmt1": |
           % if len(support_payer.extraordinary_medical_costs) > 0:
@@ -1280,7 +1343,7 @@ attachment:
           % endif 
       - "pbParentPayingSupportForm14Respondent": ${ child_support in ["respondent"] } 
       - "pbParentPayingSupportForm14Petitioner": ${ child_support in ["petitioner", "none","third_party"] } 
-      - "pbChildrenNumber": ${ len(children) } 
+      - "pbChildrenNumber": ${ "1" } 
       - "lineOneColOne": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) } 
       - "lineOneColTwo": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) } 
       - "lineOneAColOne": ${ "$" + thousands(support_recipient.maintenance_received, show_decimals=True) } 
@@ -1330,29 +1393,29 @@ attachment:
       - "lineNineColTwo": ${ "$" + thousands(support_payer.support_obligation_9, show_decimals=True) } 
       - "lineNineColOne": ${ "$" + thousands(support_recipient.support_obligation_9, show_decimals=True) } 
       - "lineTenColTwo": ${ "$" + thousands(support_payer.childrearing_credit_10, show_decimals=True) } 
-      - "lineElevenPercent": ${ "{:.0f}".format(support_payer.visitation_adjustment_percentage_11) } 
+      - "lineElevenPercent": ${ "{:.0f}".format(support_payer.visitation_adjustment_11_percentage) } 
       - "lineElevenColTwo": ${ "$" + thousands(support_payer.visitation_adjustment_11, show_decimals=True) } 
       - "lineTwelveColTwo": ${ "$" + thousands(support_payer.presumed_child_support_amount_12, show_decimals=True) }      
-      - "pbPresumedSupportSixKids": ${ thousands(basic_child_support_amount_5_6, show_decimals=True) } 
-      - "pbPresumedSupportFiveKids": ${ thousands(basic_child_support_amount_5_5, show_decimals=True) } 
-      - "pbPresumedSupportFourKids": ${ thousands(basic_child_support_amount_5_4, show_decimals=True) } 
-      - "pbPresumedSupportThreeKids": ${ thousands(basic_child_support_amount_5_3, show_decimals=True) } 
-      - "pbPresumedSupportTwoKids": ${ thousands(basic_child_support_amount_5_2, show_decimals=True) } 
-      - "pbPresumedSupportOneKid": ${ thousands(basic_child_support_amount_5_1, show_decimals=True) } 
+      - "pbPresumedSupportSixKids": ${ thousands(support_payer.presumed_child_support_amount_12_6, show_decimals=True) } 
+      - "pbPresumedSupportFiveKids": ${ thousands(support_payer.presumed_child_support_amount_12_5, show_decimals=True) } 
+      - "pbPresumedSupportFourKids": ${ thousands(support_payer.presumed_child_support_amount_12_4, show_decimals=True) } 
+      - "pbPresumedSupportThreeKids": ${ thousands(support_payer.presumed_child_support_amount_12_3, show_decimals=True) } 
+      - "pbPresumedSupportTwoKids": ${ thousands(support_payer.presumed_child_support_amount_12_2, show_decimals=True) } 
+      - "pbPresumedSupportOneKid": ${ thousands(support_payer.presumed_child_support_amount_12, show_decimals=True) } 
       - "pbCourtOrderSupportYes": ${ use_presumed_child_support == "yes" } 
       - "pbCourtOrderSupportNo": ${ use_presumed_child_support == "no" } 
       - "pbPresumedUnjustDueTo": ${ use_presumed_child_support_explanation } 
       - "pbCourtOrderSupportSix": ${ len(children) > 5 } 
-      - "pbCourtOrderSupportSixAmt": ${ thousands(basic_child_support_amount_5_6, show_decimals=True) } 
-      - "pbCourtOrderSupportFiveAmt": ${ thousands(basic_child_support_amount_5_5, show_decimals=True) } 
+      - "pbCourtOrderSupportSixAmt": ${ thousands(support_payer.presumed_child_support_amount_12_6, show_decimals=True) if use_presumed_child_support == "yes" else "" } 
+      - "pbCourtOrderSupportFiveAmt": ${ thousands(support_payer.presumed_child_support_amount_12_5, show_decimals=True) if use_presumed_child_support == "yes" else "" }
       - "pbCourtOrderSupportFive": ${ len(children) > 4 } 
-      - "pbCourtOrderSupportFourAmt": ${ thousands(basic_child_support_amount_5_4, show_decimals=True) } 
+      - "pbCourtOrderSupportFourAmt": ${ thousands(support_payer.presumed_child_support_amount_12_4, show_decimals=True) if use_presumed_child_support == "yes" else "" }
       - "pbCourtOrderSupportFour": ${ len(children) > 3 } 
       - "pbCourtOrderSupportThree": ${ len(children) > 2 } 
-      - "pbCourtOrderSupportThreeAmt": ${ thousands(basic_child_support_amount_5_3, show_decimals=True) } 
-      - "pbCourtOrderSupportTwoAmt": ${ thousands(basic_child_support_amount_5_2, show_decimals=True) } 
+      - "pbCourtOrderSupportThreeAmt": ${ thousands(support_payer.presumed_child_support_amount_12_3, show_decimals=True) if use_presumed_child_support == "yes" else "" }
+      - "pbCourtOrderSupportTwoAmt": ${ thousands(support_payer.presumed_child_support_amount_12_2, show_decimals=True) if use_presumed_child_support == "yes" else "" }
       - "pbCourtOrderSupportTwo": ${ len(children) > 1 } 
-      - "pbCourtOrderSupportOneAmt": ${ thousands(basic_child_support_amount_5_1, show_decimals=True) } 
+      - "pbCourtOrderSupportOneAmt": ${ thousands(support_payer.presumed_child_support_amount_12, show_decimals=True) if use_presumed_child_support == "yes" else "" }
       - "pbCourtOrderSupportOne": ${ len(children) > 0 } 
       - "pbSupportStartDateJudgment": ${ child_support_start_date == "judgment_date" } 
       - "pbSupportStartDateSpecific": ${ child_support_start_date == "specific_date" } 
