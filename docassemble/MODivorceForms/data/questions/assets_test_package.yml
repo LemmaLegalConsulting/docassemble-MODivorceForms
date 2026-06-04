@@ -25,6 +25,9 @@ code: |
   assets_list[i].there_is_another = False
 ---
 code: |
+  assets_list[i].there_are_any = False
+---
+code: |
   assets_edit.there_is_another = False
 ---
 code: |

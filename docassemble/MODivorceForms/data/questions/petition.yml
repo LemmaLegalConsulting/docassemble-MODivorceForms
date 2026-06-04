@@ -59,11 +59,21 @@ fields:
 ---
 ## CHILDREN  
 ---
+if: not children[i].birth_certificate[users[0].name.full()] or not not children[i].birth_certificate[other_parties[0].name.full()]
 id: adoption question
 question: Is ${ children[i].name.full() } adopted by one or both parents?
 fields:
-  - no label: children[i].adopted
+  - Is ${ children[i].name.full() } adopted by ${ users[0].name.full() }?: children[i].adopted_by_user
     datatype: yesnoradio
+    show if:
+      code: |
+        not children[i].birth_certificate[users[0].name.full()] 
+  - Is ${ children[i].name.full() } adopted by ${ other_parties[0].name.full() }?: children[i].adopted_by_other_party
+    datatype: yesnoradio
+    show if:
+      code: |
+        not children[i].birth_certificate[other_parties[0].name.full()] 
+continue button field: adopted_question
 ---
 id: Petition for Dissolution of Marriage object
 objects:
@@ -183,7 +193,7 @@ attachment:
       - "respondentSupportThemselves3": ${ respondent.self_supporting == None } 
       - "respondentActiveDuty1": ${ respondent.active_duty } 
       - "respondentActiveDuty2": ${ not respondent.active_duty } 
-      - "dateOfMarriage": ${ marriage.recorded_date } 
+      - "dateOfMarriage": ${ format_date(marriage.recorded_date, format='MM/dd/yyyy') } 
       - "locationMarriageLicenseState": ${ state_name(marriage.address.state) } 
       - "locationMarriageLicenseCounty": ${ nice_county_name(marriage.address) } 
       - "locationMarriageLicense1": ${ marriage.address.country == "US" } 

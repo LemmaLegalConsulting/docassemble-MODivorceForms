@@ -243,6 +243,7 @@ fields:
       val('health_expenses_not_covered_reimburse') === true
       
 ---
+reconsider: actual_child_support
 id: use presumed child support
 question:  Presumed Child Support amount
 subquestion: |
@@ -279,6 +280,23 @@ fields:
     show if: 
       variable: use_presumed_child_support
       is: no
+  - code: actual_child_support
+---
+id: code to make actual_child_support depending on children
+code: |
+  actual_child_support = list()
+  if number_of_children > 5:
+    actual_child_support.append({'field':'actual_child_support_6','label':'Six or more children','show if':{'variable':'use_presumed_child_support','is':'no'},'default':thousands(support_payer.presumed_child_support_amount_12_6)})
+  if number_of_children > 4:
+    actual_child_support.append({'field':'actual_child_support_5','label':'Five children','show if':{'variable':'use_presumed_child_support','is':'no'},'default':thousands(support_payer.presumed_child_support_amount_12_5)})
+  if number_of_children > 3:
+    actual_child_support.append({'field':'actual_child_support_4','label':'Four children','show if':{'variable':'use_presumed_child_support','is':'no'},'default':thousands(support_payer.presumed_child_support_amount_12_4)})
+  if number_of_children > 2:
+    actual_child_support.append({'field':'actual_child_support_3','label':'Three children','show if':{'variable':'use_presumed_child_support','is':'no'},'default':thousands(support_payer.presumed_child_support_amount_12_3)})
+  if number_of_children > 1:
+    actual_child_support.append({'field':'actual_child_support_2','label':'Two children','show if':{'variable':'use_presumed_child_support','is':'no'},'default':thousands(support_payer.presumed_child_support_amount_12_2)})
+  actual_child_support.append({'field':'actual_child_support_1','label':'One child','show if':{'variable':'use_presumed_child_support','is':'no'},'default':thousands(support_payer.presumed_child_support_amount_12)})
+
 ---
 variable name: var_doc_dict["use_presumed_child_support"]
 data:
@@ -305,8 +323,8 @@ fields:
     datatype: radio
     choices:
       - Child support shall be paid through income withholding.: income_withholding
-      - Income withholding will not issue because a written agreement has been reached between the parents that provides for an alternative arrangement.: no_agreement
-      - Income withholding will not issue because there is good cause not to require immediate income withholding for the reason that implementation of an immediate withholding would not be in the best interest of the child and the parent paying support has made timely payments of all previously ordered support.: no_not_in_best_interest
+      - No income withholding  because the parents have agreed on an alternative form of payment.: no_agreement
+      - No income withholding because immediate income withholding is not necessary. The paying parent has made timely payments on all previously ordered support.: no_not_in_best_interest
   - Should child support be paid at the Family Support Payment Center or directly to ${ support_recipient.name_full() }: child_support_location_of_payment
     datatype: radio
     choices:
@@ -1169,18 +1187,18 @@ attachment:
       - "pbParentPayingForm14Only": ${ child_support == "none" } 
       - "pbParentPayingForm14Only": ${ } 
       - "pbMedInsuranceNone": ${ medical_insurance == "none" } 
-      - "pbMedInsurancePetitioner": ${ medical_insurance == "petitioner" } 
-      - "pbMedInsuranceRespondent": ${ medical_insurance == "respondent" } 
+      - "pbMedInsurancePetitioner": ${ medical_insurance == petitioner.name.full() } 
+      - "pbMedInsuranceRespondent": ${ medical_insurance == respondent.name.full() } 
       - "pbDentalInsuranceNone": ${ dental_insurance == "none" } 
-      - "pbDentalInsurancePetitioner": ${ dental_insurance == "petitioner" } 
-      - "pbDentalInsuranceRespondent": ${ dental_insurance == "respondent" } 
-      - "pbInsCostByPetitioner": ${ petitioner.health_insurance_costs } 
-      - "pbInsCostByRespondent": ${ respondent.health_insurance_costs } 
+      - "pbDentalInsurancePetitioner": ${ dental_insurance == petitioner.name.full() } 
+      - "pbDentalInsuranceRespondent": ${ dental_insurance == respondent.name.full() } 
+      - "pbInsCostByPetitioner": ${ thousands(petitioner.health_insurance_costs, show_decimals=True) } 
+      - "pbInsCostByRespondent": ${ thousands(respondent.health_insurance_costs, show_decimals=True) } 
       - "pbHealthExpensesNotCoveredReimbure": ${ health_expenses_not_covered_reimburse } 
       - "pbHealthExpensesNotCoveredReceiverWithReimburse": ${ health_expenses_not_covered_reimburse and health_expenses_not_covered == "support_recipient" } 
       - "pbHealthExpensesNotCoveredPayorWithReimburse": ${ health_expenses_not_covered_reimburse and health_expenses_not_covered == "support_payer" } 
       - "pbHealthExpensesNotCoveredReimbursePercent": ${ "{:.0f}".format(health_expenses_not_covered_reimburse_percentage) } 
-      - "pbHealthExpensesNotCoveredNoReimburse": ${ not health_expenses_not_covered_reimburse and health_expenses_not_covered in ["support_recipient","support_payer"] } 
+      - "pbHealthExpensesNotCoveredNoReimbure": ${ not health_expenses_not_covered_reimburse and health_expenses_not_covered in ["support_recipient","support_payer"] } 
       - "pbHealthExpensesNotCoveredReceiverNoReimburse": ${ not health_expenses_not_covered_reimburse and health_expenses_not_covered == "support_recipient" } 
       - "pbHealthExpensesNotCoveredPayorNoReimburse": ${ not health_expenses_not_covered_reimburse and health_expenses_not_covered == "support_payer" } 
       - "pbHealthExpensesNotCoveredNone": ${ health_expenses_not_covered == "none" } 
@@ -1341,8 +1359,8 @@ attachment:
           % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if not included_cost.included_in_form_14]) > 2:
           ${ [included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if not included_cost.included_in_form_14][2].description }
           % endif 
-      - "pbParentPayingSupportForm14Respondent": ${ child_support in ["respondent"] } 
-      - "pbParentPayingSupportForm14Petitioner": ${ child_support in ["petitioner", "none","third_party"] } 
+      - "pbParentPayingSupportForm14Respondent": ${ child_support in ["petitioner", "none","third_party"] } 
+      - "pbParentPayingSupportForm14Petitioner": ${ child_support in ["respondent"] } 
       - "pbChildrenNumber": ${ "1" } 
       - "lineOneColOne": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) } 
       - "lineOneColTwo": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) } 
@@ -1405,18 +1423,18 @@ attachment:
       - "pbCourtOrderSupportYes": ${ use_presumed_child_support == "yes" } 
       - "pbCourtOrderSupportNo": ${ use_presumed_child_support == "no" } 
       - "pbPresumedUnjustDueTo": ${ use_presumed_child_support_explanation } 
-      - "pbCourtOrderSupportSix": ${ len(children) > 5 } 
-      - "pbCourtOrderSupportSixAmt": ${ thousands(support_payer.presumed_child_support_amount_12_6, show_decimals=True) if use_presumed_child_support == "yes" else "" } 
-      - "pbCourtOrderSupportFiveAmt": ${ thousands(support_payer.presumed_child_support_amount_12_5, show_decimals=True) if use_presumed_child_support == "yes" else "" }
-      - "pbCourtOrderSupportFive": ${ len(children) > 4 } 
-      - "pbCourtOrderSupportFourAmt": ${ thousands(support_payer.presumed_child_support_amount_12_4, show_decimals=True) if use_presumed_child_support == "yes" else "" }
-      - "pbCourtOrderSupportFour": ${ len(children) > 3 } 
-      - "pbCourtOrderSupportThree": ${ len(children) > 2 } 
-      - "pbCourtOrderSupportThreeAmt": ${ thousands(support_payer.presumed_child_support_amount_12_3, show_decimals=True) if use_presumed_child_support == "yes" else "" }
-      - "pbCourtOrderSupportTwoAmt": ${ thousands(support_payer.presumed_child_support_amount_12_2, show_decimals=True) if use_presumed_child_support == "yes" else "" }
-      - "pbCourtOrderSupportTwo": ${ len(children) > 1 } 
-      - "pbCourtOrderSupportOneAmt": ${ thousands(support_payer.presumed_child_support_amount_12, show_decimals=True) if use_presumed_child_support == "yes" else "" }
-      - "pbCourtOrderSupportOne": ${ len(children) > 0 } 
+      - "pbCourtOrderSupportSix": ${ number_of_children > 5 } 
+      - "pbCourtOrderSupportSixAmt": ${ thousands(support_payer.presumed_child_support_amount_12_6, show_decimals=True) if use_presumed_child_support == "yes" else thousands(actual_child_support_6, show_decimals=True) } 
+      - "pbCourtOrderSupportFiveAmt": ${ thousands(support_payer.presumed_child_support_amount_12_5, show_decimals=True) if use_presumed_child_support == "yes" else thousands(actual_child_support_5, show_decimals=True) }
+      - "pbCourtOrderSupportFive": ${ number_of_children > 4 } 
+      - "pbCourtOrderSupportFourAmt": ${ thousands(support_payer.presumed_child_support_amount_12_4, show_decimals=True) if use_presumed_child_support == "yes" else thousands(actual_child_support_4, show_decimals=True) }
+      - "pbCourtOrderSupportFour": ${ number_of_children > 3 } 
+      - "pbCourtOrderSupportThree": ${ number_of_children > 2 } 
+      - "pbCourtOrderSupportThreeAmt": ${ thousands(support_payer.presumed_child_support_amount_12_3, show_decimals=True) if use_presumed_child_support == "yes" else thousands(actual_child_support_3, show_decimals=True) }
+      - "pbCourtOrderSupportTwoAmt": ${ thousands(support_payer.presumed_child_support_amount_12_2, show_decimals=True) if use_presumed_child_support == "yes" else thousands(actual_child_support_2, show_decimals=True) }
+      - "pbCourtOrderSupportTwo": ${ number_of_children > 1 } 
+      - "pbCourtOrderSupportOneAmt": ${ thousands(support_payer.presumed_child_support_amount_12, show_decimals=True) if use_presumed_child_support == "yes" else thousands(actual_child_support_1, show_decimals=True) }
+      - "pbCourtOrderSupportOne": ${ number_of_children > 0 } 
       - "pbSupportStartDateJudgment": ${ child_support_start_date == "judgment_date" } 
       - "pbSupportStartDateSpecific": ${ child_support_start_date == "specific_date" } 
       - "pbSupportStartDateSpecified": ${ child_support_start_date_other_date } 

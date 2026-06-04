@@ -66,6 +66,16 @@ code: |
     temp_people_choices.append(visitation_supervisor)
   if defined('communications_other') and hasattr(communications_other.name,"first"):
     temp_people_choices.append(communications_other)
+  if defined('children'):
+    for child in children.complete_elements():
+      if defined('child.other_parent.name.first'):
+        temp_people_choices.append(child.other_parent)
+      if defined('child.birth_certificate_other.name.first'):
+        temp_people_choices.append(child.birth_certificate_other)
+  if defined('persons_lived_with'):
+    for person in persons_lived_with:
+      if person != users[0] and person != other_parties[0]:
+        temp_people_choices.append(person)
   parent_and_people_choices = temp_people_choices
 ---
 id: list of previously entered people without parents
@@ -81,6 +91,12 @@ code: |
     temp_people_choices.append(visitation_supervisor)
   if hasattr(communications_other.name,"first"):
     temp_people_choices.append(communications_other)
+  if defined('children'):
+    for child in children.complete_elements():
+      if defined('child.other_parent.name.first'):
+        temp_people_choices.append(child.other_parent)
+      if defined('child.birth_certificate_other.name.first'):
+        temp_people_choices.append(child.birth_certificate_other)
   if defined('persons_lived_with'):
     for person in persons_lived_with:
       if person != users[0] and person != other_parties[0]:
@@ -721,31 +737,56 @@ code: |
     respondent_race_identified = False
   
 ---
-id: Previous marriages info
-generic object: ALIndividual
-question: Previous marriages for ${ x.name_full() }
+id: Previous marriages info for other party
+question: Previous marriages for ${ users[0].name_full() }
 fields:  
-  - Previously married?: x.previously_married
-    datatype: yesnomaybe
-  - Number of previous marriages: x.number_of_marriages
+  - Previously married?: users[0].previously_married
+    datatype: yesnoradio
+  - Number of previous marriages: users[0].number_of_marriages
     datatype: number
-    show if: x.previously_married
+    show if: users[0].previously_married
     required: False
-  - Date Last Marriage Ended: x.last_marriage_end_date
+  - Date Last Marriage Ended: users[0].last_marriage_end_date
     datatype: date
     required: False
-    show if: x.previously_married
-  - How Last Marriage Ended: x.last_marriage_end
+    show if: users[0].previously_married
+  - How Last Marriage Ended: users[0].last_marriage_end
     required: False
     datatype: dropdown
     choices:
       - Death
       - Divorce
-    show if: x.previously_married
+    show if: users[0].previously_married
 validation code: |
-  if x.previously_married == False:
-    x.number_of_marriages = 0
-  if x.previously_married and x.last_marriage_end_date != "" and (as_datetime(x.last_marriage_end_date) > today() or as_datetime(x.last_marriage_end_date) < as_datetime(users[0].birthdate)):
+  if users[0].previously_married == False:
+    users[0].number_of_marriages = 0
+  if users[0].previously_married and users[0].last_marriage_end_date != "" and (as_datetime(users[0].last_marriage_end_date) > today() or as_datetime(users[0].last_marriage_end_date) < as_datetime(users[0].birthdate)):
+    validation_error("Please enter a date in the past that isn't before the date you were born.")
+---
+id: Previous marriages info for other party
+question: Previous marriages for ${ other_parties[0].name_full() }
+fields:  
+  - Previously married?: other_parties[0].previously_married
+    datatype: yesnomaybe
+  - Number of previous marriages: other_parties[0].number_of_marriages
+    datatype: number
+    show if: other_parties[0].previously_married
+    required: False
+  - Date Last Marriage Ended: other_parties[0].last_marriage_end_date
+    datatype: date
+    required: False
+    show if: other_parties[0].previously_married
+  - How Last Marriage Ended: other_parties[0].last_marriage_end
+    required: False
+    datatype: dropdown
+    choices:
+      - Death
+      - Divorce
+    show if: other_parties[0].previously_married
+validation code: |
+  if other_parties[0].previously_married == False:
+    other_parties[0].number_of_marriages = 0
+  if other_parties[0].previously_married and other_parties[0].last_marriage_end_date != "" and (as_datetime(other_parties[0].last_marriage_end_date) > today() or as_datetime(other_parties[0].last_marriage_end_date) < as_datetime(other_parties[0].birthdate)):
     validation_error("Please enter a date in the past that isn't before the date you were born.")
 ---
 generic object: ALIndividual
@@ -762,44 +803,35 @@ question: ${ "Your" if x.instanceName == "users[0]" else "Your spouse's" } resid
 fields:
   - How long ${ "have you" if x.instanceName == "users[0]" else "has your spouse" } lived in ${ state_name(x.address.state) }?: x.mo_length_of_residence_choice
     datatype: radio
-    default: ${ x.county_length_of_residence_choice }
     choices:
       - Less than 4 months: less_than_4
       - More than 4 months but less than a year: more_than_4
       - A year or more: year
   - How many days?: x.mo_length_of_residence_days
     datatype: integer
-    default: ${ x.county_length_of_residence_days if defined('x.county_length_of_residence_days') else '' }
     show if:
       variable: x.mo_length_of_residence_choice
       is: less_than_4
   - How many months?: x.mo_length_of_residence_months
     datatype: integer
+    min: 4
+    max: 11
     show if:
       variable: x.mo_length_of_residence_choice
       is: more_than_4
-    default: ${ x.county_length_of_residence_months if defined('x.county_length_of_residence_months') else '' }
   - How many years?: x.mo_length_of_residence_years
     datatype: integer
     show if:
       variable: x.mo_length_of_residence_choice
       is: year    
-    default: ${ x.county_length_of_residence_years if defined('x.county_length_of_residence_years') else '' }
-validation code: |
-  if x.mo_length_of_residence_choice != "less_than_4" or x.mo_length_of_residence_days >= 90:
-    x.resident_for_90_days = True
-  else:
-    x.resident_for_90_days = False
----
-generic object: ALIndividual
-question: ${ "Your" if x.instanceName == "users[0]" else "Your spouse's" } residency in ${ x.address.county }
-fields:
   - How long ${ "have you" if x.instanceName == "users[0]" else "has your spouse" } lived in ${ x.address.county }?: x.county_length_of_residence_choice
     datatype: radio
     choices:
       - Less than 4 months: less_than_4
       - More than 4 months but less than a year: more_than_4
       - A year or more: year
+    js show if: |
+      val("x.mo_length_of_residence_days") > 0 || val("x.mo_length_of_residence_months") > 0 || val("x.mo_length_of_residence_years") > 0
   - How many days?: x.county_length_of_residence_days
     datatype: integer
     show if:
@@ -807,6 +839,8 @@ fields:
       is: less_than_4
   - How many months?: x.county_length_of_residence_months
     datatype: integer
+    min: 4
+    max: 11
     show if:
       variable: x.county_length_of_residence_choice
       is: more_than_4
@@ -816,6 +850,26 @@ fields:
       variable: x.county_length_of_residence_choice
       is: year
 validation code: |
+  if x.county_length_of_residence_choice == 'less_than_4':
+    if x.mo_length_of_residence_choice == 'less_than_4':
+      if x.county_length_of_residence_days > x.mo_length_of_residence_days:
+        validation_error("Your residency in Missouri must be at least as long as your residency in a Missouri county.")
+  elif x.county_length_of_residence_choice == 'more_than_4':
+    if x.mo_length_of_residence_choice == 'less_than_4':
+      validation_error("Your residency in Missouri must be at least as long as your residency in a Missouri county.")
+    elif x.mo_length_of_residence_choice == 'more_than_4':
+      if x.county_length_of_residence_months > x.mo_length_of_residence_months:
+        validation_error("Your residency in Missouri must be at least as long as your residency in a Missouri county.")
+  elif x.county_length_of_residence_choice == 'year':
+    if x.mo_length_of_residence_choice == 'less_than_4' or x.mo_length_of_residence_choice == 'less_than_4':
+      validation_error("Your residency in Missouri must be at least as long as your residency in a Missouri county.")
+    else:
+      if x.county_length_of_residence_years > x.mo_length_of_residence_years:
+        validation_error("Your residency in Missouri must be at least as long as your residency in a Missouri county.")
+  if x.mo_length_of_residence_choice != "less_than_4" or x.mo_length_of_residence_days >= 90:
+    x.resident_for_90_days = True
+  else:
+    x.resident_for_90_days = False
   if x.county_length_of_residence_choice != "less_than_4" or x.county_length_of_residence_days >= 90:
     x.county_resident_for_90_days = False
   else:
@@ -993,11 +1047,11 @@ code: |
       children[i].legal_custody_other.name.first
     if children[i].physical_custody == "Third Party":
       children[i].physical_custody_other.name.first
-    if children[i].parents["Other"]:
-      children[i].other_parent.name.first
     if children[i].birth_certificate["Other"]:
       children[i].birth_certificate_other.name.first
-    children[i].adopted
+      children[i].adopted_question
+    if children[i].parents["Other"]:
+      children[i].other_parent.name.first
   if 'parenting_plan_attachment' in doc_list_selected.true_values() and legal_custody != "Third Party" and physical_custody != "Third Party":
     children[i].tax_dependency_even
   if len(set(var_doc_dict["under_18_in_household"]) & set(doc_list_selected.true_values())) > 0:
@@ -1071,13 +1125,24 @@ fields:
   - Number of children: number_of_children
     datatype: number
 ---
-if: defined('children.gathered')
+if: defined('children.gathered') and 'petition_attachment' in doc_list_selected.true_values()
 code: |
-  number_of_children = len(children)
+  number_of_children = 0
+  users[0].other_children = 0
+  other_parties[0].other_children = 0
+  for child in children:
+    if child.parents[users[0].name.full()] and child.parents[other_parties[0].name.full()] and not child.special_factors['self_supporting']:
+      number_of_children += 1
+    elif child.parents[users[0].name.full()] and not child.special_factors['self_supporting']:
+      users[0].other_children += 1
+    elif child.parents[other_parties[0].name.full()] and not child.special_factors['self_supporting']:
+      other_parties[0].other_children += 1
 ---
 if: not minor_children
 code: |
   number_of_children = 0
+  users[0].other_children = 0
+  other_parties[0].other_children = 0
 ---
 comment: |
   The petition requires you to put the primary person that the child has in the last 60 days.  
@@ -1172,6 +1237,11 @@ fields:
       - Third party: Third Party
     default: ${ legal_custody }
 ---
+id: set legal custody for child if selected for all children
+if: legal_custody_all_children
+code: |
+  children[i].legal_custody = legal_custody
+---
 variable name: var_doc_dict["legal_custody"]
 data:
   - petition_attachment
@@ -1241,6 +1311,8 @@ fields:
    show if:
      variable: legal_custody
      is: Third Party
+ - Should this apply to all children involved in this case?: legal_custody_all_children
+   datatype: yesnoradio
 ---
 id: follow up reason for sole legal custody
 if: legal_custody in ["petitioner", "respondent"]
@@ -1263,6 +1335,8 @@ fields:
       - "Sole physical custody to ${ respondent }: (${ respondent } has the kids in their custody 100% of the time with possible supervised visitation to ${ petitioner })": respondent
       - "Both spouses jointly (both parents have some time with the kids without supervision)": Joint
       - "Third party (someone else has custody of the kids)": Third Party
+ - Should this apply to all children involved in this case?: physical_custody_all_children
+   datatype: yesnoradio
 ---
 id: follow up visitation question for sole physical_custody
 question: Visitation
@@ -1326,6 +1400,11 @@ fields:
       - Third party: Third Party
     default: ${ physical_custody }
 ---
+id: set physical custody for child if selected for all children
+if: physical_custody_all_children
+code: |
+  children[i].physical_custody = physical_custody
+---
 id: other physical custody
 reconsider:
   - people_choices
@@ -1364,6 +1443,22 @@ fields:
       - ${ other_parties[0] }
       - Other
     none of the above: False
+---
+id: code for parent
+code: |
+  children[i].parents = dict()
+  children[i].parents['Other'] = False
+  if children[i].birth_certificate[users[0].name.full()] or children[i].adopted_by_user:
+    children[i].parents[users[0].name.full()] = True
+  else:
+    children[i].parents[users[0].name.full()] = False
+    children[i].parents['Other'] = True
+  if children[i].birth_certificate[other_parties[0].name.full()] or children[i].adopted_by_other_party:
+    children[i].parents[other_parties[0].name.full()] = True
+  else:
+    children[i].parents[other_parties[0].name.full()] = False
+    children[i].parents['Other'] = True
+    
 ---
 id: tax dependenc of child
 question: Tax dependency ${ children[i].name_full() }
@@ -1627,7 +1722,7 @@ id: are there any extraordinary medical costs
 generic object: ALIndividual
 question: Extraordinary Medical Costs to be paid by ${ x.name_full() }
 subquestion: |
-  Extraordinary medical costs are predictable and recurring expenses for things like: dental treatment, orthodontic treatment, asthma treatment, and physical therapy.
+  Extraordinary medical costs are predictable and recurring expenses for things like: ongoing dental treatment, orthodontic treatment, asthma treatment, and physical therapy.
 
   % if x.spouse.extraordinary_medical_costs.has_been_gathered() and len(x.spouse.extraordinary_medical_costs) > 0:
   You have already told us about ${ x.spouse } paying the following extraordinary medical costs: ${ comma_and_list([cost.description for cost in x.spouse.extraordinary_medical_costs.complete_elements()]) }
@@ -1646,7 +1741,7 @@ generic object: ALIndividual
 question: |
   What is the ${ ordinal(i) } extraordinary medical cost to be paid by ${ x.name_full() }?
 subquestion: |
-  Extraordinary medical costs are predictable and recurring expenses for things like: dental treatment, orthodontic treatment, asthma treatment, and physical therapy.
+  Extraordinary medical costs are predictable and recurring expenses for things like: ongoing dental treatment, orthodontic treatment, asthma treatment, and physical therapy.
   
   % if x.spouse.extraordinary_medical_costs.has_been_gathered() and len(x.spouse.extraordinary_medical_costs) > 0:
   You have already told us about ${ x.spouse } paying the following extraordinary medical costs: ${ comma_and_list([cost.description for cost in x.spouse.extraordinary_medical_costs.complete_elements()]) }
@@ -1857,8 +1952,8 @@ fields:
   - Who should maintain and pay the cost of medical insurance for the benefit of the children?: medical_insurance
     datatype: radio
     choices:
-      - ${ petitioner }: petitioner
-      - ${ respondent }: respondent
+      - ${ petitioner }: ${ petitioner }
+      - ${ respondent }: ${ respondent }
       - Neither parent: none
                       
 ---
@@ -1868,8 +1963,8 @@ fields:
   - Who should maintain and pay the cost of dental insurance for the benefit of the children?: dental_insurance
     datatype: radio
     choices:
-      - ${ petitioner }: petitioner
-      - ${ respondent }: respondent
+      - ${ petitioner }: ${ petitioner }
+      - ${ respondent }: ${ respondent }
       - Neither parent: none
                       
 ---
@@ -1883,8 +1978,18 @@ subquestion: |
 
   [FILE insurance_cost_example.png,100%]
 fields:
-  - What are the monthly health insurance costs for ${ x.name_full() } for the children who are subjects of this proceeding?: x.health_insurance_costs
+  - What are the monthly health insurance costs for ${ x.name_full() } pays for the children subject to this case?: x.health_insurance_costs
     datatype: currency
+---
+id: set user health care costs to 0 if not responsible
+if: not medical_insurance == users[0].name.full() and not dental_insurance == users[0].name.full()
+code:
+  users[0].health_insurance_costs = 0
+---
+id: set other parties health care costs to 0 if not responsible
+if: not medical_insurance == other_parties[0].name.full() and not dental_insurance == other_parties[0].name.full()
+code:
+  other_parties[0].health_insurance_costs = 0
 ---
 id: set children health insurance costs to 0 if no minor children
 if: not minor_children
@@ -3836,6 +3941,13 @@ subquestion: |
   % endif
 fields:
   - Job title: other_parties[0].jobs[i].source
+  - "I do not know ${ other_parties[0].pronoun_possessive('job title') }.": other_parties[0].jobs[i].job_title_unknown
+    datatype: yesno
+    disable others: True
+validation code: |
+  if other_parties[0].jobs[i].job_title_unknown:
+    other_parties[0].jobs[i].source = "Unknown"
+    
 ---
 id: other itemized job income value
 generic object: ALItemizedJob
@@ -3855,7 +3967,7 @@ fields:
 id: other itemized job income value for other party
 generic object: ALItemizedJob
 question: |
-  How much does ${ other_parties[0] } get paid in ${ job_items_names.get(j, j) } as a ${ other_parties[0].jobs[i].source }?
+  How much does ${ other_parties[0] } get paid in ${ job_items_names.get(j, j) }${ "" if other_parties[0].jobs[i].source == "Unknown" else " as a " + other_parties[0].jobs[i].source }?
 fields:
   - Amount: other_parties[0].jobs[i].to_add[j].value
     datatype: currency
