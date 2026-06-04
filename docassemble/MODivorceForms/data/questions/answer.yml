@@ -8,9 +8,18 @@ fields:
 ---
 id: Active Duty and Servicemember Civil Relief Act
 question: Active Duty
+subquestion: |
+
+  ${ collapse_template(servicemember_template) }
 fields:
   - Do you waive your rights pursuant to the Servicemembers Civil Relief Act of 2003?: waive_rights
     datatype: yesnoradio
+---
+id: Servicemembers Civil Relief Act template
+template: servicemember_template
+subject: What is the Servicemembers Civil Relief Act?
+content: |
+  The Servicemembers Civil Relief Act protects active-duty military from receiving a disadvantage in legal proceedings solely because they are unable to attend court hearings. This act may allow a servicemember to request a delay of the proceedings while on active duty or prevent a default judgment if the servicemember cannot appear due to being on active duty.
 ---
 id: denials question for answer
 question: Denials

@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "setuptools==80.9.0",
+    "setuptools>=80.9.0",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -13,7 +13,7 @@ authors = [
     { name = "Toby Fey", email = "tobyfey@protonmail.com" },
 ]
 dependencies = [
-    "docassemble.AssemblyLine @ git+https://github.com/SuffolkLITLab/docassemble-AssemblyLine.git@main",
+    "docassemble.AssemblyLine>=4.6.0",
 ]
 
 [project.urls]

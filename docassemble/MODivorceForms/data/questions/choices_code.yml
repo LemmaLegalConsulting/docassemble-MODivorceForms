@@ -1,0 +1,246 @@
+
+id: set choices for asset
+generic object: ALAssetList
+code: |
+  x.asset_info_choices = list()
+  if x.has_default_attributes:
+    x.asset_info_choices.append(
+      {"field":"x[i].source", "label": "Type of asset", "code": "x.ordered"}
+      )
+    x.asset_info_choices.append(
+      {"field":"x[i].source_other", "label": "Other (explain)","show if":{"variable":"x.source","is":"other"}}
+      )
+    x.asset_info_choices.append(
+      {"field":"x[i].description", "label": "Description"}
+      )
+    x.asset_info_choices.append(
+      {"field":"x[i].market_value", "label": "What is its market value? How much would you get if you sold it?","datatype":"currency"}
+      )
+    if x.may_have_loan:
+      x.asset_info_choices.append(
+        {"label": "Is there an amount owed on this property?", "field": "x[i].is_amount_owed", "datatype": "yesnoradio"}
+        )
+      x.asset_info_choices.append(
+        {"label": "Who is the money owed to?", "field": "x[i].lender", "required": False, "show if": "x[i].is_amount_owed"}
+        )
+      x.asset_info_choices.append(
+        {"label": "Balance", "field": "x[i].balance", "datatype": "currency", "show if": "x[i].is_amount_owed"}
+        )
+      x.asset_info_choices.append(
+        {"label": "Monthly Payment", "field": "x[i].monthly_payment", "datatype": "currency", "show if": "x[i].is_amount_owed"}
+        )
+      x.asset_info_choices.append(
+        {"label": "Who should pay this debt?", "field": "x[i].recommended_debt", "show if": "x[i].is_amount_owed", "choices":[{"Petitioner":"petitioner"},{"Respondent":"respondent"},{"Split the debt":"split"}, {"Other":"other"}]}
+        )
+      x.asset_info_choices.append(
+        {"label": "How much should users[0].name.full()  pay?", "field": "x[i].user_percentage_choice", "choices":[{"50%": 50}, {"75%": 75}, {"25%": 25}, {"Other": "other"}], "show if":{"variable": "x[i].recommended_debt", "is": "split"}}
+        )
+      x.asset_info_choices.append(
+        {"label": "What percentage?", "field": "x[i].user_percentage_other", "datatype": "number", "min": 0, "max": 100, "show if":{"variable": "x[i].user_percentage_choice", "is": "other"}}
+        )
+    x.asset_info_choices.append(
+      {"field":"x[i].marital_property", "label": "Is this marital or nonmarital property?","choices":[{"Marital":"Marital"},{"Nonmarital":"Nonmarital"},{"Both":"Both"}]}
+      )
+    x.asset_info_choices.append(
+      {"note":"${ collapse_template(marital_property_template) }"}
+      )
+    x.asset_info_choices.append(
+      {"field":"x[i].has_possession", "label": "Who has possession?","choices":[{"Petitioner":"petitioner"},{"Respondent":"respondent"},{"Split the award":"split"},{"Other":"other"}]}
+      )
+
+    if x.may_split_award:
+      x.asset_info_choices.append(
+        {"field":"x[i].recommended_award", "label":"Recommended Award","choices":[{"Petitioner":"petitioner"},{"Respondent":"respondent"},{"Split the award":"split"},{"Other":"other"}]}
+        )
+      x.asset_info_choices.append(
+        {"label": "How much should users[0].name.full()  pay?", "field": "x[i].award_percentage_choice", "choices":[{"50%": 50}, {"75%": 75}, {"25%": 25}, {"Other": "other"}], "show if":{"variable": "x[i].recommended_award", "is": "split"}}
+        )
+      x.asset_info_choices.append(
+        {"label": "What percentage?", "field": "x[i].award_percentage_other", "datatype": "number", "min": 0, "max": 100, "show if":{"variable": "x[i].award_percentage_choice", "is": "other"}}
+        )
+    else:
+      x.asset_info_choices.append(
+        {"field":"x[i].recommended_award", "label":"Recommended Award","choices":[{"Petitioner":"petitioner"}, {"Respondent":"respondent"}, {"Other":"other"}]}  
+        )
+  else:
+    for index in range(0,len(x.attributes)):
+      temp_dict = dict()
+      for key in x.attributes[index].keys():
+        if key == "show if":
+          if isinstance(x.attributes[index][key],dict):
+            temp_dict[key] = dict()
+            temp_dict[key]["variable"] = x.attributes[index][key]["variable"]
+            temp_dict[key]["is"] = x.attributes[index][key]["is"]
+          else:
+            temp_dict[key] = x.attributes[index][key]
+        elif key != "example":
+          temp_dict[key] = x.attributes[index][key]
+      x.asset_info_choices.append(temp_dict)
+---
+## ASSETS
+comment: |
+  Assets are gathered jointly for the user and the spouse.  The information question about the asset asks who the asset should be awarded to.  After all the different assets are gathered, a code block based on the recommended award assigns it to a single ALAssetList attribute called .assets.  This means that different asset lists can have their own attributes in the information question, but must all share the same attributes as .assets. 
+  
+  Some of the assets can also have an attached loan, and the information question allows you to assign that loan (including splitting it).  This will create a secured_debts ALAssetList, where each debt is a soft copy of the asset it is attached to.  After collecting joint debts (which can also be assigned and split), a code block will create a ALAssetList attribute .debts for both user and spouse. If the debts are not split, then these debts will also be soft copys, but if they are split, then they are new objects for the .debts attribute (and one will be created for each party).
+objects: 
+  - test_asset: ALAssetList.using(complete_attribute='complete')
+---
+id: ALIncomeList there are any
+generic object: ALIncomeList
+code: |
+  if x.selected_types.any_true():
+    x.move_checks_to_list(selected_terms=x.terms_ordered, set_other=True)
+    x.there_are_any = True
+  else:
+    x.there_are_any = False
+---
+id: ALAssetList selected values for there are any
+generic object: ALAssetList
+question: |
+  ${ x.display_name }
+subquestion: |   
+  Do you or your spouse own any ${ x.display_name }?
+fields:
+  - no label: x.selected_types
+    datatype: checkboxes
+    code: |
+      x.ordered
+
+  
+---
+id: generic ordered object for checkboxes
+generic object: ALAssetList
+objects:
+  - x.ordered: DAOrderedDict.using(elements=x.terms_ordered, auto_gather=False, gathered=True)
+---
+id: generic set display name backup
+generic object: ALAssetList
+code: |
+  if defined('x[i].source') and x[i].source != "other":
+    x[i].display_name = x.terms_ordered.get(x[i].source, x[i].source)
+  elif defined('x[i].source') and x[i].source == "other" and defined('x[i].source_other'):
+    x[i].display_name = x[i].source_other
+  else:
+    x[i].display_name = x.other_display
+---
+id: generic asset complete
+generic object: ALAssetList
+code: |
+  x[i].market_value
+  x[i].descriptions
+  x[i].complete = True
+---
+
+id: description test screen
+generic object: ALAssetList
+question: Descriptions
+subquestion: |
+  Description
+  
+  ${ x[i].description }
+
+  Loan Description
+  
+   x[i].loan_description 
+
+  Security Description
+  
+   x[i].security_description 
+continue button field: x[i].descriptions
+---
+sets: x[i].description
+generic object: ALAssetList
+code: |
+  x[i].description = "Description"
+---
+only sets: x[i].market_value
+generic object: ALAssetList
+id: describe generic
+question: |
+  Tell us about your ${ x.display_name }
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.description for asset in x.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.description for asset in x.complete_elements()) }.
+  % endif
+fields:
+  code: x.asset_info_choices
+---
+comment: |
+  - Description: x[i].description
+  - What is its market value? How much would you get if you sold it?: x[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is this marital or nonmarital property?: x[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
+  - Who has possession?: x[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Recommended Award: x[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+
+---
+id: generic review ALIncomeList
+generic object: ALIncomeList
+question: Do you want to list any other ${ x.display_name }?
+subquestion: |
+
+  Tap Next if you don't have more to add.
+  
+  ${ x.table }
+  
+  ${ x.add_action() }
+continue button field: x.review_items
+---
+id: generic review ALAssetList
+generic object: ALAssetList
+question: Do you want to list any other ${ x.display_name }?
+subquestion: |
+
+  Tap Next if you don't have more to add.
+  
+  ${ x.table }
+  
+  ${ x.add_action() }
+continue button field: x.review_items
+---
+id: generic revisit
+generic object: ALAssetList
+continue button field: x.revisit
+question: |
+  Edit ${ x.display_name }
+subquestion: |
+  ${ x.table }
+
+  ${ x.add_action() }
+---
+id: generic table ALAssetList
+generic object: ALAssetList
+table: x.table
+rows: x
+columns:
+  - Description: |
+      row_item.description
+  - Market value: |
+      currency(row_item.market_value) if defined("row_item.market_value") else ""
+  - Marital property?:  row_item.marital_property
+  - Party with possession?: row_item.has_possession
+  - Property awarded to: row_item.recommended_award
+edit:
+  - market_value
+---
+

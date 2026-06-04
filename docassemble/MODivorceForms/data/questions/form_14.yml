@@ -4,6 +4,26 @@ id: Child Support Amount Calculation Worksheet object
 objects:
   - form_14_attachment: ALDocument.using(title="Child Support Amount Calculation Worksheet", filename="form_14", has_addendum=False, )
 ---
+id: Child Support Amount Calculation Worksheet object for 2 children
+objects:
+  - form_14_attachment_2: ALDocument.using(title="Child Support Amount Calculation Worksheet for 2 children", filename="form_14_2", has_addendum=False, )
+---
+id: Child Support Amount Calculation Worksheet object for 3 children
+objects:
+  - form_14_attachment_3: ALDocument.using(title="Child Support Amount Calculation Worksheet for 3 children", filename="form_14_3", has_addendum=False, )
+---
+id: Child Support Amount Calculation Worksheet object for 4 children
+objects:
+  - form_14_attachment_4: ALDocument.using(title="Child Support Amount Calculation Worksheet for 4 children", filename="form_14_4", has_addendum=False, )
+---
+id: Child Support Amount Calculation Worksheet object for 5 children
+objects:
+  - form_14_attachment_5: ALDocument.using(title="Child Support Amount Calculation Worksheet for 5 children", filename="form_14_5", has_addendum=False, )
+---
+id: Child Support Amount Calculation Worksheet object for 6+ children
+objects:
+  - form_14_attachment_6: ALDocument.using(title="Child Support Amount Calculation Worksheet for 6 children", filename="form_14_6", has_addendum=False, )
+---
 id: Child Support Amount Calculation Worksheet attachment
 attachment:
   name: Child Support Amount Calculation Worksheet
@@ -12,8 +32,8 @@ attachment:
   skip undefined: True
   pdf template file: form_14.pdf
   fields:
-      - "Respondent CB": ${ child_support in ["respondent"] } 
-      - "Petitioner CB": ${ child_support in ["petitioner", "none","third_party"] } 
+      - "Respondent CB":  ${ child_support in ["petitioner", "none","third_party"] } 
+      - "Petitioner CB": ${ child_support in ["respondent"] }
       - "Total Number of Children": ${ number_of_children } 
       - "Line 1 - PRS": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) }
       - "Line 1 PPS": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) }
@@ -64,10 +84,330 @@ attachment:
       - "Line 9 PPS": ${ "$" + thousands(support_payer.support_obligation_9, show_decimals=True) } 
       - "Line 9 PRS": ${ "$" + thousands(support_recipient.support_obligation_9, show_decimals=True) } 
       - "Line 10 PPS": ${ "$" + thousands(support_payer.childrearing_credit_10, show_decimals=True) } 
-      - "Line 11": ${ "{:.0f}".format(support_payer.visitation_adjustment_percentage_11) } 
+      - "Line 11": ${ "{:.0f}".format(support_payer.visitation_adjustment_11_percentage) } 
       - "Line 11 PPS": ${ "$" + thousands(support_payer.visitation_adjustment_11, show_decimals=True) } 
       - "Line 12 PPS": ${ "$" + thousands(support_payer.presumed_child_support_amount_12 if support_payer.presumed_child_support_amount_12 > 0 else 0, show_decimals=True) } 
 
 
 ---
-  
+
+id: Child Support Amount Calculation Worksheet attachment for 6 children
+attachment:
+  name: Child Support Amount Calculation Worksheet
+  filename: form_14_6
+  variable name: form_14_attachment_6[i]
+  skip undefined: True
+  pdf template file: form_14.pdf
+  fields:
+      - "Respondent CB":  ${ child_support in ["petitioner", "none","third_party"] } 
+      - "Petitioner CB": ${ child_support in ["respondent"] }
+      - "Total Number of Children": ${ "6" } 
+      - "Line 1 - PRS": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) }
+      - "Line 1 PPS": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) }
+      - "Line 1a PRS": ${ "$" + thousands(support_recipient.maintenance_received, show_decimals=True) }
+      - "Line 1a PPS": ${ "$" + thousands(support_payer.maintenance_received, show_decimals=True) }
+      - "Line 2a PRS": ${ "$" + thousands(support_recipient.other_child_support_paid, show_decimals=True) }
+      - "Line 2a PPS": ${ "$" + thousands(support_payer.other_child_support_paid, show_decimals=True) }
+      - "Line 2b PRS": ${ "$" + thousands(support_recipient.maintenance_paid + support_recipient.maintenance_other_paid, show_decimals=True) } 
+      - "Line 2b PPS": ${ "$" + thousands(support_payer.maintenance_paid + support_payer.maintenance_other_paid, show_decimals=True) } 
+      - "Line 2c(1) PRS": ${ support_recipient.other_children } 
+      - "Line 2c(1) PPS": ${ support_payer.other_children } 
+      - "2c(2) PPS": ${ "$" + thousands(support_payer.support_obligation_2c2, show_decimals=True ) } 
+      - "2c(2) PRS": ${ "$" + thousands(support_recipient.support_obligation_2c2, show_decimals=True) } 
+      - "Line 2c(3) PPS": ${ "$" + thousands(support_payer.other_child_support_received, show_decimals=True) } 
+      - "Line 2c(3) PRS": ${ "$" + thousands(support_recipient.other_child_support_received, show_decimals=True) } 
+      - "Line 2c PRS": ${ "$" + thousands(support_recipient.total_adjustment_2c, show_decimals=True) } 
+      - "Line 2c PPS": ${ "$" + thousands(support_payer.total_adjustment_2c, show_decimals=True) } 
+      - "Line 3 PRS": ${ "$" + thousands(support_recipient.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "Line 3 PPS": ${ "$" + thousands(support_payer.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "Line 3 C": ${ "$" + thousands(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "Line 4 PRS": |
+          % if support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3 > 0:
+          ${ "{:.1f}".format(support_recipient.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3), show_decimals=True) } 
+          % else:
+          0
+          % endif
+      - "Line 4 PPS": |
+          % if support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3 > 0:
+          ${ "{:.1f}".format(support_payer.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3), show_decimals=True) } 
+          % else:
+          0
+          % endif
+      - "Line 5 C": ${ "$" + thousands(basic_child_support_amount_5_6, show_decimals=True) } 
+      - "Line 6a(1) PRS": ${ "$" + thousands(support_recipient.work_childcare_expenses, show_decimals=True) } 
+      - "Line 6a(2) PRS": ${ "$" + thousands(support_recipient.childcare_tax_credit_6a2, show_decimals=True) } 
+      - "Line 6a PRS": ${ "$" + thousands(support_recipient.total_adjusted_child_care_costs_6a, show_decimals=True) } 
+      - "Line 6b PPS": ${ "$" + thousands(support_payer.work_childcare_expenses, show_decimals=True) } 
+      - "Line 6c PPS": ${ "$" + thousands(support_payer.health_insurance_costs, show_decimals=True) } 
+      - "Line 6c PRS": ${ "$" + thousands(support_recipient.health_insurance_costs, show_decimals=True) } 
+      - "Line 6d PRS": ${ "$" + thousands(support_recipient.extraordinary_medical_costs.total(times_per_year = 12), show_decimals=True) } 
+      - "Line 6d PPS": ${ "$" + thousands(support_payer.extraordinary_medical_costs.total(times_per_year = 12), show_decimals=True) } 
+      - "Line 6e PRS": ${ "$" + thousands(sum([included_cost.total(times_per_year=12) for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]), show_decimals=True) }  
+      - "Line 6e PPS": ${ "$" + thousands(sum([included_cost.total(times_per_year=12) for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]), show_decimals=True) }
+      - "Line 7 PPS": ${ "$" + thousands(support_payer.total_childrearing_costs_7, show_decimals=True) } 
+      - "Line 7 PRS": ${ "$" + thousands(support_recipient.total_childrearing_costs_7  , show_decimals=True) } 
+      - "Line 7 C": ${ "$" + thousands(total_childrearing_costs_7, show_decimals=True) } 
+      - "Line 8 C": ${ "$" + thousands(combined_child_support_costs_8_6, show_decimals=True) } 
+      - "Line 9 PPS": ${ "$" + thousands(support_payer.support_obligation_9_6, show_decimals=True) } 
+      - "Line 9 PRS": ${ "$" + thousands(support_recipient.support_obligation_9_6, show_decimals=True) } 
+      - "Line 10 PPS": ${ "$" + thousands(support_payer.childrearing_credit_10, show_decimals=True) } 
+      - "Line 11": ${ "{:.0f}".format(support_payer.visitation_adjustment_11_percentage) } 
+      - "Line 11 PPS": ${ "$" + thousands(support_payer.visitation_adjustment_11, show_decimals=True) } 
+      - "Line 12 PPS": ${ "$" + thousands(support_payer.presumed_child_support_amount_12_6 if support_payer.presumed_child_support_amount_12_6 > 0 else 0, show_decimals=True) } 
+---  
+id: Child Support Amount Calculation Worksheet attachment for 5 children
+attachment:
+  name: Child Support Amount Calculation Worksheet
+  filename: form_14_5
+  variable name: form_14_attachment_5[i]
+  skip undefined: True
+  pdf template file: form_14.pdf
+  fields:
+      - "Respondent CB":  ${ child_support in ["petitioner", "none","third_party"] } 
+      - "Petitioner CB": ${ child_support in ["respondent"] }
+      - "Total Number of Children": ${ 5 } 
+      - "Line 1 - PRS": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) }
+      - "Line 1 PPS": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) }
+      - "Line 1a PRS": ${ "$" + thousands(support_recipient.maintenance_received, show_decimals=True) }
+      - "Line 1a PPS": ${ "$" + thousands(support_payer.maintenance_received, show_decimals=True) }
+      - "Line 2a PRS": ${ "$" + thousands(support_recipient.other_child_support_paid, show_decimals=True) }
+      - "Line 2a PPS": ${ "$" + thousands(support_payer.other_child_support_paid, show_decimals=True) }
+      - "Line 2b PRS": ${ "$" + thousands(support_recipient.maintenance_paid + support_recipient.maintenance_other_paid, show_decimals=True) } 
+      - "Line 2b PPS": ${ "$" + thousands(support_payer.maintenance_paid + support_payer.maintenance_other_paid, show_decimals=True) } 
+      - "Line 2c(1) PRS": ${ support_recipient.other_children } 
+      - "Line 2c(1) PPS": ${ support_payer.other_children } 
+      - "2c(2) PPS": ${ "$" + thousands(support_payer.support_obligation_2c2, show_decimals=True ) } 
+      - "2c(2) PRS": ${ "$" + thousands(support_recipient.support_obligation_2c2, show_decimals=True) } 
+      - "Line 2c(3) PPS": ${ "$" + thousands(support_payer.other_child_support_received, show_decimals=True) } 
+      - "Line 2c(3) PRS": ${ "$" + thousands(support_recipient.other_child_support_received, show_decimals=True) } 
+      - "Line 2c PRS": ${ "$" + thousands(support_recipient.total_adjustment_2c, show_decimals=True) } 
+      - "Line 2c PPS": ${ "$" + thousands(support_payer.total_adjustment_2c, show_decimals=True) } 
+      - "Line 3 PRS": ${ "$" + thousands(support_recipient.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "Line 3 PPS": ${ "$" + thousands(support_payer.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "Line 3 C": ${ "$" + thousands(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "Line 4 PRS": |
+          % if support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3 > 0:
+          ${ "{:.1f}".format(support_recipient.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3), show_decimals=True) } 
+          % else:
+          0
+          % endif
+      - "Line 4 PPS": |
+          % if support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3 > 0:
+          ${ "{:.1f}".format(support_payer.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3), show_decimals=True) } 
+          % else:
+          0
+          % endif
+      - "Line 5 C": ${ "$" + thousands(basic_child_support_amount_5_5, show_decimals=True) } 
+      - "Line 6a(1) PRS": ${ "$" + thousands(support_recipient.work_childcare_expenses, show_decimals=True) } 
+      - "Line 6a(2) PRS": ${ "$" + thousands(support_recipient.childcare_tax_credit_6a2, show_decimals=True) } 
+      - "Line 6a PRS": ${ "$" + thousands(support_recipient.total_adjusted_child_care_costs_6a, show_decimals=True) } 
+      - "Line 6b PPS": ${ "$" + thousands(support_payer.work_childcare_expenses, show_decimals=True) } 
+      - "Line 6c PPS": ${ "$" + thousands(support_payer.health_insurance_costs, show_decimals=True) } 
+      - "Line 6c PRS": ${ "$" + thousands(support_recipient.health_insurance_costs, show_decimals=True) } 
+      - "Line 6d PRS": ${ "$" + thousands(support_recipient.extraordinary_medical_costs.total(times_per_year = 12), show_decimals=True) } 
+      - "Line 6d PPS": ${ "$" + thousands(support_payer.extraordinary_medical_costs.total(times_per_year = 12), show_decimals=True) } 
+      - "Line 6e PRS": ${ "$" + thousands(sum([included_cost.total(times_per_year=12) for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]), show_decimals=True) }  
+      - "Line 6e PPS": ${ "$" + thousands(sum([included_cost.total(times_per_year=12) for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]), show_decimals=True) }
+      - "Line 7 PPS": ${ "$" + thousands(support_payer.total_childrearing_costs_7, show_decimals=True) } 
+      - "Line 7 PRS": ${ "$" + thousands(support_recipient.total_childrearing_costs_7  , show_decimals=True) } 
+      - "Line 7 C": ${ "$" + thousands(total_childrearing_costs_7, show_decimals=True) } 
+      - "Line 8 C": ${ "$" + thousands(combined_child_support_costs_8_5, show_decimals=True) } 
+      - "Line 9 PPS": ${ "$" + thousands(support_payer.support_obligation_9_5, show_decimals=True) } 
+      - "Line 9 PRS": ${ "$" + thousands(support_recipient.support_obligation_9_5, show_decimals=True) } 
+      - "Line 10 PPS": ${ "$" + thousands(support_payer.childrearing_credit_10, show_decimals=True) } 
+      - "Line 11": ${ "{:.0f}".format(support_payer.visitation_adjustment_11_percentage) } 
+      - "Line 11 PPS": ${ "$" + thousands(support_payer.visitation_adjustment_11, show_decimals=True) } 
+      - "Line 12 PPS": ${ "$" + thousands(support_payer.presumed_child_support_amount_12_5 if support_payer.presumed_child_support_amount_12_5 > 0 else 0, show_decimals=True) } 
+---
+id: Child Support Amount Calculation Worksheet attachment for 4 children
+attachment:
+  name: Child Support Amount Calculation Worksheet
+  filename: form_14_4
+  variable name: form_14_attachment_4[i]
+  skip undefined: True
+  pdf template file: form_14.pdf
+  fields:
+      - "Respondent CB":  ${ child_support in ["petitioner", "none","third_party"] } 
+      - "Petitioner CB": ${ child_support in ["respondent"] }
+      - "Total Number of Children": ${ 4 } 
+      - "Line 1 - PRS": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) }
+      - "Line 1 PPS": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) }
+      - "Line 1a PRS": ${ "$" + thousands(support_recipient.maintenance_received, show_decimals=True) }
+      - "Line 1a PPS": ${ "$" + thousands(support_payer.maintenance_received, show_decimals=True) }
+      - "Line 2a PRS": ${ "$" + thousands(support_recipient.other_child_support_paid, show_decimals=True) }
+      - "Line 2a PPS": ${ "$" + thousands(support_payer.other_child_support_paid, show_decimals=True) }
+      - "Line 2b PRS": ${ "$" + thousands(support_recipient.maintenance_paid + support_recipient.maintenance_other_paid, show_decimals=True) } 
+      - "Line 2b PPS": ${ "$" + thousands(support_payer.maintenance_paid + support_payer.maintenance_other_paid, show_decimals=True) } 
+      - "Line 2c(1) PRS": ${ support_recipient.other_children } 
+      - "Line 2c(1) PPS": ${ support_payer.other_children } 
+      - "2c(2) PPS": ${ "$" + thousands(support_payer.support_obligation_2c2, show_decimals=True ) } 
+      - "2c(2) PRS": ${ "$" + thousands(support_recipient.support_obligation_2c2, show_decimals=True) } 
+      - "Line 2c(3) PPS": ${ "$" + thousands(support_payer.other_child_support_received, show_decimals=True) } 
+      - "Line 2c(3) PRS": ${ "$" + thousands(support_recipient.other_child_support_received, show_decimals=True) } 
+      - "Line 2c PRS": ${ "$" + thousands(support_recipient.total_adjustment_2c, show_decimals=True) } 
+      - "Line 2c PPS": ${ "$" + thousands(support_payer.total_adjustment_2c, show_decimals=True) } 
+      - "Line 3 PRS": ${ "$" + thousands(support_recipient.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "Line 3 PPS": ${ "$" + thousands(support_payer.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "Line 3 C": ${ "$" + thousands(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "Line 4 PRS": |
+          % if support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3 > 0:
+          ${ "{:.1f}".format(support_recipient.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3), show_decimals=True) } 
+          % else:
+          0
+          % endif
+      - "Line 4 PPS": |
+          % if support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3 > 0:
+          ${ "{:.1f}".format(support_payer.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3), show_decimals=True) } 
+          % else:
+          0
+          % endif
+      - "Line 5 C": ${ "$" + thousands(basic_child_support_amount_5_4, show_decimals=True) } 
+      - "Line 6a(1) PRS": ${ "$" + thousands(support_recipient.work_childcare_expenses, show_decimals=True) } 
+      - "Line 6a(2) PRS": ${ "$" + thousands(support_recipient.childcare_tax_credit_6a2, show_decimals=True) } 
+      - "Line 6a PRS": ${ "$" + thousands(support_recipient.total_adjusted_child_care_costs_6a, show_decimals=True) } 
+      - "Line 6b PPS": ${ "$" + thousands(support_payer.work_childcare_expenses, show_decimals=True) } 
+      - "Line 6c PPS": ${ "$" + thousands(support_payer.health_insurance_costs, show_decimals=True) } 
+      - "Line 6c PRS": ${ "$" + thousands(support_recipient.health_insurance_costs, show_decimals=True) } 
+      - "Line 6d PRS": ${ "$" + thousands(support_recipient.extraordinary_medical_costs.total(times_per_year = 12), show_decimals=True) } 
+      - "Line 6d PPS": ${ "$" + thousands(support_payer.extraordinary_medical_costs.total(times_per_year = 12), show_decimals=True) } 
+      - "Line 6e PRS": ${ "$" + thousands(sum([included_cost.total(times_per_year=12) for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]), show_decimals=True) }  
+      - "Line 6e PPS": ${ "$" + thousands(sum([included_cost.total(times_per_year=12) for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]), show_decimals=True) }
+      - "Line 7 PPS": ${ "$" + thousands(support_payer.total_childrearing_costs_7, show_decimals=True) } 
+      - "Line 7 PRS": ${ "$" + thousands(support_recipient.total_childrearing_costs_7  , show_decimals=True) } 
+      - "Line 7 C": ${ "$" + thousands(total_childrearing_costs_7, show_decimals=True) } 
+      - "Line 8 C": ${ "$" + thousands(combined_child_support_costs_8_4, show_decimals=True) } 
+      - "Line 9 PPS": ${ "$" + thousands(support_payer.support_obligation_9_4, show_decimals=True) } 
+      - "Line 9 PRS": ${ "$" + thousands(support_recipient.support_obligation_9_4, show_decimals=True) } 
+      - "Line 10 PPS": ${ "$" + thousands(support_payer.childrearing_credit_10, show_decimals=True) } 
+      - "Line 11": ${ "{:.0f}".format(support_payer.visitation_adjustment_11_percentage) } 
+      - "Line 11 PPS": ${ "$" + thousands(support_payer.visitation_adjustment_11, show_decimals=True) } 
+      - "Line 12 PPS": ${ "$" + thousands(support_payer.presumed_child_support_amount_12_4 if support_payer.presumed_child_support_amount_12_4 > 0 else 0, show_decimals=True) } 
+---
+id: Child Support Amount Calculation Worksheet attachment for 3 children
+attachment:
+  name: Child Support Amount Calculation Worksheet
+  filename: form_14_3
+  variable name: form_14_attachment_3[i]
+  skip undefined: True
+  pdf template file: form_14.pdf
+  fields:
+      - "Respondent CB":  ${ child_support in ["petitioner", "none","third_party"] } 
+      - "Petitioner CB": ${ child_support in ["respondent"] }
+      - "Total Number of Children": ${ 3 } 
+      - "Line 1 - PRS": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) }
+      - "Line 1 PPS": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) }
+      - "Line 1a PRS": ${ "$" + thousands(support_recipient.maintenance_received, show_decimals=True) }
+      - "Line 1a PPS": ${ "$" + thousands(support_payer.maintenance_received, show_decimals=True) }
+      - "Line 2a PRS": ${ "$" + thousands(support_recipient.other_child_support_paid, show_decimals=True) }
+      - "Line 2a PPS": ${ "$" + thousands(support_payer.other_child_support_paid, show_decimals=True) }
+      - "Line 2b PRS": ${ "$" + thousands(support_recipient.maintenance_paid + support_recipient.maintenance_other_paid, show_decimals=True) } 
+      - "Line 2b PPS": ${ "$" + thousands(support_payer.maintenance_paid + support_payer.maintenance_other_paid, show_decimals=True) } 
+      - "Line 2c(1) PRS": ${ support_recipient.other_children } 
+      - "Line 2c(1) PPS": ${ support_payer.other_children } 
+      - "2c(2) PPS": ${ "$" + thousands(support_payer.support_obligation_2c2, show_decimals=True ) } 
+      - "2c(2) PRS": ${ "$" + thousands(support_recipient.support_obligation_2c2, show_decimals=True) } 
+      - "Line 2c(3) PPS": ${ "$" + thousands(support_payer.other_child_support_received, show_decimals=True) } 
+      - "Line 2c(3) PRS": ${ "$" + thousands(support_recipient.other_child_support_received, show_decimals=True) } 
+      - "Line 2c PRS": ${ "$" + thousands(support_recipient.total_adjustment_2c, show_decimals=True) } 
+      - "Line 2c PPS": ${ "$" + thousands(support_payer.total_adjustment_2c, show_decimals=True) } 
+      - "Line 3 PRS": ${ "$" + thousands(support_recipient.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "Line 3 PPS": ${ "$" + thousands(support_payer.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "Line 3 C": ${ "$" + thousands(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "Line 4 PRS": |
+          % if support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3 > 0:
+          ${ "{:.1f}".format(support_recipient.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3), show_decimals=True) } 
+          % else:
+          0
+          % endif
+      - "Line 4 PPS": |
+          % if support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3 > 0:
+          ${ "{:.1f}".format(support_payer.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3), show_decimals=True) } 
+          % else:
+          0
+          % endif
+      - "Line 5 C": ${ "$" + thousands(basic_child_support_amount_5_3, show_decimals=True) } 
+      - "Line 6a(1) PRS": ${ "$" + thousands(support_recipient.work_childcare_expenses, show_decimals=True) } 
+      - "Line 6a(2) PRS": ${ "$" + thousands(support_recipient.childcare_tax_credit_6a2, show_decimals=True) } 
+      - "Line 6a PRS": ${ "$" + thousands(support_recipient.total_adjusted_child_care_costs_6a, show_decimals=True) } 
+      - "Line 6b PPS": ${ "$" + thousands(support_payer.work_childcare_expenses, show_decimals=True) } 
+      - "Line 6c PPS": ${ "$" + thousands(support_payer.health_insurance_costs, show_decimals=True) } 
+      - "Line 6c PRS": ${ "$" + thousands(support_recipient.health_insurance_costs, show_decimals=True) } 
+      - "Line 6d PRS": ${ "$" + thousands(support_recipient.extraordinary_medical_costs.total(times_per_year = 12), show_decimals=True) } 
+      - "Line 6d PPS": ${ "$" + thousands(support_payer.extraordinary_medical_costs.total(times_per_year = 12), show_decimals=True) } 
+      - "Line 6e PRS": ${ "$" + thousands(sum([included_cost.total(times_per_year=12) for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]), show_decimals=True) }  
+      - "Line 6e PPS": ${ "$" + thousands(sum([included_cost.total(times_per_year=12) for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]), show_decimals=True) }
+      - "Line 7 PPS": ${ "$" + thousands(support_payer.total_childrearing_costs_7, show_decimals=True) } 
+      - "Line 7 PRS": ${ "$" + thousands(support_recipient.total_childrearing_costs_7  , show_decimals=True) } 
+      - "Line 7 C": ${ "$" + thousands(total_childrearing_costs_7, show_decimals=True) } 
+      - "Line 8 C": ${ "$" + thousands(combined_child_support_costs_8_3, show_decimals=True) } 
+      - "Line 9 PPS": ${ "$" + thousands(support_payer.support_obligation_9_3, show_decimals=True) } 
+      - "Line 9 PRS": ${ "$" + thousands(support_recipient.support_obligation_9_3, show_decimals=True) } 
+      - "Line 10 PPS": ${ "$" + thousands(support_payer.childrearing_credit_10, show_decimals=True) } 
+      - "Line 11": ${ "{:.0f}".format(support_payer.visitation_adjustment_11_percentage) } 
+      - "Line 11 PPS": ${ "$" + thousands(support_payer.visitation_adjustment_11, show_decimals=True) } 
+      - "Line 12 PPS": ${ "$" + thousands(support_payer.presumed_child_support_amount_12_3 if support_payer.presumed_child_support_amount_12_3 > 0 else 0, show_decimals=True) } 
+---
+id: Child Support Amount Calculation Worksheet attachment for 2 children
+attachment:
+  name: Child Support Amount Calculation Worksheet
+  filename: form_14_2
+  variable name: form_14_attachment_2[i]
+  skip undefined: True
+  pdf template file: form_14.pdf
+  fields:
+      - "Respondent CB":  ${ child_support in ["petitioner", "none","third_party"] } 
+      - "Petitioner CB": ${ child_support in ["respondent"] }
+      - "Total Number of Children": ${ 2 } 
+      - "Line 1 - PRS": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) }
+      - "Line 1 PPS": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) }
+      - "Line 1a PRS": ${ "$" + thousands(support_recipient.maintenance_received, show_decimals=True) }
+      - "Line 1a PPS": ${ "$" + thousands(support_payer.maintenance_received, show_decimals=True) }
+      - "Line 2a PRS": ${ "$" + thousands(support_recipient.other_child_support_paid, show_decimals=True) }
+      - "Line 2a PPS": ${ "$" + thousands(support_payer.other_child_support_paid, show_decimals=True) }
+      - "Line 2b PRS": ${ "$" + thousands(support_recipient.maintenance_paid + support_recipient.maintenance_other_paid, show_decimals=True) } 
+      - "Line 2b PPS": ${ "$" + thousands(support_payer.maintenance_paid + support_payer.maintenance_other_paid, show_decimals=True) } 
+      - "Line 2c(1) PRS": ${ support_recipient.other_children } 
+      - "Line 2c(1) PPS": ${ support_payer.other_children } 
+      - "2c(2) PPS": ${ "$" + thousands(support_payer.support_obligation_2c2, show_decimals=True ) } 
+      - "2c(2) PRS": ${ "$" + thousands(support_recipient.support_obligation_2c2, show_decimals=True) } 
+      - "Line 2c(3) PPS": ${ "$" + thousands(support_payer.other_child_support_received, show_decimals=True) } 
+      - "Line 2c(3) PRS": ${ "$" + thousands(support_recipient.other_child_support_received, show_decimals=True) } 
+      - "Line 2c PRS": ${ "$" + thousands(support_recipient.total_adjustment_2c, show_decimals=True) } 
+      - "Line 2c PPS": ${ "$" + thousands(support_payer.total_adjustment_2c, show_decimals=True) } 
+      - "Line 3 PRS": ${ "$" + thousands(support_recipient.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "Line 3 PPS": ${ "$" + thousands(support_payer.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "Line 3 C": ${ "$" + thousands(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3, show_decimals=True) } 
+      - "Line 4 PRS": |
+          % if support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3 > 0:
+          ${ "{:.1f}".format(support_recipient.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3), show_decimals=True) } 
+          % else:
+          0
+          % endif
+      - "Line 4 PPS": |
+          % if support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3 > 0:
+          ${ "{:.1f}".format(support_payer.adjusted_monthly_gross_income_3/(support_recipient.adjusted_monthly_gross_income_3 + support_payer.adjusted_monthly_gross_income_3), show_decimals=True) } 
+          % else:
+          0
+          % endif
+      - "Line 5 C": ${ "$" + thousands(basic_child_support_amount_5_2, show_decimals=True) } 
+      - "Line 6a(1) PRS": ${ "$" + thousands(support_recipient.work_childcare_expenses, show_decimals=True) } 
+      - "Line 6a(2) PRS": ${ "$" + thousands(support_recipient.childcare_tax_credit_6a2, show_decimals=True) } 
+      - "Line 6a PRS": ${ "$" + thousands(support_recipient.total_adjusted_child_care_costs_6a, show_decimals=True) } 
+      - "Line 6b PPS": ${ "$" + thousands(support_payer.work_childcare_expenses, show_decimals=True) } 
+      - "Line 6c PPS": ${ "$" + thousands(support_payer.health_insurance_costs, show_decimals=True) } 
+      - "Line 6c PRS": ${ "$" + thousands(support_recipient.health_insurance_costs, show_decimals=True) } 
+      - "Line 6d PRS": ${ "$" + thousands(support_recipient.extraordinary_medical_costs.total(times_per_year = 12), show_decimals=True) } 
+      - "Line 6d PPS": ${ "$" + thousands(support_payer.extraordinary_medical_costs.total(times_per_year = 12), show_decimals=True) } 
+      - "Line 6e PRS": ${ "$" + thousands(sum([included_cost.total(times_per_year=12) for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]), show_decimals=True) }  
+      - "Line 6e PPS": ${ "$" + thousands(sum([included_cost.total(times_per_year=12) for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]), show_decimals=True) }
+      - "Line 7 PPS": ${ "$" + thousands(support_payer.total_childrearing_costs_7, show_decimals=True) } 
+      - "Line 7 PRS": ${ "$" + thousands(support_recipient.total_childrearing_costs_7  , show_decimals=True) } 
+      - "Line 7 C": ${ "$" + thousands(total_childrearing_costs_7, show_decimals=True) } 
+      - "Line 8 C": ${ "$" + thousands(combined_child_support_costs_8_2, show_decimals=True) } 
+      - "Line 9 PPS": ${ "$" + thousands(support_payer.support_obligation_9_2, show_decimals=True) } 
+      - "Line 9 PRS": ${ "$" + thousands(support_recipient.support_obligation_9_2, show_decimals=True) } 
+      - "Line 10 PPS": ${ "$" + thousands(support_payer.childrearing_credit_10, show_decimals=True) } 
+      - "Line 11": ${ "{:.0f}".format(support_payer.visitation_adjustment_11_percentage) } 
+      - "Line 11 PPS": ${ "$" + thousands(support_payer.visitation_adjustment_11, show_decimals=True) } 
+      - "Line 12 PPS": ${ "$" + thousands(support_payer.presumed_child_support_amount_12_2 if support_payer.presumed_child_support_amount_12_2 > 0 else 0, show_decimals=True) } 
+---

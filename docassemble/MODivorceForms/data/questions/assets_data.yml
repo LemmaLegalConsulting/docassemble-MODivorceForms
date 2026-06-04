@@ -1,0 +1,1062 @@
+---
+variable name: assets_starter
+use objects: objects
+data:
+  object: DAObject
+  module: docassemble.base.util
+  items:
+    - variable: real_estate
+      name: real_estate
+      display_name: real estate
+      other_display: other real estate
+      has_subtypes: True
+      has_default_attributes: False
+      may_have_loan: True
+      may_split_award: True
+      attributes:
+        - object: DAObject
+          item:
+            field: x[i].source
+            required: True
+            example: House
+            label: Type of asset
+            datatype: code
+            code: x.ordered
+        - object: DAObject
+          item:
+            field: x[i].source_other
+            required: True
+            example: Cabin
+            label: Other
+            js show if: val('x[i].source') === "other"
+            datatype: text
+        - object: DAObject
+          item:
+            field: x[i].address
+            required: False
+            example: 123 Main St.
+            label: Address 
+        - object: DAObject
+          item:
+            field: x[i].legal_description
+            required: False
+            example: The back half of Lot 22.
+            label: Legal description 
+        - object: DAObject
+          item:
+            label: Is there an amount owed on this property?
+            field: x[i].is_amount_owed
+            datatype: yesnoradio
+        - object: DAObject
+          item:
+            label: Who is the money owed to?
+            field: x[i].lender
+            required: False 
+            show if: x[i].is_amount_owed
+            example: First America
+        - object: DAObject
+          item:
+            label: Balance
+            field: x[i].balance
+            datatype: currency
+            show if: x[i].is_amount_owed
+        - object: DAObject
+          item:
+            label: Monthly Payment
+            field: x[i].monthly_payment
+            datatype: currency
+            show if: x[i].is_amount_owed
+        - object: DAObject
+          item:
+            label: Who should pay this debt?
+            field: x[i].recommended_debt
+            show if: x[i].is_amount_owed
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Split the debt"]
+        - object: DAObject
+          item:
+            label: How much should users[0].name.full() pay?
+            field: x[i].user_percentage_choice
+            datatype: code
+            code: |
+              [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+            js show if: val('x[i].recommended_debt') === "Split the debt"
+        - object: DAObject
+          item:
+            label: What percentage?
+            field: x[i].user_percentage_other
+            datatype: number
+            min: 0
+            max: 100
+            js show if: val('x[i].user_percentage_choice') === "other"
+        - object: DAObject
+          item:
+            label: Is this marital or nonmarital property?
+            field: x[i].marital_property
+            datatype: code
+            code: |
+              ["Marital", "Nonmarital", "Both"]
+        - object: DAObject
+          item:
+            note: |
+              ${ collapse_template(marital_property_template) }
+        - object: DAObject
+          item:
+            label: Party with possession of this property?
+            field: x[i].has_possession
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Other"]
+        - object: DAObject
+          item:
+            label: Recommended Award
+            field: x[i].recommended_award             
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Split the award"]
+        - object: DAObject
+          item:
+            label: How much should users[0].name.full() receive?
+            field: x[i].award_percentage_choice
+            datatype: code
+            code: |
+              [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+            js show if: val('x[i].recommended_award') === "Split the award" 
+        - object: DAObject
+          item:
+            label: What percentage?
+            field: x[i].award_percentage_other
+            datatype: number
+            min: 0
+            max: 100
+            js show if: val('x[i].award_percentage_choice') === "other"
+      terms_ordered: !!omap
+        - house: "House"
+        - condominium: "Condominium"
+        - leasehold: "Leasehold"
+        - other: "Other"
+      description_code: |
+        real_estate[i].display_name + space('real_estate[i].address', prefix=' at ', suffix='') + (" See attached legal description. " if real_estate[i].legal_description != "" else "")
+      loan_description_code: |
+        "Mortgage for " + real_estate[i].display_name + space('real_estate[i].address', prefix = " at ", suffix = "")
+      security_description_code: |
+        real_estate[i].display_name + space('real_estate[i].address', prefix=' at ', suffix='')
+    - variable: vehicles
+      name: vehicles
+      display_name: vehicles
+      other_display: other vehicles
+      has_subtypes: True
+      has_default_attributes: False
+      may_have_loan: True
+      may_split_award: True
+      attributes:
+        - object: DAObject
+          item:
+            field: x[i].source
+            required: True
+            example: Car
+            label: Type of asset
+            datatype: code
+            code: x.ordered
+        - object: DAObject
+          item:
+            field: x[i].source_other
+            required: True
+            example: Moped
+            label: Other
+            js show if: val('x[i].source') === "other"
+            datatype: text
+        - object: DAObject
+          item:
+            field: x[i].year
+            required: False
+            example: "1998"
+            label: Year
+        - object: DAObject
+          item:
+            field: x[i].make
+            required: False
+            example: Schwinn
+            label: Make 
+        - object: DAObject
+          item:
+            field: x[i].model
+            required: False
+            example: Continental
+            label: Model
+        - object: DAObject
+          item:
+            field: x[i].vin
+            required: False
+            example: "12345"
+            label: VIN
+        - object: DAObject
+          item:
+            label: What is its market value? How much would you get if you sold it?
+            field: x[i].market_value
+            maxlength: 76
+            datatype: currency
+        - object: DAObject
+          item:
+            label: Is there an amount owed on this property?
+            field: x[i].is_amount_owed
+            datatype: yesnoradio
+        - object: DAObject
+          item:
+            label: Who is the money owed to?
+            field: x[i].lender
+            required: False 
+            show if: x[i].is_amount_owed
+            example: First America
+        - object: DAObject
+          item:
+            label: Balance
+            field: x[i].balance
+            datatype: currency
+            show if: x[i].is_amount_owed
+        - object: DAObject
+          item:
+            label: Monthly Payment
+            field: x[i].monthly_payment
+            datatype: currency
+            show if: x[i].is_amount_owed
+        - object: DAObject
+          item:
+            label: Who should pay this debt?
+            field: x[i].recommended_debt
+            show if: x[i].is_amount_owed
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Split the debt"]
+        - object: DAObject
+          item:
+            label: How much should users[0].name.full() pay?
+            field: x[i].user_percentage_choice
+            datatype: code
+            code: |
+              [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+            js show if: val('x[i].recommended_debt') === "Split the debt"
+        - object: DAObject
+          item:
+            label: What percentage?
+            field: x[i].user_percentage_other
+            datatype: number
+            min: 0
+            max: 100
+            js show if: val('x[i].user_percentage_choice') === "other"
+        - object: DAObject
+          item:
+            label: Is this marital or nonmarital property?
+            field: x[i].marital_property
+            datatype: code
+            code: |
+              ["Marital", "Nonmarital", "Both"]
+        - object: DAObject
+          item:
+            note: |
+              ${ collapse_template(marital_property_template) }
+        - object: DAObject
+          item:
+            label: Party with possession of this property?
+            field: x[i].has_possession
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Other"]
+        - object: DAObject
+          item:
+            label: Recommended Award
+            field: x[i].recommended_award             
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Split the award"]
+        - object: DAObject
+          item:
+            label: How much should users[0].name.full() receive?
+            field: x[i].award_percentage_choice
+            datatype: code
+            code: |
+              [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+            js show if: val('x[i].recommended_award') === "Split the award" 
+        - object: DAObject
+          item:
+            label: What percentage?
+            field: x[i].award_percentage_other
+            datatype: number
+            min: 0
+            max: 100
+            js show if: val('x[i].award_percentage_choice') === "other"
+      terms_ordered: !!omap
+        - car: "Car"
+        - truck: "Truck"
+        - motorcycle: "Motorcycle"
+        - mobile_home: "Mobile home"
+        - trailer: "Trailer"
+        - boat: "Boat or jetski"
+        - airplane: "Airplane"
+        - other: "Other"
+      description_code: |
+        space('test_asset[i].year',prefix="", suffix=" ") + space('test_asset[i].make',prefix="", suffix=" ") + space('test_asset[i].model',prefix="", suffix=" ") + test_asset[i].display_name
+      loan_description_code: |
+        space("vehicles[i].lender", prefix="", suffix=" ") + "Loan"
+      security_description_code: |
+        space('vehicles[i].year',prefix="", suffix=" ") + space('vehicles[i].make',prefix="", suffix=" ") + space('vehicles[i].model',prefix="", suffix=" ") + vehicles[i].display_name
+    - variable: personal_goods
+      name: personal_goods
+      display_name: personal goods
+      other_display: other personal goods
+      has_subtypes: True
+      has_default_attributes: False
+      may_have_loan: True
+      may_split_award: True
+      attributes:
+        module: docassemble.base.util
+        object: DAObject
+        items:
+            - field: x[i].source
+              required: True
+              example: Jewelry
+              label: Type of asset
+              datatype: code
+              code: x.ordered
+            - field: x[i].source_other
+              required: True
+              example: Baseball cards
+              label: Other (explain)
+              js show if: val('x[i].source') === "other"
+              datatype: text
+            - label: What is its market value? How much would you get if you sold it?
+              field: x[i].market_value
+              maxlength: 76
+              datatype: currency
+            - label: Is there an amount owed on this property?
+              field: x[i].is_amount_owed
+              datatype: yesnoradio
+            - label: Who is the money owed to?
+              field: x[i].lender
+              required: False 
+              show if: x[i].is_amount_owed
+              example: First America
+            - label: Balance
+              field: x[i].balance
+              datatype: currency
+              show if: x[i].is_amount_owed
+            - label: Monthly Payment
+              field: x[i].monthly_payment
+              datatype: currency
+              show if: x[i].is_amount_owed
+            - label: Who should pay this debt?
+              field: x[i].recommended_debt
+              show if: x[i].is_amount_owed
+              datatype: code
+              code: |
+                ["petitioner", "respondent", "Split the debt"]
+            - label: How much should users[0].name.full() pay?
+              field: x[i].user_percentage_choice
+              datatype: code
+              code: |
+                [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+              js show if: val('x[i].recommended_debt') === "Split the debt"
+            - label: What percentage?
+              field: x[i].user_percentage_other
+              datatype: number
+              min: 0
+              max: 100
+              js show if: val('x[i].user_percentage_choice') === "other"
+            - label: Is this marital or nonmarital property?
+              field: x[i].marital_property
+              datatype: code
+              code: |
+                ["Marital", "Nonmarital", "Both"]
+            - note: |
+                ${ collapse_template(marital_property_template) }
+            - label: Party with possession of this property?
+              field: x[i].has_possession
+              datatype: code
+              code: |
+                ["petitioner", "respondent", "Other"]
+            - label: Recommended Award
+              field: x[i].recommended_award             
+              datatype: code
+              code: |
+                ["petitioner", "respondent", "Split the award"]
+            - label: How much should users[0].name.full() receive?
+              field: x[i].award_percentage_choice
+              datatype: code
+              code: |
+                [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+              js show if: val('x[i].recommended_award') === "Split the award" 
+            - label: What percentage?
+              field: x[i].award_percentage_other
+              datatype: number
+              min: 0
+              max: 100
+              js show if: val('x[i].award_percentage_choice') === "other"
+      terms_ordered: !!omap
+        - jewelry: "Jewelry"
+        - antiques: "Antiques"
+        - artwork: "Artwork"
+        - guns: "Guns"
+        - coins_stamps: "Coins / stamps"
+        - tools: "Tools"
+        - collectibles: "Collectibles"
+        - instruments: "Piano / musical instruments"
+        - china_etc: "China / crystal / silverware"
+        - appliances: "Appliances"
+        - computers: "Computers"
+        - electronics: "Electronics"
+        - furnishings: "Furnishings / furniture"
+        - other: "Other"
+      description_code: |
+        personal_goods[i].display_name
+      loan_description_code: |
+        "Loan for " + personal_goods[i].display_name
+      security_description_code: |
+        personal_goods[i].display_name
+    - variable: securities
+      name: securities
+      display_name: securities
+      other_display: other securities
+      has_subtypes: True
+      has_default_attributes: False
+      may_have_loan: True
+      may_split_award: True
+      attributes:
+        module: docassemble.base.util
+        object: DAObject
+        items:
+          - field: x[i].source
+            required: True
+            example: Stocks
+            label: Type of asset
+            datatype: code
+            code: x.ordered
+          - field: x[i].source_other
+            required: True
+            example: CDs
+            label: Other
+            js show if: val('x[i].source') === "other"
+            datatype: text
+          - field: x[i].name
+            required: False
+            example: Apple
+            label: Name
+          - field: x[i].account_number
+            required: False
+            example: AN654321
+            label: Account number
+          - label: What is its market value? How much would you get if you sold it?
+            field: x[i].market_value
+            maxlength: 76
+            datatype: currency
+          - label: Is there an amount owed on this property?
+            field: x[i].is_amount_owed
+            datatype: yesnoradio
+          - label: Who is the money owed to?
+            field: x[i].lender
+            required: False 
+            show if: x[i].is_amount_owed
+            example: First America
+          - label: Balance
+            field: x[i].balance
+            datatype: currency
+            show if: x[i].is_amount_owed
+          - label: Monthly Payment
+            field: x[i].monthly_payment
+            datatype: currency
+            show if: x[i].is_amount_owed
+          - label: Who should pay this debt?
+            field: x[i].recommended_debt
+            show if: x[i].is_amount_owed
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Split the debt"]
+          - label: How much should users[0].name.full() pay?
+            field: x[i].user_percentage_choice
+            datatype: code
+            code: |
+              [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+            js show if: val('x[i].recommended_debt') === "Split the debt"
+          - label: What percentage?
+            field: x[i].user_percentage_other
+            datatype: number
+            min: 0
+            max: 100
+            js show if: val('x[i].user_percentage_choice') === "other"
+          - label: Is this marital or nonmarital property?
+            field: x[i].marital_property
+            datatype: code
+            code: |
+              ["Marital", "Nonmarital", "Both"]
+          - note: |
+              ${ collapse_template(marital_property_template) }
+          - label: Party with possession of this property?
+            field: x[i].has_possession
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Other"]
+          - label: Recommended Award
+            field: x[i].recommended_award             
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Split the award"]
+          - label: How much should users[0].name.full() receive?
+            field: x[i].award_percentage_choice
+            datatype: code
+            code: |
+              [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+            js show if: val('x[i].recommended_award') === "Split the award" 
+          - label: What percentage?
+            field: x[i].award_percentage_other
+            datatype: number
+            min: 0
+            max: 100
+            js show if: val('x[i].award_percentage_choice') === "other"
+      terms_ordered: !!omap
+        - stocks: "Stocks"
+        - bonds: "Bonds"
+        - notes: "Promissory notes"
+        - mortgages: "Mortgage"
+        - money market: "Money market funds"
+        - other: "Other"
+      description_code: |
+        space('securities[i].name', prefix="", suffix=" ") + securities[i].display_name
+      loan_description_code: |
+        "Loan for " + space('securities[i].name', prefix="", suffix=" ") + securities[i].display_name
+      security_description_code: |
+        space('securities[i].name', prefix="", suffix=" ") + securities[i].display_name
+    - variable: bank_assets
+      name: bank_assets
+      display_name: bank assets
+      other_display: other bank assets
+      has_subtypes: True
+      has_default_attributes: False
+      may_have_loan: False
+      may_split_award: True
+      attributes:
+        module: docassemble.base.util
+        object: DAObject
+        items:
+          - field: x[i].source
+            required: True
+            example: Checking account
+            label: Type of asset
+            datatype: code
+            code: x.ordered
+          - field: x[i].source_other
+            required: True
+            example: Piggy bank
+            label: Other
+            js show if: val('x[i].source') === "other"
+            datatype: text
+          - field: x[i].institution
+            required: False
+            example: First America
+            label: Bank or Institution
+          - field: x[i].account_number
+            required: False
+            example: "654321"
+            label: Account number
+          - label: What is its market value? How much would you get if you sold it?
+            field: x[i].market_value
+            maxlength: 76
+            datatype: currency
+          - label: Is this marital or nonmarital property?
+            field: x[i].marital_property
+            datatype: code
+            code: |
+              ["Marital", "Nonmarital", "Both"]
+          - note: |
+              ${ collapse_template(marital_property_template) }
+          - label: Names on the account
+            field: x[i].has_possession
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "both petitioner and respondent", "Other"]
+          - label: Recommended Award
+            field: x[i].recommended_award             
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Split the award"]
+          - label: How much should users[0].name.full() receive?
+            field: x[i].award_percentage_choice
+            datatype: code
+            code: |
+              [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+            js show if: val('x[i].recommended_award') === "Split the award" 
+          - label: What percentage?
+            field: x[i].award_percentage_other
+            datatype: number
+            min: 0
+            max: 100
+            js show if: val('x[i].award_percentage_choice') === "other"
+      terms_ordered: !!omap
+        - checking account: "Checking accounts"
+        - savings account: "Savings accounts"
+        - time deposit: "Time deposit"
+        - money market: "Money market accounts"
+        - certificates: "Certificates"
+      description_code: |
+        bank_assets[i].display_name + space('bank_assets[i].institution', prefix = " at ", suffix = "") + space('bank_assets[i].account_number', prefix = " ", suffix = "")
+    - variable: retirement_accounts
+      name: retirement_accounts
+      display_name: retirement accounts
+      other_display: other retirement accounts
+      has_subtypes: True
+      has_default_attributes: False
+      may_have_loan: False
+      may_split_award: True
+      attributes:
+        module: docassemble.base.util
+        object: DAObject
+        items:
+          - field: x[i].source
+            required: True
+            example: Checking account
+            label: Type of asset
+            datatype: code
+            code: x.ordered
+          - field: x[i].source_other
+            required: True
+            example: Piggy bank
+            label: Other
+            js show if: val('x[i].source') === "other"
+            datatype: text
+          - field: x[i].name
+            required: False
+            example: First America
+            label: Name of company
+          - field: x[i].percent_vested
+            datatype: number
+            maxlength: 76
+            required: False
+            example: 66
+            label: Percentage vested
+          - label: What is its market value? How much would you get if you sold it?
+            field: x[i].market_value
+            maxlength: 76
+            datatype: currency
+          - label: Is this marital or nonmarital property?
+            field: x[i].marital_property
+            datatype: code
+            code: |
+              ["Marital", "Nonmarital", "Both"]
+          - note: |
+              ${ collapse_template(marital_property_template) }
+          - label: Person holding the interest
+            field: x[i].has_possession
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "both petitioner and respondent", "Other"]
+          - label: Recommended Award
+            field: x[i].recommended_award             
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Split the award"]
+          - label: How much should users[0].name.full() receive?
+            field: x[i].award_percentage_choice
+            datatype: code
+            code: |
+              [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+            js show if: val('x[i].recommended_award') === "Split the award" 
+          - label: What percentage?
+            field: x[i].award_percentage_other
+            datatype: number
+            min: 0
+            max: 100
+            js show if: val('x[i].award_percentage_choice') === "other"
+      terms_ordered: !!omap
+        - ira: "IRA"
+        - 401k: "401K"
+        - 403b: "403B"
+        - tiaacref: "TIAA/CREF"
+        - keogh: "Keogh"
+        - tdsp: "TDSP"
+        - tsa: "TSA"
+        - profitshare: "Profit sharing"
+        - ssp: "Savings & Security Program"
+        - defcomp: "Deferred compensation"
+        - other: "Other"
+      description_code: |
+        space('retirement_accounts[i].name',prefix="", suffix=" ") + retirement_accounts[i].display_name
+    - variable: life_insurance
+      name: life_insurance
+      display_name: life insurance policies
+      other_display: other life insurance policies
+      has_subtypes: False
+      has_default_attributes: False
+      may_have_loan: False
+      may_split_award: True
+      attributes:
+        module: docassemble.base.util
+        object: DAObject
+        items:
+          - field: x[i].type
+            required: True
+            example: Checking account
+            label: Type of life insurance
+          - field: x[i].name
+            required: False
+            example: Name of issuing company
+            label: Name of company
+          - field: x[i].account_number
+            required: False
+            example: PN66456
+            label: Policy number
+          - label: Face value
+            field: x[i].market_value
+            maxlength: 76
+            datatype: currency
+          - label: Cash value
+            field: x[i].cash_value
+            maxlength: 76
+            datatype: currency
+          - label: Is this marital or nonmarital property?
+            field: x[i].marital_property
+            datatype: code
+            code: |
+              ["Marital", "Nonmarital", "Both"]
+          - note: |
+              ${ collapse_template(marital_property_template) }
+          - label: Owner of policy
+            field: x[i].owner
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "both petitioner and respondent", "Other"]
+          - label: Insured
+            field: x[i].insured
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "both petitioner and respondent", "Other"]
+          - label: Beneficiaries
+            field: x[i].beneficiaries
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "both petitioner and respondent", "Other"]
+          - label: Recommended Award
+            field: x[i].recommended_award             
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Split the award"]
+          - label: How much should users[0].name.full() receive?
+            field: x[i].award_percentage_choice
+            datatype: code
+            code: |
+              [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+            js show if: val('x[i].recommended_award') === "Split the award" 
+          - label: What percentage?
+            field: x[i].award_percentage_other
+            datatype: number
+            min: 0
+            max: 100
+            js show if: val('x[i].award_percentage_choice') === "other"
+      description_code: |
+        life_insurance[i].name + " " + life_insurance[i].type
+    - variable: interests_in_trust 
+      name: interests_in_trust 
+      display_name: interest in a trust
+      other_display: other interest in a trust
+      has_subtypes: False
+      has_default_attributes: False
+      may_have_loan: False
+      may_split_award: True
+      attributes:
+        module: docassemble.base.util
+        object: DAObject
+        items:
+          - field: x[i].name
+            required: False
+            example: Family trust
+            label: Name of trust
+          - field: x[i].nature
+            required: True
+            example: Checking account
+            label: Nature of interest
+          - label: Market value
+            field: x[i].market_value
+            maxlength: 76
+            datatype: currency
+          - label: Is this marital or nonmarital property?
+            field: x[i].marital_property
+            datatype: code
+            code: |
+              ["Marital", "Nonmarital", "Both"]
+          - note: |
+              ${ collapse_template(marital_property_template) }
+          - label: Trustee
+            field: x[i].trustee
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "both petitioner and respondent", "Other"]
+          - label: Settlor
+            field: x[i].settlor
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "both petitioner and respondent", "Other"]
+          - label: Beneficiaries
+            field: x[i].beneficiaries
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "both petitioner and respondent", "Other"]
+          - label: Recommended Award
+            field: x[i].recommended_award             
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Split the award"]
+          - label: How much should users[0].name.full() receive?
+            field: x[i].award_percentage_choice
+            datatype: code
+            code: |
+              [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+            js show if: val('x[i].recommended_award') === "Split the award" 
+          - label: What percentage?
+            field: x[i].award_percentage_other
+            datatype: number
+            min: 0
+            max: 100
+            js show if: val('x[i].award_percentage_choice') === "other"
+          - label: Copy of trust instrument
+            field: x[i].file
+            datatype: file
+            required: False
+      description_code: |
+        space('interests_in_trust[i].name',prefix="", suffix=" ") + "Trust"
+    - variable: interest_in_contract
+      name: interest_in_contract
+      display_name: interest in a contract
+      other_display: other interests in a contract
+      has_subtypes: False
+      has_default_attributes: True
+      may_have_loan: False
+      may_split_award: True
+      attributes:
+        module: docassemble.base.util
+        object: DAObject
+        items:
+          - field: x[i].description
+            required: False
+            example: Description
+            label: Name of trust
+          - label: What is its market value? How much would you get if you sold it?
+            field: x[i].market_value
+            maxlength: 76
+            datatype: currency
+          - label: Is this marital or nonmarital property?
+            field: x[i].marital_property
+            datatype: code
+            code: |
+              ["Marital", "Nonmarital", "Both"]
+          - note: |
+              ${ collapse_template(marital_property_template) }
+          - label: Party with possession of this property?
+            field: x[i].has_possession
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "both petitioner and respondent", "Other"]
+          - label: Recommended Award
+            field: x[i].recommended_award             
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Split the award"]
+          - label: How much should users[0].name.full() receive?
+            field: x[i].award_percentage_choice
+            datatype: code
+            code: |
+              [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+            js show if: val('x[i].recommended_award') === "Split the award" 
+          - label: What percentage?
+            field: x[i].award_percentage_other
+            datatype: number
+            min: 0
+            max: 100
+            js show if: val('x[i].award_percentage_choice') === "other"
+    - variable: interest_in_litigation
+      name: interest_in_litigation
+      display_name: lawsuits against anyone
+      other_display: other lawsuits against anyone
+      has_subtypes: False
+      has_default_attributes: True
+      may_have_loan: False
+      may_split_award: True
+      attributes:
+        module: docassemble.base.util
+        object: DAObject
+        items:
+          - field: x[i].description
+            required: False
+            example: Description
+            label: Name of trust
+          - label: What is its market value? How much would you get if you sold it?
+            field: x[i].market_value
+            maxlength: 76
+            datatype: currency
+          - label: Is this marital or nonmarital property?
+            field: x[i].marital_property
+            datatype: code
+            code: |
+              ["Marital", "Nonmarital", "Both"]
+          - note: |
+              ${ collapse_template(marital_property_template) }
+          - label: Party with possession of this property?
+            field: x[i].has_possession
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "both petitioner and respondent", "Other"]
+          - label: Recommended Award
+            field: x[i].recommended_award             
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Split the award"]
+          - label: How much should users[0].name.full() receive?
+            field: x[i].award_percentage_choice
+            datatype: code
+            code: |
+              [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+            js show if: val('x[i].recommended_award') === "Split the award" 
+          - label: What percentage?
+            field: x[i].award_percentage_other
+            datatype: number
+            min: 0
+            max: 100
+            js show if: val('x[i].award_percentage_choice') === "other"
+    - variable: farm
+      name: farm
+      display_name: farm equipment, animal or crops
+      other_display: other farm equipment, animal or crops
+      has_subtypes: False
+      has_default_attributes: False
+      may_have_loan: True
+      may_split_award: True
+      attributes:
+        module: docassemble.base.util
+        object: DAObject
+        items:
+          - field: x[i].description
+            required: True
+            example: Frankferd Farm
+            label: Description
+          - label: What is its market value? How much would you get if you sold it?
+            field: x[i].market_value
+            maxlength: 76
+            datatype: currency
+          - label: Is there an amount owed on this property?
+            field: x[i].is_amount_owed
+            datatype: yesnoradio
+          - label: Who is the money owed to?
+            field: x[i].lender
+            required: False 
+            show if: x[i].is_amount_owed
+            example: First America
+          - label: Balance
+            field: x[i].balance
+            datatype: currency
+            show if: x[i].is_amount_owed
+          - label: Monthly Payment
+            field: x[i].monthly_payment
+            datatype: currency
+            show if: x[i].is_amount_owed
+          - label: Who should pay this debt?
+            field: x[i].recommended_debt
+            show if: x[i].is_amount_owed
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Split the debt"]
+          - label: How much should users[0].name.full() pay?
+            field: x[i].user_percentage_choice
+            datatype: code
+            code: |
+              [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+            js show if: val('x[i].recommended_debt') === "Split the debt"
+          - label: What percentage?
+            field: x[i].user_percentage_other
+            datatype: number
+            min: 0
+            max: 100
+            js show if: val('x[i].user_percentage_choice') === "other"
+          - label: Is this marital or nonmarital property?
+            field: x[i].marital_property
+            datatype: code
+            code: |
+              ["Marital", "Nonmarital", "Both"]
+          - note: |
+              ${ collapse_template(marital_property_template) }
+          - label: Party with possession of this property?
+            field: x[i].has_possession
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Other"]
+          - label: Recommended Award
+            field: x[i].recommended_award             
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Split the award"]
+          - label: How much should users[0].name.full() receive?
+            field: x[i].award_percentage_choice
+            datatype: code
+            code: |
+              [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+            js show if: val('x[i].recommended_award') === "Split the award" 
+          - label: What percentage?
+            field: x[i].award_percentage_other
+            datatype: number
+            min: 0
+            max: 100
+            js show if: val('x[i].award_percentage_choice') === "other"
+      description_code: |
+        farm[i].display_name
+      loan_description_code: |
+        "Loan for " + farm[i].description
+      security_description_code: |
+        farm[i].display_name
+    - variable: debts_owed_to_you
+      name: debts_owed_to_you
+      display_name: money owed to you
+      other_display: other money owed to you
+      has_subtypes: False
+      has_default_attributes: True
+      may_have_loan: False
+      may_split_award: True
+      description_code: |
+        debts_owed_to_you[i].description
+      attributes:
+        module: docassemble.base.util
+        object: DAObject
+        items:
+          - field: x[i].description
+            required: False
+            example: Description
+            label: Name of trust
+          - label: What is its market value? How much would you get if you sold it?
+            field: x[i].market_value
+            maxlength: 76
+            datatype: currency
+          - label: Is this marital or nonmarital property?
+            field: x[i].marital_property
+            datatype: code
+            code: |
+              ["Marital", "Nonmarital", "Both"]
+          - note: |
+              ${ collapse_template(marital_property_template) }
+          - label: Party with possession of this property?
+            field: x[i].has_possession
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "both petitioner and respondent", "Other"]
+          - label: Recommended Award
+            field: x[i].recommended_award             
+            datatype: code
+            code: |
+              ["petitioner", "respondent", "Split the award"]
+          - label: How much should users[0].name.full() receive?
+            field: x[i].award_percentage_choice
+            datatype: code
+            code: |
+              [{50: "50%"}, {75: "75%"}, {25: "25%"}, {"other": "Other"}]
+            js show if: val('x[i].recommended_award') === "Split the award" 
+          - label: What percentage?
+            field: x[i].award_percentage_other
+            datatype: number
+            min: 0
+            max: 100
+            js show if: val('x[i].award_percentage_choice') === "other"
+
