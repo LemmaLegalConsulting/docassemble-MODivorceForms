@@ -75,6 +75,12 @@ fields:
         not children[i].birth_certificate[other_parties[0].name.full()] 
 continue button field: adopted_question
 ---
+id: adoption question
+question: Is ${ children[i].name.full() } adopted by one or both parents?
+fields:
+  - no label: children[i].adopted
+    datatype: yesnoradio
+---
 id: Petition for Dissolution of Marriage object
 objects:
   - petition_attachment: ALDocument.using(title="Petition for Dissolution of Marriage", filename="petition", has_addendum=False, )

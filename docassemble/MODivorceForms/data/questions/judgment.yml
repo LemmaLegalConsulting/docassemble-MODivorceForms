@@ -155,6 +155,7 @@ id: other orders property object
 objects:
   - other_orders_property: Thing
 ---
+id: Other orders concerning property and debt
 question: Other orders concerning property and debt
 fields:
   - Do other orders exist?: other_orders_property.exists
@@ -185,6 +186,7 @@ id: other orders object
 objects:
   - other_orders: Thing
 ---
+id: Other orders
 question: Other orders
 fields:
   - Do other orders exist?: other_orders.exists
@@ -218,6 +220,8 @@ attachment:
       - "respondent_name_suffix": ${ respondent.name.suffix } 
       - "petitioner_ssn": ${ petitioner.ssn } 
       - "respondent_ssn": ${ respondent.ssn } 
+      - "respondent_active_duty": ${ not respondent.active_duty }
+      - "respondent_active_duty": ${ respondent.active_duty }
       - "case_personal_jurisdiction_over_respondent": ${ (respondent.lives_in_missouri and respondent.resident_for_90_days) or marriage.live_together_in_mo } 
       - "case_personal_jurisdiction_over_respondent_no": ${ not ((respondent.lives_in_missouri and respondent.resident_for_90_days) or marriage.live_together_in_mo) } 
       - "petitioner_resident_for_90 days": ${ petitioner.resident_for_90_days } 
@@ -228,12 +232,12 @@ attachment:
       - "marriage_date_last_resided": ${ format_date(marriage.separation_date, format='M/d/yyyy') } 
       - "petitioner_pregnant": ${ True } 
       - "respondent_pregnant": ${ True } 
-      - "children": ${ len(children) == 0 } 
-      - "children4": ${ len(children) > 0 } 
-      - "children5": ${ len(children) if len(children) > 0 else "" } 
+      - "children": ${ number_of_children == 0 } 
+      - "children4": ${ number_of_children > 0 } 
+      - "children5": ${ number_of_children if number_of_children > 0 else "" } 
       - "children0_name_first": |
-          % if len(children) > 0:
-          ${ children[0].name.first }
+          % if True or len([child for child in children if not child.special_factors['self_supporting']]) > 0:
+          ${ [child for child in children if not child.special_factors['self_supporting']][0].name.first }
           % endif
       - "children0_name_suffix": |
           % if len(children) > 0:

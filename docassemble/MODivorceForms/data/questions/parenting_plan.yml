@@ -120,27 +120,19 @@ fields:
   - When should the exchange occur?: time_of_exchange
   - Where should the exchange occur when school or child care is not in session?: location_of_exchange_school_not_in_session
     datatype: area
-    show if:
-      variable: location_of_exchange
-      is: school
-  - Add a pick-up from school for the other parent?: add_pick_up
-    datatype: yesnoradio
-    show if:
-      variable: location_of_exchange
-      is: school
+    js show if: |
+      val('location_of_exchange') === 'school' 
   - "Where should the exchange occur?  (Please include the full address)": location_of_exchange_specific_location
     datatype: area
-    show if:
-      variable: location_of_exchange
-      is: other
-  - Add a pick-up from the other location for the other parent?: add_pick_up
+    js show if: |
+      val('location_of_exchange') === 'other'
+  - Add a pick-up for the other parent?: add_pick_up_from_school
     datatype: yesnoradio
-    show if:
-      variable: location_of_exchange
-      is: other
+    js show if: |
+      val('location_of_exchange') === 'school' || val('location_of_exchange') === 'other'
   - Time of the pickup: time_of_exchange2
     show if:
-      variable: add_pick_up
+      variable: add_pick_up_from_school
       is: True
 validation code: |
    if location_of_exchange == "pick_up":
@@ -153,17 +145,17 @@ validation code: |
      default_exchange_method = "Drop off"
      default_exchange_time = time_of_exchange
      default_exchange_location = "school"
-     default_add_pick_up_from_school = add_pick_up
-     if add_pick_up:
+     default_add_pick_up_from_school = add_pick_up_from_school
+     if add_pick_up_from_school:
        default_exchange_time2 = time_of_exchange2
      else:
        default_exchange_time2 = None
    if location_of_exchange == "other":
      default_exchange_method = "Drop off"
      default_exchange_time = time_of_exchange
-     default_exchange_location = default_exchange_location_other
-     default_add_pick_up_from_school = add_pick_up
-     if add_pick_up:
+     default_exchange_location = location_of_exchange_specific_location
+     default_add_pick_up_from_school = add_pick_up_from_school
+     if add_pick_up_from_school:
        default_exchange_time2 = time_of_exchange2
      else:
        default_exchange_time2 = None
@@ -205,6 +197,7 @@ fields:
       - 12 pm: 12
     show if: phone_contact
 ---
+id: Domestic Violence
 question: Domestic Violence
 fields:
   - Has there been a pattern of domestic violence between the parents?: domestic_violence

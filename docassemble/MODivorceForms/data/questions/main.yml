@@ -721,6 +721,7 @@ subquestion: |
   
   [Missouri Supreme Court Website](https://www.courts.mo.gov/page.jsp?id=611)
 ---
+id: Bankruptcy
 question: Bankruptcy
 fields: 
   - Are you or your spouse currently in a bankruptcy proceeding?: in_bankruptcy
@@ -734,6 +735,7 @@ code: |
     users[0].in_bankruptcy = True
     other_parties[0].in_bankruptcy = True
 ---
+id: bankruptcy_kickout
 event: bankruptcy_kickout
 question: Bankruptcy
 subquestion: |
@@ -756,11 +758,13 @@ subquestion: |
   You may want to consider talking to a lawyer if your spouse is asking the court for maintenance or child support that you don't agree with.
 continue button field: respondent_personal_jurisdiction_warning
 ---
+id: jurisdiction_kickout
 event: jurisdiction_kickout
 question: No jurisdiction
 subquestion: |
   Missouri law requires that at least one party in the divorce live in Missouri for at least 90 days before filing divorce.  Since neither you nor your spouse has lived in Missouri for 90 days, this tool is not appropriate for you.
 ---
+id: respondent_jurisdiction_kickout
 event: respondent_jurisdiction_kickout
 question: No jurisdiction
 subquestion: |
@@ -1143,6 +1147,7 @@ question: Video on filing pleadings
 subquestion: |
   <iframe width="480" height="270" src="https://www.powtoon.com/embed/dvKxPdVmlhD/" frameborder="0" allowfullscreen></iframe>
 
+
   % if defined('case.address.address'):
   Your courthouse is located at ${ case.address.on_one_line() } in ${ nice_county_name(case) }.
   % endif
@@ -1195,6 +1200,7 @@ code: |
   addresses_to_search = [user.address for user in users.complete_elements()]
 
 ---
+id: users revisit
 continue button field: users.revisit
 question: |
   Edit users

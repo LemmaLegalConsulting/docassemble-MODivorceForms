@@ -31,6 +31,7 @@ code: |
   var_doc_dict["children_number"]
   var_doc_dict["children_birthdate"]
   var_doc_dict["under_18_in_household"]
+  var_doc_dict["adoption"]
   var_doc_dict["persons_lived_with"]
   var_doc_dict["legal_custody"]
   var_doc_dict["additional_children_information"]
@@ -182,13 +183,15 @@ code: |
   else:
     case.type_code = "DH"
 ---
+comment: | 
+  Is this unused?
 id: Hearing date and time
 question: Hearing date and time
 fields:
   - Hearing date: hearing_date
     required: False
     datatype: date
-  - Hearing date: hearing_time
+  - Hearing time: hearing_time
     required: False
     datatype: time
 ---
@@ -633,7 +636,7 @@ id: Birth info
 generic object: ALIndividual
 question: Birth information for ${ x.name_full() }
 fields:    
-  - Birthdate: x.birthdate
+  - Birth date: x.birthdate
     datatype: ThreePartsDate
   - "BIRTHPLACE (State or Foreign Country)": x.birthplace
     maxlength: 40
@@ -880,9 +883,7 @@ generic object: ALIndividual
 objects:
   - x.attorney: ALIndividual
 ---
-sets:
-  - x.attorney.name.first
-id: attorney information
+id: does user have attorney 
 generic object: ALIndividual
 question: Attorney for ${ x }
 subquestion: |
@@ -893,50 +894,42 @@ fields:
   - Is an attorney helping ${ "you" if x.instanceName == "users[0]" else x }?:  x.attorney_involved
     datatype: yesnoradio
     required: False
+---
+sets:
+  - x.attorney.name.first
+id: attorney information
+generic object: ALIndividual
+question: Attorney Information for ${ x }
+subquestion: |
+
+  ${ collapse_template(attorney_casenet_template) }
+fields:    
   - code: |
-      x.attorney.name_fields(show_if="x.attorney_involved")
+      x.attorney.name_fields()
+  - Is the attorney representing ${ "you" if x.instanceName == "users[0]" else x }?: x.type_of_assistance
+    datatype: radio
+    required: False
+    choices:
+      - Yes, the attorney is representing ${  "me" if x.instanceName == "users[0]" else x }: representation
+      - No, the attorney is only providing assistance preparing documents.: assistance
   - Bar number: x.attorney.bar_number
     required: False
-    show if:
-      variable: x.attorney_involved
-      is: True
   - Address of ${ "your attorney" if x.instanceName == "users[0]" else x.possessive("attorney") }: x.attorney.address.address
     address autocomplete: True
     required: False
-    show if:
-      variable: x.attorney_involved
-      is: True
   - City: x.attorney.address.city
     required: False
-    show if:
-      variable: x.attorney_involved
-      is: True
   - State: x.attorney.address.state
     required: False
-    show if:
-      variable: x.attorney_involved
-      is: True
   - Zip code: x.attorney.address.zip
     required: False
-    show if:
-      variable: x.attorney_involved
-      is: True
   - Country: x.attorney.address.country
     required: False
-    show if:
-      variable: x.attorney_involved
-      is: True
   - Phone: x.attorney.phone_number
     required: False
-    show if:
-      variable: x.attorney_involved
-      is: True
   - Email: x.attorney.email
     datatype: email
     required: False
-    show if:
-      variable: x.attorney_involved
-      is: True
 validation code: |
   validate_us_state(x.attorney.address)
 ---
@@ -1029,27 +1022,23 @@ fields:
   - no label: children.there_are_any
     datatype: yesnoradio
 ---
-id: children complete
-code: |
-  children[i].ssn
-  children[i].birthdate
-  children[i].complete = True
----
 id: children complete from petition
 code: |
   children[i].name.first
   if len(set(var_doc_dict["children_birthdate"]) & set(doc_list_selected.true_values())) > 0:
     children[i].birthdate
   if 'petition_attachment' in doc_list_selected.true_values():
-    children[i].lived_with.name.first
+    if not children[i].unemancipated:
+      children[i].lived_with.name.first
     children[i].address.address
     if children[i].legal_custody == "Third Party":
       children[i].legal_custody_other.name.first
     if children[i].physical_custody == "Third Party":
       children[i].physical_custody_other.name.first
+    if len(set(var_doc_dict["adoption"]) & set(doc_list_selected.true_values())) > 0:
+      children[i].adopted
     if children[i].birth_certificate["Other"]:
       children[i].birth_certificate_other.name.first
-      children[i].adopted_question
     if children[i].parents["Other"]:
       children[i].other_parent.name.first
   if 'parenting_plan_attachment' in doc_list_selected.true_values() and legal_custody != "Third Party" and physical_custody != "Third Party":
@@ -1076,6 +1065,7 @@ fields:
       children[i].name_fields()
 ---
 sets: children[i].address.address
+if: defined('children[i].lived_with.name.first')
 id: sets child's address to lived with address
 code: |
  children[i].address = children[i].lived_with.address
@@ -1120,6 +1110,7 @@ data:
   - parenting_plan_attachment
   - confidential_information_sheet_attachment
 ---
+id: back up number of children question if no need to collect all children
 question: How many minor children do you have with ${ other_parties[0] }?
 fields:
   - Number of children: number_of_children
@@ -1131,11 +1122,11 @@ code: |
   users[0].other_children = 0
   other_parties[0].other_children = 0
   for child in children:
-    if child.parents[users[0].name.full()] and child.parents[other_parties[0].name.full()] and not child.special_factors['self_supporting']:
+    if child.parents[users[0].name.full()] and child.parents[other_parties[0].name.full()] and not child.unemancipated:
       number_of_children += 1
-    elif child.parents[users[0].name.full()] and not child.special_factors['self_supporting']:
+    elif child.parents[users[0].name.full()] and not child.unemancipated:
       users[0].other_children += 1
-    elif child.parents[other_parties[0].name.full()] and not child.special_factors['self_supporting']:
+    elif child.parents[other_parties[0].name.full()] and not child.unemancipated:
       other_parties[0].other_children += 1
 ---
 if: not minor_children
@@ -1161,6 +1152,11 @@ fields:
       children[i].lived_with.address_fields()
 
 ---
+id: don't ask lived with for adult children
+if: children[i].unemancipated
+code: |
+  children[i].lived_with = None
+---
 objects:
   children[i].lived_with: ALIndividual
 ---
@@ -1169,11 +1165,30 @@ question: Residence at separation
 fields:
   - Did ${ children[i].name_full() } live with ${ users[0].name_full() } and ${ other_parties[0].name_full() } on ${ marriage.separation_date }?: children[i].under_18_in_household
     datatype: yesnoradio
+    default: children[i].unemancipated
+---
+id: code to determine if child is unemancipated
+code: |
+  if children[i].special_factors['college']:
+    if children[i].birthdate.plus(years=21) > today():
+      children[i].unemancipated = True
+    else:
+      children[i].unemancipated = False
+  else:
+    if children[i].birthdate.plus(years=18) > today():
+      children[i].unemancipated = True
+    else:
+      children[i].unemancipated = False
 ---
 id: under_18_in_household document list
 variable name: var_doc_dict["under_18_in_household"]
 data:
   - certificate_of_dissolution_attachment
+---
+id: adoption document list
+variable name: var_doc_dict["adoption"]
+data:
+  - petition_attachment
 ---
 id: lived with other object
 objects: 
@@ -1241,6 +1256,11 @@ id: set legal custody for child if selected for all children
 if: legal_custody_all_children
 code: |
   children[i].legal_custody = legal_custody
+---
+id: don't ask legal_custody for adult children
+if: children[i].unemancipated
+code: |
+  children[i].legal_custody = None
 ---
 variable name: var_doc_dict["legal_custody"]
 data:
@@ -1360,8 +1380,9 @@ fields:
   - code: |
       visitation_supervisor.name_fields()
 ---
+id: follow up block for sole physical custody
 if: physical_custody in ["petitioner","respondent"] and visitation
-question: Reason for sole custody
+question: Reason for sole physical custody
 subquestion: |
   Describe why
 fields:
@@ -1405,6 +1426,11 @@ if: physical_custody_all_children
 code: |
   children[i].physical_custody = physical_custody
 ---
+id: don't ask physical_custody for adult children
+if: children[i].unemancipated
+code: |
+  children[i].physical_custody = None
+---
 id: other physical custody
 reconsider:
   - people_choices
@@ -1435,6 +1461,8 @@ objects:
 ---
 id: parents of child
 question: Parents of ${ children[i].name_full() }
+subquestion: |
+  If you or your spouse are not a parent of this child by sexual intercourse, adoption or artificial insemination, please name the other parent.
 fields:
   - Who are the parents of this child?: children[i].parents
     datatype: checkboxes
@@ -1444,8 +1472,7 @@ fields:
       - Other
     none of the above: False
 ---
-id: code for parent
-code: |
+comment: |
   children[i].parents = dict()
   children[i].parents['Other'] = False
   if children[i].birth_certificate[users[0].name.full()] or children[i].adopted_by_user:
@@ -1688,11 +1715,13 @@ code: |
   temp_child_support_choices.append({"none":"No child support awarded"})
   child_support_choices = temp_child_support_choices
 ---
+id:  Child support received in this case
 question: Child support received in this case
 fields:
   - How much child support do you receive in this case?: users[0].child_support_received
     datatype: currency
 ---
+id: Child support paid in this case
 question: Child support paid in this case
 fields:
   - How much child support do you pay in this case?: users[0].child_support_paid
@@ -1780,17 +1809,17 @@ generic object: ALIndividual
 objects:
   - x.extraordinary_childrearing_costs: ALExpenseList.using(complete_attribute='included_in_form_14')
 ---
-id: extraordinary childrearing costs there are any
+id: extraordinary child-rearing costs there are any
 generic object: ALIndividual
-question: Extraordinary childrearing Costs to be paid by ${ x.name_full() }
+question: Extraordinary child-rearing Costs to be paid by ${ x.name_full() }
 subquestion: |
-  Extraordinary childrearing costs can include things like school tuition, lessons, or extracurricular activities.
+  Extraordinary child-rearing costs can include things like school tuition, lessons, or extracurricular activities.
 
   % if x.spouse.extraordinary_childrearing_costs.has_been_gathered() and len(x.spouse.extraordinary_childrearing_costs) > 0:
-  You have already told us about ${ x.spouse } paying the following extraordinary childrearing costs: ${ comma_and_list(cost.description for cost in x.spouse.extraordinary_childrearing_costs.complete_elements()) }
+  You have already told us about ${ x.spouse } paying the following extraordinary child-rearing costs: ${ comma_and_list(cost.description for cost in x.spouse.extraordinary_childrearing_costs.complete_elements()) }
   % endif
 fields:
-  - Are there any extraordinary childrearing costs to be paid by ${ x.name_full() }?: x.extraordinary_childrearing_costs.there_are_any
+  - Are there any extraordinary child-rearing costs to be paid by ${ x.name_full() }?: x.extraordinary_childrearing_costs.there_are_any
     datatype: yesnoradio
 ---
 if: not minor_children
@@ -1800,9 +1829,9 @@ code: |
 ---
 id: extraordinary childrearing cost information
 generic object: ALIndividual
-question: What is the ${ ordinal(i) } extraordinary childrearing cost to be paid by ${ x.name_full() }?
+question: What is the ${ ordinal(i) } extraordinary child-rearing cost to be paid by ${ x.name_full() }?
 subquestion: |
-  Extraordinary childrearing costs can include things like school tuition, lessons, or extracurricular activities.
+  Extraordinary child-rearing costs can include things like school tuition, lessons, or extracurricular activities.
   
   % if x.spouse.extraordinary_childrearing_costs.has_been_gathered() and len(x.spouse.extraordinary_childrearing_costs) > 0:
   You have already told us about ${ x.spouse } paying the following extraordinary childrearing costs: ${ comma_and_list(cost.description for cost in x.spouse.extraordinary_childrearing_costs.complete_elements()) }.
@@ -1815,7 +1844,7 @@ fields:
   - Description: x.extraordinary_childrearing_costs[i].description
   - "Do you want to include this in the child support calculation?": x.extraordinary_childrearing_costs[i].included_in_form_14
     datatype: yesnoradio
-  - Amount of extraordinary childrearing cost: x.extraordinary_childrearing_costs[i].value
+  - Amount of extraordinary child-rearing cost: x.extraordinary_childrearing_costs[i].value
     datatype: currency
     show if: x.extraordinary_childrearing_costs[i].included_in_form_14
   - Times per year pays this cost: x.extraordinary_childrearing_costs[i].times_per_year
@@ -1832,21 +1861,21 @@ fields:
       variable: x.extraordinary_childrearing_costs[i].included_in_form_14
       is: False
 ---
-id: extraordinary childrearing costs is there another
+id: extraordinary child-rearing costs is there another
 generic object: ALIndividual
-question: Extraordinary Childrearing Costs to be paid by ${ x.name_full() }
+question: Extraordinary Child-rearing Costs to be paid by ${ x.name_full() }
 subquestion: |
-  Extraordinary childrearing costs can include things like school tuition, lessons, or extracurricular activities.
+  Extraordinary child-rearing costs can include things like school tuition, lessons, or extracurricular activities.
   
   % if x.spouse.extraordinary_childrearing_costs.has_been_gathered() and len(x.spouse.extraordinary_childrearing_costs) > 0:
-  You have already told us about ${ x.spouse } paying the following extraordinary childrearing costs: ${ comma_and_list(cost.description for cost in x.spouse.extraordinary_childrearing_costs.complete_elements()) }
+  You have already told us about ${ x.spouse } paying the following extraordinary child-rearing costs: ${ comma_and_list(cost.description for cost in x.spouse.extraordinary_childrearing_costs.complete_elements()) }
   % endif
 
   % if len(x.extraordinary_childrearing_costs.complete_elements()) > 0:
   You have already told us about your ${ comma_and_list(cost.description for cost in x.extraordinary_childrearing_costs.complete_elements()) }.
   % endif
 fields:
-  - Are there any more extraordinary childrearing costs to be paid by ${ x.name_full() }?: x.extraordinary_childrearing_costs.there_is_another
+  - Are there any more extraordinary child-rearing costs to be paid by ${ x.name_full() }?: x.extraordinary_childrearing_costs.there_is_another
     datatype: yesnoradio
 ---
 id: child support for other children
@@ -5073,6 +5102,7 @@ fields:
       - No maintenance is to be paid to ${ respondent.name.full() } by ${ petitioner.name.full() }. This agreement is not subject to modification.: none
       - ${ petitioner.name.full() } shall pay maintenance to ${ respondent.name.full() }.: ordered_to_pay
 ---
+id: maintenance to respondent follow up
 sets:
   - petitioner.maintenance_paid
 question: Maintenance to ${ respondent.name.full() }
@@ -5102,6 +5132,7 @@ validation code: |
   petitioner.maintenance_received = maintenance_to_petitioner_amount
   respondent.maintenance_paid = maintenance_to_petitioner_amount
 ---
+id: Income Withholding
 question: Income Withholding
 subquestion: |
   ${ prog_disclose(maintenance_template) }

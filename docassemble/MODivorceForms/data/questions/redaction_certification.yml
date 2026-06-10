@@ -12,9 +12,6 @@ code: |
   al_court_bundle.get_titles()
   mo_divorce_forms_download
 ---
-continue button field: doc_test
-question: ${ al_court_bundle.get_titles() }
----
 objects:
   - redaction_certification_attachment: ALDocument.using(title="Redaction Certification", filename="redaction_certification", has_addendum=False, )
 ---
