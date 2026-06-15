@@ -3543,6 +3543,8 @@ code: |
       x.assets.append(item)
   x.assets.gathered = True
 ---
+depends on:
+  - real_estate
 code: |
   joint_assets.clear()
   for asset_list in [real_estate,vehicles, bank_assets, securities, personal_goods, retirement_accounts, life_insurance, interests_in_trust, interest_in_contract, interest_in_litigation, farm, debts_owed_to_you, businesses, other_assets]:
@@ -3554,6 +3556,12 @@ code: |
         joint_assets[-1].source = asset_list.instanceName + "_other"
   joint_assets.gathered = True
 ---
+on change:
+  real_estate[i].value: |
+    undefine('joint_assets')
+---
+---
+reconsider: joint_assets
 id: joint_assets review 
 question: All Assets
 subquestion: |
@@ -3561,8 +3569,35 @@ subquestion: |
   Tap Next if you don't have more to add.
   
   ${ joint_assets.table }
-  
-  ${  joint_assets.add_action() }
+
+  ${ real_estate.add_action(label="Add real estate") }  
+
+  ${ vehicles.add_action(label="Add a vehicle") }  
+
+  ${ bank_assets.add_action(label="Add a bank account") }  
+
+  ${ securities.add_action(label="Add a security") }  
+
+  ${ personal_goods.add_action(label="Add personal goods") }  
+
+  ${ retirement_accounts.add_action(label="Add a retirement account") }  
+
+  ${ life_insurance.add_action(label="Add life insurance") }  
+
+  ${ interests_in_trust.add_action(label="Add an interest in trust") }  
+
+  ${ interest_in_contract.add_action(label="Add an interest in contract") }  
+
+  ${ interest_in_litigation.add_action(label="Add an interest in litigation") }  
+
+  ${ farm.add_action(label="Add a farm") }  
+
+  ${ debts_owed_to_you.add_action(label="Add a debt owed to you") }  
+
+  ${ businesses.add_action(label="Add a business") }  
+
+  ${ other_assets.add_action(label="Add other assets") }  
+
 continue button field:  joint_assets.review_items
 ---
 id: generic review
@@ -3840,6 +3875,7 @@ code: |
         x.debts[-1].monthly_payment = debt.monthly_payment * (1 - debt.user_percentage)
   x.debts.gathered = True
 ---
+reconsider: joint_debts
 id: joint_debts review 
 question: All Debts
 subquestion: |
@@ -3848,7 +3884,7 @@ subquestion: |
   
   ${ joint_debts.table }
   
-  ${  joint_debts.add_action() }
+  ${  debts.add_action() }
 continue button field:  joint_debts.review_items
 ---
 id: generic review
@@ -5326,5 +5362,416 @@ id: service by mail affidavit objects
 objects:
   - service_by_mail_affidavit_attachment: ALDocument.using(title="Affidavit Service By Mail", filename="service_by_mail_affidavit",  has_addendum=False, )
 ---
-  
----
+id: review screen
+event: review_form
+question: Review your answers
+review:
+- note: |
+    Relief
+- Edit: relief['maintenance']
+  button: |
+    **Maintenance award**
+
+    Should the court award maintenance to ${ petitioner.name_full() } or ${ respondent.name_full() }?: ${ word(yesno(relief['maintenance'])) }
+
+    Who should be awarded maintenance?: ${ showifdef('maintenance_awarded_to') }
+- Edit: maintenance_to_petitioner
+  button: |
+    **Maintenance to ${ petitioner.name.full() }**
+
+    Should ${ respondent.name.full() } pay maintenance to ${ petitioner.name.full() }?: ${ showifdef('maintenance_to_petitioner') }
+- Edit: maintenance_to_respondent
+  button: |
+    **Maintenance to ${ respondent.name.full() }**
+
+    Should ${ petitioner.name.full() } pay maintenance to ${ respondent.name.full() }?: ${ showifdef('maintenance_to_respondent') }
+- Edit: maintenance_to_respondent_amount
+  button: |
+    **Maintenance to ${ respondent.name.full() }**
+
+    How much?: ${ currency(showifdef('maintenance_to_respondent_amount')) }
+
+    Should the maintenance be subject to modification?: ${ word(yesno(maintenance_to_respondent_modifiable)) }
+- Edit: maintenance_to_petitioner_amount
+  button: |
+    **Maintenance to ${ petitioner.name.full() }**
+
+    How much?: ${ currency(showifdef('maintenance_to_petitioner_amount')) }
+
+    Should the maintenance be subject to modification?: ${ word(yesno(maintenance_to_petitioner_modifiable)) }
+- Edit: maintenance_income_withholding
+  button: |
+    **Income Withholding**
+
+    Should income withholding be prepared by the person receiving maintenance?: ${ word(yesno(maintenance_income_withholding)) }
+
+    % if showifdef('maintenance_income_withholding') == "False":
+    Reason income withholding shall not issue: ${ showifdef('maintenance_income_withholding_reason') }
+    % endif
+- Edit: relief['change_name']
+  button: |
+    **What do you want the court to do?**
+
+    % if showifdef('relief["change_name"]'):
+    Do you want to change your name to your prior name?: ${ word(yesno(relief['change_name'])) }
+    % endif
+
+    Is there any other relief you want to request from the court?: ${ word(yesno(relief['other'])) }
+
+    % if showifdef('relief["other"]'):
+    Explain: ${ showifdef('relief_other') }
+    % endif
+- note: |
+    Information about you
+- Edit: users[0].name.first
+  button: |
+    **We can help!**
+
+    First: ${ showifdef('users[0].name.first') }
+
+    Middle: ${ showifdef('users[0].name.middle') }
+
+    Last: ${ showifdef('users[0].name.last') }
+
+    Do you have a prior name?: ${ word(yesno(users[0].has_prior_name)) }
+- Edit: users[0].address.address
+  button: |
+    **Your address**
+
+    Address: ${ showifdef('users[0].address.address') }
+
+    Apartment or Unit: ${ showifdef('users[0].address.unit') }
+
+    City: ${ showifdef('users[0].address.city') }
+
+    State: ${ showifdef('users[0].address.state') }
+
+    Zip: ${ showifdef('users[0].address.zip') }
+
+    Country: ${ showifdef('users[0].address.country') }
+
+    Phone: ${ showifdef('users[0].phone_number') }
+
+    Email: ${ showifdef('users[0].email') }
+- Edit: users[0].previously_married
+  button: |
+    **Previous marriages for ${ users[0].name_full() }**
+
+    Previously married?: ${ word(yesno(users[0].previously_married)) }
+
+    % if showifdef('users[0].previously_married'):
+    Number of previous marriages: ${ showifdef('users[0].number_of_marriages') }
+    % endif
+
+    % if showifdef('users[0].previously_married'):
+    Date Last Marriage Ended: ${ showifdef('users[0].last_marriage_end_date') }
+    % endif
+
+    % if showifdef('users[0].previously_married'):
+    How Last Marriage Ended: ${ showifdef('users[0].last_marriage_end') }
+    % endif
+- note: |
+    Information about the other party
+- Edit: other_parties[0].name.first
+  button: |
+    **What is your current spouse's name?**
+
+    First: ${ showifdef('other_parties[0].name.first') }
+
+    Middle: ${ showifdef('other_parties[0].name.middle') }
+
+    Last: ${ showifdef('other_parties[0].name.last') }
+
+    Does the other party have a prior name?: ${ word(yesno(other_parties[0].has_prior_name)) }
+- Edit: other_parties[0].address.address
+  button: |
+    **What is your current spouse’s last known address?**
+
+    Address: ${ showifdef('other_parties[0].address.address') }
+
+    Apartment or Unit: ${ showifdef('other_parties[0].address.unit') }
+
+    City: ${ showifdef('other_parties[0].address.city') }
+
+    State: ${ showifdef('other_parties[0].address.state') }
+
+    Zip: ${ showifdef('other_parties[0].address.zip') }
+
+    Country: ${ showifdef('other_parties[0].address.country') }
+
+    Phone: ${ showifdef('other_parties[0].phone_number') }
+
+    Email: ${ showifdef('other_parties[0].email') }
+- Edit: other_parties[0].previously_married
+  button: |
+    **Previous marriages for ${ other_parties[0].name_full() }**
+
+    Previously married?: ${ showifdef('other_parties[0].previously_married') }
+
+    % if showifdef('other_parties[0].previously_married'):
+    Number of previous marriages: ${ showifdef('other_parties[0].number_of_marriages') }
+    % endif
+
+    % if showifdef('other_parties[0].previously_married'):
+    Date Last Marriage Ended: ${ showifdef('other_parties[0].last_marriage_end_date') }
+    % endif
+
+    % if showifdef('other_parties[0].previously_married'):
+    How Last Marriage Ended: ${ showifdef('other_parties[0].last_marriage_end') }
+    % endif
+- note: |
+    Children
+- Edit: children.there_are_any
+  button: |
+    **Children of the Marriage**
+
+    ${ word(yesno(children.there_are_any)) }
+- Edit: number_of_children
+  button: |
+    **How many minor children do you have with ${ other_parties[0] }?**
+
+    Number of children: ${ showifdef('number_of_children') }
+- Edit: persons_lived_with.there_is_another
+  button: |
+    **Did the children live with anybody else during the last five years?**
+
+    ${ word(yesno(persons_lived_with.there_is_another)) }
+- Edit: legal_custody_other
+  button: |
+    **Sole Legal Custody to Third Party**
+
+    Existing person: ${ showifdef('legal_custody_other') }
+
+    First: ${ showifdef('legal_custody_other.name.first') }
+
+    Middle: ${ showifdef('legal_custody_other.name.middle') }
+
+    Last: ${ showifdef('legal_custody_other.name.last') }
+- Edit: legal_custody
+  button: |
+    **Legal Custody**
+
+    What would you like to ask the court to give you in terms of legal custody?: ${ showifdef('legal_custody') }
+
+    Should this apply to all children involved in this case?: ${ word(yesno(legal_custody_all_children)) }
+- Edit: legal_custody_sole_explanation
+  button: |
+    **Reason for sole custody**
+
+    ${ showifdef('legal_custody_sole_explanation') }
+- Edit: physical_custody
+  button: |
+    **Physical Custody**
+
+    What would you like to ask the court to give you in terms of physical custody?: ${ showifdef('physical_custody') }
+
+    Should this apply to all children involved in this case?: ${ word(yesno(physical_custody_all_children)) }
+- Edit: visitation
+  button: |
+    **Visitation**
+
+    Should visitation with ${ respondent if physical_custody == "petitioner" else petitioner } be supervised?: ${ word(yesno(visitation)) }
+- Edit: visitation_supervisor
+  button: |
+    **Visitation**
+
+    Existing person: ${ showifdef('visitation_supervisor') }
+
+    First: ${ showifdef('visitation_supervisor.name.first') }
+
+    Middle: ${ showifdef('visitation_supervisor.name.middle') }
+
+    Last: ${ showifdef('visitation_supervisor.name.last') }
+- Edit: physical_custody_sole_explanation
+  button: |
+    **Reason for sole physical custody**
+
+    ${ showifdef('physical_custody_sole_explanation') }
+- Edit: physical_custody_other
+  button: |
+    **Sole physical Custody to Third Party**
+
+    Existing person: ${ showifdef('physical_custody_other') }
+
+    First: ${ showifdef('physical_custody_other.name.first') }
+
+    Middle: ${ showifdef('physical_custody_other.name.middle') }
+
+    Last: ${ showifdef('physical_custody_other.name.last') }
+- Edit: others_with_physical_custody
+  button: |
+    **Additional information about children**
+
+    Do you know of anyone other than you or your spouse who has physical custody of any of the children or claims to have custody or visitation rights with respect to any of the children?: ${ word(yesno(others_with_physical_custody)) }
+
+    Do you have information about any other custody proceeding concerning any of the children pending in a court of this or any other state?: ${ word(yesno(other_custody_proceeding)) }
+
+    Have you participated in other litigation concerning the custody of any of the children in this or any other state?: ${ word(yesno(other_litigation)) }
+
+    Have any of the children been a victim of abuse or neglect?: ${ word(yesno(abuse_or_neglect)) }
+
+    Have any orders pertaining to any of the children been entered by the Family Support Division?: ${ word(yesno(family_support_order)) }
+- Edit: children_explanation
+  button: |
+    **Further information**
+
+    ${ showifdef('children_explanation') }
+- Edit: communications
+  button: |
+    **Communication between parents**
+
+    Communication methods: ${ showifdef('communications') }
+- Edit: communications_other
+  button: |
+    **Communication**
+
+    Existing person: ${ showifdef('communications_other') }
+
+    First: ${ showifdef('communications_other.name.first') }
+
+    Middle: ${ showifdef('communications_other.name.middle') }
+
+    Last: ${ showifdef('communications_other.name.last') }
+- note: |
+    Case information
+- Edit: case.filed
+  button: |
+    **Court Case**
+
+    Has your case already been filed?: ${ showifdef('case.filed') }
+
+    % if showifdef('case.filed') == "user0_filed":
+    Has the case you filed been dismissed?: ${ showifdef('active_case') }
+    % endif
+- Edit: previous_petitions
+  button: |
+    **Has ${ petitioner.name.full() } filed any petitions before the one you are answering?**
+
+    ${ showifdef('previous_petitions') }  
+- Edit: case.name.text
+  button: |
+    **Case information - Case Name**
+
+    Case name: ${ showifdef('case.name.text') }
+- Edit: case.matter_type
+  button: |
+    **Case information - Case Description**
+
+    Case description: ${ showifdef('case.matter_type') }
+
+    % if showifdef('case.matter_type') == "Something else":
+    Other case description: ${ showifdef('case.matter_type_other') }
+    % endif
+- Edit: case.filing_date
+  button: |
+    **Case information - Filing date**
+
+    What date was the case filed?: ${ showifdef('case.filing_date') }
+- Edit: case.judge
+  button: |
+    **Case information - Judge**
+
+    Judge: ${ showifdef('case.judge') }
+- Edit: case.docket_number
+  button: |
+    **Case information - Case number**
+
+    Case number: ${ showifdef('case.docket_number') }
+- Edit: marriage.address.city
+  button: |
+    **Information about Your Marriage**
+
+    Place of this Marriage - City, Town, or Location: ${ showifdef('marriage.address.city') }
+
+    County: ${ showifdef('marriage.address.county') }
+
+    Country: ${ showifdef('marriage.address.country') }
+
+    Date of this Marriage: ${ showifdef('marriage.recorded_date') }
+- Edit: marriage.separation_date
+  button: |
+    **When did your marriage end?**
+
+    What date did you separate and stop residing together?: ${ showifdef('marriage.separation_date') }
+- Edit: marriage.live_together_in_mo
+  button: |
+    **Did you live together as a couple in Missouri?**
+
+    ${ word(yesno(marriage.live_together_in_mo)) }
+- note: |
+    Income
+- Edit: users[0].jobs.there_are_any
+  button: |
+    **Jobs**
+
+    Do you have a job?: ${ word(yesno(users[0].jobs.there_are_any)) }    
+- Edit: users[0].has_self_employment_income
+  button: |
+    **Self Employment Income**
+
+    Do you have any self employment income?: ${ word(yesno(users[0].has_self_employment_income)) }
+
+    % if showifdef('users[0].has_self_employment_income'):
+    Monthly self employment income: ${ currency(showifdef('users[0].self_employment_income')) }
+    % endif
+
+- Edit: other_parties[0].jobs.there_are_any
+  button: |
+    **Jobs**
+
+    Does ${ other_parties[0].name_full() } have a job?: ${ showifdef('other_parties[0].jobs.there_are_any') }
+- Edit: other_parties[0].has_self_employment_income
+  button: |
+    **Self Employment Income**
+
+    Does ${ other_parties[0].name_full() } have any self employment income?: ${ showifdef('other_parties[0].has_self_employment_income') }
+
+    % if showifdef('other_parties[0].has_self_employment_income'):
+    Monthly self employment income: ${ currency(showifdef('other_parties[0].self_employment_income')) }
+    % endif
+
+    % if showifdef('other_parties[0].has_self_employment_income'):
+    Description of ${ other_parties[0].pronoun_possessive("self employment")}: ${ showifdef('other_parties[0].employer.name.text') }
+    % endif
+
+    % if showifdef('other_parties[0].has_self_employment_income'):
+    Street address: ${ showifdef('other_parties[0].employer.address.address') }
+    % endif
+
+    % if showifdef('other_parties[0].has_self_employment_income'):
+    Unit: ${ showifdef('other_parties[0].employer.address.unit') }
+    % endif
+
+    % if showifdef('other_parties[0].has_self_employment_income'):
+    City: ${ showifdef('other_parties[0].employer.address.city') }
+    % endif
+
+    % if showifdef('other_parties[0].has_self_employment_income'):
+    State: ${ showifdef('other_parties[0].employer.address.state') }
+    % endif
+
+    % if showifdef('other_parties[0].has_self_employment_income'):
+    Zip or postal code: ${ showifdef('other_parties[0].employer.address.zip') }
+    % endif
+
+    % if showifdef('other_parties[0].has_self_employment_income'):
+    Phone: ${ showifdef('other_parties[0].employer.phone_number') }
+    % endif
+- note: |
+    Expenses
+- note: |
+    Assets
+- Edit: users[0].cash
+  button: |
+    **Cash on Hand**
+
+    How much cash do you have on hand?: ${ currency(showifdef('users[0].cash')) }
+- note: |
+    Debts
+- note: |
+    Service
+- Edit: other_parties[0].service_type
+  button: |
+    **Service to ${ other_parties[0].name_full() }?**
+
+    How will you serve ${ other_parties[0].name_full() }?: ${ showifdef('other_parties[0].service_type') }

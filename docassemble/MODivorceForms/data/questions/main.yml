@@ -555,6 +555,9 @@ code: |
   al_intro_screen
   # mo_divorce_forms_intro
   interview_order_mo_divorce_forms
+  if task_not_yet_performed('show review'):
+    mark_task_as_performed('show review')
+    force_ask('review_form')
   signature_date
   # Store anonymous data for analytics / statistics
   store_variables_snapshot(
@@ -1035,7 +1038,11 @@ subquestion: |
 id: active duty warning
 question: Servicemember Civil Relief Act
 subquestion: |
-  Pursuant to the Servicemembers Civil Relief Act (SCRA), military members on active duty are able to request that the case be “paused” until they return. It might be in your best interest to discuss this with an attorney. 
+  Pursuant to the Servicemembers Civil Relief Act (SCRA), military members on active duty are able to request that the case be “paused” until they return. 
+  
+  Important: This pause is not automatic. The court will only pause the case if the active-duty service member explicitly requests it.
+  
+  It might be in your best interest to discuss this with an attorney. 
 
   [Missouri Supreme Court Website](https://www.courts.mo.gov/page.jsp?id=611)
 continue button field: active_duty_warning
