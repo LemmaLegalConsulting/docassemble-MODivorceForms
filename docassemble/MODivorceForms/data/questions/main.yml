@@ -157,7 +157,10 @@ code: |
     relief['change_name']
     relief['divide_property']
     relief['other']
-  
+    if relief['maintenance']:
+      maintenance_amount
+      maintenance_income_withholding
+    is_maintenance_currently_paid  
 
   section_relief = True
 ---
@@ -276,9 +279,7 @@ code: |
   if len(set(var_doc_dict["marriage.separation_date"]) & set(doc_list_selected.true_values())) > 0:
     marriage.separation_date
 
-  if 'petition_attachment' in doc_list_selected.true_values():
-    if other_allegations_exist:
-      other_allegations # petition
+
   
   section_marriage = True
 ---
@@ -366,9 +367,7 @@ code: |
     other_parties[0].extraordinary_medical_costs.gather()
     other_parties[0].extraordinary_childrearing_costs.gather()
 
-    if len(set(var_doc_dict["relief"]) & set(doc_list_selected.true_values())) > 0:
-      relief['maintenance']
-    is_maintenance_currently_paid
+
   if 'answer_attachment' in doc_list_selected.true_values():
     denials_exist
 
@@ -488,10 +487,8 @@ code: |
       businesses.review_items 
     if len(other_assets) > 0:
       other_assets.review_items 
-    joint_assets.review_items
     users[0].assets.gathered
     other_parties[0].assets.gathered
-    is_additional_provisions
   section_assets = True
 ---
 id: debts interview code
@@ -512,8 +509,9 @@ code: |
   if len(set(var_doc_dict["service"]) & set(doc_list_selected.true_values())) > 0:
     people_served.gathered
     people_served[0].service_address_pdf
+  if other_parties[0].service_type == "publication":
+    location_attempts
   filing_pleadings_video
-  al_court_bundle
   section_service = True
 ---
 id: documents with service
@@ -555,9 +553,18 @@ code: |
   al_intro_screen
   # mo_divorce_forms_intro
   interview_order_mo_divorce_forms
+  if 'petition_attachment' in doc_list_selected.true_values():
+    if other_allegations_exist:
+      other_allegations # petition
+  if 'property_statement_attachment' in doc_list_selected.true_values():
+    is_additional_provisions_property_statement
+  if 'parenting_plan_attachment' in doc_list_selected.true_values():
+    is_additional_provisions_parenting_plan
+  preview_additional_allegations  
   if task_not_yet_performed('show review'):
     mark_task_as_performed('show review')
     force_ask('review_form')
+  al_court_bundle
   signature_date
   # Store anonymous data for analytics / statistics
   store_variables_snapshot(
@@ -570,7 +577,6 @@ code: |
   if not al_user_bundle.generate_downloads_task.ready():
     al_download_waiting_screen
   mo_divorce_forms_download
-
 ---
 include:
   - property_statement.yml
@@ -1324,6 +1330,13 @@ code: |
   else:
     service_by_mail_affidavit_attachment.enabled = False
 ---
+id: service_by_publication enabled block for main interview
+code: |
+  if case.filed in ['not_filed'] and respondent.service_type == "publication":
+    service_by_publication_attachment.enabled = True
+  else:
+    service_by_publication_attachment.enabled = False
+---
 id: form 14 enabled block for main interview
 code: |
   if "form_14_attachment" in doc_list_selected.true_values() and not "parenting_plan_attachment" in doc_list_selected.true_values():
@@ -1371,6 +1384,6 @@ code: |
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
 ---

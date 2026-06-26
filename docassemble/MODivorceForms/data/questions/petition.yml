@@ -45,16 +45,7 @@ fields:
     show if:
       variable: family_support_order
       is: True
----
-id: Other allegations
-question: Other allegations
-fields:
-  - Do you want to make any other allegations?: other_allegations_exist
-    datatype: yesnoradio
-  - Are there any other allegations: other_allegations
-    datatype: area
-    required: False
-    show if: other_allegations_exist
+
 
 ---
 ## CHILDREN  

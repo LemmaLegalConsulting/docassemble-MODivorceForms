@@ -245,7 +245,7 @@ attachment:
           % endif
       - "children0_age": |
           % if len(children) > 0:
-          ${ "round(date_difference(as_datetime(children[0].birthdate),today()).years,0)" }
+          ${ round(date_difference(as_datetime(children[0].birthdate),today()).years,0) }
           % endif
       - "children0_ssn": |
           % if len(children) > 0:
@@ -269,11 +269,11 @@ attachment:
           % endif
       - "children1_name_middle": |
           % if len(children) > 1:
-          ${ "{:.0f}".format(children[1].name.middle) }
+          ${ children[1].name.middle }
           % endif
       - "children1_name_ssn": |
           % if len(children) > 1:
-          ${ children[1].ssn }
+          ${ "{:.0f}".format(children[1].ssn) }
           % endif
       - "children1_name_name_last": |
           % if len(children) > 1:
@@ -281,7 +281,7 @@ attachment:
           % endif
       - "children1_name_suffix": |
           % if len(children) > 1:
-          ${ "round(date_difference(as_datetime(children[1].birthdate),today()).years,0)" }
+          ${ round(date_difference(as_datetime(children[1].birthdate),today()).years,0) }
           % endif
       - "children2_name_middle": |
           % if len(children) > 2:
@@ -297,7 +297,7 @@ attachment:
           % endif
       - "children2_name_last": |
           % if len(children) > 2:
-          ${ "{:.0f}".format(children[2].name.last) }
+          ${ children[2].name.last }
           % endif
       - "children2_name_age": |
           % if len(children) > 2:
@@ -305,7 +305,7 @@ attachment:
           % endif
       - "children2_ssn": |
           % if len(children) > 2:
-          ${ children[2].ssn }
+          ${ "{:.0f}".format(children[2].ssn) }
           % endif
       - "children3_name_middle": |
           % if len(children) > 3:
@@ -325,7 +325,7 @@ attachment:
           % endif
       - "children3_age": |
           % if len(children) > 3:
-          ${ "round(date_difference(as_datetime(children[3].birthdate),today()).years,0)" }
+          ${ round(date_difference(as_datetime(children[3].birthdate),today()).years,0) }
           % endif
       - "children3_ssn": |
           % if len(children) > 3:
@@ -341,7 +341,7 @@ attachment:
           % endif
       - "children4_name_suffix": |
           % if len(children) > 4:
-          ${ "round(date_difference(as_datetime(children[4].birthdate),today()).years,0)" }
+          ${ round(date_difference(as_datetime(children[4].birthdate),today()).years,0) }
           % endif
       - "children4_ssn": |
           % if len(children) > 4:
@@ -369,7 +369,7 @@ attachment:
           % endif
       - "children5_age": |
           % if len(children) > 5:
-          ${ "round(date_difference(as_datetime(children[5].birthdate),today()).years,0)" }
+          ${ round(date_difference(as_datetime(children[5].birthdate),today()).years,0) }
           % endif
       - "children5_ssn": |
           % if len(children) > 5:
