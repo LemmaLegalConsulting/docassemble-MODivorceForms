@@ -511,6 +511,8 @@ code: |
     people_served[0].service_address_pdf
   if other_parties[0].service_type == "publication":
     location_attempts
+  elif other_parties[0].service_type == "mail":
+    mail_information
   filing_pleadings_video
   section_service = True
 ---
@@ -554,13 +556,11 @@ code: |
   # mo_divorce_forms_intro
   interview_order_mo_divorce_forms
   if 'petition_attachment' in doc_list_selected.true_values():
-    if other_allegations_exist:
-      other_allegations # petition
+    preview_additional_allegations  
   if 'property_statement_attachment' in doc_list_selected.true_values():
     is_additional_provisions_property_statement
   if 'parenting_plan_attachment' in doc_list_selected.true_values():
     is_additional_provisions_parenting_plan
-  preview_additional_allegations  
   if task_not_yet_performed('show review'):
     mark_task_as_performed('show review')
     force_ask('review_form')

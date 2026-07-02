@@ -1,5 +1,12 @@
 id: service by publication follow up
 question: Service by Publication
+subquestion: |
+  If attempts to serve your spouse in person have failed, you can file a request to serve them by publication.
+  
+  What to know about service by publication:
+  
+  * A notice will be posted in your local legal newspaper, also called a paper of record, informing your spouse that you have filed for divorce.
+  * The court may be unable to award monetary relief such as maintenance or child support.
 fields:
   - When was the last time you talked with ${ other_parties[0].name_full() }?: last_time_talked
     required: False

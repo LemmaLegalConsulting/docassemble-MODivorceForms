@@ -10,6 +10,7 @@ modules:
   - docassemble.ALToolbox.misc
   - .jod_functions
   - .progressivedisclosure
+  - docassemble.demo.accordion
 ---
 features:
   css: progressivedisclosure.css
@@ -74,7 +75,7 @@ code: |
       if defined('child.birth_certificate_other.name.first'):
         temp_people_choices.append(child.birth_certificate_other)
   if defined('persons_lived_with'):
-    for person in persons_lived_with:
+    for person in persons_lived_with.complete_elements():
       if person != users[0] and person != other_parties[0]:
         temp_people_choices.append(person)
   parent_and_people_choices = temp_people_choices
@@ -616,7 +617,7 @@ sets:
   - other_parties[0].address.address
   - other_parties[0].address.state
 id: Address other party
-question: Current spouse’s address
+question: Current spouse’s contact information
 fields:
   - Do you know your spouse's current address?: other_parties[0].address_known
     datatype: yesnoradio
@@ -632,19 +633,19 @@ fields:
     address autocomplete: True
     js show if: |
      val('other_parties[0].address_known') === true || val('other_parties[0].address_known') === false
-  - Unit: users[0].address.unit
+  - Unit: other_parties[0].address.unit
     required: False
     js show if: |
      val('other_parties[0].address_known') === true || val('other_parties[0].address_known') === false
-  - City: users[0].address.city
+  - City: other_parties[0].address.city
     js show if: |
      val('other_parties[0].address_known') === true || val('other_parties[0].address_known') === false
-  - State: users[0].address.state
+  - State: other_parties[0].address.state
     code: |
       states_list()
     js show if: |
      val('other_parties[0].address_known') === true || val('other_parties[0].address_known') === false
-  - Zip: users[0].address.zip
+  - Zip: other_parties[0].address.zip
     required: False
     js show if: |
      val('other_parties[0].address_known') === true || val('other_parties[0].address_known') === false
@@ -1056,13 +1057,14 @@ code: |
   if len(set(var_doc_dict["children_birthdate"]) & set(doc_list_selected.true_values())) > 0:
     children[i].birthdate
   if 'petition_attachment' in doc_list_selected.true_values():
-    if not children[i].unemancipated:
+    if children[i].unemancipated:
       children[i].lived_with.name.first
     children[i].address.address
-    if children[i].legal_custody == "Third Party":
-      children[i].legal_custody_other.name.first
-    if children[i].physical_custody == "Third Party":
-      children[i].physical_custody_other.name.first
+    if children[i].unemancipated:
+      if children[i].legal_custody == "Third Party":
+        children[i].legal_custody_other.name.first
+      if children[i].physical_custody == "Third Party":
+        children[i].physical_custody_other.name.first
     if len(set(var_doc_dict["adoption"]) & set(doc_list_selected.true_values())) > 0:
       children[i].adopted
     if children[i].birth_certificate["Other"]:
@@ -1070,7 +1072,9 @@ code: |
     if children[i].parents["Other"]:
       children[i].other_parent.name.first
   if 'parenting_plan_attachment' in doc_list_selected.true_values() and legal_custody != "Third Party" and physical_custody != "Third Party":
-    children[i].tax_dependency_even
+    
+    if children[i].unemancipated:
+      children[i].tax_dependency_even
   if len(set(var_doc_dict["under_18_in_household"]) & set(doc_list_selected.true_values())) > 0:
     children[i].under_18_in_household
   children[i].complete = True
@@ -1200,13 +1204,278 @@ code: |
   if children[i].special_factors['college']:
     if children[i].birthdate.plus(years=21) > today():
       children[i].unemancipated = True
+      children[i].unemancipated_reason = "Under 21 in college"
     else:
       children[i].unemancipated = False
+      children[i].unemancipated_reason = "Over 21"
   else:
     if children[i].birthdate.plus(years=18) > today():
       children[i].unemancipated = True
     else:
       children[i].unemancipated = False
+---
+id: children there is another
+question: Children
+subquestion: |
+
+  Tap Next if you don't have more to add.
+  
+  ${ children.table }
+  
+  ${ children.add_action() }
+continue button field: x.review_items
+---
+id: children review items
+question: Children
+subquestion: |
+
+  
+  % if len([chi for chi in children if chi.unemancipated and chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()]]) > 0:
+  So far, you have told us about the following children who will be included in the parenting plan:
+  % for child in children.complete_elements():
+  % if child.unemancipated and child.parents[petitioner.name.full()] and child.parents[respondent.name.full()]:
+  
+   - ${ child.name.full() }
+  % endif
+  % endfor
+  % endif
+  
+  % if len([chi for chi in children if not chi.unemancipated and chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()]]) > 0:
+  You have also told us about the following emancipated children.  These children will be included in the petition, but not the parenting plan:  
+  % for child in children.complete_elements():
+  % if not child.unemancipated and child.parents[petitioner.name.full()] and child.parents[respondent.name.full()]:
+  
+   - ${ child.name.full() }
+  % endif
+  % endfor
+  % endif
+
+  % if len([chi for chi in children if chi.unemancipated and chi.parents[users[0].name.full()] and not chi.parents[other_parties[0].name.full()]]) > 0:
+  You have also told us about the following other children of ${ users[0].name.full() }.  These children will be not be included in the petition or the parenting plan, but the number of other children will be used in Form 14:  
+  % for child in children.complete_elements():
+  % if child.unemancipated and child.parents[users[0].name.full()] and not child.parents[other_parties[0].name.full()]:
+  
+   - ${ child.name.full() }
+  % endif
+  % endfor
+  % endif
+
+
+  % if len([chi for chi in children if chi.unemancipated and not chi.parents[users[0].name.full()] and chi.parents[other_parties[0].name.full()]]) > 0:
+  You have also told us about the following other children of ${ other_parties[0].name.full() }.  These children will be not be included in the petition or the parenting plan, but the number of other children will be used in Form 14:  
+  % for child in children.complete_elements():
+  % if child.unemancipated and not child.parents[users[0].name.full()] and child.parents[other_parties[0].name.full()]:
+  
+   - ${ child.name.full() }
+  % endif
+  % endfor
+  % endif
+
+fields: 
+  - Do you have any more children?: children.there_is_another
+    datatype: yesnoradio
+---
+id: children revisit
+generic object: ALAssetList
+continue button field: children.revisit
+question: |
+  Children
+subquestion: |
+  
+  ${ children.table }
+
+  ${ children.add_action() }
+---
+table: children.table
+id: children table
+rows: children
+columns:
+  - Name: |
+      row_item.name.full()
+  - Included in parenting plan: |
+      "Yes" if row_item.unemancipated and row_item.parents[petitioner.name.full()] and row_item.parents[respondent.name.full()] else "Adult" if row_item.parents[petitioner.name.full()] and row_item.parents[respondent.name.full()] else petitioner.possessive('child') if row_item.parents[petitioner.name.full()] else respondent.possessive('child')
+  - Birthdate:  showifdef('row_item.birthdate')
+edit:
+  - child_review
+---
+continue button field: children[i].child_review
+question: Review ${ children[i].name.full() }
+review: 
+  - Edit: children[i].name.first
+    button: |
+      ${ children[i].name.full() }
+  - Edit: children[i].birthdate
+    button: |
+      Last 4 digits of SSN: ${ showifdef('children[i].ssn') }
+      
+      Birthdate: ${ showifdef('children[i].birthdate') }
+      
+      Special factors:
+      % if children[i].special_factors.all_false():
+      None
+      % else:
+      % if children[i].special_factors['married']:
+      
+      This child is married
+      % endif
+      % if children[i].special_factors['active_duty']:
+      
+      This child is on active duty in the military
+      % endif
+      % if children[i].special_factors['self_supporting']:
+      
+      This child is self-supporting
+      % endif
+      % if children[i].special_factors['high_school']:
+      
+      This child is attending high school
+      % endif
+      % if children[i].special_factors['college']:
+      
+      This child is attending college or vocational school
+      % endif
+      % endif
+  - Edit: children[i].lived_with.name.first
+    button: |
+      Lives with:
+      ${ children[i].lived_with.name.full() }
+            
+      ${ children[i].lived_with.address.block() }
+
+  - edit: children[i].address.address
+    button: |
+      Address:
+      
+      ${ children[i].address.block() }
+  - Edit: 
+      - legal_custody_all_children
+      - children[i].legal_custody
+      - invalidate:
+        - children[i].legal_custody.name.first
+        - children[i].legal_custody.name.middle
+        - children[i].legal_custody.name.last
+        - children[i].legal_custody.name.suffix
+      - recompute:
+        - children[i].complete
+    button: |
+      % if legal_custody_all_children:
+      % if legal_custody == "petitioner":
+      ${ petitioner }
+      % elif legal_custody == "respondent":
+      ${ respondent }
+      % elif legal_custody == "Joint":
+      Both spouses jointly
+      % elif legal_custody == "Third Party":
+      ${ children[i].legal_custody_other }
+      % endif
+       will have legal custody, because that was chosen for all children.
+      % else:
+      % if children[i].legal_custody == "petitioner":
+      ${ petitioner }
+      % elif children[i].legal_custody == "respondent":
+      ${ respondent }
+      % elif children[i].legal_custody == "Joint":
+      Both spouses jointly
+      % elif children[i].legal_custody == "Third Party":
+      ${ children[i].legal_custody_other }
+      % endif
+       will have legal custody for ${ children[i] }.
+      % endif
+  - Edit: 
+      - physical_custody_all_children
+      - children[i].physical_custody
+      - invalidate:
+        - children[i].physical_custody.name.first
+        - children[i].physical_custody.name.middle
+        - children[i].physical_custody.name.last
+        - children[i].physical_custody.name.suffix
+      - recompute:
+        - children[i].complete
+    button: |
+      % if physical_custody_all_children:
+      % if physical_custody == "petitioner":
+      ${ petitioner }
+      % elif physical_custody == "respondent":
+      ${ respondent }
+      % elif physical_custody == "Joint":
+      Both spouses jointly
+      % elif physical_custody == "Third Party":
+      ${ children[i].physical_custody_other }
+      % endif
+       will have legal custody, because that was chosen for all children.
+      % else:
+      % if children[i].physical_custody == "petitioner":
+      ${ petitioner }
+      % elif children[i].physical_custody == "respondent":
+      ${ respondent }
+      % elif children[i].physical_custody == "Joint":
+      Both spouses jointly
+      % elif children[i].physical_custody == "Third Party":
+      ${ children[i].physical_custody_other }
+      % endif
+       will have legal custody for ${ children[i] }.
+      % endif
+  - Edit: 
+      - children[i].birth_certificate
+      - invalidate:
+        - children[i].birth_certificate_other.name.first
+        - children[i].birth_certificate_other.name.middle
+        - children[i].birth_certificate_other.name.last
+        - children[i].birth_certificate_other.name.suffix
+      - recompute:
+        - children[i].complete
+    button: |
+      On birth certificate:
+      
+      % if children[i].birth_certificate[users[0].name.full()]:
+      ${ users[0] } 
+
+      % endif
+      % if children[i].birth_certificate[other_parties[0].name.full()]:
+      ${ other_parties[0] } 
+
+      % endif
+      % if children[i].birth_certificate['Other']:
+      ${ children[i].birth_certificate_other } 
+
+      % endif
+  - Edit: 
+      - children[i].parents
+      - invalidate:
+        - children[i].other_parent.name.first
+        - children[i].other_parent.name.middle
+        - children[i].other_parent.name.last
+        - children[i].other_parent.name.suffix
+      - recompute:
+        - children[i].complete
+    button: |
+      Parents:
+      
+      % if children[i].parents[users[0].name.full()]:
+      ${ users[0] } 
+
+      % endif
+      % if children[i].parents[other_parties[0].name.full()]:
+      ${ other_parties[0] } 
+
+      % endif
+      % if children[i].parents['Other']:
+      ${ children[i].other_parent } 
+
+      % endif
+  - Edit: children[i].adopted
+    button: |
+      Adopted: ${ yesno(children[i].adopted) }
+  - Edit: children[i].tax_dependency_even
+    button: |
+      In even years, ${ tax_dependency_even } can claim ${ children[i] } as a dependency on taxes.
+      
+      In odd years, ${ tax_dependency_odd } can claim ${ children[i] } as a dependency on taxes.
+  - Edit: children[i].under_18_in_household
+    button: |
+      Did ${ children[i].name_full() } live with ${ users[0].name_full() } and ${ other_parties[0].name_full() } on ${ marriage.separation_date }?: ${ yesno( children[i].under_18_in_household) }
+  
+---
 ---
 id: under_18_in_household document list
 variable name: var_doc_dict["under_18_in_household"]
@@ -1231,6 +1500,7 @@ code: |
 ---
 sets: persons_lived_with[i].name.first
 id: who children lived with
+reconsider: parent_and_people_choices
 question: Who have the children lived with in the past 5 years?
 subquestion: |
   % if len(persons_lived_with.complete_elements()) > 0:
@@ -1286,7 +1556,7 @@ code: |
   children[i].legal_custody = legal_custody
 ---
 id: don't ask legal_custody for adult children
-if: children[i].unemancipated
+if: not children[i].unemancipated
 code: |
   children[i].legal_custody = None
 ---
@@ -1455,7 +1725,7 @@ code: |
   children[i].physical_custody = physical_custody
 ---
 id: don't ask physical_custody for adult children
-if: children[i].unemancipated
+if: not children[i].unemancipated
 code: |
   children[i].physical_custody = None
 ---
@@ -1548,7 +1818,9 @@ question: |
 fields:
   - Existing person: children[i].other_parent
     datatype: object
-    choices: people_choices
+    choices: 
+      - people_choices
+      - showifdef('children[i].birth_certificate_other')
     disable others: True
     exclude:
      - users[0]
@@ -2252,6 +2524,8 @@ columns:
   - Marital property?:  row_item.marital_property
   - Party with possession?: row_item.has_possession
   - Property awarded to: row_item.recommended_award
+edit:
+  - market_value
 ---
 id: joint_debts table
 table: joint_debts.table
@@ -3070,7 +3344,7 @@ code: |
 ---
 only sets: farm[i].market_value
 generic object: ALAssetList
-id: describe generic
+id: describe farm
 question: |
   Tell us about your farm
 subquestion: |
@@ -3163,7 +3437,7 @@ code: |
 ---
 only sets: businesses[i].market_value
 generic object: ALAssetList
-id: describe generic
+id: describe business
 question: |
   Tell us about your businesses
 subquestion: |
@@ -3254,7 +3528,7 @@ code: |
 ---
 only sets: other_assets[i].market_value
 generic object: ALAssetList
-id: describe generic
+id: describe other_asset
 question: |
   Tell us about your other assets
 subquestion: |
@@ -3326,7 +3600,7 @@ validation code: |
     other_assets[i].user_percentage = other_assets[i].user_percentage_other/100
   elif other_assets[i].is_amount_owed and other_assets[i].recommended_debt == "split":
     other_assets[i].user_percentage = float(other_assets[i].user_percentage_choice)/100
-  if vehicles[i].is_amount_owed:
+  if other_assets[i].is_amount_owed:
     other_assets[i].loan_description = space("other_assets[i].lender", prefix="", suffix=" ") + "Loan"
     other_assets[i].security =  other_assets[i].description
 ---
@@ -5251,7 +5525,17 @@ code: |
     else:
       people_served.append(other_parties[0])
   people_served.gathered = True
-
+---
+id: service by mail follow up
+question: Service by mail
+subquestion: |
+  You may only serve by mail if you are unable to make personal service in Missouri for a number of reasons.  You already said that ${ respondent.name.full() } does not live in Missouri and is not employed in Missouri.
+fields:
+  - "Has ${ respondent.name.first } signed a waiver of service?": waiver_of_service
+    datatype: yesnoradio
+  - "Does ${ respondent.name.first } have any family in Missouri that ${ respondent.pronoun_subjective() } visits on a regular basis?": missouri_family
+    datatype: yesnoradio
+continue button field: mail_information
 ---
 ########## DOWNLOAD
 id: download MO divorce forms
@@ -5331,12 +5615,15 @@ objects:
   - service_by_publication_attachment: ALDocument.using(title="Request for Service By Publication", filename="service_by_publication",  has_addendum=False, )
 ---
 ############ REVIEW
+need: children.table
 id: review screen
 event: review_form
 question: Review your answers
 subquestion: |
-  ##Documents##
+  Click the section headings to see and edit your answers.
 review:
+- raw html: |
+    ${ start_accordion("Documents", showing=False) }
 - edit:
     - doc_list_selected
   button: |
@@ -5346,8 +5633,8 @@ review:
      - ${ doc_list_dictionary[doc] }
     
     % endfor
-- note: |
-    ##Relief##
+- raw html: |
+    ${ next_accordion("Maintenance and other relief", showing=False) }
 - Edit: 
     - relief['maintenance']
     - recompute:
@@ -5384,150 +5671,10 @@ review:
     % if showifdef('relief["other"]'):
     Explain: ${ showifdef('relief_other') }
     % endif
-- note: |
-    ##Information about you##
-- Edit: 
-    - users[0].name.first
-    - invalidate:
-      - users[0].prior_name
-    - recompute:
-      - section_user_info
-  button: |
-    Your name is **${ users[0].name.full() }**.
-
-    % if users[0].has_prior_name:
-    Your prior name is ${ users[0].prior_name.name.full() }.
-    % else:
-    You do not have a prior name.
-    % endif
-
-- Edit: users[0].address.address
-  button: |
-    **Your address**
-
-    ${ users[0].address.block() }
-
-    Phone: ${ showifdef('users[0].phone_number') }
-
-    Email: ${ showifdef('users[0].email') }
-- Edit: users[0].birthdate
-  button: |
-    Your birthdate: **${ users[0].birthdate }**
-
-    Your birthplace: **${ users[0].birthplace }** 
-- Edit: users[0].ssn
-  button: |
-    Last 4 digits of your social security number: **${ users[0].ssn }**
-- Edit: users[0].gender
-  button: |
-    Your gender: **${ users[0].gender }**
-- Edit: users[0].pronouns
-  button: |
-    Your pronouns: **${ users[0].pronouns.true_values() }**
-- Edit: users[0].race
-  button: |
-    Your race: **${ users[0].race }**
-- Edit: users[0].education_info
-  button: |
-    Your highest level of elementary education: **${ users[0].education_elementary }**
-
-    Your highest level of secondary education: **${ users[0].education_college }**
-- Edit: 
-    - users[0].active_duty
-    - section_user_info
-  button: |
-    Active duty? **${ word(yesno(users[0].active_duty)) }**
-- Edit: 
-    - waive_rights
-  button: |
-    Waive rights? **${ word(yesno(waive_rights)) }**
-- Edit: users[0].previously_married
-  button: |
-    **Previous marriages for ${ users[0].name_full() }**
-
-    Previously married?: ${ word(yesno(users[0].previously_married)) }
-
-    % if showifdef('users[0].previously_married'):
-    Number of previous marriages: ${ showifdef('users[0].number_of_marriages') }
-    % endif
-
-    % if showifdef('users[0].previously_married'):
-    Date Last Marriage Ended: ${ showifdef('users[0].last_marriage_end_date') }
-    % endif
-
-    % if showifdef('users[0].previously_married'):
-    How Last Marriage Ended: ${ showifdef('users[0].last_marriage_end') }
-    % endif
-- note: |
-    ##Information about the other party##
-- Edit: other_parties[0].name.first
-  button: |
-    Your current spouse's name is **${ other_parties[0].name.full() }**
-
-    % if other_parties[0].has_prior_name:
-    Your spouse's prior name is ${ other_parties[0].prior_name.name.full() }.
-    % else:
-    Your spouse does not have a prior name.
-    % endif
-- Edit: other_parties[0].address.address
-  button: |
-    % if other_parties[0].address_known:
-    Your spouse’s current address:
-    % else:
-    You said you do not know your spouse's current address.  Your spouse's last known address:
-    % endif
-
-    ${ other_parties[0].address.block() }
-
-    Phone: ${ showifdef('other_parties[0].phone_number') }
-
-    Email: ${ showifdef('other_parties[0].email') }
-- Edit: other_parties[0].birthdate
-  button: |
-    Your spouse's birthdate: **${ other_parties[0].birthdate }**
-    
-    Your spouse's birthplace: **${ other_parties[0].birthplace }**
-- Edit: other_parties[0].ssn
-  button: |
-    Last 4 digits of your spouse's social security number: **${ other_parties[0].ssn }**
-- Edit: other_parties[0].gender
-  button: |
-    Your spouse's gender: **${ other_parties[0].gender }**
-- Edit: other_parties[0].pronouns
-  button: |
-    Your spouse's pronouns: **${ other_parties[0].pronouns.true_values() }**
-- Edit: other_parties[0].race
-  button: |
-    Your spouse's race: **${ other_parties[0].race }**
-- Edit: other_parties[0].education_info
-  button: |
-    Your spouse's highest level of elementary education: **${ other_parties[0].education_elementary }**
-
-    Your spouse's highest level of secondary education: **${ other_parties[0].education_college }**
-- Edit: 
-    - other_parties[0].active_duty
-    - section_user_info
-  button: |
-    Is your spouse active duty? **${ word(yesno(other_parties[0].active_duty)) }**
-- Edit: other_parties[0].previously_married
-  button: |
-    **Previous marriages for ${ other_parties[0].name_full() }**
-
-    Previously married?: ${ showifdef('other_parties[0].previously_married') }
-
-    % if showifdef('other_parties[0].previously_married'):
-    Number of previous marriages: ${ showifdef('other_parties[0].number_of_marriages') }
-
-    Date Last Marriage Ended: ${ showifdef('other_parties[0].last_marriage_end_date') }
-
-    How Last Marriage Ended: ${ showifdef('other_parties[0].last_marriage_end') }
-    % endif
-- raw html: |
-    ${ start_accordion("Children", showing=True) }
-- note: |
-    PLACEHOLDER
 - raw html: |
     ${ next_accordion("Custody", showing=False) }
+- raw html: |
+    ${ start_accordion("Legal Custody", showing=False) }
 - Edit: legal_custody_other
   button: |
     **Sole Legal Custody to Third Party**
@@ -5573,6 +5720,8 @@ review:
     **Dispute Resolution Procedure**
 
     Is there another way you would like to resolve disagreements, in addition to mediation?: ${ showifdef('dispute_resolution') } 
+- raw html: |
+    ${ next_accordion("Physical Custody", showing=False) }
 - Edit: physical_custody
   button: |
     **Physical Custody**
@@ -5625,43 +5774,68 @@ review:
     Have any of the children been a victim of abuse or neglect?: ${ word(yesno(abuse_or_neglect)) }
 
     Have any orders pertaining to any of the children been entered by the Family Support Division?: ${ word(yesno(family_support_order)) }
+- Edit: domestic_violence
+  button: |
+    **Domestic Violence**
+
+    Has there been a pattern of domestic violence between the parents?: ${ word(yesno(domestic_violence)) }
+
+    % if showifdef('domestic_violence'):
+    Who has committed the domestic violence?: ${ showifdef('domestic_violence_committed_by') }
+    % endif
+
+    % if showifdef('domestic_violence'):
+    Should the address information be restricted?: ${ word(yesno(educational_records_include_victim_address)) }
+    % endif
 - raw html: |
     ${ next_accordion("Weekly Exchange Schedule", showing=False) }
-- Edit: biweekly_schedule
+- Edit: biweekly_schedule[0]
   button: |
     **Weekday and Weekend Exchange Schedule**
 
-    Sunday Week 1: ${ showifdef('biweekly_schedule[0]') }
-
-    Monday Week 1: ${ showifdef('biweekly_schedule[1]') }
-
-    Tuesday Week 1: ${ showifdef('biweekly_schedule[2]') }
-
-    Wednesday Week 1: ${ showifdef('biweekly_schedule[3]') }
-
-    Thursday Week 1: ${ showifdef('biweekly_schedule[4]') }
-
-    Friday Week 1: ${ showifdef('biweekly_schedule[5]') }
-
-    Saturday Week 1: ${ showifdef('biweekly_schedule[6]') }
-
-    Sunday Week 2: ${ showifdef('biweekly_schedule[7]') }
-
-    Monday Week 2: ${ showifdef('biweekly_schedule[8]') }
-
-    Tuesday Week 2: ${ showifdef('biweekly_schedule[9]') }
-
-    Wednesday Week 2: ${ showifdef('biweekly_schedule[10]') }
-
-    Thursday Week 2: ${ showifdef('biweekly_schedule[11]') }
-
-    Friday Week 2: ${ showifdef('biweekly_schedule[12]') }
-
-    Saturday Week 2: ${ showifdef('biweekly_schedule[13]') }
+    ###Week 1###
+    
+    Day  | Exchange
+    -----|-----------
+    Sunday |  ${ showifdef('biweekly_schedule[0]').strip() }
+    Monday |  ${ showifdef('biweekly_schedule[1]').strip() }
+    Tuesday |  ${ showifdef('biweekly_schedule[2]').strip() }
+    Wednesday |  ${ showifdef('biweekly_schedule[3]').strip() }
+    Thursday |  ${ showifdef('biweekly_schedule[4]').strip() }
+    Friday |  ${ showifdef('biweekly_schedule[5]').strip() }
+    Saturday |  ${ showifdef('biweekly_schedule[6]').strip() }
+   
+    ###Week 2###
+    
+    Day  | Exchange
+    -----|-----------
+    Sunday|${ showifdef('biweekly_schedule[7]').strip() }
+    Monday|${ showifdef('biweekly_schedule[8]').strip() }
+    Tuesday: |  ${ showifdef('biweekly_schedule[9]').strip() }
+    Wednesday: |  ${ showifdef('biweekly_schedule[10]').strip() }
+    Thursday: |  ${ showifdef('biweekly_schedule[11]').strip() }
+    Friday: |  ${ showifdef('biweekly_schedule[12]').strip() }
+    Saturday: |  ${ showifdef('biweekly_schedule[13]').strip() }
 - raw html: |
     ${ next_accordion("Holiday Exchange Schedule", showing=False) }
-- note: |
-    PLACEHOLDER
+- Edit: holidays_default
+  button: |
+    Holiday |Even Years|Odd Years|From|To
+    --------|-------------------|------------------|----|--
+    ${ holidays["mlk"]["description"] }  | ${ value(holidays["mlk"]["even_years"]) } | ${ value(holidays["mlk"]["odd_years"]) } | ${ holidays["mlk"]["custody_from_time"] } | ${ holidays["mlk"]["custody_to_time"]}
+    ${ holidays["president"]["description"] }  | ${ value(holidays["president"]["even_years"]) } | ${ value(holidays["president"]["odd_years"]) } | ${ holidays["president"]["custody_from_time"] } | ${ holidays["president"]["custody_to_time"]}
+    ${ holidays["memorial"]["description"] }  | ${ value(holidays["memorial"]["even_years"]) } | ${ value(holidays["memorial"]["odd_years"]) } | ${ holidays["memorial"]["custody_from_time"] } | ${ holidays["memorial"]["custody_to_time"]}
+    ${ holidays["independence"]["description"] }  | ${ value(holidays["independence"]["even_years"]) } | ${ value(holidays["independence"]["odd_years"]) } | ${ holidays["independence"]["custody_from_time"] } | ${ holidays["independence"]["custody_to_time"]}
+    ${ holidays["labor"]["description"] }  | ${ value(holidays["labor"]["even_years"]) } | ${ value(holidays["labor"]["odd_years"]) } | ${ holidays["labor"]["custody_from_time"] } | ${ holidays["labor"]["custody_to_time"]}
+    ${ holidays["halloween"]["description"] }  | ${ value(holidays["halloween"]["even_years"]) } | ${ value(holidays["halloween"]["odd_years"]) } | ${ holidays["halloween"]["custody_from_time"] } | ${ holidays["halloween"]["custody_to_time"]}
+    ${ holidays["thanksgiving"]["description"] }  | ${ value(holidays["thanksgiving"]["even_years"]) } | ${ value(holidays["thanksgiving"]["odd_years"]) } | ${ holidays["thanksgiving"]["custody_from_time"] } | ${ holidays["thanksgiving"]["custody_to_time"]}
+    ${ holidays["xmas_eve"]["description"] }  | ${ value(holidays["xmas_eve"]["even_years"]) } | ${ value(holidays["xmas_eve"]["odd_years"]) } | ${ holidays["xmas_eve"]["custody_from_time"] } | ${ holidays["xmas_eve"]["custody_to_time"]}
+    ${ holidays["xmas_day"]["description"] }  | ${ value(holidays["xmas_day"]["even_years"]) } | ${ value(holidays["xmas_day"]["odd_years"]) } | ${ holidays["xmas_day"]["custody_from_time"] } | ${ holidays["xmas_day"]["custody_to_time"]}
+    ${ holidays["mother"]["description"] }  | ${ value(holidays["mother"]["even_years"]) } | ${ value(holidays["mother"]["odd_years"]) } | ${ holidays["mother"]["custody_from_time"] } | ${ holidays["mother"]["custody_to_time"]}
+    ${ holidays["father"]["description"] }  | ${ value(holidays["father"]["even_years"]) } | ${ value(holidays["father"]["odd_years"]) } | ${ holidays["father"]["custody_from_time"] } | ${ holidays["father"]["custody_to_time"]}
+    ${ holidays["petitioner_birthday"]["description"] }  | ${ value(holidays["petitioner_birthday"]["even_years"]) } | ${ value(holidays["petitioner_birthday"]["odd_years"]) } | ${ holidays["petitioner_birthday"]["custody_from_time"] } | ${ holidays["petitioner_birthday"]["custody_to_time"]}
+    ${ holidays["respondent_birthday"]["description"] }  | ${ value(holidays["respondent_birthday"]["even_years"]) } | ${ value(holidays["respondent_birthday"]["odd_years"]) } | ${ holidays["respondent_birthday"]["custody_from_time"] } | ${ holidays["respondent_birthday"]["custody_to_time"]}
+    ${ holidays["children_birthday"]["description"] }  | ${ value(holidays["children_birthday"]["even_years"]) } | ${ value(holidays["children_birthday"]["odd_years"]) } | ${ holidays["children_birthday"]["custody_from_time"] } | ${ holidays["children_birthday"]["custody_to_time"]}
 - raw html: |
     ${ next_accordion("Other Provisions", showing=False) }
 - Edit: location_of_exchange
@@ -5695,161 +5869,16 @@ review:
     What is the latest that a child can be contacted on the phone?: ${ showifdef('phone_contact_pm') }
     % endif
 - raw html: |
-    ${ next_accordion("Domestic Violence", showing=False) }
-- Edit: domestic_violence
-  button: |
-    **Domestic Violence**
-
-    Has there been a pattern of domestic violence between the parents?: ${ word(yesno(domestic_violence)) }
-
-    % if showifdef('domestic_violence'):
-    Who has committed the domestic violence?: ${ showifdef('domestic_violence_committed_by') }
-    % endif
-
-    % if showifdef('domestic_violence'):
-    Should the address information be restricted?: ${ word(yesno(educational_records_include_victim_address)) }
-    % endif
+    ${ end_accordion() }
 - raw html: |
     ${ next_accordion("Child Support", showing=False) }
+- edit: child_support
+  button: |
+    Who are you asking the court to award child support to?: **${ third_party_other if child_support == "third_party" else "No child support" if child_support == "none" else value(child_support)}**
+    
+- raw html: |
+    ${ start_accordion("Income", showing=False) }
 - note: |
-    PLACEHOLDER
-- raw html: |
-    ${ next_accordion("Medical and Dental Insurance", showing=False) }
-- Edit: medical_insurance
-  button: |
-    **Parent Responsible for Medical Insurance**
-
-    Who should maintain and pay the cost of medical insurance for the benefit of the children?: ${ showifdef('medical_insurance') }
-- Edit: dental_insurance
-  button: |
-    **Parent Responsible for Dental Insurance**
-
-    Who should maintain and pay the cost of dental insurance for the benefit of the children?: ${ showifdef('dental_insurance') }
-- Edit: health_expenses_not_covered
-  button: |
-    **Health Expenses Not Covered by Insurance**
-
-    Who should pay health expenses not covered by insurance?: ${ showifdef('health_expenses_not_covered') }
-
-    Should that other parent reimburse for a percentage of thse expenses?: ${ word(yesno(health_expenses_not_covered_reimburse)) }
-
-    What percentage?: ${ showifdef('health_expenses_not_covered_reimburse_percentage') }
-- raw html: |
-    ${ next_accordion("Child Care Expenses", showing=False) }
-- Edit: pay_work_childcare_expenses
-  button: |
-    **Child Care Expenses**
-
-    How should work-related childcare expenses be handled?: ${ showifdef('pay_work_childcare_expenses') }
-
-    % if showifdef('pay_work_childcare_expenses') == "pay_percentage":
-    What percentage of ${ possessify(support_recipient.name_full(), 'childcare costs') }should ${ support_payer.name_full() } reimburse?: ${ showifdef('pay_work_childcare_expenses_percentage') }
-    % endif
-- raw html: |
-    ${ next_accordion("Form 14", showing=False) }
-- note: |
-    PLACEHOLDER
-- raw html: |
-    ${ next_accordion("Child Support Payment", showing=False) }
-- Edit: use_presumed_child_support
-  button: |
-    **Presumed Child Support amount**
-
-    Should the court order this amount in monthly child support?: ${ showifdef('use_presumed_child_support') }
-
-    % if showifdef('use_presumed_child_support') == "no":
-    Why is the presumed child support amount unjust and inappropriate?: ${ showifdef('use_presumed_child_support_explanation') }
-    % endif
-- Edit: child_support_start_date
-  button: |
-    **Child support starting date**
-
-    When should the child support start?: ${ showifdef('child_support_start_date') }
-
-    % if showifdef('child_support_start_date') == "specific_date":
-    Date: ${ showifdef('child_support_start_date_other_date') }
-    % endif
-- Edit: child_support_method_of_payment
-  button: |
-    **Method of payment of Child Support**
-
-    How should child support be paid?: ${ showifdef('child_support_method_of_payment') }
-
-    Should child support be paid at the Family Support Payment Center or directly to ${ support_recipient.name_full() }: ${ showifdef('child_support_location_of_payment') }
-- Edit: tax_deductions
-  button: |
-    **Tax Deductions for ${ children[i].name_full() }**
-- raw html: |
-    ${ end_accordion() }
-- note: |
-    ##Case information##
-- Edit: case.filed
-  button: |
-    **Court Case**
-
-    Has your case already been filed?: ${ showifdef('case.filed') }
-
-    % if showifdef('case.filed') == "user0_filed":
-    Has the case you filed been dismissed?: ${ showifdef('active_case') }
-    % endif
-- Edit: previous_petitions
-  button: |
-    **Has ${ petitioner.name.full() } filed any petitions before the one you are answering?**
-
-    ${ showifdef('previous_petitions') }  
-- Edit: case.name.text
-  button: |
-    **Case information - Case Name**
-
-    Case name: ${ showifdef('case.name.text') }
-- Edit: case.matter_type
-  button: |
-    **Case information - Case Description**
-
-    Case description: ${ showifdef('case.matter_type') }
-
-    % if showifdef('case.matter_type') == "Something else":
-    Other case description: ${ showifdef('case.matter_type_other') }
-    % endif
-- Edit: case.filing_date
-  button: |
-    **Case information - Filing date**
-
-    What date was the case filed?: ${ showifdef('case.filing_date') }
-- Edit: case.judge
-  button: |
-    **Case information - Judge**
-
-    Judge: ${ showifdef('case.judge') }
-- Edit: case.docket_number
-  button: |
-    **Case information - Case number**
-
-    Case number: ${ showifdef('case.docket_number') }
-- Edit: marriage.address.city
-  button: |
-    **Information about Your Marriage**
-
-    Place of this Marriage - City, Town, or Location: ${ showifdef('marriage.address.city') }
-
-    County: ${ showifdef('marriage.address.county') }
-
-    Country: ${ showifdef('marriage.address.country') }
-
-    Date of this Marriage: ${ showifdef('marriage.recorded_date') }
-- Edit: marriage.separation_date
-  button: |
-    **When did your marriage end?**
-
-    What date did you separate and stop residing together?: ${ showifdef('marriage.separation_date') }
-- Edit: marriage.live_together_in_mo
-  button: |
-    **Did you live together as a couple in Missouri?**
-
-    ${ word(yesno(marriage.live_together_in_mo)) }
-- note: |
-    ##Income##
-
     Your monthly gross income: **$${ thousands(users[0].monthly_gross_income) }**
 - Edit: 
     - users[0].jobs.revisit
@@ -5933,8 +5962,76 @@ review:
       - other_parties[0].monthly_gross_income
   button: |
     Your spouse's monthly gross income from benefits: **$${ thousands(other_parties[0].benefits.total(times_per_year=12)) }**
+- raw html: |
+    ${ next_accordion("Medical and Dental Insurance", showing=False) }
+- Edit: medical_insurance
+  button: |
+    **Parent Responsible for Medical Insurance**
+
+    Who should maintain and pay the cost of medical insurance for the benefit of the children?: ${ showifdef('medical_insurance') }
+- Edit: dental_insurance
+  button: |
+    **Parent Responsible for Dental Insurance**
+
+    Who should maintain and pay the cost of dental insurance for the benefit of the children?: ${ showifdef('dental_insurance') }
+- Edit: health_expenses_not_covered
+  button: |
+    **Health Expenses Not Covered by Insurance**
+
+    Who should pay health expenses not covered by insurance?: ${ showifdef('health_expenses_not_covered') }
+
+    Should that other parent reimburse for a percentage of thse expenses?: ${ word(yesno(health_expenses_not_covered_reimburse)) }
+
+    What percentage?: ${ showifdef('health_expenses_not_covered_reimburse_percentage') }
+- raw html: |
+    ${ next_accordion("Child Care Expenses", showing=False) }
+- Edit: pay_work_childcare_expenses
+  button: |
+    **Child Care Expenses**
+
+    How should work-related childcare expenses be handled?: ${ showifdef('pay_work_childcare_expenses') }
+
+    % if showifdef('pay_work_childcare_expenses') == "pay_percentage":
+    What percentage of ${ possessify(support_recipient.name_full(), 'childcare costs') }should ${ support_payer.name_full() } reimburse?: ${ showifdef('pay_work_childcare_expenses_percentage') }
+    % endif
+- raw html: |
+    ${ next_accordion("Form 14", showing=False) }
 - note: |
-    ##Expenses##
+    PLACEHOLDER
+- raw html: |
+    ${ next_accordion("Child Support Payment", showing=False) }
+- Edit: use_presumed_child_support
+  button: |
+    **Presumed Child Support amount**
+
+    Should the court order this amount in monthly child support?: ${ showifdef('use_presumed_child_support') }
+
+    % if showifdef('use_presumed_child_support') == "no":
+    Why is the presumed child support amount unjust and inappropriate?: ${ showifdef('use_presumed_child_support_explanation') }
+    % endif
+- Edit: child_support_start_date
+  button: |
+    **Child support starting date**
+
+    When should the child support start?: ${ showifdef('child_support_start_date') }
+
+    % if showifdef('child_support_start_date') == "specific_date":
+    Date: ${ showifdef('child_support_start_date_other_date') }
+    % endif
+- Edit: child_support_method_of_payment
+  button: |
+    **Method of payment of Child Support**
+
+    How should child support be paid?: ${ showifdef('child_support_method_of_payment') }
+
+    Should child support be paid at the Family Support Payment Center or directly to ${ support_recipient.name_full() }: ${ showifdef('child_support_location_of_payment') }
+- Edit: tax_deductions
+  button: |
+    **Tax Deductions for ${ children[i].name_full() }**
+- raw html: |
+    ${ end_accordion() }
+- raw html: |
+    ${ next_accordion("Expenses", showing=False) }
 - edit: 
     - users[0].expenses.revisit
   button: |
@@ -5943,15 +6040,585 @@ review:
     - other_parties[0].expenses.revisit
   button: |
     Your spouse's monthly expenses - **$${ thousands(other_parties[0].expenses.total(times_per_year=12)) }**
+- raw html: |
+    ${ next_accordion("Assets", showing=False) }
 - note: |
-    ##Assets##
+    The Property Statement requires users to identify which party currently owns the property.  This section shows you how each question is answered in this section.
+- Edit: real_estate.revisit
+  button: |
+    Does Petitioner own a house, condominium or other real estate?: **${ yesno(len([re for re in real_estate if re.marital_property in ["Marital","Both"] or re.title in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in real_estate if re.marital_property in ["Marital","Both"] or re.title in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
+    Does Respondent own a house, condominium or other real estate?: **${ yesno(len([re for re in real_estate if re.marital_property in ["Marital","Both"] or re.title in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+    
+    % for asset in [re for re in real_estate if re.marital_property in ["Marital","Both"] or re.title in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+- Edit: vehicles.revisit
+  button: |
+    Does Petitioner own a car, truck or motorcycle?: **${ yesno(len([re for re in vehicles.matches(source=['car','truck','motorcycle']) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in vehicles.matches(source=['car','truck','motorcycle']) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
+    Does Petitioner own a mobile home, trailer, boat or airplane?: **${ yesno(len([re for re in vehicles.matches(source=['mobile_home','trailer','boat','airplane','vehicles_other']) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in vehicles.matches(source=['mobile_home','trailer','boat','airplane','vehicles_other']) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
+    Does Respondent own a car, truck or motorcycle?: **${ yesno(len([re for re in vehicles.matches(source=['car','truck','motorcycle']) if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in vehicles.matches(source=['car','truck','motorcycle']) if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
+    Does Respondent own a mobile home, trailer, boat or airplane?: **${ yesno(len([re for re in vehicles.matches(source=['mobile_home','trailer','boat','airplane','vehicles_other']) if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in vehicles.matches(source=['mobile_home','trailer','boat','airplane','vehicles_other']) if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+- Edit: bank_assets.revisit
+  button: |
+    Does Petitioner have any bank accounts?: **${ yesno(len([re for re in bank_assets if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in bank_assets if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
+    Does Respondent have any bank accounts?: **${ yesno(len([re for re in bank_assets if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+    
+    % for asset in [re for re in bank_assets if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+- Edit: retirement_accounts.revisit
+  button: |
+    Does Petitioner have any right to receive any pension or retirement benefits other than Social Security?: **${ yesno(len([re for re in retirement_accounts.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_acconts_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in retirement_accounts.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_acconts_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+    
+    Does Petitioner have an IRA or 401(k) or other retirement account?: **${ yesno(len([re for re in retirement_accounts.matches(source=["ira"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in retirement_accounts.matches(source=["ira"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
+    Does Respondent have any right to receive any pension or retirement benefits other than Social Security?: **${ yesno(len([re for re in retirement_accounts.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_acconts_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in retirement_accounts.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_acconts_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+    
+    Does Respondent have an IRA or 401(k) or other retirement account?: **${ yesno(len([re for re in retirement_accounts.matches(source=["ira"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in retirement_accounts.matches(source=["ira"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+- Edit: personal_goods.revisit
+  button: |
+    Does Petitioner have any furniture, appliances or other household goods worth more than $100?: **${ yesno(len([re for re in personal_goods.matches(source=["appliances", "computers", "electronics", "furnishings", "personal_goods_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in personal_goods.matches(source=["appliances", "computers", "electronics", "furnishings", "personal_goods_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+    
+    Does Petitioner have any jewelry, clothing or other personal items worth more than $100?: **${ yesno(len([re for re in personal_goods.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in personal_goods.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
+    Does Respondent have any furniture, appliances or other household goods worth more than $100?: **${ yesno(len([re for re in personal_goods.matches(source=["appliances", "computers", "electronics", "furnishings", "personal_goods_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in personal_goods.matches(source=["appliances", "computers", "electronics", "furnishings", "personal_goods_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+    
+    Does Respondent have any jewelry, clothing or other personal items worth more than $100?: **${ yesno(len([re for re in personal_goods.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in personal_goods.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
+- Edit: businesses.revisit
+  button: |
+    Does Petitioner own a business?: **${ yesno(len([re for re in businesses if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in businesses if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
+    Does Respondent own a business?: **${ yesno(len([re for re in businesses if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+    
+    % for asset in [re for re in businesses if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+- Edit: securities.revisit
+  button: |
+    Does Petitioner own any stocks or bond?: **${ yesno(len([re for re in securities if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in securities if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
+    Does Respondent own any stocks or bond?: **${ yesno(len([re for re in securities if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+    
+    % for asset in [re for re in securities if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+- Edit: life_insurance.revisit
+  button: |
+    Does Petitioner have any life insurance that could be cashed in?: **${ yesno(len([re for re in life_insurance if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in life_insurance if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
+    Does Respondent have any life insurance that could be cashed in?: **${ yesno(len([re for re in life_insurance if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+    
+    % for asset in [re for re in life_insurance if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+- note: |
+    Does anyone owe Petitioner any money?: **${ yesno(len([re for re in securities if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+- Edit: debts_owed_to_you.revisit
+  button: |
+    Debts owed to you
+    % for asset in [re for re in debts_owed_to_you if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+- Edit: interest_in_contract.revisit
+  button: |
+    Interest in contract
+    % for asset in [re for re in interest_in_contract if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
+- note: |
+    Does anyone owe Respondent any money?: **${ yesno(len([re for re in securities if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+- Edit: debts_owed_to_you.revisit
+  button: |
+    % for asset in [re for re in debts_owed_to_you if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+- Edit: interest_in_contract.revisit
+  button: |
+    % for asset in [re for re in interest_in_contract if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+- Edit: interest_in_litigation.revisit
+  button: |
+    Does Petitioner have any lawsuits against anyone?: **${ yesno(len([re for re in interest_in_litigation if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in interest_in_litigation if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
+    Does Respondent have any lawsuits against anyone?: **${ yesno(len([re for re in interest_in_litigation if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+    
+    % for asset in [re for re in interest_in_litigation if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+- Edit: farm.revisit
+  button: |
+    Does Petitioner have any farm equipment, animals or crops?: **${ yesno(len([re for re in farm if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in farm if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
+    Does Respondent have any farm equipment, animals or crops?: **${ yesno(len([re for re in farm if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+    
+    % for asset in [re for re in farm if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+- Edit: interests_in_trust.revisit
+  button: |
+    Does Petitioner have any interest in any trusts?: **${ yesno(len([re for re in interests_in_trust if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in interests_in_trust if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
+    Does Respondent have any interest in any trusts?: **${ yesno(len([re for re in interests_in_trust if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+    
+    % for asset in [re for re in interests_in_trust if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+- Edit: other_assets.revisit
+  button: |
+    Does Petitioner have any other asset or property?: **${ yesno(len([re for re in other_assets if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+
+    % for asset in [re for re in other_assets if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
+    Does Respondent have any other asset or property?: **${ yesno(len([re for re in other_assets if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
+    
+    % for asset in [re for re in other_assets if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+     - ${ asset.description }
+    
+    % endfor
+
 - Edit: users[0].cash
   button: |
     **Cash on Hand**
 
     How much cash do you have on hand?: ${ currency(showifdef('users[0].cash')) }
+- raw html: |
+    ${ next_accordion("Debts", showing=False) }
 - note: |
-    ##Service##
+    Does Petitioner owe a mortgage on a house or condominium or land?:  **${ yesno(len(petitioner.debts.matches(source=['house','condominium', 'leasehold','real_estate_other'])) > 0)}**
+
+    % for debt in petitioner.debts.matches(source=['house','condominium', 'leasehold','real_estate_other']):
+    ${ debt.loan_description }
+
+    % endfor
+    
+    Does Respondent owe a mortgage on a house or condominium or land?:  **${ yesno(len(respondent.debts.matches(source=['house','condominium', 'leasehold','real_estate_other'])) > 0)}**
+
+    % for debt in respondent.debts.matches(source=['house','condominium', 'leasehold','real_estate_other']):
+    ${ debt.loan_description }
+
+    % endfor
+    
+    Does Petitioner owe money on a car?: **${ yesno(len(petitioner.debts.matches(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane',"vehicles_other"])) > 0) }**
+
+    % for debt in petitioner.debts.matches(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane',"vehicles_other"]):
+    ${ debt.loan_description }
+
+    % endfor
+    
+    Does Respondent owe money on a car?: **${ yesno(len(respondent.debts.matches(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane',"vehicles_other"])) > 0) }**
+
+    % for debt in petitioner.debts.matches(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane',"vehicles_other"]):
+    ${ debt.loan_description }
+
+    % endfor
+
+    To change these debts, update the asset that they are secured by.
+- Edit: debts.revisit
+  button: |
+    Does Petitioner owe money on any credit cards?: **${ yesno(len(petitioner.debts.matches(source=['credit_card_debt'])) > 0) }**
+
+    % for debt in petitioner.debts.matches(source=['credit_card_debt']):
+    - ${ debt.loan_description }
+
+    % endfor
+    
+    Does Petitioner owe any money to any family or friends?: **${ yesno(len(petitioner.debts.matches(source=['personal_loans'])) > 0) }**
+
+    % for debt in petitioner.debts.matches(source=['personal_loans']):
+    - ${ debt.loan_description }
+
+    % endfor
+    
+    Does Petitioner owe any medical or dental bills?: **${ yesno(len(petitioner.debts.matches(source=['medical_debt'])) > 0) }**
+
+    % for debt in petitioner.debts.matches(source=['medical_debt']):
+    - ${ debt.loan_description }
+
+    % endfor
+    
+    Does Petitioner owe any student loans?: **${ yesno(len(petitioner.debts.matches(source=['student_loans'])) > 0) }**
+
+    % for debt in petitioner.debts.matches(source=['student_loans']):
+    - ${ debt.loan_description }
+
+    % endfor
+    
+    Does Petitioner owe any other debts?: **${ yesno(len(petitioner.debts.matches(source=None,exclude_source=['house','condominium', 'leasehold','real_estate_other','car','truck','motorcycle','mobile_home','trailer','boat','airplane',"vehicles_other",'credit_card_debt','personal_loans','medical_debt','student_loans'])) > 0) }**
+
+    % for debt in petitioner.debts.matches(source=None, exclude_source=['house','condominium', 'leasehold', 'real_estate_other', 'car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', "vehicles_other", 'credit_card_debt', 'personal_loans', 'medical_debt', 'student_loans']):
+    - ${ debt.loan_description }
+
+    % endfor
+  
+      Does Respondent owe money on any credit cards?: **${ yesno(len(respondent.debts.matches(source=['credit_card_debt'])) > 0) }**
+
+    % for debt in respondent.debts.matches(source=['credit_card_debt']):
+    - ${ debt.loan_description }
+
+    % endfor
+    
+    Does Respondent owe any money to any family or friends?: **${ yesno(len(respondent.debts.matches(source=['personal_loans'])) > 0) }**
+
+    % for debt in respondent.debts.matches(source=['personal_loans']):
+    - ${ debt.loan_description }
+
+    % endfor
+    
+    Does Respondent owe any medical or dental bills?: **${ yesno(len(respondent.debts.matches(source=['medical_debt'])) > 0) }**
+
+    % for debt in respondent.debts.matches(source=['medical_debt']):
+    - ${ debt.loan_description }
+
+    % endfor
+    
+    Does Respondent owe any student loans?: **${ yesno(len(respondent.debts.matches(source=['student_loans'])) > 0) }**
+
+    % for debt in respondent.debts.matches(source=['student_loans']):
+    - ${ debt.loan_description }
+
+    % endfor
+    
+    Does Respondent owe any other debts?: **${ yesno(len(respondent.debts.matches(source=None,exclude_source=['house','condominium', 'leasehold', 'real_estate_other', 'car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', "vehicles_other", 'credit_card_debt', 'personal_loans', 'medical_debt', 'student_loans'])) > 0) }**
+
+    % for debt in respondent.debts.matches(source=None,exclude_source=['house','condominium', 'leasehold', 'real_estate_other', 'car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', "vehicles_other", 'credit_card_debt', 'personal_loans', 'medical_debt', 'student_loans']):
+    - ${ debt.loan_description }
+
+    % endfor
+- raw html: |
+    ${ next_accordion("Children", showing=False) }
+- note: |
+    ${ children.table }
+    
+    ${ children.add_action() }
+- raw html: |
+    ${ next_accordion("Information about you", showing=False) }
+- Edit: 
+    - users[0].name.first
+    - invalidate:
+      - users[0].prior_name
+    - recompute:
+      - section_user_info
+  button: |
+    Your name is **${ users[0].name.full() }**.
+
+    % if users[0].has_prior_name:
+    Your prior name is ${ users[0].prior_name.name.full() }.
+    % else:
+    You do not have a prior name.
+    % endif
+
+- Edit: users[0].address.address
+  button: |
+    **Your address**
+
+    ${ users[0].address.block() }
+
+    Phone: ${ showifdef('users[0].phone_number') }
+
+    Email: ${ showifdef('users[0].email') }
+- Edit: users[0].birthdate
+  button: |
+    Your birthdate: **${ users[0].birthdate }**
+
+    Your birthplace: **${ users[0].birthplace }** 
+- Edit: users[0].ssn
+  button: |
+    Last 4 digits of your social security number: **${ users[0].ssn }**
+- Edit: users[0].gender
+  button: |
+    Your gender: **${ users[0].gender }**
+- Edit: users[0].pronouns
+  button: |
+    Your pronouns: **${ users[0].pronouns.true_values() }**
+- Edit: users[0].race
+  button: |
+    Your race: **${ users[0].race }**
+- Edit: users[0].education_info
+  button: |
+    Your highest level of elementary education: **${ users[0].education_elementary }**
+
+    Your highest level of secondary education: **${ users[0].education_college }**
+- Edit: 
+    - users[0].active_duty
+    - section_user_info
+  button: |
+    Active duty? **${ word(yesno(users[0].active_duty)) }**
+- Edit: 
+    - waive_rights
+  button: |
+    Waive rights? **${ word(yesno(waive_rights)) }**
+- Edit: users[0].previously_married
+  button: |
+    **Previous marriages for ${ users[0].name_full() }**
+
+    Previously married?: ${ word(yesno(users[0].previously_married)) }
+
+    % if showifdef('users[0].previously_married'):
+    Number of previous marriages: ${ showifdef('users[0].number_of_marriages') }
+    % endif
+
+    % if showifdef('users[0].previously_married'):
+    Date Last Marriage Ended: ${ showifdef('users[0].last_marriage_end_date') }
+    % endif
+
+    % if showifdef('users[0].previously_married'):
+    How Last Marriage Ended: ${ showifdef('users[0].last_marriage_end') }
+    % endif
+- raw html: |
+    ${ next_accordion("Information about your current spouse", showing=False) }
+- Edit: other_parties[0].name.first
+  button: |
+    Your current spouse's name is **${ other_parties[0].name.full() }**
+
+    % if other_parties[0].has_prior_name:
+    Your spouse's prior name is ${ other_parties[0].prior_name.name.full() }.
+    % else:
+    Your spouse does not have a prior name.
+    % endif
+- Edit: other_parties[0].address.address
+  button: |
+    % if other_parties[0].address_known:
+    Your spouse’s current address:
+    % else:
+    You said you do not know your spouse's current address.  Your spouse's last known address:
+    % endif
+
+    ${ other_parties[0].address.block() }
+
+    Phone: ${ showifdef('other_parties[0].phone_number') }
+
+    Email: ${ showifdef('other_parties[0].email') }
+- Edit: other_parties[0].birthdate
+  button: |
+    Your spouse's birthdate: **${ other_parties[0].birthdate }**
+    
+    Your spouse's birthplace: **${ other_parties[0].birthplace }**
+- Edit: other_parties[0].ssn
+  button: |
+    Last 4 digits of your spouse's social security number: **${ other_parties[0].ssn }**
+- Edit: other_parties[0].gender
+  button: |
+    Your spouse's gender: **${ other_parties[0].gender }**
+- Edit: other_parties[0].pronouns
+  button: |
+    Your spouse's pronouns: **${ other_parties[0].pronouns.true_values() }**
+- Edit: other_parties[0].race
+  button: |
+    Your spouse's race: **${ other_parties[0].race }**
+- Edit: other_parties[0].education_info
+  button: |
+    Your spouse's highest level of elementary education: **${ other_parties[0].education_elementary }**
+
+    Your spouse's highest level of secondary education: **${ other_parties[0].education_college }**
+- Edit: 
+    - other_parties[0].active_duty
+    - section_user_info
+  button: |
+    Is your spouse active duty? **${ word(yesno(other_parties[0].active_duty)) }**
+- Edit: other_parties[0].previously_married
+  button: |
+    **Previous marriages for ${ other_parties[0].name_full() }**
+
+    Previously married?: ${ showifdef('other_parties[0].previously_married') }
+
+    % if showifdef('other_parties[0].previously_married'):
+    Number of previous marriages: ${ showifdef('other_parties[0].number_of_marriages') }
+
+    Date Last Marriage Ended: ${ showifdef('other_parties[0].last_marriage_end_date') }
+
+    How Last Marriage Ended: ${ showifdef('other_parties[0].last_marriage_end') }
+    % endif
+- raw html: |
+    ${ next_accordion("Case information", showing=False) }
+- Edit: case.filed
+  button: |
+    **Court Case**
+
+    Has your case already been filed?: ${ showifdef('case.filed') }
+
+    % if showifdef('case.filed') == "user0_filed":
+    Has the case you filed been dismissed?: ${ showifdef('active_case') }
+    % endif
+- Edit: previous_petitions
+  button: |
+    **Has ${ petitioner.name.full() } filed any petitions before the one you are answering?**
+
+    ${ showifdef('previous_petitions') }  
+- Edit: case.name.text
+  button: |
+    **Case information - Case Name**
+
+    Case name: ${ showifdef('case.name.text') }
+- Edit: case.matter_type
+  button: |
+    **Case information - Case Description**
+
+    Case description: ${ showifdef('case.matter_type') }
+
+    % if showifdef('case.matter_type') == "Something else":
+    Other case description: ${ showifdef('case.matter_type_other') }
+    % endif
+- Edit: case.filing_date
+  button: |
+    **Case information - Filing date**
+
+    What date was the case filed?: ${ showifdef('case.filing_date') }
+- Edit: case.judge
+  button: |
+    **Case information - Judge**
+
+    Judge: ${ showifdef('case.judge') }
+- Edit: case.docket_number
+  button: |
+    **Case information - Case number**
+
+    Case number: ${ showifdef('case.docket_number') }
+- Edit: marriage.address.city
+  button: |
+    **Information about Your Marriage**
+
+    Place of this Marriage - City, Town, or Location: ${ showifdef('marriage.address.city') }
+
+    County: ${ showifdef('marriage.address.county') }
+
+    Country: ${ showifdef('marriage.address.country') }
+
+    Date of this Marriage: ${ showifdef('marriage.recorded_date') }
+- Edit: marriage.separation_date
+  button: |
+    **When did your marriage end?**
+
+    What date did you separate and stop residing together?: ${ showifdef('marriage.separation_date') }
+- Edit: marriage.live_together_in_mo
+  button: |
+    **Did you live together as a couple in Missouri?**
+
+    ${ word(yesno(marriage.live_together_in_mo)) }
+- raw html: |
+    ${ next_accordion("Service", showing=False) }
 - Edit: 
     - other_parties[0].service_type
     - invalidate:
@@ -5967,6 +6634,13 @@ review:
     **Service to ${ other_parties[0].name_full() }?**
 
     How will you serve ${ other_parties[0].name_full() }?: ${ showifdef('other_parties[0].service_type') }
+- Edit: mail_information
+  button: |
+    Has ${ respondent.name.first } signed a waiver of service? **${ word(yesno(waiver_of_service)) }**
+
+    Does ${ respondent.name.first } have any family in Missouri that ${ respondent.pronoun_subjective() } visits on a regular basis?": **${ word(yesno(missouri_family)) }**
+- raw html: |
+    ${ end_accordion() }
 ---
 id: parenting plan review
 question: Review the Parenting Plan
@@ -6077,6 +6751,19 @@ review:
       Have any of the children been a victim of abuse or neglect?: ${ word(yesno(abuse_or_neglect)) }
   
       Have any orders pertaining to any of the children been entered by the Family Support Division?: ${ word(yesno(family_support_order)) }
+  - Edit: domestic_violence
+    button: |
+      **Domestic Violence**
+
+      Has there been a pattern of domestic violence between the parents?: ${ word(yesno(domestic_violence)) }
+
+      % if showifdef('domestic_violence'):
+      Who has committed the domestic violence?: ${ showifdef('domestic_violence_committed_by') }
+      % endif
+
+      % if showifdef('domestic_violence'):
+      Should the address information be restricted?: ${ word(yesno(educational_records_include_victim_address)) }
+      % endif
   - raw html: |
       ${ next_accordion("Weekly Exchange Schedule", showing=False) }
   - Edit: biweekly_schedule
@@ -6145,21 +6832,6 @@ review:
 
       % if showifdef('phone_contact'):
       What is the latest that a child can be contacted on the phone?: ${ showifdef('phone_contact_pm') }
-      % endif
-  - raw html: |
-      ${ next_accordion("Domestic Violence", showing=False) }
-  - Edit: domestic_violence
-    button: |
-      **Domestic Violence**
-
-      Has there been a pattern of domestic violence between the parents?: ${ word(yesno(domestic_violence)) }
-
-      % if showifdef('domestic_violence'):
-      Who has committed the domestic violence?: ${ showifdef('domestic_violence_committed_by') }
-      % endif
-
-      % if showifdef('domestic_violence'):
-      Should the address information be restricted?: ${ word(yesno(educational_records_include_victim_address)) }
       % endif
   - raw html: |
       ${ next_accordion("Child Support", showing=False) }
@@ -6241,15 +6913,7 @@ question: Preview petition
 subquestion: |
   ${ petition_attachment.as_pdf() }
 
-  ${ collapse_template(case_information_template)}
-  
-  ${ collapse_template(petitioner_template)}
-  
-  ${ collapse_template(respondent_template)}
-
-  ${ collapse_template(children_petition_template)}
-
-  ${ collapse_template(relief_template)}
+  ${ children_petition_template }
 
 fields:
   - Do you want to make any other allegations?: other_allegations_exist
@@ -6344,17 +7008,23 @@ subject: Children in the Petition
 content: |
   The petition is different than other documents that you will file.  In the petition, you are supposed to list all children you have together, regardless of age.
 
-   How many living children do you and your spouse have together that were born after the date of this marriage? **${  len([child for child in children if child.birthdate > marriage.recorded_date]) }** 
+   How many living children do you and your spouse have together that were born after the date of this marriage? **${  len([child for child in children if child.parents[petitioner.name.full()] and child.parents[respondent.name.full()] and child.birthdate > marriage.recorded_date]) }** 
+  % for child in [child for child in children if child.parents[petitioner.name.full()] and child.parents[respondent.name.full()] and child.birthdate > marriage.recorded_date]:
 
-  How many living children did you and your spouse adopt? **${ len([child for child in children if child.adopted == True]) }**
+  1. ${ child.name }
+  % endfor
 
-  How many living children do you and your spouse have together that were born before the date of this marriage? ${ len([child for child in children if child.birthdate < marriage.recorded_date]) } 
-      - "numberOfChildrenBornToYouAndSomeoneOtherThanSpouseDuringMarriage": ${ 0 } 
-      - "numberOfChildrenBornToSpouseWithSomeoneElseDuringMarriage": ${ 0 } 
+  How many living children did you and your spouse adopt? **${ len([child for child in children if child.parents[petitioner.name.full()] and child.parents[respondent.name.full()] and child.adopted == True]) }**
+  % for child in [child for child in children if child.parents[petitioner.name.full()] and child.parents[respondent.name.full()] and child.adopted == True]:
 
-  ${ children.table }
+  1. ${ child.name }
+  % endfor
 
-  ${ children.add_action() }
+  How many living children do you and your spouse have together that were born before the date of this marriage? ${ len([child for child in children if child.parents[petitioner.name.full()] and child.parents[respondent.name.full()] and child.birthdate < marriage.recorded_date and child.adopted == False]) } 
+  % for child in [child for child in children if child.parents[petitioner.name.full()] and child.parents[respondent.name.full()] and child.birthdate < marriage.recorded_date and child.adopted == False]:
+
+  1. ${ child.name }
+  % endfor
 ---
 id: relief_template
 template: relief_template
@@ -6395,9 +7065,9 @@ subquestion: |
 
   ${ collapse_template(assets_checkboxes)}
 
-  ${ collapse_template(assets_petitioner_award)}
+  ${ collapse_template(assets_petitioner_award) }
 
-  ${ collapse_template(assets_respondent_award)}
+  ${ collapse_template(assets_respondent_award) }
 
   ${ collapse_template(debts_checkboxes)}
 
@@ -6434,12 +7104,18 @@ content: |
   Does Petitioner own a mobile home, trailer, boat or airplane? **${ yesno(len(petitioner.assets.matches(source=['mobile_home','trailer','boat','airplane','vehicles_other'])) > 0) }**
   
   Does Respondent own a mobile home, trailer, boat or airplane? **${ yesno(len(petitioner.assets.matches(source=['mobile_home','trailer','boat','airplane','vehicles_other'])) > 0) }**
+  % if len(vehicles.complete_elements()) > 0:
+  ${ vehicles.table }  
+  % endif
   
   ${ vehicles.add_action(label="Add a vehicle") }  
   
   Does Petitioner have any bank accounts? **${ yesno(len(petitioner.assets.matches(source=["checking account", "savings account", "time deposit", "money market", "certificates", "bank_assets_other"])) > 0) }**
   
   Does Respondent have any bank accounts? **${ yesno(len(petitioner.assets.matches(source=["checking account", "savings account", "time deposit", "money market", "certificates", "bank_assets_other"])) > 0) }**
+  % if len(bank_assets.complete_elements()) > 0:
+  ${ bank_assets.table }  
+  % endif
   
   ${ bank_assets.add_action(label="Add a bank account") } 
   
@@ -6451,6 +7127,10 @@ content: |
   
   Does Respondent have an IRA or 401(k) or other retirement account? **${ yesno(len(petitioner.assets.matches(source=["ira"])) > 0) }**
   
+  % if len(retirement_accounts.complete_elements()) > 0:
+  ${ retirement_accounts.table }  
+  % endif
+  
   ${ retirement_accounts.add_action(label="Add a retirement account") } 
   
   Does Petitioner have any furniture, appliances or other household goods worth more than $100? **${ yesno(len(petitioner.assets.matches(source=["appliances", "computers", "electronics", "furnishings", "personal_goods_other"])) > 0) }**
@@ -6461,6 +7141,9 @@ content: |
   
   Does Respondent have any jewelry, clothing or other personal items worth more than $100? **${ yesno(len(petitioner.assets.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc"]) ) > 0) }**
   
+  % if len(personal_goods.complete_elements()) > 0:
+  ${ personal_goodstable }  
+  % endif  
   
   ${ personal_goods.add_action(label="Add personal goods") } 
   
@@ -6468,11 +7151,19 @@ content: |
   
   Does Respondent own a business? **${ yesno(len(petitioner.assets.matches(source=["businesses"])) > 0) }**
   
+  % if len(businesses.complete_elements()) > 0:
+  ${ businesses.table }  
+  % endif
+  
   ${ businesses.add_action(label="Add a business") } 
   
   Does Petitioner own any stocks or bond? **${ yesno(len(petitioner.assets.matches(source=["stocks", "bonds", "notes", "mortgages", "money market", "securities_other" ])) > 0) }**
   
   Does Respondent own any stocks or bond? **${ yesno(len(petitioner.assets.matches(source=["stocks", "bonds", "notes", "mortgages", "money market", "securities_other" ])) > 0) }**
+  
+  % if len(securities.complete_elements()) > 0:
+  ${ securities.table }  
+  % endif
   
   ${ securities.add_action(label="Add a security") }
   
@@ -6480,13 +7171,25 @@ content: |
   
   Does Respondent have any life insurance that could be cashed in? **${ yesno(len(petitioner.assets.matches(source=["life_insurance"])) > 0) }**
   
+  % if len(life_insurance.complete_elements()) > 0:
+  ${ life_insurance.table }  
+  % endif
+  
   ${ life_insurance.add_action(label="Add life insurance") }
   
   Does anyone owe Petitioner any money? **${ yesno(len(petitioner.assets.matches(source=["interest_in_contract","debts-owed_to_you"])) > 0) }**
   
   Does anyone owe Respondent any money? **${ yesno(len(petitioner.assets.matches(source=["interest_in_contract","debts-owed_to_you"])) > 0) }**
   
+  % if len(debts_owed_to_you.complete_elements()) > 0:
+  ${ debts_owed_to_you.table }  
+  % endif
+  
   ${ debts_owed_to_you.add_action(label="Add a debt owed to you") } 
+  
+  % if len(interest_in_contract.complete_elements()) > 0:
+  ${ interest_in_contract.table }  
+  % endif
   
   ${ interest_in_contract.add_action(label="Add an interest in contract") } 
   
@@ -6494,11 +7197,19 @@ content: |
   
   Does Respondent have any lawsuits against anyone?**${ yesno(len(petitioner.assets.matches(source=["interest_in_litigation"])) > 0) }**
   
+  % if len(interest_in_litigation.complete_elements()) > 0:
+  ${ interest_in_litigation.table }  
+  % endif
+  
   ${ interest_in_litigation.add_action(label="Add an interest in litigation") }  
   
   Does Petitioner have any farm equipment, animals or crops? **${ yesno(len(petitioner.assets.matches(source=["farm"])) > 0) }**
   
   Does Respondent have any farm equipment, animals or crops? **${ yesno(len(petitioner.assets.matches(source=["farm"])) > 0) }**
+  
+  % if len(farm.complete_elements()) > 0:
+  ${ farm.table }  
+  % endif
   
   ${ farm.add_action(label="Add a farm") } 
   
@@ -6506,11 +7217,19 @@ content: |
   
   Does Respondent have any interest in any trusts? **${ yesno(len(petitioner.assets.matches(source=["interests_in_trust"])) > 0) }**
   
+  % if len(interests_in_trust.complete_elements()) > 0:
+  ${ interests_in_trust.table }  
+  % endif
+  
   ${ interests_in_trust.add_action(label="Add an interest in trust") }
   
   Does Petitioner have any other asset or property? **${ yesno(len(petitioner.assets.matches(source=["other_assets"])) > 0) }**
   
   Does Respondent have any other asset or property? **${ yesno(len(respondent.assets.matches(source=["other_assets"])) > 0) }**
+  
+  % if len(other_assets.complete_elements()) > 0:
+  ${ other_assets.table }  
+  % endif
   
   ${ other_assets.add_action(label="Add other assets") } 
 ---
@@ -6587,9 +7306,9 @@ content: |
   No maintenance is to be paid to Petitioner by Respondent. This agreement is not subject to modification.
   % endif
 
-  % if relief['maintenance'] and maintenance_awarded_to in ["petitioner","respondent"] and maintenance_income_witholding:
+  % if relief['maintenance'] and maintenance_awarded_to in ["petitioner","respondent"] and maintenance_income_withholding:
   Income withholding shall be prepared by the person receiving maintenance and issued by the circuit clerk upon the effective date of this order.
-  % elif relief['maintenance'] and maintenance_awarded_to in ["petitioner","respondent"] and not maintenance_income_witholding:
+  % elif relief['maintenance'] and maintenance_awarded_to in ["petitioner","respondent"] and not maintenance_income_withholding:
   Income withholding shall not issue for the following reason(s):
   ${ maintenance_income_withholding_reason }
   % else:
