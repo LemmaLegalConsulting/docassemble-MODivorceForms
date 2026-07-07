@@ -65,26 +65,26 @@ attachment:
       - "raRespondentState": ${ respondent.address.state } 
       - "raRespondentsPhone": ${ phone_number_formatted(respondent.phone_number) } 
       - "raRespondentsEmail": ${ respondent.email } 
-      - "raRespondentsSsnLastFour": ${ respondent.ssn } 
+      - "raRespondentsSsnLastFour": ${ redact(respondent.ssn) } 
       - "raRespondentActiveDutyOrNot1": ${ not respondent.active_duty } 
       - "raRespondentActiveDutyOrNot2": ${ respondent.active_duty and waive_rights } 
       - "raRespondentActiveDutyOrNot3": ${ respondent.active_duty and not waive_rights } 
-      - "raPetitionersSsnLastFour": ${ petitioner.ssn } 
+      - "raPetitionersSsnLastFour": ${ redact(petitioner.ssn) } 
       - "raFirstChildFirstName": |
           % if len(children) > 0:
-          ${ children[0].name.first }
+          ${ redact(children[0].name.first) }
           % endif
       - "raFirstChildMiddleName": |
           % if len(children) > 0:
-          ${ children[0].name.middle }
+          ${ redact(children[0].name.middle) }
           % endif
       - "raFirstChildLastName": |
           % if len(children) > 0:
-          ${ children[0].name.last }
+          ${ redact(children[0].name.last) }
           % endif
       - "raFirstChildSuffix": |
           % if len(children) > 0:
-          ${ children[0].name.suffix }
+          ${ redact(children[0].name.suffix) }
           % endif
       - "raFirstChildsAge": |
           % if len(children) > 0:
@@ -96,15 +96,15 @@ attachment:
           % endif
       - "raLastFourSsnFirstChild": |
           % if len(children) > 0:
-          ${ "{:.0f}".format(children[0].ssn) }
+          ${ redact("{:.0f}".format(children[0].ssn)) }
           % endif
       - "raSecondChildFirstName": |
           % if len(children) > 1:
-          ${ children[1].name.first }
+          ${ redact(children[1].name.first) }
           % endif
       - "raSecondChildMiddleName": |
           % if len(children) > 1:
-          ${ children[1].name.middle }
+          ${ redact(children[1].name.middle) }
           % endif
       - "raSecondChildAge": |
           % if len(children) > 1:
@@ -116,19 +116,19 @@ attachment:
           % endif
       - "raLastFourSsnSecondChild": |
           % if len(children) > 1:
-          ${ "{:.0f}".format(children[1].ssn) }
+          ${ redact("{:.0f}".format(children[1].ssn)) }
           % endif
       - "raSecondChildLastName": |
           % if len(children) > 1:
-          ${ children[1].name.last }
+          ${ redact(children[1].name.last) }
           % endif
       - "raSecondChildSuffix": |
           % if len(children) > 1:
-          ${ children[1].name.suffix }
+          ${ redact(children[1].name.suffix) }
           % endif
       - "raThirdChildSuffix": |
           % if len(children) > 2:
-          ${ children[2].name.suffix }
+          ${ redact(children[2].name.suffix) }
           % endif
       - "raThirdChildAge": |
           % if len(children) > 2:
@@ -140,35 +140,35 @@ attachment:
           % endif
       - "raLastFourSsnThirdChild": |
           % if len(children) > 2:
-          ${ "{:.0f}".format(children[2].ssn) }
+          ${ redact("{:.0f}".format(children[2].ssn)) }
           % endif
       - "raThirdChildFirstName": |
           % if len(children) > 2:
-          ${ children[2].name.first }
+          ${ redact(children[2].name.first) }
           % endif
       - "raThirdChildMiddleName": |
           % if len(children) > 2:
-          ${ children[2].name.middle }
+          ${ redact(children[2].name.middle) }
           % endif
       - "raThirdChildLastName": |
           % if len(children) > 2:
-          ${ children[2].name.last }
+          ${ redact(children[2].name.last) }
           % endif
       - "raFourthChildFirstName": |
           % if len(children) > 3:
-          ${ children[3].name.first }
+          ${ redact(children[3].name.first) }
           % endif
       - "raFourthChildMiddleName": |
           % if len(children) > 3:
-          ${ children[3].name.middle }
+          ${ redact(children[3].name.middle) }
           % endif
       - "raFourthChildLastName": |
           % if len(children) > 3:
-          ${ children[3].name.last }
+          ${ redact(children[3].name.last) }
           % endif
       - "raFourthChildSuffix": |
           % if len(children) > 3:
-          ${ children[3].name.suffix }
+          ${ redact(children[3].name.suffix) }
           % endif
       - "raFourthChildAge": |
           % if len(children) > 3:
@@ -180,15 +180,15 @@ attachment:
           % endif
       - "raLastFourSsnFourthChild": |
           % if len(children) > 3:
-          ${ "{:.0f}".format(children[3].ssn) }
+          ${ redact("{:.0f}".format(children[3].ssn)) }
           % endif
       - "raFifthChildFirstName": |
           % if len(children) > 4:
-          ${ children[4].name.first }
+          ${ redact(children[4].name.first) }
           % endif
       - "raFifthChildSuffix": |
           % if len(children) > 4:
-          ${ children[4].name.suffix }
+          ${ redact(children[4].name.suffix) }
           % endif
       - "raFifthChildAge": |
           % if len(children) > 4:
@@ -200,27 +200,27 @@ attachment:
           % endif
       - "raLastFourSsnFifthChild": |
           % if len(children) > 4:
-          ${ "{:.0f}".format(children[4].ssn) }
+          ${ redact("{:.0f}".format(children[4].ssn)) }
           % endif
       - "raFifthChildMiddleName": |
           % if len(children) > 4:
-          ${ children[4].name.middle }
+          ${ redact(children[4].name.middle) }
           % endif
       - "raFifthChildLastName": |
           % if len(children) > 4:
-          ${ children[4].name.last }
+          ${ redact(children[4].name.last) }
           % endif
       - "raSixthChildMiddleName": |
           % if len(children) > 5:
-          ${ children[5].name.middle }
+          ${ redact(children[5].name.middle) }
           % endif
       - "raSixthChildLastName": |
           % if len(children) > 5:
-          ${ children[5].name.last }
+          ${ redact(children[5].name.last) }
           % endif
       - "raSixthChildSuffix": |
           % if len(children) > 5:
-          ${ children[5].name.suffix }
+          ${ redact(children[5].name.suffix) }
           % endif
       - "raSixthChildAge": |
           % if len(children) > 5:
@@ -232,11 +232,11 @@ attachment:
           % endif
       - "raLastFourSsnSixthChild": |
           % if len(children) > 5:
-          ${ "{:.0f}".format(children[5].ssn) }
+          ${ redact("{:.0f}".format(children[5].ssn)) }
           % endif
       - "raSixthChildFirstName": |
           % if len(children) > 5:
-          ${ children[5].name.first }
+          ${ redact(children[5].name.first) }
           % endif
       - "raPerson1ChildrenLivedWithPast5YearsFirstName": ${ persons_lived_with[0].name.first } 
       - "raPerson1ChildrenLivedWithPast5YearsMiddleName": ${ persons_lived_with[0].name.middle } 
@@ -329,7 +329,7 @@ attachment:
       - "raRequestReliefFormerFirstName": ${ respondent.prior_name.name.first if relief['change_name'] else "" } 
       - "raRequestReliefFormerMiddleName": ${ respondent.prior_name.name.last if relief['change_name'] else "" } 
       - "raRequestReliefFormerLastName": ${ respondent.prior_name.name.last if relief['change_name'] else ""  } 
-      - "raRequestReliefOther": ${ relief["Other"] } 
+      - "raRequestReliefOther": ${ relief["other"] } 
       - "raRequestReliefOtherRequests1": ${ relief_other } 
       - "raDateOfNotice": ${ service.date } 
       - "raNameRow1": ${ people_served[0].name_full() } 
@@ -358,7 +358,7 @@ attachment:
           % if len(people_served) > 3:
           ${ people_served[3].service_address }
           % endif
-      - "raRespondentsAttorneyCheckbox": ${ respondent.attorney.type_of_assistance == "assistance" } 
+      - "raRespondentsAttorneyCheckbox": ${ respondent.type_of_assistance == "assistance" } 
       - "raRespondentsMissouriBarNumber": ${ respondent.attorney.bar_number } 
       - "raRespondentsAttorneyName": ${ respondent.attorney.name } 
       - "raRespondentsAttorneyStreet": ${ respondent.attorney.address.address } 

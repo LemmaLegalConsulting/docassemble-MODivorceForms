@@ -51,6 +51,7 @@ code: |
   var_doc_dict["user_self_supporting"]
   var_doc_dict["user_expenses"]
   var_doc_dict["other_party_expenses"]
+  var_doc_dict["answer"]
   var_doc_dict_loaded = True
 ---
 id: list of previously entered people
@@ -209,6 +210,10 @@ fields:
       ${ petitioner.name } v. ${ respondent.name }
     
 continue button field: case.name_asked
+---
+variable name: var_doc_dict["answer"]
+data:
+  - answer_attachment
 ---
 variable name: var_doc_dict["case.name_asked"]
 data:
@@ -5461,12 +5466,13 @@ validation code: |
 id: code to present relevant service options
 code: |
   temp_service_type_choices = list()
-  temp_service_type_choices.append({'label': other_parties[0].name_full()  + " has signed a verified Respondent’s Answer to Petition for Dissolution of Marriage, which is being filed with the Petition for Dissolution of Marriage. Therefore, do not issue a summons.","value":"none"})
+  if users[0] == petitioner :
+    temp_service_type_choices.append({'label': other_parties[0].name_full()  + " has signed a verified Respondent’s Answer to Petition for Dissolution of Marriage, which is being filed with the Petition for Dissolution of Marriage. Therefore, do not issue a summons.","value":"none"})
   if other_parties[0].address.state == "MO":
     temp_service_type_choices.append({'label': other_parties[0].name_full() + " should be served with a summons at their home.","value":"home"})
-  if (len(other_parties[0].jobs) > 0 or other_parties[0].has_self_employment_income) and other_parties[0].employer.address.state == "MO":
+  if users[0] == petitioner and (len(other_parties[0].jobs) > 0 or other_parties[0].has_self_employment_income) and other_parties[0].employer.address.state == "MO":
     temp_service_type_choices.append({'label': other_parties[0].name_full() + " should be served with a summons at their place of employment.","value":"work"})
-  if other_parties[0].address.state != "MO" and (not defined('other_parties[0].employer.address.address') or other_parties[0].employer.address.state != "MO"):
+  if users[0] == petitioner and other_parties[0].address.state != "MO" and (not defined('other_parties[0].employer.address.address') or other_parties[0].employer.address.state != "MO"):
     temp_service_type_choices.append({'label': other_parties[0].name_full() + " cannot be served in Missouri. Therefore, service by registered mail is requested. A copy of the Affidavit for Service by Mail is attached to this form. See Missouri Supreme Court Rule 54.12(b).","value":"mail"})
   if not other_parties[0].address_known and not defined('other_parties[0].employer.address.address'):
     temp_service_type_choices.append({'label': "The address of " + other_parties[0].name_full() + " is unknown and cannot be found. Therefore, service by publication is requested. A copy of the Request for Service by Publication is attached to this form.", "value": "publication"})
@@ -5537,6 +5543,20 @@ fields:
     datatype: yesnoradio
 continue button field: mail_information
 ---
+id: waiting screen
+question: |
+  Please wait while we make your documents
+subquestion: |
+  This can take a few minutes.
+
+ 
+
+  <div class="spinner-border text-primary d-flex justify-content-center" role="status">
+      <span class="sr-only visually-hidden">Making documents...</span>
+  </div>
+event: al_download_waiting_screen
+reload: True
+---
 ########## DOWNLOAD
 id: download MO divorce forms
 event: mo_divorce_forms_download
@@ -5552,6 +5572,16 @@ subquestion: |
   Print out of itinerary
   
   Thank you ${users}. Your form is ready to download and deliver.
+
+  % if users[0] == petitioner:
+
+  [YOUTUBE Ic6miGHGsZA]
+
+  % else:
+
+  [YOUTUBE iSJpUrncf0Y]
+
+  % endif
   
   View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
 
@@ -5615,7 +5645,6 @@ objects:
   - service_by_publication_attachment: ALDocument.using(title="Request for Service By Publication", filename="service_by_publication",  has_addendum=False, )
 ---
 ############ REVIEW
-need: children.table
 id: review screen
 event: review_form
 question: Review your answers
@@ -5635,6 +5664,7 @@ review:
     % endfor
 - raw html: |
     ${ next_accordion("Maintenance and other relief", showing=False) }
+  show if: len(set(var_doc_dict["relief"]) & set(doc_list_selected.true_values())) > 0
 - Edit: 
     - relief['maintenance']
     - recompute:
@@ -5672,9 +5702,24 @@ review:
     Explain: ${ showifdef('relief_other') }
     % endif
 - raw html: |
+    ${ next_accordion("Answer", showing=False) }
+  show if: len(set(var_doc_dict["answer"]) & set(doc_list_selected.true_values())) > 0
+- Edit: agree_with_parenting_plan
+  button: |
+    Do you agree with the Parenting Plan filed by ${ petitioner }?:  **${ word(yesno(agree_with_parenting_plan)) }**
+- Edit: denials_exist
+  button: |
+    Is there anything you disagree with on your spouse's Petition for Dissolution of Marriage?:  **${ word(yesno(denials_exist)) }**
+
+    % if denials_exist:
+    ${ denials }
+    % endif
+- raw html: |
     ${ next_accordion("Custody", showing=False) }
+  show if: len(set(var_doc_dict["legal_custody"]) & set(doc_list_selected.true_values())) > 0
 - raw html: |
     ${ start_accordion("Legal Custody", showing=False) }
+  show if: len(set(var_doc_dict["legal_custody"]) & set(doc_list_selected.true_values())) > 0
 - Edit: legal_custody_other
   button: |
     **Sole Legal Custody to Third Party**
@@ -5722,6 +5767,7 @@ review:
     Is there another way you would like to resolve disagreements, in addition to mediation?: ${ showifdef('dispute_resolution') } 
 - raw html: |
     ${ next_accordion("Physical Custody", showing=False) }
+  show if: len(set(var_doc_dict["legal_custody"]) & set(doc_list_selected.true_values())) > 0
 - Edit: physical_custody
   button: |
     **Physical Custody**
@@ -5789,6 +5835,7 @@ review:
     % endif
 - raw html: |
     ${ next_accordion("Weekly Exchange Schedule", showing=False) }
+  show if: len(set(var_doc_dict["use_presumed_child_support"]) & set(doc_list_selected.true_values())) > 0
 - Edit: biweekly_schedule[0]
   button: |
     **Weekday and Weekend Exchange Schedule**
@@ -5818,6 +5865,7 @@ review:
     Saturday: |  ${ showifdef('biweekly_schedule[13]').strip() }
 - raw html: |
     ${ next_accordion("Holiday Exchange Schedule", showing=False) }
+  show if: len(set(var_doc_dict["use_presumed_child_support"]) & set(doc_list_selected.true_values())) > 0
 - Edit: holidays_default
   button: |
     Holiday |Even Years|Odd Years|From|To
@@ -5838,6 +5886,7 @@ review:
     ${ holidays["children_birthday"]["description"] }  | ${ value(holidays["children_birthday"]["even_years"]) } | ${ value(holidays["children_birthday"]["odd_years"]) } | ${ holidays["children_birthday"]["custody_from_time"] } | ${ holidays["children_birthday"]["custody_to_time"]}
 - raw html: |
     ${ next_accordion("Other Provisions", showing=False) }
+  show if: len(set(var_doc_dict["use_presumed_child_support"]) & set(doc_list_selected.true_values())) > 0
 - Edit: location_of_exchange
   button: |
     **Specific location for an exchange**
@@ -5870,14 +5919,17 @@ review:
     % endif
 - raw html: |
     ${ end_accordion() }
+  show if: len(set(var_doc_dict["legal_custody"]) & set(doc_list_selected.true_values())) > 0
 - raw html: |
     ${ next_accordion("Child Support", showing=False) }
+  show if: len(set(var_doc_dict["legal_custody"]) & set(doc_list_selected.true_values())) > 0
 - edit: child_support
   button: |
     Who are you asking the court to award child support to?: **${ third_party_other if child_support == "third_party" else "No child support" if child_support == "none" else value(child_support)}**
     
 - raw html: |
     ${ start_accordion("Income", showing=False) }
+  show if: len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0
 - note: |
     Your monthly gross income: **$${ thousands(users[0].monthly_gross_income) }**
 - Edit: 
@@ -5933,6 +5985,7 @@ review:
       - other_parties[0].monthly_gross_income
     - recompute:
       - section_income
+  show if: len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0
   button: |
     % if other_parties[0].jobs.there_are_any:
     Your spouse's monthly gross income from a job:  **$${ thousands(other_parties[0].jobs.total(times_per_year=12)) }**
@@ -5954,6 +6007,7 @@ review:
       - other_parties[0].monthly_gross_income
     - recompute:
       - section_income
+  show if: len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0
   button: |
     Your spouse's monthly gross income from self employment: **$${ thousands(other_parties[0].self_employment_income) }**
 - Edit: 
@@ -5964,6 +6018,7 @@ review:
     Your spouse's monthly gross income from benefits: **$${ thousands(other_parties[0].benefits.total(times_per_year=12)) }**
 - raw html: |
     ${ next_accordion("Medical and Dental Insurance", showing=False) }
+  show if: len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0
 - Edit: medical_insurance
   button: |
     **Parent Responsible for Medical Insurance**
@@ -5985,6 +6040,7 @@ review:
     What percentage?: ${ showifdef('health_expenses_not_covered_reimburse_percentage') }
 - raw html: |
     ${ next_accordion("Child Care Expenses", showing=False) }
+  show if: len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0
 - Edit: pay_work_childcare_expenses
   button: |
     **Child Care Expenses**
@@ -5995,11 +6051,8 @@ review:
     What percentage of ${ possessify(support_recipient.name_full(), 'childcare costs') }should ${ support_payer.name_full() } reimburse?: ${ showifdef('pay_work_childcare_expenses_percentage') }
     % endif
 - raw html: |
-    ${ next_accordion("Form 14", showing=False) }
-- note: |
-    PLACEHOLDER
-- raw html: |
     ${ next_accordion("Child Support Payment", showing=False) }
+  show if: len(set(var_doc_dict["form_14_calculations"]) & set(doc_list_selected.true_values())) > 0
 - Edit: use_presumed_child_support
   button: |
     **Presumed Child Support amount**
@@ -6030,8 +6083,10 @@ review:
     **Tax Deductions for ${ children[i].name_full() }**
 - raw html: |
     ${ end_accordion() }
+  show if: len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0
 - raw html: |
     ${ next_accordion("Expenses", showing=False) }
+  show if: len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0
 - edit: 
     - users[0].expenses.revisit
   button: |
@@ -6042,8 +6097,10 @@ review:
     Your spouse's monthly expenses - **$${ thousands(other_parties[0].expenses.total(times_per_year=12)) }**
 - raw html: |
     ${ next_accordion("Assets", showing=False) }
+  show if: len(set(var_doc_dict["real_estate"]) & set(doc_list_selected.true_values())) > 0
 - note: |
     The Property Statement requires users to identify which party currently owns the property.  This section shows you how each question is answered in this section.
+  show if: len(set(var_doc_dict["real_estate"]) & set(doc_list_selected.true_values())) > 0
 - Edit: real_estate.revisit
   button: |
     Does Petitioner own a house, condominium or other real estate?: **${ yesno(len([re for re in real_estate if re.marital_property in ["Marital","Both"] or re.title in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
@@ -6306,6 +6363,7 @@ review:
     How much cash do you have on hand?: ${ currency(showifdef('users[0].cash')) }
 - raw html: |
     ${ next_accordion("Debts", showing=False) }
+  show if: len(set(var_doc_dict["debts"]) & set(doc_list_selected.true_values())) > 0
 - note: |
     Does Petitioner owe a mortgage on a house or condominium or land?:  **${ yesno(len(petitioner.debts.matches(source=['house','condominium', 'leasehold','real_estate_other'])) > 0)}**
 
@@ -6409,10 +6467,12 @@ review:
     % endfor
 - raw html: |
     ${ next_accordion("Children", showing=False) }
+  show if: len(set(var_doc_dict["real_estate"]) & set(doc_list_selected.true_values())) > 0
 - note: |
     ${ children.table }
     
     ${ children.add_action() }
+  show if: len(set(var_doc_dict["real_estate"]) & set(doc_list_selected.true_values())) > 0
 - raw html: |
     ${ next_accordion("Information about you", showing=False) }
 - Edit: 
@@ -6469,7 +6529,7 @@ review:
 - Edit: 
     - waive_rights
   button: |
-    Waive rights? **${ word(yesno(waive_rights)) }**
+    Do you waive your rights pursuant to the Servicemembers Civil Relief Act of 2003? **${ word(yesno(waive_rights)) }**
 - Edit: users[0].previously_married
   button: |
     **Previous marriages for ${ users[0].name_full() }**
@@ -6639,6 +6699,13 @@ review:
     Has ${ respondent.name.first } signed a waiver of service? **${ word(yesno(waiver_of_service)) }**
 
     Does ${ respondent.name.first } have any family in Missouri that ${ respondent.pronoun_subjective() } visits on a regular basis?": **${ word(yesno(missouri_family)) }**
+- Edit: 
+    - other_parties[0].employer.address.address
+  show if: not len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0
+  button: |
+    Address for your spouse's work address for service
+
+    ${ other_parties[0].employer.address.on_one_line() }
 - raw html: |
     ${ end_accordion() }
 ---
