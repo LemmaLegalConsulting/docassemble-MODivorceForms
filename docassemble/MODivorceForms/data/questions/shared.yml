@@ -15,45 +15,6 @@ modules:
 features:
   css: progressivedisclosure.css
 ---
-code: |
-  var_doc_dict["previous_petitions"]
-  var_doc_dict["case.matter_type_asked"]
-  var_doc_dict["case.name_asked"]
-  var_doc_dict["case.filing_date_asked"]
-  var_doc_dict["case.judge_asked"]
-  var_doc_dict["case.docket_number"]
-  var_doc_dict["case.county"]
-  var_doc_dict["relief"]
-  var_doc_dict["users_ssn"]
-  var_doc_dict["users_birthdate"]
-  var_doc_dict["other_parties_active_duty"]
-  var_doc_dict["petitioner.party_type_code"]
-  var_doc_dict["children"]
-  var_doc_dict["children_number"]
-  var_doc_dict["children_birthdate"]
-  var_doc_dict["under_18_in_household"]
-  var_doc_dict["adoption"]
-  var_doc_dict["persons_lived_with"]
-  var_doc_dict["legal_custody"]
-  var_doc_dict["additional_children_information"]
-  var_doc_dict["child support"]
-  var_doc_dict["user_child_expenses"]
-  var_doc_dict["other_party_child_expenses"]
-  var_doc_dict['pay_work_childcare_expenses']
-  var_doc_dict["marriage_info"]
-  var_doc_dict["marriage.separation_date"]
-  var_doc_dict["user_cash"]
-  var_doc_dict["real_estate"]
-  var_doc_dict["vehicles"]
-  var_doc_dict["other_assets"]
-  var_doc_dict["debts"]
-  var_doc_dict["user_jobs"]
-  var_doc_dict["user_self_supporting"]
-  var_doc_dict["user_expenses"]
-  var_doc_dict["other_party_expenses"]
-  var_doc_dict["answer"]
-  var_doc_dict_loaded = True
----
 id: list of previously entered people
 code: |
   temp_people_choices = list()
@@ -174,11 +135,6 @@ fields:
       variable: previous_petitions
       is: 0
 ---
-variable name: var_doc_dict["previous_petitions"]
-data:
-  - petition_attachment
-  - answer_attachment
----
 code: |
   if minor_children:
     case.type_code = "DI"
@@ -210,15 +166,6 @@ fields:
       ${ petitioner.name } v. ${ respondent.name }
     
 continue button field: case.name_asked
----
-variable name: var_doc_dict["answer"]
-data:
-  - answer_attachment
----
-variable name: var_doc_dict["case.name_asked"]
-data:
-  - confidential_information_sheet_attachment
-  - redaction_certification_attachment
 ---
 id: case.name_casenet_template
 template: case.name_casenet_template
@@ -256,10 +203,6 @@ fields:
 continue button field: case.matter_type_asked
 
 ---
-variable name: var_doc_dict["case.matter_type_asked"]
-data:
-  - confidential_information_sheet_attachment
----
 id: case.matter_type_casenet_template
 template: case.matter_type_casenet_template
 subject: |
@@ -289,10 +232,6 @@ validation code: |
   if as_datetime(case.filing_date) > today() or as_datetime(case.filing_date) < as_datetime("1/1/1900"):
     validation_error("Please enter a realistic date in the past.")
 ---
-variable name: var_doc_dict["case.filing_date_asked"]
-data:
-  - confidential_information_sheet_attachment
----
 id: case.filing_date_casenet_template
 template: case.filing_date_casenet_template
 subject: |
@@ -318,10 +257,6 @@ fields:
 continue button field: case.judge_asked
 
 ---
-variable name: var_doc_dict["case.judge_asked"]
-data:
-  - fee_waiver_attachment
----
 id: case.judge_casenet_template
 template: case.judge_casenet_template
 subject: |
@@ -346,20 +281,6 @@ fields:
 continue button field: case.docket_number_asked
 
 ---
-variable name: var_doc_dict["case.docket_number"]
-data:
-  - petition_attachment
-  - answer_attachment
-  - parenting_plan_attachment
-  - notice_of_hearing_attachment
-  - certificate_of_dissolution_attachment
-  - judgment_attachment
-  - property_statement_attachment
-  - income_statement_attachment
-  - fee_waiver_attachment
-  - confidential_information_sheet_attachment
-  - redaction_certification_attachment
----
 id: case.docket_number_casenet_template
 template: case.docket_number_casenet_template
 subject: |
@@ -383,30 +304,10 @@ id: code to set circuit from county_dictionary
 code: |
   case.circuit = county_dictionary[case.county]["circuit"]
 ---
-variable name: var_doc_dict["case.county"]
-data:
-  - petition_attachment
-  - answer_attachment
-  - parenting_plan_attachment
-  - notice_of_hearing_attachment
-  - certificate_of_dissolution_attachment
-  - judgment_attachment
-  - property_statement_attachment
-  - income_statement_attachment
-  - fee_waiver_attachment
-  - confidential_information_sheet_attachment
-  - redaction_certification_attachment
----
 ## RELIEF ##
 id: relief object
 objects:
   - relief: DADict
----
-id: documents with relief
-variable name: var_doc_dict["relief"]
-data:
-  - petition_attachment
-  - answer_attachment
 ---
 id: set relief ['divide_property']
 code: |
@@ -450,10 +351,6 @@ code: |
     relief['custody'] = True
   else:
     relief['custody'] = False
----
-if: not minor_children
-code: |
-  relief['child_support'] = False
 ---
 code: |
   temp_relief_options = list()
@@ -558,15 +455,6 @@ fields:
 validation code: |
   if x.instanceName != "users[0]" and x.ssn_unknown:
     x.ssn = "Unknown"
----
-variable name: var_doc_dict["users_ssn"]
-data:
-  - answer_attachment
-  - certificate_of_dissolution_attachment
-  - confidential_information_sheet_attachment
-  - judgment_attachment
-  - petition_attachment
-  - redaction_certification_attachment
 ---
 id: users driver's license number
 question: Driver's license number for ${ users[0].name_full() }
@@ -676,14 +564,6 @@ fields:
     maxlength: 40
     required: False
 ---
-variable name: var_doc_dict["users_birthdate"]
-data:
-  - certificate_of_dissolution_attachment
-  - confidential_information_sheet_attachment
-  - petition_attachment
-  - redaction_certification_attachment
-  - judgment_attachment
----
 id: education info
 generic object: ALIndividual
 question: Educational info for ${ x.name_full() } completed?
@@ -729,12 +609,6 @@ question: Military info for ${ x.name_full() }
 fields:  
   - Is ${ x.name_full() } active duty military?: x.active_duty
     datatype: yesnoradio
----
-variable name: var_doc_dict["other_parties_active_duty"]
-data:
-  - answer_attachment
-  - judgment_attachment
-  - petition_attachment
 ---
 id: race
 generic object: ALIndividual
@@ -1028,10 +902,6 @@ code: |
     other_parties[0].attorney.party_type_code = "ARES"
     other_parties[0].attorney.party_type_description = "Attorney for Respondent"
 ---
-variable name: var_doc_dict["petitioner.party_type_code"]
-data:
-  - confidential_information_sheet_attachment
----
 code: |
   children[i].party_type_code = "CHLD"
   children[i].party_type_description = "Child"
@@ -1059,7 +929,7 @@ fields:
 id: children complete from petition
 code: |
   children[i].name.first
-  if len(set(var_doc_dict["children_birthdate"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]'):
     children[i].birthdate
   if 'petition_attachment' in doc_list_selected.true_values():
     if children[i].unemancipated:
@@ -1070,7 +940,7 @@ code: |
         children[i].legal_custody_other.name.first
       if children[i].physical_custody == "Third Party":
         children[i].physical_custody_other.name.first
-    if len(set(var_doc_dict["adoption"]) & set(doc_list_selected.true_values())) > 0:
+    if showifdef('doc_list_selected["petition_attachment"]'):
       children[i].adopted
     if children[i].birth_certificate["Other"]:
       children[i].birth_certificate_other.name.first
@@ -1080,7 +950,7 @@ code: |
     
     if children[i].unemancipated:
       children[i].tax_dependency_even
-  if len(set(var_doc_dict["under_18_in_household"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["certificate_of_dissolution_attachment"]'):
     children[i].under_18_in_household
   children[i].complete = True
 ---
@@ -1123,29 +993,6 @@ fields:
       - This child is self-supporting: self_supporting
       - This child is attending high school: high_school
       - This child is attending college or vocational school: college
----
-variable name: var_doc_dict["children"]
-data:
-  - answer_attachment
-  - certificate_of_dissolution_attachment
-  - confidential_information_sheet_attachment
-  - petition_attachment
-  - income_statement_attachment
-  - judgment_attachment
-  - parenting_plan_attachment
----
-variable name: var_doc_dict["children_number"]
-data:
-  - form_14_attachment
-  - fee_waiver_attachment
----
-variable name: var_doc_dict["children_birthdate"]
-data:
-  - answer_attachment
-  - petition_attachment
-  - judgment_attachment
-  - parenting_plan_attachment
-  - confidential_information_sheet_attachment
 ---
 id: back up number of children question if no need to collect all children
 question: How many minor children do you have with ${ other_parties[0] }?
@@ -1203,6 +1050,11 @@ fields:
   - Did ${ children[i].name_full() } live with ${ users[0].name_full() } and ${ other_parties[0].name_full() } on ${ marriage.separation_date }?: children[i].under_18_in_household
     datatype: yesnoradio
     default: children[i].unemancipated
+---
+id: set under_18_in_household to False if adult
+if: children[i].birthdate.plus(years=18) < today()
+code: |
+  children[i].under_18_in_household = False
 ---
 id: code to determine if child is unemancipated
 code: |
@@ -1481,17 +1333,6 @@ review:
       Did ${ children[i].name_full() } live with ${ users[0].name_full() } and ${ other_parties[0].name_full() } on ${ marriage.separation_date }?: ${ yesno( children[i].under_18_in_household) }
   
 ---
----
-id: under_18_in_household document list
-variable name: var_doc_dict["under_18_in_household"]
-data:
-  - certificate_of_dissolution_attachment
----
-id: adoption document list
-variable name: var_doc_dict["adoption"]
-data:
-  - petition_attachment
----
 id: lived with other object
 objects: 
   - persons_lived_with: ALPeopleList.using(there_are_any=True)
@@ -1538,11 +1379,6 @@ fields:
   - no label: persons_lived_with.there_is_another
     datatype: yesnoradio
 ---
-variable name: var_doc_dict["persons_lived_with"]
-data:
-  - answer_attachment
-  - petition_attachment
----
 id: legal custody of child
 question: Legal custody of ${ children[i].name_full() }
 fields:
@@ -1564,11 +1400,6 @@ id: don't ask legal_custody for adult children
 if: not children[i].unemancipated
 code: |
   children[i].legal_custody = None
----
-variable name: var_doc_dict["legal_custody"]
-data:
-  - petition_attachment
-  - parenting_plan_attachment
 ---
 id: other legal custody
 reconsider:
@@ -1660,6 +1491,14 @@ fields:
       - "Third party (someone else has custody of the kids)": Third Party
  - Should this apply to all children involved in this case?: physical_custody_all_children
    datatype: yesnoradio
+ - Whose address should you use for mailing and educational purposes?: physical_custody_address
+   datatype: radio
+   choices:
+    - ${ petitioner }: petitioner
+    - ${ respondent }: (${ respondent }
+   show if: 
+     variable: physical_custody
+     is: Joint
 ---
 id: follow up visitation question for sole physical_custody
 question: Visitation
@@ -1939,11 +1778,6 @@ fields:
   - no label: children_explanation
     datatype: area
 ---  
-variable name: var_doc_dict["additional_children_information"]
-data:
-  - petition_attachment
-  - judgment_attachment
----
 ## CHILDREN RELIEF AND SUPPORT
 id: communications question
 question: Communication between parents
@@ -1997,18 +1831,15 @@ validation code: |
   elif child_support in ["respondent"]:
     support_recipient = respondent
     support_payer = petitioner  
-  if len(set(var_doc_dict["relief"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]'):
     if child_support == "none":
       relief['child_support'] = False
     else:
       relief['child_support'] = True
 ---
-id: var_doc_dict child_support
-variable name: var_doc_dict["child support"]
-data:
-  - petition_attachment
-  - parenting_plan_attachment
-  - certificate_of_dissolution_attachment
+if: not minor_children
+code: |
+  relief['child_support'] = False
 ---
 id: child support options
 code: |
@@ -2036,21 +1867,6 @@ id: extraordinary medical cost object
 generic object: ALIndividual
 objects:
   - x.extraordinary_medical_costs: ALExpenseList.using(complete_attribute='value')
----
-variable name: var_doc_dict["user_child_expenses"]
-data:
-  - fee_waiver_attachment
-  - petition_attachment
-  - income_statement_attachment
-  - parenting_plan_attachment
-  - form_14_attachment
----
-variable name: var_doc_dict["other_party_child_expenses"]
-data:
-  - petition_attachment
-  - income_statement_attachment
-  - parenting_plan_attachment
-  - form_14_attachment
 ---
 id: are there any extraordinary medical costs
 generic object: ALIndividual
@@ -2108,6 +1924,30 @@ subquestion: |
 fields:
   - Are there any more extraordinary medical costs to be paid by ${ x.name_full() }?: x.extraordinary_medical_costs.there_is_another
     datatype: yesnoradio
+---
+id: extraordinary medical expenses table
+generic object: ALIndividual
+table: x.extraordinary_medical_costs.table
+rows: x.extraordinary_medical_costs
+columns:
+  - Description: |
+      row_item.description
+  - Amount of extraordinary medical cost: |
+      row_item.extraordinary_medical_cost
+  - Times per year pays this cost: |
+      row_item.times_per_year
+edit:
+  - description
+---
+id: extraordinary medical expenses revisit
+generic object: ALIndividual
+continue button field: x.extraordinary_medical_costs.revisit
+question: Review extraordinary medical costs for ${ x }
+subquestion: |
+  ${ x.extraordinary_medical_costs.table }
+
+  ${ x.extraordinary_medical_costs.add_action() }
+
 ---
 id: extraordinary child rearing cost object
 generic object: ALIndividual
@@ -2183,6 +2023,30 @@ fields:
   - Are there any more extraordinary child-rearing costs to be paid by ${ x.name_full() }?: x.extraordinary_childrearing_costs.there_is_another
     datatype: yesnoradio
 ---
+id: extraordinary childcare expenses table
+generic object: ALIndividual
+table: x.extraordinary_childrearing_costs.table
+rows: x.extraordinary_childrearing_costs
+columns:
+  - Description: |
+      row_item.description
+  - Included in form 14: |
+      word(yesno(row_item.included_in_form_14))
+  - Monthly expense or reimbursement percentage: |
+      "$" + thousands(row_item.total(times_per_year=12)) if row_item.included_in_form_14 else str(row_item.percentage) + "%"
+edit:
+  - description
+---
+id: extraordinary childcare expenses revisit
+generic object: ALIndividual
+continue button field: x.extraordinary_childrearing_costs.revisit
+question: Review extraordinary childcare costs for ${ x }
+subquestion: |
+  ${ x.extraordinary_childrearing_costs.table }
+
+  ${ x.extraordinary_childrearing_costs.add_action() }
+
+---
 id: child support for other children
 generic object: ALIndividual
 question: Child support paid for other children
@@ -2233,12 +2097,6 @@ fields:
     show if:
       variable: pay_work_childcare_expenses
       is: pay_percentage
----
-variable name: var_doc_dict['pay_work_childcare_expenses']
-data:
-  - form_14_attachment
-  - income_statement_attachment
-  - parenting_plan_attachment
 ---
 id: pay_work_childcare_expenses
 comment: |
@@ -2315,21 +2173,15 @@ fields:
   - What are the monthly health insurance costs for ${ x.name_full() } pays for the children subject to this case?: x.health_insurance_costs
     datatype: currency
 ---
-id: set user health care costs to 0 if not responsible
-if: not medical_insurance == users[0].name.full() and not dental_insurance == users[0].name.full()
+id: set user health care costs to 0 if not responsible or no minor children
+if: not minor_children or (not medical_insurance == users[0].name.full() and not dental_insurance == users[0].name.full())
 code:
   users[0].health_insurance_costs = 0
 ---
-id: set other parties health care costs to 0 if not responsible
-if: not medical_insurance == other_parties[0].name.full() and not dental_insurance == other_parties[0].name.full()
+id: set other parties health care costs to 0 if not responsible or no minor children
+if: not minor_children or (not medical_insurance == other_parties[0].name.full() and not dental_insurance == other_parties[0].name.full())
 code:
   other_parties[0].health_insurance_costs = 0
----
-id: set children health insurance costs to 0 if no minor children
-if: not minor_children
-generic object: ALIndividual
-code: |
-  x.health_insurance_costs = 0
 ---
 ## MARRIAGE ##
 id: Marriage questions
@@ -2352,12 +2204,6 @@ validation code: |
   if as_datetime(marriage.recorded_date) > today() or as_datetime(marriage.recorded_date) < users[0].birthdate:
     validation_error("Please enter a date in the past that isn't before the date you were born.")
 ---
-variable name: var_doc_dict["marriage_info"]
-data:
-  - petition_attachment
-  - judgment_attachment
-  - certificate_of_dissolution_attachment
----
 id: marriage object
 objects:
   - marriage: Thing
@@ -2371,13 +2217,6 @@ fields:
 validation code: |
   if as_datetime(marriage.separation_date) > today() or as_datetime(marriage.separation_date) < users[0].birthdate:
     validation_error("Please enter a date in the past that isn't before the date you were born.")
----
-variable name: var_doc_dict["marriage.separation_date"]
-data:
-  - petition_attachment
-  - judgment_attachment
-  - certificate_of_dissolution_attachment
-
 ---
 id: marriage in missouri
 question: Did you live together as a couple in Missouri?
@@ -2393,10 +2232,6 @@ fields:
   - How much cash do you have on hand?: users[0].cash
     datatype: currency
 
----
-variable name: var_doc_dict["user_cash"]
-data:
-  - fee_waiver_attachment
 ---
 comment: |
   Assets are gathered jointly for the user and the spouse.  The information question about the asset asks who the asset should be awarded to.  After all the different assets are gathered, a code block based on the recommended award assigns it to a single ALAssetList attribute called .assets.  This means that different asset lists can have their own attributes in the information question, but must all share the same attributes as .assets. 
@@ -2558,14 +2393,6 @@ id: real_estate there is anotehre
 code: |
   real_estate.there_is_another = False
 ---
-comment: |
-  real_estate is mostly used in property statement and fee waiver like most of the other assets, but whether any real estate is owned is also in the judgment
-variable name: var_doc_dict["real_estate"]
-data:
-  - fee_waiver_attachment
-  - judgment_attachment
-  - property_statement_attachment
----
 id: real_estate terms_ordered
 # "!!omap" makes these terms ordered
 # their order here will be their same order when shown to users.
@@ -2714,11 +2541,6 @@ id: vehicles object
 objects:
   - vehicles: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
-variable name: var_doc_dict["vehicles"]
-data:
-  - fee_waiver_attachment
-  - property_statement_attachment
----
 id: vehicles terms_ordered
 # "!!omap" makes these terms ordered
 # their order here will be their same order when shown to users.
@@ -2844,11 +2666,6 @@ comment: |
 id: securities object
 objects:
   - securities: ALAssetList.using(complete_attribute='complete',there_is_another=False)
----
-variable name: var_doc_dict["other_assets"]
-data:
-  - property_statement_attachment
-  - fee_waiver_attachment
 ---
 id: securities other display
 comment: |
@@ -3912,10 +3729,6 @@ id: debts object
 objects: 
   - debts: ALAssetList.using(there_is_another=False,complete_attribute='complete')
 ---
-variable name: var_doc_dict["debts"]
-data:
-  - property_statement_attachment
----
 id: debts terms_ordered
 # "!!omap" makes these terms ordered
 # their order here will be their same order when shown to users.
@@ -4229,14 +4042,6 @@ generic object: ALIndividual
 objects:
   - x.jobs: ALItemizedJobList.using(complete_attribute='complete')
 ---
-variable name: var_doc_dict["user_jobs"]
-data:
-  - fee_waiver_attachment
-  - petition_attachment
-  - income_statement_attachment
-  - parenting_plan_attachment
-  - form_14_attachment
----
 code: |
   users[0].jobs[i].is_hourly = False
 ---
@@ -4371,6 +4176,8 @@ validation code: |
   validate_us_state(x.employer.address)
 
 ---
+comment: |
+  Is this ever used
 sets:
   - x.employer.name.first
 id: employer
@@ -4664,10 +4471,6 @@ fields:
   - Is ${ other_parties[0].name_full() } able to support themselves on their monthly income?: other_parties[0].self_supporting
     datatype: yesnomaybe
 ---
-variable name: var_doc_dict["user_self_supporting"]
-data:
-  - petition_attachment
----
 variable name: job_items_names
 data:
   wages: wages
@@ -4684,6 +4487,18 @@ code: |
     x.monthly_gross_income = float(x.jobs.total(times_per_year=12)) + float(x.benefits.total(times_per_year=12)) + float(x.other_incomes.total(times_per_year=12)) + x.self_employment_income
   else:
     x.monthly_gross_income = float(x.jobs.total(times_per_year=12)) + float(x.benefits.total(times_per_year=12)) + float(x.other_incomes.total(times_per_year=12))
+---
+
+code: |
+  if other_parties[0].jobs.there_are_any == None and other_parties[0].benefits.there_are_any == None and other_parties[0].has_self_employment_income == None:
+    other_parties[0].monthly_gross_income = float(2600)
+    other_parties[0].assumed_monthly_gross_income = True
+  elif other_parties[0].has_self_employment_income:
+    other_parties[0].monthly_gross_income = float(other_parties[0].jobs.total(times_per_year=12)) + float(other_parties[0].benefits.total(times_per_year=12)) + float(other_parties[0].other_incomes.total(times_per_year=12)) + other_parties[0].self_employment_income
+    other_parties[0].assumed_monthly_gross_income = False
+  else:
+    other_parties[0].monthly_gross_income = float(other_parties[0].jobs.total(times_per_year=12)) + float(other_parties[0].benefits.total(times_per_year=12)) + float(other_parties[0].other_incomes.total(times_per_year=12))
+    other_parties[0].assumed_monthly_gross_income = False
 ---
 ################################# PUBLIC BENEFITS ##############################
 comment: |
@@ -5165,15 +4980,6 @@ code: |
 ---
 ############################# EXPENSES #############################
 ---
-variable name: var_doc_dict["user_expenses"]
-data:
-  - fee_waiver_attachment
-  - income_statement_attachment
----
-variable name: var_doc_dict["other_party_expenses"]
-data:
-  - income_statement_attachment
----
 id: expenses intro screen
 continue button field: expenses_intro_screen
 question: |
@@ -5645,6 +5451,7 @@ objects:
   - service_by_publication_attachment: ALDocument.using(title="Request for Service By Publication", filename="service_by_publication",  has_addendum=False, )
 ---
 ############ REVIEW
+need: children.table
 id: review screen
 event: review_form
 question: Review your answers
@@ -5655,6 +5462,23 @@ review:
     ${ start_accordion("Documents", showing=False) }
 - edit:
     - doc_list_selected
+    - undefine:
+      - section_relief
+      - section_case_information
+      - section_user_info
+      - section_other_party
+      - section_marriage
+      - section_children
+      - section_income
+      - section_expenses
+      - section_assets
+      - section_debts
+      - section_service
+      - form_14_calculations
+    - invalidate:
+      - use_presumed_child_support
+    - recompute:
+      - interview_order_mo_divorce_forms
   button: |
     You are producting the following documents:
     
@@ -5664,7 +5488,8 @@ review:
     % endfor
 - raw html: |
     ${ next_accordion("Maintenance and other relief", showing=False) }
-  show if: len(set(var_doc_dict["relief"]) & set(doc_list_selected.true_values())) > 0
+  show if: |
+    showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]')
 - Edit: 
     - relief['maintenance']
     - recompute:
@@ -5703,7 +5528,7 @@ review:
     % endif
 - raw html: |
     ${ next_accordion("Answer", showing=False) }
-  show if: len(set(var_doc_dict["answer"]) & set(doc_list_selected.true_values())) > 0
+  show if: showifdef('doc_list_selected["answer_attachment"]')
 - Edit: agree_with_parenting_plan
   button: |
     Do you agree with the Parenting Plan filed by ${ petitioner }?:  **${ word(yesno(agree_with_parenting_plan)) }**
@@ -5716,10 +5541,10 @@ review:
     % endif
 - raw html: |
     ${ next_accordion("Custody", showing=False) }
-  show if: len(set(var_doc_dict["legal_custody"]) & set(doc_list_selected.true_values())) > 0
+  show if: (showifdef('doc_list_selected["petition_attachment"]') and minor_children) or showifdef('doc_list_selected["parenting_plan_attachment"]')
 - raw html: |
     ${ start_accordion("Legal Custody", showing=False) }
-  show if: len(set(var_doc_dict["legal_custody"]) & set(doc_list_selected.true_values())) > 0
+  show if: (showifdef('doc_list_selected["petition_attachment"]') and minor_children) or showifdef('doc_list_selected["parenting_plan_attachment"]')
 - Edit: legal_custody_other
   button: |
     **Sole Legal Custody to Third Party**
@@ -5767,7 +5592,7 @@ review:
     Is there another way you would like to resolve disagreements, in addition to mediation?: ${ showifdef('dispute_resolution') } 
 - raw html: |
     ${ next_accordion("Physical Custody", showing=False) }
-  show if: len(set(var_doc_dict["legal_custody"]) & set(doc_list_selected.true_values())) > 0
+  show if: (showifdef('doc_list_selected["petition_attachment"]') and minor_children) or showifdef('doc_list_selected["parenting_plan_attachment"]')
 - Edit: physical_custody
   button: |
     **Physical Custody**
@@ -5775,6 +5600,10 @@ review:
     What would you like to ask the court to give you in terms of physical custody?: ${ showifdef('physical_custody') }
 
     Should this apply to all children involved in this case?: ${ word(yesno(physical_custody_all_children)) }
+
+    % if physical_custody == "Joint":
+    Whose address should you use for mailing and educational purposes? ${ value(physical_custody_address) }
+    % endif
 - Edit: visitation
   button: |
     **Visitation**
@@ -5835,7 +5664,8 @@ review:
     % endif
 - raw html: |
     ${ next_accordion("Weekly Exchange Schedule", showing=False) }
-  show if: len(set(var_doc_dict["use_presumed_child_support"]) & set(doc_list_selected.true_values())) > 0
+  show if: |
+    'parenting_plan_attachment' in doc_list_selected.true_values()
 - Edit: biweekly_schedule[0]
   button: |
     **Weekday and Weekend Exchange Schedule**
@@ -5865,8 +5695,14 @@ review:
     Saturday: |  ${ showifdef('biweekly_schedule[13]').strip() }
 - raw html: |
     ${ next_accordion("Holiday Exchange Schedule", showing=False) }
-  show if: len(set(var_doc_dict["use_presumed_child_support"]) & set(doc_list_selected.true_values())) > 0
-- Edit: holidays_default
+  show if: |
+    'parenting_plan_attachment' in doc_list_selected.true_values()
+- Edit: 
+    - holidays_default
+    - invalidate: 
+      - holidays_review
+    - recompute:
+      - section_children
   button: |
     Holiday |Even Years|Odd Years|From|To
     --------|-------------------|------------------|----|--
@@ -5884,9 +5720,58 @@ review:
     ${ holidays["petitioner_birthday"]["description"] }  | ${ value(holidays["petitioner_birthday"]["even_years"]) } | ${ value(holidays["petitioner_birthday"]["odd_years"]) } | ${ holidays["petitioner_birthday"]["custody_from_time"] } | ${ holidays["petitioner_birthday"]["custody_to_time"]}
     ${ holidays["respondent_birthday"]["description"] }  | ${ value(holidays["respondent_birthday"]["even_years"]) } | ${ value(holidays["respondent_birthday"]["odd_years"]) } | ${ holidays["respondent_birthday"]["custody_from_time"] } | ${ holidays["respondent_birthday"]["custody_to_time"]}
     ${ holidays["children_birthday"]["description"] }  | ${ value(holidays["children_birthday"]["even_years"]) } | ${ value(holidays["children_birthday"]["odd_years"]) } | ${ holidays["children_birthday"]["custody_from_time"] } | ${ holidays["children_birthday"]["custody_to_time"]}
+- edit: other_holidays.revisit
+  button: |
+    % if len(other_holidays.complete_elements()) > 0:
+    You have already mentioned:
+    % for other_holiday in other_holidays.complete_elements():
+    
+     - ${ other_holiday.description }
+    % endfor
+    % else:
+    You have not listed any other holidays.
+    % endif
+- edit: vacation
+  button: |
+    **Vacation Schedule**
+
+    Do you want to set aside specific weeks for vacations?: ${ word(yesno(vacation)) }
+
+    % if showifdef('vacation'):
+    How many weeks each year?: ${ showifdef('vacation_weeks') }
+    % endif
+
+    % if showifdef('vacation'):
+    Do you want to add any extra information about vacations?: ${ showifdef('vacation_invo') }
+    % endif
 - raw html: |
     ${ next_accordion("Other Provisions", showing=False) }
-  show if: len(set(var_doc_dict["use_presumed_child_support"]) & set(doc_list_selected.true_values())) > 0
+  show if: |
+    'parenting_plan_attachment' in doc_list_selected.true_values()
+- Edit: 
+  - parenting_plan_A_author
+  - invalidate: 
+    - parenting_plan_A_author_other
+  - recompute:
+    - section_children
+  button: |
+    Who helped write part A of the parenting plan?
+    
+    % if parenting_plan_A_author['petitioner']:
+     - ${ petitioner }
+    % endif
+    % if parenting_plan_A_author['respondent']:
+     - ${ respondent }: 
+    % endif
+    % if parenting_plan_A_author['The court']:
+     - The court
+    % endif
+    % if parenting_plan_A_author['The guardian ad litem']:
+     - The guardian ad litem
+    % endif
+    % if parenting_plan_A_author['Other']:
+     - Other: ${ parenting_plan_A_author_other }
+    % endif
 - Edit: location_of_exchange
   button: |
     **Specific location for an exchange**
@@ -5919,17 +5804,116 @@ review:
     % endif
 - raw html: |
     ${ end_accordion() }
-  show if: len(set(var_doc_dict["legal_custody"]) & set(doc_list_selected.true_values())) > 0
+  show if: (showifdef('doc_list_selected["petition_attachment"]') and minor_children) or showifdef('doc_list_selected["parenting_plan_attachment"]')
 - raw html: |
     ${ next_accordion("Child Support", showing=False) }
-  show if: len(set(var_doc_dict["legal_custody"]) & set(doc_list_selected.true_values())) > 0
+  show if: (showifdef('doc_list_selected["petition_attachment"]') and minor_children) or showifdef('doc_list_selected["parenting_plan_attachment"]')
 - edit: child_support
   button: |
     Who are you asking the court to award child support to?: **${ third_party_other if child_support == "third_party" else "No child support" if child_support == "none" else value(child_support)}**
+- Edit: 
+  - parenting_plan_B_author
+  - invalidate: 
+    - parenting_plan_B_author_other
+  - recompute:
+    - section_children
+  button: |
+    Who helped write part B of the parenting plan?
     
+    % if parenting_plan_B_author['petitioner']:
+     - ${ petitioner }
+    % endif
+    % if parenting_plan_B_author['respondent']:
+     - ${ respondent }: 
+    % endif
+    % if parenting_plan_B_author['The court']:
+     - The court
+    % endif
+    % if parenting_plan_B_author['The guardian ad litem']:
+     - The guardian ad litem
+    % endif
+    % if parenting_plan_B_author['Other']:
+     - Other: ${ parenting_plan_B_author_other }
+    % endif
 - raw html: |
-    ${ start_accordion("Income", showing=False) }
-  show if: len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0
+    ${ start_accordion("Medical and Dental Insurance", showing=False) }
+  show if: minor_children and (showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]')or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'))
+- Edit: 
+    - medical_insurance
+    - dental_insurance
+    - users[0].health_insurance_costs
+    - other_parties[0].health_insurance_costs
+  button: |
+    **Parent Responsible for Medical Insurance**
+
+    Who should maintain and pay the cost of medical insurance for the benefit of the children?: ${ showifdef('medical_insurance') }
+
+    **Parent Responsible for Dental Insurance**
+
+    Who should maintain and pay the cost of dental insurance for the benefit of the children?: ${ showifdef('dental_insurance') }
+
+    Health insurance costs for ${ users[0] }: **${ users[0].health_insurance_costs }**
+    
+    Health insurance costs for ${ other_parties[0] }: **${ other_parties[0].health_insurance_costs }**
+- Edit: health_expenses_not_covered
+  button: |
+    **Health Expenses Not Covered by Insurance**
+
+    Who should pay health expenses not covered by insurance?: ${ showifdef('health_expenses_not_covered') }
+
+    Should that other parent reimburse for a percentage of thse expenses?: ${ word(yesno(health_expenses_not_covered_reimburse)) }
+
+    What percentage?: ${ showifdef('health_expenses_not_covered_reimburse_percentage') }
+- Edit: users[0].extraordinary_medical_costs.revisit
+  button: |
+    % if len(users[0].extraordinary_medical_costs.complete_elements()) > 0:
+    You have told us that you are paying the following extraordinary medical costs: ${ comma_and_list([cost.description for cost in users[0].extraordinary_medical_costs.complete_elements()]) }
+    % else:
+    You said that you are not paying any extraordinary medical costs
+    % endif
+- Edit: other_parties[0].extraordinary_medical_costs.revisit
+  button: |
+    % if len(other_parties[0].extraordinary_medical_costs.complete_elements()) > 0:
+    You have told us that ${ other_parties[0] } paying the following extraordinary medical costs: ${ comma_and_list([cost.description for cost in other_parties[0].extraordinary_medical_costs.complete_elements()]) }
+    % else:
+    You said that ${ other_parties[0] } is not paying any extraordinary medical costs
+    % endif
+- raw html: |
+    ${ next_accordion("Child Care Expenses", showing=False) }
+  show if: minor_children and (showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]')or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'))
+- Edit: 
+    - pay_work_childcare_expenses
+    - users[0].work_childcare_expenses
+    - other_parties[0].work_childcare_expenses
+  button: |
+    **Child Care Expenses**
+
+    Work-related childcare expenses for ${ users[0] }: **$${ thousands(users[0].work_childcare_expenses) }**
+    
+    Work-related childcare expenses for ${ other_parties[0] }: **$${ thousands(other_parties[0].work_childcare_expenses) }**
+
+    How should work-related childcare expenses be handled?: ${ showifdef('pay_work_childcare_expenses') }
+
+    % if showifdef('pay_work_childcare_expenses') == "pay_percentage":
+    What percentage of ${ possessify(support_recipient.name_full(), 'childcare costs') }should ${ support_payer.name_full() } reimburse?: ${ showifdef('pay_work_childcare_expenses_percentage') }
+    % endif
+- Edit: users[0].extraordinary_childrearing_costs.revisit
+  button: |
+    % if len(users[0].extraordinary_childrearing_costs.complete_elements()) > 0:
+    You have told us that you are paying the following extraordinary childcare costs: ${ comma_and_list([cost.description for cost in users[0].extraordinary_childrearing_costs.complete_elements()]) }
+    % else:
+    You said that you are not paying any extraordinary childcare costs
+    % endif
+- Edit: other_parties[0].extraordinary_childrearing_costs.revisit
+  button: |
+    % if len(other_parties[0].extraordinary_childrearing_costs.complete_elements()) > 0:
+    You have told us that ${ other_parties[0] } paying the following extraordinary childcare costs: ${ comma_and_list([cost.description for cost in other_parties[0].extraordinary_childrearing_costs.complete_elements()]) }
+    % else:
+    You said that ${ other_parties[0] } is not paying any extraordinary childcare costs
+    % endif
+- raw html: |
+    ${ next_accordion("Income", showing=False) }
+  show if: showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]')
 - note: |
     Your monthly gross income: **$${ thousands(users[0].monthly_gross_income) }**
 - Edit: 
@@ -5970,8 +5954,36 @@ review:
       - users[0].monthly_gross_income
   button: |
     Your monthly gross income from benefits: **$${ thousands(users[0].benefits.total(times_per_year=12)) }**
+- Edit: users[0].self_supporting
+  button: |
+    Are you able to support yourself on your monthly income?: **${ word(yesno(users[0].self_supporting))}**
+- Edit: users[0].employer.name.text
+  button: |
+    % if users[0].jobs.there_are_any:
+    Tell us about your main employer.
+    % elif users[0].has_self_employment_income:
+    Describe your self employment and provide the address for your self employment.
+    % endif
+  
+    Name: ${ users[0].employer.name.text }
+    
+    Address: ${ users[0].employer.address.on_one_line() }
+    
+    Phone: ${ showifdef('users[0].employer.phone_number') }
+- Edit: users[0].employer.email
+  button: |
+    % if users[0].employer.email_unknown:
+    I don't know the email address for ${ users[0].name.text }
+    % else:
+    Email for ${ users[0].name.text }: **${ users[0].employer.email }**
+    % endif
 - note: |
     Your spouse's monthly gross income: **$${ thousands(other_parties[0].monthly_gross_income) }**
+
+    % if other_parties[0].assumed_monthly_gross_income:
+    You said you don't know about any source of income for your spouse, so we can assume that your spouse has an income based on minimum wage, working 40 hours per week.
+
+    % endif
 - Edit: 
     - other_parties[0].jobs.revisit
     - invalidate:
@@ -5985,7 +5997,7 @@ review:
       - other_parties[0].monthly_gross_income
     - recompute:
       - section_income
-  show if: len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0
+  show if: showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]')
   button: |
     % if other_parties[0].jobs.there_are_any:
     Your spouse's monthly gross income from a job:  **$${ thousands(other_parties[0].jobs.total(times_per_year=12)) }**
@@ -6007,60 +6019,104 @@ review:
       - other_parties[0].monthly_gross_income
     - recompute:
       - section_income
-  show if: len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0
+  show if: showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]')
   button: |
+    % if other_parties[0].has_self_employment_income == True:
     Your spouse's monthly gross income from self employment: **$${ thousands(other_parties[0].self_employment_income) }**
+    % elif other_parties[0].has_self_employment_income == False:
+    Your spouse has no self employment income.
+    % elif other_parties[0].has_self_employment_income == None:
+    You don't know if your spouse has any self employment income.
+    % endif
 - Edit: 
     - other_parties[0].benefits.revisit
     - recompute:
       - other_parties[0].monthly_gross_income
   button: |
+    % if len(other_parties[0].benefits) > 0:
     Your spouse's monthly gross income from benefits: **$${ thousands(other_parties[0].benefits.total(times_per_year=12)) }**
-- raw html: |
-    ${ next_accordion("Medical and Dental Insurance", showing=False) }
-  show if: len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0
-- Edit: medical_insurance
+    % elif other_parties[0].benefits.there_are_any == False:
+    Your spouse has no income from benefits.
+    % elif other_parties[0].benefits.there_are_any == None:
+    You don't know if your spouse has any income from benefits
+    % endif
+- Edit: other_parties[0].self_supporting
   button: |
-    **Parent Responsible for Medical Insurance**
-
-    Who should maintain and pay the cost of medical insurance for the benefit of the children?: ${ showifdef('medical_insurance') }
-- Edit: dental_insurance
+    Is ${ other_parties[0].name_full() } able to support themselves on their monthly income?: **${ "Unknown" if other_parties[0].self_supporting == None else word(yesno(other_parties[0].self_supporting))}**
+- Edit: other_parties[0].employer.name.text
   button: |
-    **Parent Responsible for Dental Insurance**
-
-    Who should maintain and pay the cost of dental insurance for the benefit of the children?: ${ showifdef('dental_insurance') }
-- Edit: health_expenses_not_covered
+    % if other_parties[0].jobs.there_are_any:
+    Tell us about ${ other_parties[0].pronoun_possessive("main employer") }.
+    % elif other_parties[0].has_self_employment_income:
+    Describe ${ other_parties[0].pronoun_possessive("self employment") }and provide the address.
+    % endif
+  
+    Name: ${ other_parties[0].employer.name.text }
+    
+    Address: ${ other_parties[0].employer.address.on_one_line() }
+    
+    Phone: ${ showifdef('other_parties[0].employer.phone_number') }
+- Edit: other_parties[0].employer.email
   button: |
-    **Health Expenses Not Covered by Insurance**
-
-    Who should pay health expenses not covered by insurance?: ${ showifdef('health_expenses_not_covered') }
-
-    Should that other parent reimburse for a percentage of thse expenses?: ${ word(yesno(health_expenses_not_covered_reimburse)) }
-
-    What percentage?: ${ showifdef('health_expenses_not_covered_reimburse_percentage') }
-- raw html: |
-    ${ next_accordion("Child Care Expenses", showing=False) }
-  show if: len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0
-- Edit: pay_work_childcare_expenses
-  button: |
-    **Child Care Expenses**
-
-    How should work-related childcare expenses be handled?: ${ showifdef('pay_work_childcare_expenses') }
-
-    % if showifdef('pay_work_childcare_expenses') == "pay_percentage":
-    What percentage of ${ possessify(support_recipient.name_full(), 'childcare costs') }should ${ support_payer.name_full() } reimburse?: ${ showifdef('pay_work_childcare_expenses_percentage') }
+    % if other_parties[0].employer.email_unknown:
+    I don't know the email address for ${ other_parties[0].name.text }
+    % else:
+    Email for ${ other_parties[0].name.text }: **${ other_parties[0].employer.email }**
     % endif
 - raw html: |
     ${ next_accordion("Child Support Payment", showing=False) }
-  show if: len(set(var_doc_dict["form_14_calculations"]) & set(doc_list_selected.true_values())) > 0
+  show if: |
+    "form_14_attachment" in doc_list_selected.true_values() or "parenting_plan_attachment" in doc_list_selected.true_values()
 - Edit: use_presumed_child_support
   button: |
     **Presumed Child Support amount**
 
-    Should the court order this amount in monthly child support?: ${ showifdef('use_presumed_child_support') }
+    % if number_of_children > 5:
+     - Six or more children - ${ currency(support_payer.presumed_child_support_amount_12_6 if support_payer.presumed_child_support_amount_12_6 > 0 else 0 ) }
+    
+    % endif
+    % if number_of_children > 4:
+     - Five children - ${ currency(support_payer.presumed_child_support_amount_12_5 if support_payer.presumed_child_support_amount_12_5 > 0 else 0 ) }
+    
+    % endif
+    % if number_of_children > 3:
+     - Four children - ${ currency(support_payer.presumed_child_support_amount_12_4 if support_payer.presumed_child_support_amount_12_4 > 0 else 0 ) }
+    
+    % endif
+    % if number_of_children > 2:
+     - Three children - ${ currency(support_payer.presumed_child_support_amount_12_3 if support_payer.presumed_child_support_amount_12_3 > 0 else 0 ) }
+    
+    % endif
+    % if number_of_children > 1:
+     - Two children - ${ currency(support_payer.presumed_child_support_amount_12_2 if support_payer.presumed_child_support_amount_12_2 > 0 else 0 ) }
+    
+    % endif
+     - One child - ${ currency(support_payer.presumed_child_support_amount_12 if support_payer.presumed_child_support_amount_12 > 0 else 0 ) }
+    
+    Should the court order this amount in monthly child support?: **${ showifdef('use_presumed_child_support') }**
 
     % if showifdef('use_presumed_child_support') == "no":
     Why is the presumed child support amount unjust and inappropriate?: ${ showifdef('use_presumed_child_support_explanation') }
+
+    % if defined('actual_child_support_6'):
+     - Six or more children: **$${ thousands(actual_child_support_6) }**
+    % endif
+    % if defined('actual_child_support_5'):
+     - Five children: **$${ thousands(actual_child_support_5) }**
+    % endif
+    % if defined('actual_child_support_4'):
+     - Four children: **$${ thousands(actual_child_support_4) }**
+    % endif
+    % if defined('actual_child_support_3'):
+     - Three children: **$${ thousands(actual_child_support_3) }**
+    % endif
+    % if defined('actual_child_support_2'):
+     - Two children: **$${ thousands(actual_child_support_2) }**
+    % endif
+    % if defined('actual_child_support_1'):
+     - One child: **$${ thousands(actual_child_support_1) }**
+    % endif
+    
     % endif
 - Edit: child_support_start_date
   button: |
@@ -6078,15 +6134,21 @@ review:
     How should child support be paid?: ${ showifdef('child_support_method_of_payment') }
 
     Should child support be paid at the Family Support Payment Center or directly to ${ support_recipient.name_full() }: ${ showifdef('child_support_location_of_payment') }
-- Edit: tax_deductions
+- Edit: children.revisit
   button: |
-    **Tax Deductions for ${ children[i].name_full() }**
+    **Income Tax Dependents**
+    
+    Child | Even Years | Odd Years
+    ------|------------|----------
+    % for child in [chi for chi in children if chi.unemancipated]:
+    ${ child.name_full() } | ${ child.tax_dependency_even } | ${ child.tax_dependency_odd } 
+    % endfor
 - raw html: |
     ${ end_accordion() }
-  show if: len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0
+  show if: minor_children and (showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]')or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'))
 - raw html: |
     ${ next_accordion("Expenses", showing=False) }
-  show if: len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0
+  show if: showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]')
 - edit: 
     - users[0].expenses.revisit
   button: |
@@ -6097,10 +6159,10 @@ review:
     Your spouse's monthly expenses - **$${ thousands(other_parties[0].expenses.total(times_per_year=12)) }**
 - raw html: |
     ${ next_accordion("Assets", showing=False) }
-  show if: len(set(var_doc_dict["real_estate"]) & set(doc_list_selected.true_values())) > 0
+  show if: showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]')
 - note: |
     The Property Statement requires users to identify which party currently owns the property.  This section shows you how each question is answered in this section.
-  show if: len(set(var_doc_dict["real_estate"]) & set(doc_list_selected.true_values())) > 0
+  show if: showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]')
 - Edit: real_estate.revisit
   button: |
     Does Petitioner own a house, condominium or other real estate?: **${ yesno(len([re for re in real_estate if re.marital_property in ["Marital","Both"] or re.title in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])  > 0) }**
@@ -6363,7 +6425,8 @@ review:
     How much cash do you have on hand?: ${ currency(showifdef('users[0].cash')) }
 - raw html: |
     ${ next_accordion("Debts", showing=False) }
-  show if: len(set(var_doc_dict["debts"]) & set(doc_list_selected.true_values())) > 0
+  show if: |
+    "parenting_plan_attachment" in doc_list_selected.true_values()
 - note: |
     Does Petitioner owe a mortgage on a house or condominium or land?:  **${ yesno(len(petitioner.debts.matches(source=['house','condominium', 'leasehold','real_estate_other'])) > 0)}**
 
@@ -6467,12 +6530,23 @@ review:
     % endfor
 - raw html: |
     ${ next_accordion("Children", showing=False) }
-  show if: len(set(var_doc_dict["real_estate"]) & set(doc_list_selected.true_values())) > 0
+- Edit: has_children
+  button: |
+    Do you and your spouse have children, including adopted children?: **${ yesno(has_children) }**
+
+    Do you and your spouse have children under 18 (or under 21 if in college), including adopted children?": **${ yesno(minor_children) }**
+
+    Do you and your spouse have any children that were born before your marriage?: **${ yesno(minor_children_before_marriage) }**
+
+    Have you or your spouse physically given birth to a child with another partner during your marriage?: **${ yesno(child_outside_marriage) }**
+    
+    Are you or your spouse currently pregnant?: **${ yesno(pregnant) }**
+    
 - note: |
     ${ children.table }
     
     ${ children.add_action() }
-  show if: len(set(var_doc_dict["real_estate"]) & set(doc_list_selected.true_values())) > 0
+  show if: showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]') or showifdef('doc_list_selected["petition_attachment"]')
 - raw html: |
     ${ next_accordion("Information about you", showing=False) }
 - Edit: 
@@ -6490,7 +6564,10 @@ review:
     You do not have a prior name.
     % endif
 
-- Edit: users[0].address.address
+- Edit: 
+    - users[0].address.address
+    - recompute:
+      - section_user_info
   button: |
     **Your address**
 
@@ -6499,6 +6576,33 @@ review:
     Phone: ${ showifdef('users[0].phone_number') }
 
     Email: ${ showifdef('users[0].email') }
+- Edit: users[0].mo_length_of_residence_choice
+  button: |
+    How long have you lived in ${ state_name(users[0].address.state) }?: ${ users[0].mo_length_of_residence_choice }
+    % if users[0].mo_length_of_residence_choice == "less_than_4":
+      - Less than 4 months: **${ users[0].mo_length_of_residence_days } days**
+    % elif users[0].mo_length_of_residence_choice == "more_than_4":
+      - More than 4 months but less than a year: **${ users[0].mo_length_of_residence_months } months**
+    % elif users[0].mo_length_of_residence_choice == "year":
+      - A year or more: **${ users[0].mo_length_of_residence_years } years**
+    % endif
+    
+    % if defined('users[0].resident_for_90_days'):
+    You are a Missouri resident for 90 days: **${ yesno(users[0].resident_for_90_days) }** 
+    % endif
+
+    How long have you lived in ${ users[0].address.county }?: 
+    % if users[0].county_length_of_residence_choice == "less_than_4":
+      - Less than 4 months: **${ users[0].county_length_of_residence_days } days**
+    % elif users[0].county_length_of_residence_choice == "more_than_4":
+      - More than 4 months but less than a year: **${ users[0].county_length_of_residence_months } months**
+    % elif users[0].county_length_of_residence_choice == "year":
+      - A year or more: **${ users[0].county_length_of_residence_years } years**
+    % endif
+
+    % if defined('users[0].county_resident_for_90_days'):
+    You are a resident of ${ users[0].address.county } for 90 days: **${ yesno(users[0].county_resident_for_90_days) }**     
+    % endif
 - Edit: users[0].birthdate
   button: |
     Your birthdate: **${ users[0].birthdate }**
@@ -6518,9 +6622,11 @@ review:
     Your race: **${ users[0].race }**
 - Edit: users[0].education_info
   button: |
-    Your highest level of elementary education: **${ users[0].education_elementary }**
+    You said your highest level of education was **${ users[0].education }**.  This entered into the form in the following way:
+    
+     - Your highest level of elementary education: **${ users[0].education_elementary }**
+     - Your highest level of secondary education: **${ showifdef(users[0].education_college) }**
 
-    Your highest level of secondary education: **${ users[0].education_college }**
 - Edit: 
     - users[0].active_duty
     - section_user_info
@@ -6571,6 +6677,35 @@ review:
     Phone: ${ showifdef('other_parties[0].phone_number') }
 
     Email: ${ showifdef('other_parties[0].email') }
+- Edit: other_parties[0].mo_length_of_residence_choice
+  button: |
+    How long has your spouse lived in ${ state_name(other_parties[0].address.state) }?: ${ other_parties[0].mo_length_of_residence_choice }
+    % if other_parties[0].mo_length_of_residence_choice == "less_than_4":
+      - Less than 4 months: **${ other_parties[0].mo_length_of_residence_days } days**
+    % elif other_parties[0].mo_length_of_residence_choice == "more_than_4":
+      - More than 4 months but less than a year: **${ other_parties[0].mo_length_of_residence_months } months**
+    % elif other_parties[0].mo_length_of_residence_choice == "year":
+      - A year or more: **${ other_parties[0].mo_length_of_residence_years } years**
+    % endif
+
+    % if defined('other_parties[0].resident_for_90_days'):
+    Your spouse is a Missouri resident for 90 days: **${ yesno(other_parties[0].resident_for_90_days) }** 
+    % endif
+
+    How long has your spouse lived in ${ other_parties[0].address.county }?: 
+    % if other_parties[0].county_length_of_residence_choice == "less_than_4":
+      - Less than 4 months: **${ other_parties[0].county_length_of_residence_days } days**
+    % elif other_parties[0].county_length_of_residence_choice == "more_than_4":
+      - More than 4 months but less than a year: **${ other_parties[0].county_length_of_residence_months } months**
+    % elif other_parties[0].county_length_of_residence_choice == "year":
+      - A year or more: **${ other_parties[0].county_length_of_residence_years } years**
+    % endif
+    
+    % if defined('other_parties[0].county_resident_for_90_days'):
+    Your spouse is a resident of ${ other_parties[0].address.county } for 90 days: **${ yesno(other_parties[0].county_resident_for_90_days) }** 
+    % endif
+
+
 - Edit: other_parties[0].birthdate
   button: |
     Your spouse's birthdate: **${ other_parties[0].birthdate }**
@@ -6590,9 +6725,10 @@ review:
     Your spouse's race: **${ other_parties[0].race }**
 - Edit: other_parties[0].education_info
   button: |
-    Your spouse's highest level of elementary education: **${ other_parties[0].education_elementary }**
-
-    Your spouse's highest level of secondary education: **${ other_parties[0].education_college }**
+    You said your spouse's highest level of education was **${ other_parties[0].education }**.  This entered into the form in the following way:
+    
+     - Your spouse's highest level of elementary education: **${ other_parties[0].education_elementary }**
+     - Your spouse's highest level of secondary education: **${ showifdef(other_parties[0].education_college) }**
 - Edit: 
     - other_parties[0].active_duty
     - section_user_info
@@ -6615,23 +6751,95 @@ review:
     ${ next_accordion("Case information", showing=False) }
 - Edit: case.filed
   button: |
-    **Court Case**
-
-    Has your case already been filed?: ${ showifdef('case.filed') }
-
-    % if showifdef('case.filed') == "user0_filed":
-    Has the case you filed been dismissed?: ${ showifdef('active_case') }
+    Has your case already been filed?: 
+    % if case.filed == "user0_filed":
+    **Yes, I filed myself**
+    
+    This means you, ${ users[0].name }, are considered the Petitioner in this case, and your spouse ${ other_parties[0].name } is the Respondent.
+    
+    Has the case you filed been dismissed?: **${ yesno(active_case) }**
+    
+    If the case has been dismissed, you will have to file a petition to start a new case.
+    
+    % elif case.filed == "other_parties0_filed": 
+    **Yes, my spouse filed**
+    
+    This means you, ${ users[0].name }, are considered the Respondent in this case, and your spouse ${ other_parties[0].name } is the Petitioner.
+    % elif case.filed == "not_filed":
+    **Not yet**
+    
+    This means you, ${ users[0].name }, will be considered the Petitioner in this case when you file, and your spouse ${ other_parties[0].name } will be the Respondent.
+    % elif case.filed == "unknown":
+    **I don't know**
+    
     % endif
 - Edit: previous_petitions
   button: |
-    **Has ${ petitioner.name.full() } filed any petitions before the one you are answering?**
-
-    ${ showifdef('previous_petitions') }  
+    Has ${ petitioner.name.full() } filed any petitions before the one you are answering?: **${ showifdef('previous_petitions') }**
 - Edit: case.name.text
   button: |
     **Case information - Case Name**
 
     Case name: ${ showifdef('case.name.text') }
+- Edit: 
+    - users[0].attorney_involved
+    - invalidate:
+      - users[0].attorney.bar_number
+      - users[0].attorney.address.address
+      - users[0].attorney.address.city
+      - users[0].attorney.address.state
+      - users[0].attorney.address.zip
+      - users[0].attorney.address.country
+      - users[0].attorney.phone_numberFalse
+      - users[0].attorney.email
+    - recompute:
+      - section_case_information
+  button: | 
+    Is an attorney helping you?: **${ yesno(users[0].attorney_involved) }**
+- Edit: users[0].attorney.name.first
+  button: |        
+    **${ users[0].attorney.name.full() }**
+    % if users[0].type_of_assistance == "representation":
+    is representing me.
+    % elif users[0].type_of_assistance == "assistance":
+    is only providing assistance preparing documents
+    % endif
+
+    - Bar number: **${ showifdef('users[0].attorney.bar_number') }**
+    - Address: **${ showifdef('users[0].attorney.address') }**
+    - Country: **${ showifdef('users[0].attorney.address.country') }**
+    - Phone: **${ showifdef('users[0].attorney.phone_number') }**
+    - Email: **${ showifdef('users[0].attorney.email') }**
+- Edit: 
+    - other_parties[0].attorney_involved
+    - invalidate:
+      - other_parties[0].attorney.bar_number
+      - other_parties[0].attorney.address.address
+      - other_parties[0].attorney.address.city
+      - other_parties[0].attorney.address.state
+      - other_parties[0].attorney.address.zip
+      - other_parties[0].attorney.address.country
+      - other_parties[0].attorney.phone_numberFalse
+      - other_parties[0].attorney.email
+    - recompute:
+      - section_case_information
+  button: | 
+    Is an attorney helping ${ other_parties[0].name.full() }?: **${ yesno(other_parties[0].attorney_involved) }**
+- Edit: other_parties[0].attorney.name.first
+  button: |        
+    **${ other_parties[0].attorney.name.full() }**
+    % if other_parties[0].type_of_assistance == "representation":
+    is representing ${ other_parties[0].name.full() }.
+    % elif other_parties[0].type_of_assistance == "assistance":
+    is only providing assistance preparing documents to ${ other_parties[0].name.full() }
+    % endif
+
+    - Bar number: **${ showifdef('other_parties[0].attorney.bar_number') }**
+    - Address: **${ showifdef('other_parties[0].attorney.address') }**
+    - Country: **${ showifdef('other_parties[0].attorney.address.country') }**
+    - Phone: **${ showifdef('other_parties[0].attorney.phone_number') }**
+    - Email: **${ showifdef('other_parties[0].attorney.email') }**
+        
 - Edit: case.matter_type
   button: |
     **Case information - Case Description**
@@ -6660,23 +6868,16 @@ review:
   button: |
     **Information about Your Marriage**
 
-    Place of this Marriage - City, Town, or Location: ${ showifdef('marriage.address.city') }
-
-    County: ${ showifdef('marriage.address.county') }
-
-    Country: ${ showifdef('marriage.address.country') }
-
-    Date of this Marriage: ${ showifdef('marriage.recorded_date') }
+    - Place of this Marriage - City, Town, or Location: **${ showifdef('marriage.address.city') }**
+    - County: **${ showifdef('marriage.address.county') }**
+    - Country: **${ showifdef('marriage.address.country') }**
+    - Date of this Marriage: **${ showifdef('marriage.recorded_date') }**
 - Edit: marriage.separation_date
   button: |
-    **When did your marriage end?**
-
-    What date did you separate and stop residing together?: ${ showifdef('marriage.separation_date') }
+    What date did you separate and stop residing together?: **${ showifdef('marriage.separation_date') }**
 - Edit: marriage.live_together_in_mo
   button: |
-    **Did you live together as a couple in Missouri?**
-
-    ${ word(yesno(marriage.live_together_in_mo)) }
+    Did you live together as a couple in Missouri?: **${ word(yesno(marriage.live_together_in_mo)) }**
 - raw html: |
     ${ next_accordion("Service", showing=False) }
 - Edit: 
@@ -6701,11 +6902,52 @@ review:
     Does ${ respondent.name.first } have any family in Missouri that ${ respondent.pronoun_subjective() } visits on a regular basis?": **${ word(yesno(missouri_family)) }**
 - Edit: 
     - other_parties[0].employer.address.address
-  show if: not len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0
+  show if: not (showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'))
   button: |
     Address for your spouse's work address for service
 
     ${ other_parties[0].employer.address.on_one_line() }
+- Edit:
+    - location_attempts
+  button: |
+    When was the last time you talked with ${ other_parties[0].name_full() }?: **${ last_time_talked }**
+
+    When was the last time you saw ${ other_parties[0].name_full() }?: **${ last_time_seen }**
+
+    How did you attempt to locate ${ other_parties[0].name_full() }?: 
+   
+    % if location_attempts['friends']:
+     - I have contacted family and friends of ${ other_parties[0].name_full() }, but they were unable to tell me where ${ other_parties[0].pronoun_subjective() } can be located
+    % endif 
+    % if location_attempts['phonebook']:
+      - I have looked in the telephone book for the telephone number and/or address of ${ other_parties[0].name_full() }
+    % endif 
+    % if location_attempts['personal_service']:
+      - I have attempted to have ${ other_parties[0].name_full() } personally served, but ${ other_parties[0].pronoun_subjective() } could not be found
+    % endif 
+    % if location_attempts['internet']:
+      - I have searched the internet for the telephone number and/or address of ${ other_parties[0].name_full() }
+    % endif 
+    % if location_attempts['former_employer']:
+      - I have contacted people at the former employer of ${ other_parties[0].name_full() } in an attempt to find ${ other_parties[0].pronoun_possessive("whereabouts") }.
+    % endif 
+    % if location_attempts['talked_to']: 
+      - I have talked to ${ other_parties[0].name_full() } but ${ other_parties[0].pronoun_subjective() } refused to give me any information about ${ other_parties[0].pronoun_possessive("location") }.
+    % endif 
+    % if location_attempts['other']: 
+      - Other
+    % endif 
+      
+    % if location_attempts['friends']:
+    What friends or family did you contact?: **${ family_and_friends_contacted }**
+    
+    % endif
+    % if location_attempts['other']:
+    What other way did you attempt to contact ${ other_parties[0].pronoun() }?: **${ other_attempt }**
+    
+    % endif
+
+    What is the name of the newspaper where you will publish service?: **${ newspaper }**    
 - raw html: |
     ${ end_accordion() }
 ---
@@ -7209,7 +7451,7 @@ content: |
   Does Respondent have any jewelry, clothing or other personal items worth more than $100? **${ yesno(len(petitioner.assets.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc"]) ) > 0) }**
   
   % if len(personal_goods.complete_elements()) > 0:
-  ${ personal_goodstable }  
+  ${ personal_goods.table }  
   % endif  
   
   ${ personal_goods.add_action(label="Add personal goods") } 

@@ -42,23 +42,23 @@ attachment:
       - "users1_name_middle": ${ users[0].name.middle } 
       - "users1_name_last": ${ users[0].name.last } 
       - "users1_prior_name": ${ users[0].prior_name } 
-      - "users1_ssn": ${ users[0].ssn } 
+      - "users1_ssn": ${ redact(users[0].ssn) } 
       - "users1_address_city": ${ users[0].address.city } 
       - "users1_address_state": ${ users[0].address.state } 
       - "users1_address_zip": ${ users[0].address.zip } 
       - "users1_address_county": ${ users[0].address.county } 
-      - "users1_birthdate": ${ format_date(users[0].birthdate, format='M/d/yyyy') } 
+      - "users1_birthdate": ${ redact(format_date(users[0].birthdate, format='M/d/yyyy')) } 
       - "users1_birthplace": ${ users[0].birthplace } 
       - "users2_name_first": ${ other_parties[0].name.first } 
       - "users2_name_middle": ${ other_parties[0].name.middle } 
       - "users2_name_last": ${ other_parties[0].name.last } 
       - "users2_prior_name": ${ other_parties[0].prior_name } 
-      - "users2_ssn": ${ other_parties[0].ssn } 
+      - "users2_ssn": ${ redact(other_parties[0].ssn) } 
       - "users2_address_city": ${ other_parties[0].address.city } 
       - "users2_address_state": ${ other_parties[0].address.state } 
       - "users2_address_zip": ${ other_parties[0].address.zip } 
       - "users2_address_county": ${ other_parties[0].address.county } 
-      - "users2_birthdate": ${ format_date(other_parties[0].birthdate, format='M/d/yyyy') } 
+      - "users2_birthdate": ${ redact(format_date(other_parties[0].birthdate, format='M/d/yyyy')) } 
       - "users2_birthplace": ${ other_parties[0].birthplace } 
       - "marriage_address_city": ${ marriage.address.city } 
       - "marriage_address_county": ${ nice_county_name(marriage.address) } 
@@ -96,7 +96,7 @@ attachment:
       - "users1_race_black": ${ users[0].race == "Black or African American" } 
       - "users1_last_marriage_ended_divorce": ${ users[0].last_marriage_end == "Divorce" } 
       - "users1_race_AmericanIndian": ${ users[0].race == "American Indian or Alaska Native" } 
-      - "users1_number_of_marriage": ${ ordinal(users[0].number_of_marriages) } 
+      - "users1_number_of_marriage": ${ "first" if users[0].previously_married == None else ordinal(users[0].number_of_marriages) } 
       - "users1_last_marriage_ended_date": ${ format_date(users[0].last_marriage_end_date, format='M/d/yyyy') } 
       - "users1_race_other": ${ users[0].race in ["Asian", "Native Hawaiian or other Pacific Islander", "Hispanic or Latino", "Middle Eastern or North African (MENA)","Other"] } 
       - "users1_race_other_description": |
@@ -112,7 +112,7 @@ attachment:
       - "users2_race_black": ${ other_parties[0].race == "Black or African American" } 
       - "users2_last_marriage_ended_divorce": ${ other_parties[0].last_marriage_end == "Divorce" } 
       - "users2_race_AmericanIndian": ${ other_parties[0].race == "American Indian or Alaska Native" } 
-      - "users2_number_of_marriage": ${ ordinal(other_parties[0].number_of_marriages) } 
+      - "users2_number_of_marriage": ${ "first" if other_parties[0].previously_married == None else ordinal(other_parties[0].number_of_marriages) } 
       - "users2_race_other": ${ other_parties[0].race in ["Asian", "Native Hawaiian or other Pacific Islander", "Hispanic or Latino", "Middle Eastern or North African (MENA)","Other"] } 
       - "users2_last_marriage_ended_date": ${ format_date(other_parties[0].last_marriage_end_date, format='M/d/yyyy') } 
       - "users2_race_other_description": |

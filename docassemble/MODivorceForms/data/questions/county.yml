@@ -224,7 +224,7 @@ data:
       - name: Adair County Courthouse
         address: 106 W. Washington Street
         city: Kirksville
-        state: MISSOURI
+        state: Missouri
         zip: 63501
         phone: (660) 665-2552
         rules: https://www.courts.mo.gov/file.jsp?id=36560
@@ -246,7 +246,7 @@ data:
       - name: Andrew County Courthouse
         address: 411 Court St.
         city: Savannah
-        state: MISSOURI
+        state: Missouri
         zip: 64485
         phone: (816) 324-3921
         rules: https://www.courts.mo.gov/file.jsp?id=29274
@@ -266,7 +266,7 @@ data:
       - name: Atchison County Courthouse
         address: 400 S. Washington Street
         city: Rock Port
-        state: MISSOURI
+        state: Missouri
         zip: 64482
         phone: (660) 744-2700
         rules: https://www.courts.mo.gov/file.jsp?id=53533
@@ -288,7 +288,7 @@ data:
       - name: Audrain County Courthouse
         address: 101 N. Jefferson
         city: Mexico
-        state: MISSOURI
+        state: Missouri
         zip: 65265
         phone: (573) 473-5840
         rules: https://www.courts.mo.gov/file.jsp?id=85613
@@ -310,7 +310,7 @@ data:
       - name: Barry County Judicial Center
         address: 102 West Street
         city: Cassville
-        state: MISSOURI
+        state: Missouri
         zip: 65625
         phone: (417) 847-3133
         rules: https://www.courts.mo.gov/file.jsp?id=5154
@@ -330,7 +330,7 @@ data:
       - name: Barton County Courthouse
         address: 1004 Gulf
         city: Lamar
-        state: MISSOURI
+        state: Missouri
         zip: 64759
         phone: (417) 682-2444
         rules: https://www.courts.mo.gov/file.jsp?id=4073
@@ -352,7 +352,7 @@ data:
       - name: Bates County Courthouse
         address: One North Delaware
         city: Butler
-        state: MISSOURI
+        state: Missouri
         zip: 64730
         phone: (660) 679-5171
         rules: #VALUE!
@@ -374,7 +374,7 @@ data:
       - name: Benton County Courthouse
         address: 316 Van Buren Road
         city: Warsaw
-        state: MISSOURI
+        state: Missouri
         zip: 65355
         phone: (660) 438-7712
         rules: #VALUE!
@@ -394,7 +394,7 @@ data:
       - name: Bollinger County Courthouse
         address: 204 High Street
         city: Marble Hill
-        state: MISSOURI
+        state: Missouri
         zip: 63764
         phone: (573) 238-1900 ext. 6
         rules: https://www.courts.mo.gov/file.jsp?id=36433
@@ -416,7 +416,7 @@ data:
       - name: Boone County Courthouse
         address: 705 E. Walnut Street
         city: Columbia
-        state: MISSOURI
+        state: Missouri
         zip: 65201
         phone: (573) 886-4000
         rules: https://www.courts.mo.gov/file.jsp?id=50452
@@ -438,7 +438,7 @@ data:
       - name: Buchanan County Courthouse
         address: 411 Jules Street
         city: St. Joseph
-        state: MISSOURI
+        state: Missouri
         zip: 64501
         phone: (816) 271-1462
         rules: https://www.courts.mo.gov/file.jsp?id=29274
@@ -460,7 +460,7 @@ data:
       - name: Butler County Courthouse
         address: 100 North Main
         city: Poplar Bluff
-        state: MISSOURI
+        state: Missouri
         zip: 63901
         phone: (573) 686-8082
         rules: https://www.courts.mo.gov/file.jsp?id=5626
@@ -482,7 +482,7 @@ data:
       - name: Caldwell County Courthouse
         address: 49 East Main Street
         city: Kingston
-        state: MISSOURI
+        state: Missouri
         zip: 64650
         phone: (816) 586-2581
         rules: https://www.courts.mo.gov/file.jsp?id=29626
@@ -504,7 +504,7 @@ data:
       - name: Callaway County Justice Center
         address: 5 E. 2nd Street
         city: Fulton
-        state: MISSOURI
+        state: Missouri
         zip: 65251
         phone: (573) 642-0780
         website: https://callawaycounty.org/circuit-clerk/
@@ -524,7 +524,7 @@ data:
         address: 1 Court Circle
         unit: Suite 8
         city: Camdenton
-        state: MISSOURI
+        state: Missouri
         zip: 65020
         phone: (573) 346-4440
         rules: https://www.courts.mo.gov/file.jsp?id=50573
@@ -546,7 +546,7 @@ data:
       - name: Cape Girardeau County Courthouse
         address: 203 North High Street
         city: Jackson
-        state: MISSOURI
+        state: Missouri
         zip: 63755
         phone: (573) 243-1755
         rules: https://www.courts.mo.gov/file.jsp?id=36433
@@ -568,7 +568,7 @@ data:
       - name: Carroll County Courthouse
         address: 8 South Main
         city: Carrollton
-        state: MISSOURI
+        state: Missouri
         zip: 64633
         phone: (660) 542-1466
         rules: #VALUE!
@@ -588,7 +588,7 @@ data:
       - name: Carter County Courthouse
         address: 1122 Main Street
         city: Van Buren
-        state: MISSOURI
+        state: Missouri
         zip: 63965
         phone: (573) 323-4513
         rules: #VALUE!
@@ -610,7 +610,7 @@ data:
       - name: Cass County Justice Center
         address: 2501 West Mechanic
         city: Harrisonville
-        state: MISSOURI
+        state: Missouri
         zip: 64701
         phone: (816) 380-8227
         rules: https://www.courts.mo.gov/file.jsp?id=51228
@@ -632,7 +632,7 @@ data:
       - name: Cedar County Courthouse
         address: 113 South Street
         city: Stockton
-        state: MISSOURI
+        state: Missouri
         zip: 65785
         phone: (417) 276-6700 ext. 234
         rules: https://www.courts.mo.gov/file.jsp?id=4073
@@ -654,7 +654,7 @@ data:
       - name: Chariton County Courthouse
         address: 306 South Cherry Street
         city: Keytesville
-        state: MISSOURI
+        state: Missouri
         zip: 65261
         phone: (660) 288-3602
         rules: https://www.courts.mo.gov/file.jsp?id=68013
@@ -676,7 +676,7 @@ data:
       - name: Christian County Justice Center
         address: 110 W. Elm Street
         city: Ozark
-        state: MISSOURI
+        state: Missouri
         zip: 65721
         rules: https://www.courts.mo.gov/file.jsp?id=3732
         website: https://courts.christiancountymo.gov/
@@ -698,7 +698,7 @@ data:
         address: 111 East Court Street
         unit: Suite 210
         city: Kahoka
-        state: MISSOURI
+        state: Missouri
         zip: 63445
         phone: (660) 727-3292
         rules: https://www.courts.mo.gov/file.jsp?id=85013
@@ -720,7 +720,7 @@ data:
       - name: Clay County Courthouse
         address: 11 South Water
         city: Liberty
-        state: MISSOURI
+        state: Missouri
         zip: 64068
         phone: (816) 407-3901
         rules: https://www.courts.mo.gov/file.jsp?id=35954
@@ -742,7 +742,7 @@ data:
       - name: Clinton County Courthouse
         address: 207 North Main Street
         city: Plattsburg
-        state: MISSOURI
+        state: Missouri
         zip: 64477
         phone: (816) 539-3731
         rules: https://www.courts.mo.gov/file.jsp?id=29626
@@ -764,7 +764,7 @@ data:
       - name: Cole County Courthouse
         address: 301 East High Street
         city: Jefferson City
-        state: MISSOURI
+        state: Missouri
         zip: 65101
         phone: (573) 634-9150
         rules: https://colecounty.org/DocumentCenter/View/6779/Local-Court-Rules-FINAL-Revised-12-20-2024?bidId=
@@ -784,7 +784,7 @@ data:
       - name: Cooper County Courthouse
         address: 200 Main Street
         city: Boonville
-        state: MISSOURI
+        state: Missouri
         zip: 65233
         phone: (660) 882-2232
         rules: https://www.courts.mo.gov/file.jsp?id=29396
@@ -806,7 +806,7 @@ data:
       - name: Crawford County Courthouse
         address: 302 W. Main Street
         city: Steelville
-        state: MISSOURI
+        state: Missouri
         zip: 65565
         phone: (573) 775-2866
         rules: https://www.courts.mo.gov/file.jsp?id=10300
@@ -828,7 +828,7 @@ data:
       - name: Dade County Courthouse
         address: 300 W. Water
         city: Greenfield
-        state: MISSOURI
+        state: Missouri
         zip: 65661
         phone: (417) 238-2400
         rules: https://www.courts.mo.gov/file.jsp?id=4073
@@ -850,7 +850,7 @@ data:
       - name: Dallas County Courthouse
         address: 108 S. Maple Street
         city: Buffalo
-        state: MISSOURI
+        state: Missouri
         zip: 65622
         phone: (417) 345-2243
         rules: https://www.courts.mo.gov/file.jsp?id=12314
@@ -872,7 +872,7 @@ data:
       - name: Daviess County Courthouse
         address: 102 North Main
         city: Gallatin
-        state: MISSOURI
+        state: Missouri
         zip: 64640
         phone: (660) 663-3300 ext. 2
         rules: https://www.courts.mo.gov/file.jsp?id=29626
@@ -894,7 +894,7 @@ data:
       - name: DeKalb County Courthouse
         address: 109 W. Main
         city: Maysville
-        state: MISSOURI
+        state: Missouri
         zip: 64469
         phone: (816) 449-2602
         rules: https://www.courts.mo.gov/file.jsp?id=29626
@@ -914,7 +914,7 @@ data:
       - name: Dent County Judicial Building
         address: 112 E. 5th Street
         city: Salem
-        state: MISSOURI
+        state: Missouri
         zip: 65560
         phone: (573) 729-3931
         rules: https://www.courts.mo.gov/file.jsp?id=10300
@@ -936,7 +936,7 @@ data:
       - name: Douglas County Courthouse
         address: 203 E. Lincoln Avenue
         city: Ava
-        state: MISSOURI
+        state: Missouri
         zip: 65608
         phone: (417) 683-4713
         rules: https://www.courts.mo.gov/file.jsp?id=36706
@@ -958,7 +958,7 @@ data:
       - name: Dunklin County Justice Center
         address: 1175 Floyd Street
         city: Kennett
-        state: MISSOURI
+        state: Missouri
         zip: 63857
         phone: (573) 888-2456
         rules: #VALUE!
@@ -980,7 +980,7 @@ data:
       - name: Franklin County Judicial Center
         address: 401 East Main Street
         city: Union
-        state: MISSOURI
+        state: Missouri
         zip: 63084
         phone: (636) 583-7378
         rules: https://www.courts.mo.gov/file.jsp?id=70553
@@ -1003,7 +1003,7 @@ data:
         address: 119 E. 1st Street
         unit:  Room 6
         city: Hermann
-        state: MISSOURI
+        state: Missouri
         zip: 65041
         phone: (573) 486-2632
         rules: https://www.courts.mo.gov/file.jsp?id=70553
@@ -1026,7 +1026,7 @@ data:
         address: 200 West Clay Street
         unit: Suite 101
         city: Albany
-        state: MISSOURI
+        state: Missouri
         zip: 64402
         phone: (660) 726-3618
         rules: https://www.courts.mo.gov/file.jsp?id=53533
@@ -1048,7 +1048,7 @@ data:
       - name: Greene County Judicial Courts Facility
         address: 1010 North Boonville
         city: Springfield
-        state: MISSOURI
+        state: Missouri
         zip: 65802
         phone: (417) 868-4074
         rules: https://www.courts.mo.gov/file.jsp?id=35837
@@ -1068,7 +1068,7 @@ data:
       - name: Grundy County Courthouse
         address: 700 Main Street
         city: Trenton
-        state: MISSOURI
+        state: Missouri
         zip: 64683
         phone: (660) 359-4040
         rules: https://www.courts.mo.gov/file.jsp?id=42463
@@ -1090,7 +1090,7 @@ data:
       - name: Harrison County Courthouse
         address: 1500 Central Street
         city: Bethany
-        state: MISSOURI
+        state: Missouri
         zip: 64424
         phone: (660) 425-6425
         rules: https://www.courts.mo.gov/file.jsp?id=42463
@@ -1112,7 +1112,7 @@ data:
       - name: Henry County Courthouse
         address: 100 W. Franklin
         city: Clinton
-        state: MISSOURI
+        state: Missouri
         zip: 64735
         phone: (660) 885-7232
         rules: #VALUE!
@@ -1134,7 +1134,7 @@ data:
       - name: Hickory County Courthouse
         address: 100 W. Polk Street
         city: Hermitage
-        state: MISSOURI
+        state: Missouri
         zip: 65668
         phone: (417) 745-6421
         rules: https://www.courts.mo.gov/file.jsp?id=12314
@@ -1154,7 +1154,7 @@ data:
       - name: Holt County Courthouse
         address: 102 West Nodaway
         city: Oregon
-        state: MISSOURI
+        state: Missouri
         zip: 64473
         phone: (660) 446-3301
         rules: https://www.courts.mo.gov/file.jsp?id=53533
@@ -1174,7 +1174,7 @@ data:
       - name: Howard County Courthouse
         address: #1 Courthouse Square
         city: Fayette
-        state: MISSOURI
+        state: Missouri
         zip: 65248
         phone: (660) 248-2194
         rules: https://www.courts.mo.gov/file.jsp?id=32067
@@ -1196,7 +1196,7 @@ data:
       - name: Howell County Courthouse
         address: 106 Courthouse
         city: West Plains
-        state: MISSOURI
+        state: Missouri
         zip: 65775
         phone: (417) 256-3741
         rules: https://www.courts.mo.gov/file.jsp?id=59621
@@ -1219,7 +1219,7 @@ data:
         address: 250 S. Main Street
         unit: Suite 220
         city: Ironton
-        state: MISSOURI
+        state: Missouri
         zip: 63650
         phone: (573) 546-2511
         rules: https://www.courts.mo.gov/file.jsp?id=10300
@@ -1241,7 +1241,7 @@ data:
       - name: Kansas City Courthouse
         address: 415 E. 12th Street
         city: Kansas City
-        state: MISSOURI
+        state: Missouri
         zip: 64106
         phone: (816) 881-3000
         rules: https://www.16thcircuit.org/court-rules
@@ -1252,7 +1252,7 @@ data:
       - name: Independence Courthouse
         address: 308 West Kansas
         city: Independence
-        state: MISSOURI
+        state: Missouri
         zip: 64050
         phone: (816) 881-4400
         photo: Jackson2.jpeg
@@ -1270,7 +1270,7 @@ data:
       - name: Jasper County Courthouse (Carthage)
         address: 302 S. Main
         city: Carthage
-        state: MISSOURI
+        state: Missouri
         zip: 64836
         photo: Jasper2.jpeg
         schedule: |
@@ -1278,7 +1278,7 @@ data:
       - name: Jasper County Courthouse (Joplin)
         address: 633 South Pearl Avenue
         city: Joplin
-        state: MISSOURI
+        state: Missouri
         zip: 64804
         phone: (417) 625-4310
         rules: https://www.courts.mo.gov/file.jsp?id=29627
@@ -1300,7 +1300,7 @@ data:
       - name: Jefferson County Courthouse
         address: 300 Main Street
         city: Hillsboro
-        state: MISSOURI
+        state: Missouri
         zip: 63050
         phone: (636) 797-5443
         rules: https://www.courts.mo.gov/file.jsp?id=60221
@@ -1322,7 +1322,7 @@ data:
       - name: Johnson County Justice Center
         address: 101 West Market
         city: Warrensburg
-        state: MISSOURI
+        state: Missouri
         zip: 64093
         phone: (660) 422-7413
         rules: https://www.courts.mo.gov/file.jsp?id=51228
@@ -1344,7 +1344,7 @@ data:
         address: 107 North 4th Street
         unit: Suite I
         city: Edina
-        state: MISSOURI
+        state: Missouri
         zip: 63537
         phone: (660) 397-2305
         rules: https://www.courts.mo.gov/file.jsp?id=36560
@@ -1366,7 +1366,7 @@ data:
       - name: Laclede County Courthouse
         address: 200 N. Adams
         city: Lebanon
-        state: MISSOURI
+        state: Missouri
         zip: 65536
         phone: (417) 532-2471
         rules: https://www.courts.mo.gov/file.jsp?id=50573
@@ -1388,12 +1388,12 @@ data:
       - name: 
         address: 1001 Main St.
         city: Lexington
-        state: MISSOURI
+        state: Missouri
         zip: 64067
       - name: Lafayette County Courthouse
         address: 116 S. 10th Street
         city: Lexington
-        state: MISSOURI
+        state: Missouri
         zip: 64067
         phone: (660) 259-6101
         rules: https://www.courts.mo.gov/file.jsp?id=29394
@@ -1416,7 +1416,7 @@ data:
         address: 240 North Main
         unit: Suite 110
         city: Mount Vernon
-        state: MISSOURI
+        state: Missouri
         zip: 65712
         phone: (417) 466-2471
         rules: https://www.courts.mo.gov/file.jsp?id=5154
@@ -1438,7 +1438,7 @@ data:
       - name: Lewis County Courthouse
         address: 100 East Lafayette
         city: Monticello
-        state: MISSOURI
+        state: Missouri
         zip: 63457
         phone: (573) 767-5352
         rules: https://www.courts.mo.gov/file.jsp?id=36560
@@ -1460,7 +1460,7 @@ data:
       - name: Lincoln County Justice Center
         address: 45 Business Park Drive
         city: Troy
-        state: MISSOURI
+        state: Missouri
         zip: 63379
         phone: (636) 528-0326
         rules: https://www.courts.mo.gov/file.jsp?id=7918
@@ -1482,7 +1482,7 @@ data:
       - name: Linn County Courthouse
         address: 108 North High
         city: Linneus
-        state: MISSOURI
+        state: Missouri
         zip: 64653
         phone: (660) 895-5212
         rules: https://www.courts.mo.gov/file.jsp?id=68013
@@ -1502,7 +1502,7 @@ data:
       - name: Livingston County Courthouse
         address: 700 Webster
         city: Chillicothe
-        state: MISSOURI
+        state: Missouri
         zip: 64601
         phone: (660) 646-8000 ext. 305
         rules: https://www.courts.mo.gov/file.jsp?id=29626
@@ -1524,7 +1524,7 @@ data:
       - name: McDonald County Courthouse
         address: Highway W. & Main Street
         city: Pineville
-        state: MISSOURI
+        state: Missouri
         zip: 64856
         phone: (417) 223-7512
         rules: https://www.courts.mo.gov/file.jsp?id=64953
@@ -1546,7 +1546,7 @@ data:
       - name: Macon County Courthouse
         address: 101 E. Washington Street
         city: Macon
-        state: MISSOURI
+        state: Missouri
         zip: 63552
         phone: (660) 385-4631
         rules: https://www.courts.mo.gov/file.jsp?id=29214
@@ -1569,7 +1569,7 @@ data:
         address: 3 Court Square
         unit: Suite 1
         city: Fredericktown
-        state: MISSOURI
+        state: Missouri
         zip: 63645
         phone: (573) 783-2176 ext. 2
         rules: https://www.courts.mo.gov/file.jsp?id=65063
@@ -1588,7 +1588,7 @@ data:
       - name: Maries County Courthouse
         address: 211 Fourth Street
         city: Vienna
-        state: MISSOURI
+        state: Missouri
         zip: 65582
         phone: (573) 422-3338
         rules: https://www.courts.mo.gov/file.jsp?id=29398
@@ -1610,7 +1610,7 @@ data:
       - name: Marion County I      Round Grove, Union, Warren, Fabius, Liberty, and South River 
         address: 100 S. Main
         city: Palmyra
-        state: MISSOURI
+        state: Missouri
         zip: 63461
         phone: (573) 769-2550
         rules: https://www.courts.mo.gov/file.jsp?id=74934
@@ -1621,7 +1621,7 @@ data:
       - name: Marion County II  Miller and Mason
         address: 906 Broadway
         city: Hannibal
-        state: MISSOURI
+        state: Missouri
         zip: 63401
         phone: (573) 221-0198
         schedule: |
@@ -1640,7 +1640,7 @@ data:
       - name: Mercer County Courthouse
         address: 802 East Main Street
         city: Princeton
-        state: MISSOURI
+        state: Missouri
         zip: 64673
         phone: (660) 748-4335
         rules: https://www.courts.mo.gov/file.jsp?id=42463
@@ -1661,7 +1661,7 @@ data:
       - name: Miller County Courthouse
         address: 2001 Highway 52
         city: Tuscumbia
-        state: MISSOURI
+        state: Missouri
         zip: 65082
         phone: (573) 369-1980
         rules: https://www.courts.mo.gov/file.jsp?id=50573
@@ -1683,7 +1683,7 @@ data:
       - name: Mississippi County Courthouse
         address: 200 North Main Street
         city: Charleston
-        state: MISSOURI
+        state: Missouri
         zip: 63834
         phone: (573) 683-2146
         website: https://www.misscomo.net/services/circuit_clerk.php
@@ -1704,7 +1704,7 @@ data:
       - name: Moniteau County Courthouse
         address: 200 E. Main
         city: California
-        state: MISSOURI
+        state: Missouri
         zip: 65018
         phone: (573) 796-2071
         rules: https://www.courts.mo.gov/file.jsp?id=50573
@@ -1725,7 +1725,7 @@ data:
       - name: Monroe County Courthouse
         address: 300 North Main Street
         city: Paris
-        state: MISSOURI
+        state: Missouri
         zip: 65275
         phone: (877) 433-3061 ext. 425
         rules: https://www.courts.mo.gov/file.jsp?id=74934
@@ -1746,7 +1746,7 @@ data:
       - name: Montgomery County Courthouse
         address: 211 E. Third Street
         city: Montgomery City
-        state: MISSOURI
+        state: Missouri
         zip: 63361
         phone: (573) 564-3341
         rules: 12 Circuit Local Court Rules.pdf
@@ -1769,7 +1769,7 @@ data:
         address: 211 East Newton Street
         unit: Suite 4
         city: Versailles
-        state: MISSOURI
+        state: Missouri
         zip: 65084
         phone: (573) 378-4413
         rules: https://www.courts.mo.gov/file.jsp?id=50573
@@ -1791,7 +1791,7 @@ data:
       - name: New Madrid County Courthouse
         address: 450 Main Street
         city: New Madrid
-        state: MISSOURI
+        state: Missouri
         zip: 63869
         phone: (573) 748-2228
         photo: New_Madrid.png
@@ -1809,7 +1809,7 @@ data:
       - name: Newton County Judicial Center
         address: 123 East Main St.
         city: Neosho
-        state: MISSOURI
+        state: Missouri
         zip: 64850
         phone: (417) 451-8210
         rules: https://www.courts.mo.gov/file.jsp?id=64953
@@ -1829,7 +1829,7 @@ data:
       - name: Nodaway County Courthouse
         address: 305 N. Main
         city: Maryville
-        state: MISSOURI
+        state: Missouri
         zip: 64468
         phone: (660) 582-5431
         rules: https://www.courts.mo.gov/file.jsp?id=53533
@@ -1851,7 +1851,7 @@ data:
       - name: Oregon County Courthouse
         address: Courthouse Square
         city: Alton
-        state: MISSOURI
+        state: Missouri
         zip: 65606
         phone: (417) 778-7460
         rules: https://www.courts.mo.gov/file.jsp?id=59621
@@ -1872,7 +1872,7 @@ data:
       - name: Osage County Courthouse
         address: 106 E. Main Street
         city: Linn
-        state: MISSOURI
+        state: Missouri
         zip: 65051
         phone: (573) 897-3114
         rules: https://www.courts.mo.gov/file.jsp?id=70553
@@ -1894,7 +1894,7 @@ data:
       - name: Ozark County Courthouse
         address: 2 Court Square
         city: Gainesville
-        state: MISSOURI
+        state: Missouri
         zip: 65655
         phone: (417) 679-4232
         rules: https://www.courts.mo.gov/file.jsp?id=85613
@@ -1916,7 +1916,7 @@ data:
       - name: Pemiscot County Courthouse (Division I and III)
         address: 610 Ward Avenue
         city: Caruthersville
-        state: MISSOURI
+        state: Missouri
         zip: 63830
         phone: (573) 333-0187
         website: https://www.pemiscotcounty.org/circuit-clerk.php
@@ -1938,7 +1938,7 @@ data:
         address: 400 W. St. Joseph Street
         unit:  Suite 4
         city: Perryville
-        state: MISSOURI
+        state: Missouri
         zip: 63775
         phone: (573) 547-6581
         rules: https://www.courts.mo.gov/file.jsp?id=36433
@@ -1960,7 +1960,7 @@ data:
       - name: Pettis County Courthouse
         address: 415 South Ohio
         city: Sedalia
-        state: MISSOURI
+        state: Missouri
         zip: 65301
         phone: (660) 826-5000 ext. 926
         rules: https://www.courts.mo.gov/file.jsp?id=29396
@@ -1982,7 +1982,7 @@ data:
       - name: Phelps County Courthouse
         address: 200 N. Main Street
         city: Rolla
-        state: MISSOURI
+        state: Missouri
         zip: 65401
         phone: (573) 458-6210
         rules: https://www.courts.mo.gov/file.jsp?id=29398
@@ -2004,7 +2004,7 @@ data:
       - name: Pike County Courthouse
         address: 115 W. Main
         city: Bowling Green
-        state: MISSOURI
+        state: Missouri
         zip: 63334
         phone: (573) 324-5582
         rules: https://www.courts.mo.gov/file.jsp?id=7918
@@ -2026,7 +2026,7 @@ data:
       - name: Platte County Courthouse
         address: 415 Third Street
         city: Platte City
-        state: MISSOURI
+        state: Missouri
         zip: 64079
         phone: (816) 858-3481
         rules: https://www.courts.mo.gov/file.jsp?id=30067
@@ -2049,7 +2049,7 @@ data:
         address: 102 E. Broadway Street
         unit: Room 14
         city: Bolivar
-        state: MISSOURI
+        state: Missouri
         zip: 65613
         phone: (417) 326-4912
         rules: https://www.courts.mo.gov/file.jsp?id=12314
@@ -2072,7 +2072,7 @@ data:
         address: 301 Historic Route 66 E
         unit: Suite 318
         city: Waynesville
-        state: MISSOURI
+        state: Missouri
         zip: 65583
         phone: (573) 774-4755
         rules: https://www.courts.mo.gov/file.jsp?id=29398
@@ -2094,7 +2094,7 @@ data:
       - name: Putnam County Courthouse
         address: 1601 West Main Street
         city: Unionville
-        state: MISSOURI
+        state: Missouri
         zip: 63565
         phone: (660) 947-2071
         rules: https://www.courts.mo.gov/file.jsp?id=42463
@@ -2115,7 +2115,7 @@ data:
       - name: Ralls County Courthouse
         address: 311 South Main Street
         city: New London
-        state: MISSOURI
+        state: Missouri
         zip: 63459
         phone: (573) 985-5633
         rules: https://www.courts.mo.gov/file.jsp?id=74934
@@ -2138,7 +2138,7 @@ data:
         address: 372 Highway JJ
         unit: Suite 1A
         city: Huntsville
-        state: MISSOURI
+        state: Missouri
         zip: 65259
         phone: (844) 277-6555 ext. 400
         rules: https://www.courts.mo.gov/file.jsp?id=32067
@@ -2161,7 +2161,7 @@ data:
         address: 100 West Main Street
         unit: 2nd Floor
         city: Richmond
-        state: MISSOURI
+        state: Missouri
         zip: 64085
         phone: (816) 776-3377
         website: https://raycountymo.com/index.php/ray-county-circuit-court/
@@ -2182,7 +2182,7 @@ data:
       - name: Reynolds County Courthouse
         address: 2319 Greene Street
         city: Centerville
-        state: MISSOURI
+        state: Missouri
         zip: 63633
         phone: (573) 648-2494
         rules: https://www.courts.mo.gov/file.jsp?id=10300
@@ -2202,7 +2202,7 @@ data:
         address: 100 Courthouse Square
         unit: Suite #4
         city: Doniphan
-        state: MISSOURI
+        state: Missouri
         zip: 63935
         phone: (573) 996-2818
         rules: https://www.courts.mo.gov/file.jsp?id=5626
@@ -2223,7 +2223,7 @@ data:
       - name: St. Charles County Courthouse
         address: 300 N. 2nd Street
         city: St. Charles
-        state: MISSOURI
+        state: Missouri
         zip: 63301
         phone: (636) 949-3097
         rules: https://www.courts.mo.gov/file.jsp?id=42261
@@ -2245,7 +2245,7 @@ data:
       - name: St. Clair County Courthouse
         address: 655 Second Street
         city: Osceola
-        state: MISSOURI
+        state: Missouri
         zip: 64776
         phone: (417) 646-2226
         website: https://www.stclaircomo.com/node/17
@@ -2266,7 +2266,7 @@ data:
       - name: Ste. Genevieve County Courthouse
         address: 55 South 3rd Street
         city: Ste. Genevieve
-        state: MISSOURI
+        state: Missouri
         zip: 63670
         phone: (573) 883-2705 ext. 135
         rules: https://www.courts.mo.gov/file.jsp?id=65063
@@ -2288,7 +2288,7 @@ data:
       - name: St. Francois County Courthouse
         address: 1 North Washington Street
         city: Farmington
-        state: MISSOURI
+        state: Missouri
         zip: 63640
         phone: (573) 756-4551
         rules: https://www.courts.mo.gov/file.jsp?id=65063
@@ -2310,7 +2310,7 @@ data:
       - name: St. Louis County Court Building
         address: 105 South Central Avenue
         city: Clayton
-        state: MISSOURI
+        state: Missouri
         zip: 63105
         phone: (314) 615-8029
         website: https://stlcountycourts.com/services/circuit-clerk/
@@ -2329,7 +2329,7 @@ data:
       - name: Saline County Courthouse
         address: 19 E. Arrow Street
         city: Marshall
-        state: MISSOURI
+        state: Missouri
         zip: 65340
         phone: (660) 886-2300
         rules: https://www.courts.mo.gov/file.jsp?id=29394
@@ -2350,7 +2350,7 @@ data:
       - name: Schuyler County Courthouse
         address: 110 W. Washington
         city: Lancaster
-        state: MISSOURI
+        state: Missouri
         zip: 63548
         phone: (660) 956-9187
         rules: https://www.courts.mo.gov/file.jsp?id=85013
@@ -2371,7 +2371,7 @@ data:
       - name: Scotland County Courthouse
         address: 117 South Market Street
         city: Memphis
-        state: MISSOURI
+        state: Missouri
         zip: 63555
         phone: (660) 465-8605
         rules: https://www.courts.mo.gov/file.jsp?id=85013
@@ -2392,7 +2392,7 @@ data:
       - name: Scott County Courthouse
         address: 131 S. Winchester Street
         city: Benton
-        state: MISSOURI
+        state: Missouri
         zip: 63736
         phone: (573) 545-3596
         website: https://www.scottcountymo.com/circuit.php
@@ -2413,7 +2413,7 @@ data:
       - name: Shannon County Circuit Court
         address: 18529 Main Street
         city: Eminence
-        state: MISSOURI
+        state: Missouri
         zip: 65466
         phone: (573) 226-3315
         rules: https://www.courts.mo.gov/file.jsp?id=59621
@@ -2435,7 +2435,7 @@ data:
       - name: Shelby County Courthouse
         address: 100 E. Main Street
         city: Shelbyville
-        state: MISSOURI
+        state: Missouri
         zip: 63469
         phone: (573) 633-2151
         rules: https://www.courts.mo.gov/file.jsp?id=29214
@@ -2456,7 +2456,7 @@ data:
       - name: Stoddard County Justice Center
         address: 403 South Prairie
         city: Bloomfield
-        state: MISSOURI
+        state: Missouri
         zip: 63825
         phone: (573) 568-4640
         photo: Stoddard.jpeg
@@ -2476,7 +2476,7 @@ data:
       - name: Stone County Courthouse
         address: 110-F S. Maple Street
         city: Galena
-        state: MISSOURI
+        state: Missouri
         zip: 65656
         phone: (417) 357-6511
         rules: https://www.courts.mo.gov/file.jsp?id=5154
@@ -2498,7 +2498,7 @@ data:
       - name: Sullivan County Courthouse
         address: 109 N. Main St.
         city: Milan
-        state: MISSOURI
+        state: Missouri
         zip: 63556
         phone: (660) 265-4717
         rules: https://www.courts.mo.gov/file.jsp?id=68013
@@ -2517,7 +2517,7 @@ data:
       - name: Taney County Courthouse
         address: 266 Main Street
         city: Forsyth
-        state: MISSOURI
+        state: Missouri
         zip: 65653
         phone: (417) 546-7230
         rules: https://www.courts.mo.gov/file.jsp?id=135553
@@ -2539,7 +2539,7 @@ data:
       - name: Texas County Justice Center
         address: 519 N. Grand
         city: Houston
-        state: MISSOURI
+        state: Missouri
         zip: 65483
         phone: (417) 967-3742
         rules: https://www.courts.mo.gov/file.jsp?id=29398
@@ -2561,7 +2561,7 @@ data:
       - name: Vernon County Courthouse
         address: 100 West Cherry Street
         city: Nevada
-        state: MISSOURI
+        state: Missouri
         zip: 64772
         phone: (417) 448-2550
         rules: https://www.courts.mo.gov/file.jsp?id=4073
@@ -2583,7 +2583,7 @@ data:
       - name: Warren County Courthouse
         address: 104 West Main Street
         city: Warrenton
-        state: MISSOURI
+        state: Missouri
         zip: 63383
         phone: (636) 456-3363
         rules: 12 Circuit Local Court Rules.pdf
@@ -2604,7 +2604,7 @@ data:
       - name: Washington County Courthouse
         address: 102 North Missouri Street
         city: Potosi
-        state: MISSOURI
+        state: Missouri
         zip: 63664
         phone: (573) 438-4171
         rules: https://www.courts.mo.gov/file.jsp?id=65063
@@ -2624,7 +2624,7 @@ data:
       - name: Wayne County Courthouse
         address: 109 Walnut Street
         city: Greenville
-        state: MISSOURI
+        state: Missouri
         zip: 63944
         phone: (573) 224-5600
         rules: https://www.courts.mo.gov/file.jsp?id=10300
@@ -2644,7 +2644,7 @@ data:
         address: 101 S. Crittenden Street
         unit: Room 22
         city: Marshfield
-        state: MISSOURI
+        state: Missouri
         zip: 65706
         phone: (417) 859-2006
         rules: https://www.courts.mo.gov/file.jsp?id=12314
@@ -2666,7 +2666,7 @@ data:
       - name: Worth County Courthouse
         address: 11 West 4th Street
         city: Grant City
-        state: MISSOURI
+        state: Missouri
         zip: 64456
         phone: (660) 564-2210
         rules: https://www.courts.mo.gov/file.jsp?id=53533
@@ -2687,7 +2687,7 @@ data:
       - name: Wright County Courthouse
         address: 125 Court Square
         city: Hartville
-        state: MISSOURI
+        state: Missouri
         zip: 65667
         phone: (417) 741-7121
         rules: https://www.courts.mo.gov/file.jsp?id=36706
@@ -2707,7 +2707,7 @@ data:
       - name: St. Louis Circuit Court
         address: 10 N. Tucker Boulevard
         city: St. Louis
-        state: MISSOURI
+        state: Missouri
         zip: 63101
         phone: (314) 622-4433
         rules: https://www.courts.mo.gov/file.jsp?id=29404

@@ -119,7 +119,7 @@ attachment:
       - "petitonersZip": ${ petitioner.address.zip } 
       - "petitionersPhone": ${ phone_number_formatted(petitioner.phone_number) } 
       - "petitonersEmail": ${ petitioner.email } 
-      - "petitionersSsnLastFour": ${ petitioner.ssn } 
+      - "petitionersSsnLastFour": ${ redact(petitioner.ssn) } 
       - "petitionerOverEighteenOrNot1": ${ petitioner.birthdate.plus(years=18) < today() } 
       - "petitionerOverEighteenOrNot2": ${ petitioner.birthdate.plus(years=18) >= today()  } 
       - "petitonersCountryOfResidenceName": ${ petitioner.address.country if petitioner.address.country != "US" else "" } 
@@ -143,7 +143,7 @@ attachment:
       - "petitionersEmploymentCity": ${ petitioner.employer.address.city } 
       - "petitionersEmploymentState": ${ state_name(petitioner.employer.address.state) } 
       - "petitionersEmploymentZip": ${ petitioner.employer.address.zip } 
-      - "petitionersMonthlyGrossIncome": ${ round(petitioner.monthly_gross_income,2) } 
+      - "petitionersMonthlyGrossIncome": ${ thousands(petitioner.monthly_gross_income) } 
       - "petitionerSupportYourself1": ${ petitioner.self_supporting } 
       - "petitionerSupportYourself2": ${ not petitioner.self_supporting } 
       - "respondentsFirstName3": ${ respondent.name.first } 
@@ -156,7 +156,7 @@ attachment:
       - "respondentsZip": ${ respondent.address.zip } 
       - "respondentsPhone": ${ respondent.email } 
       - "respondentsEmail": ${ phone_number_formatted(respondent.phone_number) } 
-      - "respondentsSsnLast4": ${ respondent.ssn } 
+      - "respondentsSsnLast4": ${ redact(respondent.ssn) } 
       - "respondentOverEighteenOrNot1": ${ respondent.birthdate.plus(years=18) < today() } 
       - "respondentOverEighteenOrNot2": ${ respondent.birthdate.plus(years=18) >= today()  } 
       - "respondentsCountryOfResidenceName": ${ respondent.address.country if respondent.address.country != "US" else "" } 
@@ -184,7 +184,7 @@ attachment:
       - "respondentsEmploymentState": ${ "" if not len(respondent.jobs) > 0 and not respondent.has_self_employment_income and not (respondent.jobs.there_are_any == False and respondent.has_self_employment_income == False) else respondent.employer.address.state } 
       - "respondentsEmploymentCity": ${ "" if not len(respondent.jobs) > 0 and not respondent.has_self_employment_income and not (respondent.jobs.there_are_any == False and respondent.has_self_employment_income == False) else respondent.employer.address.city } 
       - "respondentsEmploymentZip": ${ "" if not len(respondent.jobs) > 0 and not respondent.has_self_employment_income and not (respondent.jobs.there_are_any == False and respondent.has_self_employment_income == False) else respondent.employer.address.zip } 
-      - "respondentsMonthlyGrossIncome": ${ round(respondent.monthly_gross_income,2) } 
+      - "respondentsMonthlyGrossIncome": ${ thousands(respondent.monthly_gross_income) } 
       - "respondentSupportThemselves1": ${ respondent.self_supporting } 
       - "respondentSupportThemselves2": ${ respondent.self_supporting == False } 
       - "respondentSupportThemselves3": ${ respondent.self_supporting == None } 
@@ -212,23 +212,23 @@ attachment:
       - "totalNumberOfChildren": ${ len(children) } 
       - "childOneFirstName": |
           % if len(children) > 0:
-          ${ children[0].name.first }
+          ${ redact(children[0].name.first) }
           % endif
       - "childOneMiddleName": |
           % if len(children) > 0:
-          ${ children[0].name.middle }
+          ${ redact(children[0].name.middle) }
           % endif
       - "childOneLastName": |
           % if len(children) > 0:
-          ${ children[0].name.last }
+          ${ redact(children[0].name.last) }
           % endif
       - "childOneSuffixJrSrIII": |
           % if len(children) > 0:
-          ${ children[0].name.suffix }
+          ${ redact(children[0].name.suffix) }
           % endif
       - "childOneSsnLastFour": |
           % if len(children) > 0:
-          ${ "{:.0f}".format(children[0].ssn) }
+          ${ redact("{:.0f}".format(children[0].ssn)) }
           % endif
       - "childOneStreet": |
           % if len(children) > 0:
@@ -412,23 +412,23 @@ attachment:
           % endif
       - "childTwoFirstName": |
           % if len(children) > 1:
-          ${ children[1].name.first }
+          ${ redact(children[1].name.first) }
           % endif
       - "childTwoMiddleName": |
           % if len(children) > 1:
-          ${ children[1].name.middle }
+          ${ redact(children[1].name.middle) }
           % endif
       - "childTwoLastName": |
           % if len(children) > 1:
-          ${ children[1].name.last }
+          ${ redact(children[1].name.last) }
           % endif
       - "childTwoSuffixJrSrIII": |
           % if len(children) > 1:
-          ${ children[1].name.suffix }
+          ${ redact(children[1].name.suffix) }
           % endif
       - "childTwoSsnLastFour": |
           % if len(children) > 1:
-          ${ "{:.0f}".format(children[1].ssn) }
+          ${ redact("{:.0f}".format(children[1].ssn)) }
           % endif
       - "childTwoStreet": |
           % if len(children) > 1:
@@ -612,23 +612,23 @@ attachment:
           % endif
       - "childThreeFirstName": |
           % if len(children) > 2:
-          ${ children[2].name.first }
+          ${ redact(children[2].name.first) }
           % endif
       - "childThreeMiddleName": |
           % if len(children) > 2:
-          ${ children[2].name.middle }
+          ${ redact(children[2].name.middle) }
           % endif
       - "childThreeLastName": |
           % if len(children) > 2:
-          ${ children[2].name.last }
+          ${ redact(children[2].name.last) }
           % endif
       - "childThreeSuffixJrSrIII": |
           % if len(children) > 2:
-          ${ children[2].name.suffix }
+          ${ redact(children[2].name.suffix) }
           % endif
       - "childThreeSsnLastFour": |
           % if len(children) > 2:
-          ${ "{:.0f}".format(children[2].ssn) }
+          ${ redact("{:.0f}".format(children[2].ssn)) }
           % endif
       - "childThreeStreet": |
           % if len(children) > 2:
@@ -812,23 +812,23 @@ attachment:
           % endif
       - "childFourMiddleName": |
           % if len(children) > 3:
-          ${ children[3].name.middle }
+          ${ redact(children[3].name.middle) }
           % endif
       - "childFourFirstName": |
           % if len(children) > 3:
-          ${ children[3].name.first }
+          ${ redact(children[3].name.first) }
           % endif
       - "childFourLastName": |
           % if len(children) > 3:
-          ${ children[3].name.last }
+          ${ redact(children[3].name.last) }
           % endif
       - "childFourSuffixJrSrIII": |
           % if len(children) > 3:
-          ${ children[3].name.suffix }
+          ${ redact(children[3].name.suffix) }
           % endif
       - "childFourSsnLastFour": |
           % if len(children) > 3:
-          ${ "{:.0f}".format(children[3].ssn) }
+          ${ redact("{:.0f}".format(children[3].ssn)) }
           % endif
       - "childFourStreet": |
           % if len(children) > 3:

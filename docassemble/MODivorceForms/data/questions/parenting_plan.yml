@@ -50,7 +50,7 @@ fields:
 continue button field: ask_about_dispute_resolution
 ---
 id: Parenting Plan Part A
-question: Who helped write the parenting plan?
+question: Who helped write Part A of the parenting plan?
 fields:
   - Check all that apply: parenting_plan_A_author
     datatype: checkboxes
@@ -65,7 +65,6 @@ id: parenting plan author other object
 objects: 
   - parenting_plan_A_author_other: ALIndividual
 ---
----
 id: other physical custody
 reconsider:
   - people_choices
@@ -77,7 +76,7 @@ sets:
   - parenting_plan_A_author_other.name.suffix
 
 question: |
-  What other person helped write the parenting plan?
+  What other person helped write Part A of the parenting plan?
 
 fields:
   - Existing person: parenting_plan_A_author_other
@@ -89,6 +88,46 @@ fields:
      - other_parties[0]
   - code: |
       parenting_plan_A_author_other.name_fields()
+---
+id: Parenting Plan Part B
+question: Who helped write Part B of the parenting plan?
+fields:
+  - Check all that apply: parenting_plan_B_author
+    datatype: checkboxes
+    choices:
+      - ${ petitioner }: petitioner
+      - ${ respondent }: respondent
+      - The court
+      - The guardian ad litem
+      - Other
+---
+id: parenting plan author other object
+objects: 
+  - parenting_plan_B_author_other: ALIndividual
+---
+id: other physical custody
+reconsider:
+  - people_choices
+
+sets:
+  - parenting_plan_B_author_other.name.first
+  - parenting_plan_B_author_other.name.last
+  - parenting_plan_B_author_other.name.middle
+  - parenting_plan_B_author_other.name.suffix
+
+question: |
+  What other person helped write Part B of the parenting plan?
+
+fields:
+  - Existing person: parenting_plan_B_author_other
+    datatype: object
+    choices: people_choices
+    disable others: True
+    exclude:
+     - users[0]
+     - other_parties[0]
+  - code: |
+      parenting_plan_B_author_other.name_fields()
 ---
 id: Vacation
 question: Vacation Schedule
@@ -242,6 +281,13 @@ question:  Presumed Child Support amount
 subquestion: |
   Based on the information you provided, it looks like  ${ support_payer.name_full() } should pay the following in child support.  
 
+  This is calculated using a monthly gross income of $${ thousands(support_payer.monthly_gross_income) }.
+
+  % if showifdef('support_payer.assumed_monthly_gross_income'):
+  Because you didn't know if ${ support_payer.name_full() } has a job or any other income, we assumed that ${ support_payer.name.full() } had a monthly income of minimum wage, working 40 hours per week. 
+
+  % endif
+
   % if number_of_children > 5:
    - Six or more children - ${ currency(support_payer.presumed_child_support_amount_12_6 if support_payer.presumed_child_support_amount_12_6 > 0 else 0 ) }
   
@@ -290,10 +336,6 @@ code: |
     actual_child_support.append({'field':'actual_child_support_2','label':'Two children','show if':{'variable':'use_presumed_child_support','is':'no'},'default':thousands(support_payer.presumed_child_support_amount_12_2)})
   actual_child_support.append({'field':'actual_child_support_1','label':'One child','show if':{'variable':'use_presumed_child_support','is':'no'},'default':thousands(support_payer.presumed_child_support_amount_12)})
 
----
-variable name: var_doc_dict["use_presumed_child_support"]
-data:
-  - parenting_plan_attachment
 ---
 id: child support starting date
 question: Child support starting date      
@@ -360,7 +402,7 @@ fields:
 id: form_14_starting calculations
 generic object: ALIndividual
 code: |
-  x.monthly_income_1 = float(x.jobs.total(times_per_year=12)) + x.self_employment_income + float(x.other_incomes.total(times_per_year = 12))
+  x.monthly_income_1 = x.monthly_gross_income
   if x.monthly_income_1 < 1300:
     x.support_obligation_2c2_income_index = 1300
   elif x.monthly_income_1 > 30000:
@@ -540,11 +582,6 @@ code: |
     support_payer.presumed_child_support_amount_1_children = None
   form_14_calculations = True
   
----
-variable name: var_doc_dict["form_14_calculations"]
-data:
-  - parenting_plan_attachment
-  - form_14_attachment
 ---
 id: Parenting Plan object
 objects:
@@ -1017,16 +1054,16 @@ attachment:
       - "respondentsLastName2": ${ respondent.name.last } 
       - "respondentsFirstName2": ${ respondent.name.first } 
       - "pDivisionNumber2": ${ case.division_number } 
-      - "pAuthorsBothParentsB": ${ parenting_plan_A_author["petitioner"] and parenting_plan_A_author["respondent"]  } 
-      - "pAuthorsPetitionerB": ${ parenting_plan_A_author["petitioner"] and not parenting_plan_A_author["respondent"] } 
-      - "pAuthorsRespondentB": ${ parenting_plan_A_author["respondent"] and not parenting_plan_A_author["petitioner"] } 
-      - "pAuthorsCourtB": ${ parenting_plan_A_author["The court"] } 
-      - "pAuthorsGuardianAdLitemB": ${ parenting_plan_A_author["The guardian ad litem"] } 
-      - "PAuthorsOtherB": ${ parenting_plan_A_author["Other"] } 
-      - "pAuthorsOtherMiddleNameB": ${ parenting_plan_A_author_other.name.middle } 
-      - "pAuthorsOtherSuffixB": ${ parenting_plan_A_author_other.name.suffix } 
-      - "pAuthorsOtherLastNameB": ${ parenting_plan_A_author_other.name.last } 
-      - "pAuthorsOtherFirstNameB": ${ parenting_plan_A_author_other.name.first } 
+      - "pAuthorsBothParentsB": ${ parenting_plan_B_author["petitioner"] and parenting_plan_B_author["respondent"]  } 
+      - "pAuthorsPetitionerB": ${ parenting_plan_B_author["petitioner"] and not parenting_plan_B_author["respondent"] } 
+      - "pAuthorsRespondentB": ${ parenting_plan_B_author["respondent"] and not parenting_plan_B_author["petitioner"] } 
+      - "pAuthorsCourtB": ${ parenting_plan_B_author["The court"] } 
+      - "pAuthorsGuardianAdLitemB": ${ parenting_plan_B_author["The guardian ad litem"] } 
+      - "PAuthorsOtherB": ${ parenting_plan_B_author["Other"] } 
+      - "pAuthorsOtherMiddleNameB": ${ parenting_plan_B_author_other.name.middle } 
+      - "pAuthorsOtherSuffixB": ${ parenting_plan_B_author_other.name.suffix } 
+      - "pAuthorsOtherLastNameB": ${ parenting_plan_B_author_other.name.last } 
+      - "pAuthorsOtherFirstNameB": ${ parenting_plan_B_author_other.name.first } 
       - "pChildrenNumber2": ${ len(children) } 
       - "pFirstChildsAge2": |
           % if len(children) > 0:

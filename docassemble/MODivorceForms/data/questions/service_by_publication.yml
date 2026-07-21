@@ -28,6 +28,8 @@ fields:
   - What other way did you attempt to contact ${ other_parties[0].pronoun() }?: other_attempt
     show if: location_attempts['other']
   - What is the name of the newspaper where you will publish service?: newspaper
+  - note: |
+      This notice will not be published in your typical newspaper. Search for legal newspapers in your specific county to answer this question.
 ---
 attachment:
   filename: service_by_publication

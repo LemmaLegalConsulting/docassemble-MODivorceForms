@@ -864,7 +864,7 @@ code: |
         if exchange.starting_parent == petitioner.name.full():
           temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children at " + (possessify(exchange.starting_parent, 'house')) + "\n"  
         elif exchange.starting_parent == respondent.instanceName.name.full():
-          temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops up children at " + (possessify(exchange.exchange_parent, 'house')) + "\n"  
+          temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house')) + "\n"  
       elif exchange.exchange_method == "respondent_residence":
         if exchange.starting_parent == petitioner.name.full():
           temp_description = str(format_time(exchange.exchange_time))  + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house')) + "\n"  
@@ -899,7 +899,7 @@ code: |
         if exchange.starting_parent== petitioner.name.full():
           temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children at " + (possessify(exchange.starting_parent, 'house')) + "\n"  
         elif exchange.starting_parent == respondent.name.full():
-          temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops up children at " + (possessify(exchange.exchange_parent, 'house')) + "\n"  
+          temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house')) + "\n"  
       elif exchange.exchange_method == "respondent_residence":
         if exchange.starting_parent == petitioner.name.full():
           temp_description = str(format_time(exchange.exchange_time))  + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house')) + "\n"  
@@ -930,7 +930,7 @@ code: |
         if exchange.starting_parent == petitioner.name.full():
           temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.exchange_parent + " picks up children at " + (possessify(exchange.starting_parent, 'house')) + "\n"  
         elif exchange.starting_parent == respondent.name.full():
-          temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops up children at " + (possessify(exchange.exchange_parent, 'house')) + "\n"  
+          temp_description = str(format_time(exchange.exchange_time)) + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house')) + "\n"  
       elif exchange.exchange_method == "respondent_residence":
         if exchange.starting_parent == petitioner.name.full():
           temp_description = str(format_time(exchange.exchange_time))  + " " + exchange.starting_parent + " drops off children at " + (possessify(exchange.exchange_parent, 'house')) + "\n"  
@@ -1636,6 +1636,14 @@ fields:
 ---
 id: other holidays there is another
 question: Do you want to add any more holidays?
+subquestion: |
+  % if len(other_holidays.complete_elements()) > 0:
+  You have already mentioned:
+  % for other_holiday in other_holidays.complete_elements():
+  
+   - ${ other_holiday.description }
+  % endfor
+  % endif
 fields:
   - Other holidays: other_holidays.there_is_another
     datatype: yesnoradio
@@ -1667,6 +1675,34 @@ fields:
  - Physical custody to: other_holidays[i].custody_to_time
    datatype: time
 continue button field: other_holidays[i].complete
+---
+id: other holidays revisit
+continue button field: other_holidays.revisit
+question: |
+  Edit other holidays
+subquestion: |
+  These are holidays other than the holidays included on the parenting plan, which include ${ comma_and_list([dict['description'] for dict in holidays.values()]) }
+  
+  ${ other_holidays.table }
+
+  ${ other_holidays.add_action() }
+---
+id: other_holidays table
+table: other_holidays.table
+rows: other_holidays
+columns:
+  - Description: |
+      row_item.description
+  - Even years: |
+      value(row_item.even_years)
+  - Odd years: |
+      value(row_item.odd_years)
+  - From: |
+      row_item.custody_from_time
+  - To: |
+      row_item.custody_to_time
+edit:
+  - description
 ---
 id: holiday review if not holidays_default
 only sets: holidays_review
