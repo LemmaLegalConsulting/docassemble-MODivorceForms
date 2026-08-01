@@ -156,6 +156,7 @@ code: |
     relief['change_name']
     relief['divide_property']
     relief['other']
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]'):
     if relief['maintenance']:
       maintenance_amount
       maintenance_income_withholding
@@ -495,8 +496,7 @@ code: |
       businesses.review_items 
     if len(other_assets) > 0:
       other_assets.review_items 
-    users[0].assets.gathered
-    other_parties[0].assets.gathered
+    joint_assets.review_items
   section_assets = True
 ---
 id: debts interview code
@@ -507,8 +507,6 @@ code: |
     if len(debts) > 0:
       debts.review_items
     joint_debts.review_items
-    users[0].debts.gathered
-    other_parties[0].debts.gathered
   section_debts = True
 ---
 id: service interview code
