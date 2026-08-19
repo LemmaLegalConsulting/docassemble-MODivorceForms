@@ -16,66 +16,66 @@ attachment:
   pdf template file: fee_waiver.pdf
   editable: False
   fields:
-      - "Judicial Circuit Court Number": ${ case.circuit } 
-      - "COUNTY NAME": ${ nice_county_name(case) } 
-      - "Judge or Division": ${ case.docket_number } 
-      - "Case Number": ${ case.judge } 
-      - "Petitioner Name": ${ petitioner.name_full() } 
-      - "Petitioners AddressTelephone": ${ petitioner.address.block() + "\n" + showifdef('petitioner.phone_number')  } 
-      - "Respondent Name": ${ respondent.name_full()} 
-      - "Respondents AddressTelephone": ${ respondent.address.block() + "\n" + showifdef('respondent.phone_number') } 
-      - "Marital Status": "Married"
-      - "If Married Spouses name": ${ other_parties[0].name_full() } 
-      - "Number of dependents": ${ number_of_children } 
-      - "Gross Salary": ${ "{:.2f}".format(float(users[0].jobs.total(times_per_year=12)) + users[0].self_employment_income,symbol='') } 
-      - "Mortgage or Rent Payment Amount": ${ "{:.2f}".format(float(users[0].expenses.total(source=['rent'], times_per_year=12)) + sum([house.monthly_payment for house in users[0].debts.matches(source=['house'])]))  } 
-      - "Mortgage": ${ len(users[0].debts.matches(source=['house'])) > 0 } 
-      - "Rent Payment": ${ len(users[0].expenses.matches(source=['rent'])) > 0 } 
-      - "Public Assistance": ${ "{:.2f}".format(users[0].benefits.total(source=['tanf'], times_per_year=12)) } 
-      - "Utilities Amount": ${ "{:.2f}".format(users[0].expenses.total(source=['utilities'], times_per_year=12)) } 
-      - "Retirement Pension": ${ "{:.2f}".format(users[0].other_incomes.total(source=['retirement','pension'], times_per_year=12)) } 
-      - "Food Amount": ${ "{:.2f}".format(users[0].expenses.total(source=['food'], times_per_year=12)) } 
-      - "Social Security": ${ "{:.2f}".format(users[0].benefits.total(source=['ssi'], times_per_year=12) + users[0].other_incomes.total(source=['social security'], times_per_year=12) ) } 
-      - "Payment on Debts and Credit Cards": ${ "{:.2f}".format(sum([debt.monthly_payment for debt in users[0].debts.matches(source=None, exclude_source=['house'])])) } 
-      - "Child Support": ${ "{:.2f}".format(showifdef('users[0].other_child_support_received',0) + showifdef('users[0].child_support_received',0)) } 
-      - "Child Support  Expense": ${ "{:.2f}".format(showifdef('users[0].other_child_support_paid',0) + showifdef('users[0].child_support_paid',0)) } 
-      - "Maintenance  Income": ${ "{:.2f}".format(users[0].maintenance_other_received + users[0].maintenance_received) } 
-      - "Maintenance": ${ "{:.2f}".format(users[0].maintenance_paid + users[0].maintenance_other_paid) } 
-      - "Other Income Amount": ${ "{:.2f}".format(users[0].other_incomes.total(source=["trust", "dividends", "unemployment income", "severance", "worker comp", "veteran", "military", "other"], times_per_year=12)) } 
-      - "Medical Expenses": ${ "{:.2f}".format(float(users[0].expenses.total(source=['medical'], times_per_year=12)) + float(users[0].health_insurance_costs) + float(users[0].extraordinary_medical_costs.total(times_per_year=12))) } 
-      - "Other income to be considered": ${ comma_and_list(item.source_other for item in users[0].other_incomes.matches(source=['other'])) } 
-      - "Medical expenses to be considered": ${ comma_and_list([expense.description for expense in users[0].expenses.matches(source="medical")]) } 
-      - "Total Monthly Income": ${ "{:.2f}".format(float(users[0].jobs.total(times_per_year=12)) + users[0].self_employment_income + float(users[0].benefits.total(source=['tanf','ssi'], times_per_year=12)) + float(users[0].other_incomes.total(times_per_year=12)) + showifdef('users[0].other_child_support_received',0) + showifdef('users[0].child_support_received',0) + users[0].maintenance_other_received + users[0].maintenance_received) } 
-      - "Total Monthly Expenses": ${ "{:.2f}".format(float(users[0].expenses.total(source=['rent', 'mortgage'], times_per_year=12)) + float(sum([debt.monthly_payment for debt in users[0].debts])) + float(users[0].expenses.total(source=['utilities'], times_per_year=12)) + float(users[0].expenses.total(source=['food'], times_per_year=12)) + float(users[0].expenses.total(source=['debt_payment'], times_per_year=12)) + showifdef('users[0].other_child_support_paid',0) + showifdef('users[0].child_support_paid',0) + float(users[0].maintenance_paid + users[0].maintenance_other_paid) + float(users[0].expenses.total(source=['medical'], times_per_year=12)) + float(users[0].health_insurance_costs) + float(users[0].extraordinary_medical_costs.total(times_per_year=12))) } 
-      - "Cash on Hand": ${ users[0].cash } 
-      - "Home Loan Balance": ${ "{:.2f}".format(users[0].debts.balance(source=['house','condominium', 'leasehold','real estate other']))} 
-      - "Automobile Loan": ${ "{:.2f}".format(users[0].debts.balance(source=['car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other'])) } 
-      - "Checking Account": ${ "{:.2f}".format(users[0].assets.market_value(source=['checking account'])) } 
-      - "Credit Card Balance s ": ${ "{:.2f}".format(users[0].debts.balance(source='credit_card_debt'))  } 
-      - "Savings Account": ${ "{:.2f}".format(users[0].assets.market_value(source=['savings account'])) } 
-      - "Value of Home": ${ "{:.2f}".format(users[0].assets.market_value(source=['house'])) } 
-      - "Other debts to be considered 1": ${ users[0].debts.matches(source=None,exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[0].loan_description } 
-      - "Debts Other debts to be considered 1": ${ "{:.2f}".format(users[0].debts.matches(source=None,exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[0].balance) } 
-      - "Value of Other Real Estate": ${ "{:.2f}".format(users[0].assets.market_value(source=['condominium', 'leasehold','real estate other'])) } 
-      - "Debts Other debts to be considered 2": ${ "{:.2f}".format(users[0].debts.matches(source=None,exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[1].balance) } 
-      - "Other debts to be considered 2": ${ users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[1].loan_description } 
-      - "Value of Automobiles": ${ "{:.2f}".format(users[0].assets.market_value(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane',"vehicles other"])) } 
-      - "Debts Other debts to be considered 3": ${ "{:.2f}".format(users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[2].balance) } 
-      - "Other debts to be considered 3": ${ users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[2].loan_description } 
-      - "1 yrmake": ${ users[0].assets.matches(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane','vehicles other'])[0].description } 
-      - "Debts Other debts to be considered 4": ${ "{:.2f}".format(users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[3].balance) } 
-      - "Other debts to be considered 4": ${ users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[3].loan_description }
-      - "2 yrmake": ${ users[0].assets.matches(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane','vehicles other'])[1].description } 
-      - "Other debts to be considered 5": ${ users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[4].loan_description }
-      - "Debts Other debts to be considered 5": ${ "{:.2f}".format(users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[4].balance) } 
-      - "Other debts to be considered 6": ${ users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[5].loan_description }
-      - "Debts Other debts to be considered 6": ${ "{:.2f}".format(users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[5].balance) } 
-      - "Possessions list 1": ${ users[0].assets.matches(source=None, exclude_source=['house','condominium', 'leasehold', 'real estate other', 'car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','vehicles other', 'checking account', 'savings account'])[0].description } 
-      - "Enter Assests Approximate value of personal possessions item 1": ${ users[0].assets.matches(source=None, exclude_source=['house','condominium', 'leasehold', 'real estate other', 'car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','vehicles other', 'checking account', 'savings account'])[0].market_value } 
-      - "Enter Assests Approximate value of personal possessions item 2": ${ users[0].assets.matches(source=None, exclude_source=['house','condominium', 'leasehold', 'real estate other', 'car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','vehicles other', 'checking account', 'savings account'])[1].market_value } 
-      - "Possessions list 2": ${ users[0].assets.matches(source=None, exclude_source=['house','condominium', 'leasehold', 'real estate other', 'car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','vehicles other', 'checking account', 'savings account'])[1].description } 
-      - "Possessions list 3": ${ users[0].assets.matches(source=None, exclude_source=['house','condominium', 'leasehold', 'real estate other', 'car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','vehicles other', 'checking account', 'savings account'])[2].description } 
-      - "Enter Assests Approximate value of personal possessions item 3": ${ users[0].assets.matches(source=None, exclude_source=['house','condominium', 'leasehold', 'real estate other', 'car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','vehicles other', 'checking account', 'savings account'])[2].market_value } 
-      - "Total Assets": ${ "{:.2f}".format(users[0].cash + float(users[0].assets.market_value())) } 
-      - "Total Debts": ${ "{:.2f}".format(users[0].debts.balance()) } 
+    - "Judicial_Circuit_Court_Number": ${ case.circuit } 
+    - "COUNTY_NAME": ${ nice_county_name(case) } 
+    - "Judge_or_Division": ${ case.docket_number } 
+    - "Case_Number": ${ case.judge } 
+    - "Petitioner_Name": ${ petitioner.name_full() } 
+    - "Petitioners_AddressTelephone": ${ petitioner.address.block() + "\n" + showifdef('petitioner.phone_number')  } 
+    - "Respondent_Name": ${ respondent.name_full()} 
+    - "Respondents_AddressTelephone": ${ respondent.address.block() + "\n" + showifdef('respondent.phone_number') } 
+    - "Marital_Status": ${ "Married" }
+    - "If_Married_Spouses_name": ${ other_parties[0].name_full() } 
+    - "Number_of_dependents": ${ number_of_children } 
+    - "Gross_Salary": ${ "{:.2f}".format(float(users[0].jobs.total(times_per_year=12)) + users[0].self_employment_income,symbol='') } 
+    - "Mortgage_or_Rent_Payment_Amount": ${ "{:.2f}".format(float(users[0].expenses.total(source=['rent'], times_per_year=12)) + sum([house.monthly_payment for house in users[0].debts.matches(source=['house'])]))  } 
+    - "Mortgage": ${ len(users[0].debts.matches(source=['house'])) > 0 } 
+    - "Rent_Payment": ${ len(users[0].expenses.matches(source=['rent'])) > 0 } 
+    - "Public_Assistance": ${ "{:.2f}".format(users[0].benefits.total(source=['tanf'], times_per_year=12)) } 
+    - "Utilities_Amount": ${ "{:.2f}".format(users[0].expenses.total(source=['utilities'], times_per_year=12)) } 
+    - "Retirement_Pension": ${ "{:.2f}".format(users[0].other_incomes.total(source=['retirement','pension'], times_per_year=12)) } 
+    - "Food_Amount": ${ "{:.2f}".format(users[0].expenses.total(source=['food'], times_per_year=12)) } 
+    - "Social_Security": ${ "{:.2f}".format(users[0].benefits.total(source=['ssi'], times_per_year=12) + users[0].other_incomes.total(source=['social security'], times_per_year=12) ) } 
+    - "Payment_on_Debts_and_Credit_Cards": ${ "{:.2f}".format(sum([debt.monthly_payment for debt in users[0].debts.matches(source=None, exclude_source=['house'])])) } 
+    - "Child_Support": ${ "{:.2f}".format(showifdef('users[0].other_child_support_received',0) + showifdef('users[0].child_support_received',0)) } 
+    - "Child_Support_Expense": ${ "{:.2f}".format(showifdef('users[0].other_child_support_paid',0) + showifdef('users[0].child_support_paid',0)) } 
+    - "Maintenance_Income": ${ "{:.2f}".format(users[0].maintenance_other_received + users[0].maintenance_received) } 
+    - "Maintenance": ${ "{:.2f}".format(users[0].maintenance_paid + users[0].maintenance_other_paid) } 
+    - "Other_Income_Amount": ${ "{:.2f}".format(users[0].other_incomes.total(source=["trust", "dividends", "unemployment income", "severance", "worker comp", "veteran", "military", "other"], times_per_year=12)) } 
+    - "Medical_Expenses": ${ "{:.2f}".format(float(users[0].expenses.total(source=['medical'], times_per_year=12)) + float(users[0].health_insurance_costs) + float(users[0].extraordinary_medical_costs.total(times_per_year=12))) } 
+    - "Other_income_to_be_considered": ${ comma_and_list(item.source_other for item in users[0].other_incomes.matches(source=['other'])) } 
+    - "Medical_expenses_to_be_considered": ${ comma_and_list([expense.description for expense in users[0].expenses.matches(source="medical")]) } 
+    - "Total_Monthly_Income": ${ "{:.2f}".format(float(users[0].jobs.total(times_per_year=12)) + users[0].self_employment_income + float(users[0].benefits.total(source=['tanf','ssi'], times_per_year=12)) + float(users[0].other_incomes.total(times_per_year=12)) + showifdef('users[0].other_child_support_received',0) + showifdef('users[0].child_support_received',0) + users[0].maintenance_other_received + users[0].maintenance_received) } 
+    - "Total_Monthly_Expenses": ${ "{:.2f}".format(float(users[0].expenses.total(source=['rent', 'mortgage'], times_per_year=12)) + float(sum([debt.monthly_payment for debt in users[0].debts])) + float(users[0].expenses.total(source=['utilities'], times_per_year=12)) + float(users[0].expenses.total(source=['food'], times_per_year=12)) + float(users[0].expenses.total(source=['debt_payment'], times_per_year=12)) + showifdef('users[0].other_child_support_paid',0) + showifdef('users[0].child_support_paid',0) + float(users[0].maintenance_paid + users[0].maintenance_other_paid) + float(users[0].expenses.total(source=['medical'], times_per_year=12)) + float(users[0].health_insurance_costs) + float(users[0].extraordinary_medical_costs.total(times_per_year=12))) } 
+    - "Cash_on_Hand": ${ users[0].cash } 
+    - "Home_Loan_Balance": ${ "{:.2f}".format(users[0].debts.balance(source=['house','condominium', 'leasehold','real estate other']))} 
+    - "Automobile_Loan": ${ "{:.2f}".format(users[0].debts.balance(source=['car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other'])) } 
+    - "Checking_Account": ${ "{:.2f}".format(users[0].assets.market_value(source=['checking account'])) } 
+    - "Credit_Card_Balance s ": ${ "{:.2f}".format(users[0].debts.balance(source='credit_card_debt'))  } 
+    - "Savings_Account": ${ "{:.2f}".format(users[0].assets.market_value(source=['savings account'])) } 
+    - "Value_of_Home": ${ "{:.2f}".format(users[0].assets.market_value(source=['house'])) } 
+    - "Other_debts_to_be_considered_1": ${ users[0].debts.matches(source=None,exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[0].loan_description } 
+    - "Debts_Other_debts_to_be_considered_1": ${ "{:.2f}".format(users[0].debts.matches(source=None,exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[0].balance) } 
+    - "Value_of_Other_Real_Estate": ${ "{:.2f}".format(users[0].assets.market_value(source=['condominium', 'leasehold','real estate other'])) } 
+    - "Debts_Other_debts_to_be_considered_2": ${ "{:.2f}".format(users[0].debts.matches(source=None,exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[1].balance) } 
+    - "Other_debts_to_be_considered_2": ${ users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[1].loan_description } 
+    - "Value_of_Automobiles": ${ "{:.2f}".format(users[0].assets.market_value(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane',"vehicles other"])) } 
+    - "Debts_Other_debts_to_be_considered_3": ${ "{:.2f}".format(users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[2].balance) } 
+    - "Other debts to be considered 3": ${ users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[2].loan_description } 
+    - "1_yrmake": ${ users[0].assets.matches(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane','vehicles other'])[0].description } 
+    - "Debts_Other_debts_to_be_considered_4": ${ "{:.2f}".format(users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[3].balance) } 
+    - "Other_debts_to_be_considered_4": ${ users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[3].loan_description }
+    - "2_yrmake": ${ users[0].assets.matches(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane','vehicles other'])[1].description } 
+    - "Other_debts_to_be_considered_5": ${ users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[4].loan_description }
+    - "Debts_Other_debts_to_be_considered_5": ${ "{:.2f}".format(users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[4].balance) } 
+    - "Other_debts_to_be_considered_6": ${ users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[5].loan_description }
+    - "Debts_Other_debts_to_be_considered_6": ${ "{:.2f}".format(users[0].debts.matches(source=None, exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])[5].balance) } 
+    - "Possessions_list_1": ${ users[0].assets.matches(source=None, exclude_source=['house','condominium', 'leasehold', 'real estate other', 'car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','vehicles other', 'checking account', 'savings account'])[0].description } 
+    - "Enter_Assests_Approximate_value_of_personal_possessions_item_1": ${ users[0].assets.matches(source=None, exclude_source=['house','condominium', 'leasehold', 'real estate other', 'car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','vehicles other', 'checking account', 'savings account'])[0].market_value } 
+    - "Enter_Assests_Approximate_value_of_personal_possessions_item_2": ${ users[0].assets.matches(source=None, exclude_source=['house','condominium', 'leasehold', 'real estate other', 'car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','vehicles other', 'checking account', 'savings account'])[1].market_value } 
+    - "Possessions_list_2": ${ users[0].assets.matches(source=None, exclude_source=['house','condominium', 'leasehold', 'real estate other', 'car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','vehicles other', 'checking account', 'savings account'])[1].description } 
+    - "Possessions_list_3": ${ users[0].assets.matches(source=None, exclude_source=['house','condominium', 'leasehold', 'real estate other', 'car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','vehicles other', 'checking account', 'savings account'])[2].description } 
+    - "Enter_Assests_Approximate_value_of_personal_possessions_item_3": ${ users[0].assets.matches(source=None, exclude_source=['house','condominium', 'leasehold', 'real estate other', 'car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane','vehicles other', 'checking account', 'savings account'])[2].market_value } 
+    - "Total_Assets": ${ "{:.2f}".format(users[0].cash + float(users[0].assets.market_value())) } 
+    - "Total_Debts": ${ "{:.2f}".format(users[0].debts.balance()) } 
 ---

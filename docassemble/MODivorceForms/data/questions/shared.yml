@@ -15,6 +15,9 @@ modules:
 features:
   css: progressivedisclosure.css
 ---
+metadata:
+  error action: None
+---
 id: list of previously entered people
 code: |
   temp_people_choices = list()
@@ -2274,6 +2277,24 @@ code: |
   else:
     x[i].display_name = x.other_display
 ---
+code: |
+  interests_in_trust[i].display_name = "interest in a trust"
+---
+code: |
+  life_insurance[i].display_name = "life insurance policy"
+---
+code: |
+  interest_in_contract[i].display_name = "interest in a contract"
+---
+code: |
+  interest_in_litigation[i].display_name = "lawsuit"
+---
+code: |
+  farm[i].display_name = "farm equipment, animal or crops"
+---
+code: |
+  debts_owed_to_you[i].display_name = "money owed to you"
+---
 id: generic asset complete
 generic object: ALAssetList
 code: |
@@ -2349,6 +2370,17 @@ subquestion: |
   ${ x.add_action() }
 continue button field: x.review_items
 ---
+id: generic review ALAssetList
+generic object: ALAssetList
+question: Review all assets
+subquestion: |
+
+  Here is a list of all assets
+  
+  ${ joint_assets.table }
+  
+continue button field: joint_assets.review_items
+---
 id: generic revisit
 generic object: ALAssetList
 continue button field: x.revisit
@@ -2380,15 +2412,45 @@ table: joint_debts.table
 rows: joint_debts
 columns:
   - Description: |
-      row_item.loan_description
+      row_item.loan_description_template
   - Balance: |
       currency(row_item.balance) if defined("row_item.balance") else ""
   - Monthly payment: currency(row_item.monthly_payment)
   - Security for debt: row_item.security
   - Marital property?:  row_item.marital_property
-  - Debt assigned to: row_item.recommended_debt if row_item.recommended_debt != "split" else " ".join([petitioner.name.full(),"pays", "{:.0%}".format(row_item.petitioner_debt_percentage)])
+
 edit:
-  - market_value
+  - recommended_debt
+---
+generic object: ALAssetList
+id: generic award_template_petitioner
+code: |
+  x[i].award_template_petitioner = (thousands(x[i].award_percentage_petitioner * 100) + "% of " if x[i].recommended_award == "split" else "") + space("x[i].name", prefix="", suffix=" ") + x[i].display_name
+---
+generic object: ALAssetList
+id: generic award_template_petitioner 
+code: |
+  x[i].award_template_petitioner = (thousands(x[i].award_percentage_petitioner * 100) + "% of " if x[i].recommended_award == "split" else "") + space("x[i].name", prefix="", suffix=" ") + x[i].display_name
+---
+generic object: ALAssetList
+id: generic award_template_petitioner
+code: |
+  x[i].award_template_petitioner = (thousands(x[i].award_percentage_petitioner * 100) + "% of " if x[i].recommended_award == "split" else "") + space("x[i].name", prefix="", suffix=" ") + x[i].display_name
+---
+generic object: ALAssetList
+id: generic award_template_respondent
+code: |
+  x[i].award_template_respondent = (thousands(x[i].award_percentage_respondent * 100) + "% of " if x[i].recommended_award == "split" else "") + space("x[i].name", prefix="", suffix=" ") + x[i].display_name
+---
+generic object: ALAssetList
+id: generic award_template_respondent
+code: |
+  x[i].award_template_respondent = (thousands(x[i].award_percentage_respondent * 100) + "% of " if x[i].recommended_award == "split" else "") + space("x[i].name", prefix="", suffix=" ") + x[i].display_name
+---
+generic object: ALAssetList
+id: generic award_template_respondent
+code: |
+  x[i].award_template_respondent = (thousands(x[i].award_percentage_respondent * 100) + "% of " if x[i].recommended_award == "split" else "") + space("x[i].name", prefix="", suffix=" ") + x[i].display_name
 ---
 generic object: ALAsset
 id: generic award_template_petitioner
@@ -2401,6 +2463,12 @@ id: generic award_template_respondent
 template: x.award_template_respondent
 content: |
   ${ thousands(x.award_percentage_respondent * 100) + "% of " if x.recommended_award == "split" else "" }${ space("x.name", prefix="", suffix=" ") + x.display_name }
+---
+generic object: ALAsset
+id: generic loan description template 
+template: x.loan_description_template
+content: |
+  ${ ((x.lender + " ") if defined('x.lender') else "") + "Loan" }
 ---
 generic object: ALAsset
 id: generic loan description template petitioner
@@ -2450,7 +2518,9 @@ code: |
   real_estate.other_display = "other real estate"
   real_estate.display_name = "real estate"
 ---
-only sets: real_estate[i].market_value
+only sets: 
+  - real_estate[i].market_value
+  - real_estate[i].recommended_debt
 id: describe real_estate
 reconsider: real_estate[i].display_name
 question: |
@@ -2557,31 +2627,31 @@ validation code: |
     real_estate[i].display_name = real_estate.terms_ordered.get(real_estate[i].source, real_estate[i].source)
   else:
     real_estate[i].display_name = real_estate[i].source_other
-  if real_estate[i].recommended_award == "split" and real_estate[i].award_percentage_choice == "other" and users[0] == petitioner:
+  if real_estate[i].recommended_award == "split" and real_estate[i].award_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     real_estate[i].award_percentage_petitioner = real_estate[i].award_percentage_other/100
     real_estate[i].award_percentage_respondent = 1- real_estate[i].award_percentage_other/100
-  elif real_estate[i].recommended_award == "split" and users[0] == petitioner:
+  elif real_estate[i].recommended_award == "split" and users[0].name.full() == petitioner.name.full():
     real_estate[i].award_percentage_petitioner = float(real_estate[i].award_percentage_choice)/100
     real_estate[i].award_percentage_respondent = 1- float(real_estate[i].award_percentage_choice)/100
-  elif real_estate[i].recommended_award == "split" and real_estate[i].award_percentage_choice == "other" and users[0] == respondent:
+  elif real_estate[i].recommended_award == "split" and real_estate[i].award_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     real_estate[i].award_percentage_respondent = real_estate[i].award_percentage_other/100
     real_estate[i].award_percentage_petitioner = 1- real_estate[i].award_percentage_other/100
-  elif real_estate[i].recommended_award == "split" and users[0] == respondent:
+  elif real_estate[i].recommended_award == "split" and users[0].name.full() == respondent.name.full():
     real_estate[i].award_percentage_respondent = float(real_estate[i].award_percentage_choice)/100
     real_estate[i].award_percentage_petitioner = 1- float(real_estate[i].award_percentage_choice)/100
   else:
     real_estate[i].award_percentage_petitioner = None
     real_estate[i].award_percentage_respondent = None
-  if real_estate[i].is_amount_owed and real_estate[i].recommended_debt == "split" and real_estate[i].user_percentage_choice == "other" and users[0] == petitioner:
+  if real_estate[i].is_amount_owed and real_estate[i].recommended_debt == "split" and real_estate[i].user_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     real_estate[i].petitioner_debt_percentage = real_estate[i].user_percentage_other/100
     real_estate[i].respondent_debt_percentage = 1 - real_estate[i].user_percentage_other/100
-  elif real_estate[i].is_amount_owed and real_estate[i].recommended_debt == "split" and users[0] == petitioner:
+  elif real_estate[i].is_amount_owed and real_estate[i].recommended_debt == "split" and users[0].name.full() == petitioner.name.full():
     real_estate[i].petitioner_debt_percentage = float(real_estate[i].user_percentage_choice)/100
     real_estate[i].respondent_debt_percentage = 1 - float(real_estate[i].user_percentage_choice)/100
-  elif real_estate[i].is_amount_owed and real_estate[i].recommended_debt == "split" and real_estate[i].user_percentage_choice == "other" and users[0] == respondent:
+  elif real_estate[i].is_amount_owed and real_estate[i].recommended_debt == "split" and real_estate[i].user_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     real_estate[i].respondent_debt_percentage = real_estate[i].user_percentage_other/100
     real_estate[i].petitioner_debt_percentage = 1 - real_estate[i].user_percentage_other/100
-  elif real_estate[i].is_amount_owed and real_estate[i].recommended_debt == "split" and users[0] == respondent:
+  elif real_estate[i].is_amount_owed and real_estate[i].recommended_debt == "split" and users[0].name.full() == respondent.name.full():
     real_estate[i].respondent_debt_percentage = float(real_estate[i].user_percentage_choice)/100
     real_estate[i].petitioner_debt_percentage = 1 - float(real_estate[i].user_percentage_choice)/100
   else:
@@ -2603,6 +2673,11 @@ id: real_estate award_template_respondent
 template: real_estate[i].award_template_respondent
 content: |
   ${ thousands(real_estate[i].award_percentage_respondent * 100) + "% of " if real_estate[i].recommended_award == "split" else "" }${ real_estate[i].display_name + space('real_estate[i].address', prefix=' at ', suffix='') + (" See attached legal description. " if real_estate[i].legal_description != "" else "") }
+---
+id: real_estate loan description template petitioner
+template: real_estate[i].loan_description_template
+content: |
+  ${ space("real_estate[i].lender", prefix="", suffix=" ") + "Mortgage" }
 ---
 id: real_estate loan description template petitioner
 template: real_estate[i].loan_description_template_petitioner
@@ -2656,7 +2731,9 @@ code: |
   vehicles.other_display = "other vehicles"
   vehicles.display_name = "vehicles"
 ---
-only sets: vehicles[i].market_value
+only sets: 
+  - vehicles[i].market_value
+  - vehicles[i].recommended_debt
 id: describe vehicles
 reconsider: vehicles[i].display_name
 question: |
@@ -2744,31 +2821,31 @@ validation code: |
     vehicles[i].display_name = vehicles.terms_ordered.get(vehicles[i].source, vehicles[i].source)
   else:
     vehicles[i].display_name = vehicles[i].source_other
-  if vehicles[i].recommended_award == "split" and vehicles[i].award_percentage_choice == "other" and users[0] == petitioner:
+  if vehicles[i].recommended_award == "split" and vehicles[i].award_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     vehicles[i].award_percentage_petitioner = vehicles[i].award_percentage_other/100
     vehicles[i].award_percentage_respondent = 1- vehicles[i].award_percentage_other/100
-  elif vehicles[i].recommended_award == "split" and users[0] == petitioner:
+  elif vehicles[i].recommended_award == "split" and users[0].name.full() == petitioner.name.full():
     vehicles[i].award_percentage_petitioner = float(vehicles[i].award_percentage_choice)/100
     vehicles[i].award_percentage_respondent = 1- float(vehicles[i].award_percentage_choice)/100
-  elif vehicles[i].recommended_award == "split" and vehicles[i].award_percentage_choice == "other" and users[0] == respondent:
+  elif vehicles[i].recommended_award == "split" and vehicles[i].award_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     vehicles[i].award_percentage_respondent = vehicles[i].award_percentage_other/100
     vehicles[i].award_percentage_petitioner = 1- vehicles[i].award_percentage_other/100
-  elif vehicles[i].recommended_award == "split" and users[0] == respondent:
+  elif vehicles[i].recommended_award == "split" and users[0].name.full() == respondent.name.full():
     vehicles[i].award_percentage_respondent = float(vehicles[i].award_percentage_choice)/100
     vehicles[i].award_percentage_petitioner = 1- float(vehicles[i].award_percentage_choice)/100
   else:
     vehicles[i].award_percentage_petitioner = None
     vehicles[i].award_percentage_respondent = None
-  if vehicles[i].is_amount_owed and vehicles[i].recommended_debt == "split" and vehicles[i].user_percentage_choice == "other" and users[0] == petitioner:
+  if vehicles[i].is_amount_owed and vehicles[i].recommended_debt == "split" and vehicles[i].user_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     vehicles[i].petitioner_debt_percentage = vehicles[i].user_percentage_other/100
     vehicles[i].respondent_debt_percentage = 1 - vehicles[i].user_percentage_other/100
-  elif vehicles[i].is_amount_owed and vehicles[i].recommended_debt == "split" and users[0] == petitioner:
+  elif vehicles[i].is_amount_owed and vehicles[i].recommended_debt == "split" and users[0].name.full() == petitioner.name.full():
     vehicles[i].petitioner_debt_percentage = float(vehicles[i].user_percentage_choice)/100
     vehicles[i].respondent_debt_percentage = 1 - float(vehicles[i].user_percentage_choice)/100
-  elif vehicles[i].is_amount_owed and vehicles[i].recommended_debt == "split" and vehicles[i].user_percentage_choice == "other" and users[0] == respondent:
+  elif vehicles[i].is_amount_owed and vehicles[i].recommended_debt == "split" and vehicles[i].user_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     vehicles[i].respondent_debt_percentage = vehicles[i].user_percentage_other/100
     vehicles[i].petitioner_debt_percentage = 1 - vehicles[i].user_percentage_other/100
-  elif vehicles[i].is_amount_owed and vehicles[i].recommended_debt == "split" and users[0] == respondent:
+  elif vehicles[i].is_amount_owed and vehicles[i].recommended_debt == "split" and users[0].name.full() == respondent.name.full():
     vehicles[i].respondent_debt_percentage = float(vehicles[i].user_percentage_choice)/100
     vehicles[i].petitioner_debt_percentage = 1 - float(vehicles[i].user_percentage_choice)/100
   else:
@@ -2790,6 +2867,11 @@ id: vehicles award_template_respondent
 template: vehicles[i].award_template_respondent
 content: |
   ${ thousands(vehicles[i].award_percentage_respondent * 100) + "% of " if vehicles[i].recommended_award == "split" else "" }${ space('vehicles[i].year',prefix="", suffix=" ") + space('vehicles[i].make',prefix="", suffix=" ") + space('vehicles[i].model',prefix="", suffix=" ") + vehicles[i].display_name }
+---
+id: vehicles loan description template 
+template: vehicles[i].loan_description_template
+content: |
+  ${ space("vehicles[i].lender", prefix="", suffix=" ") + "Loan" }
 ---
 id: vehicles loan description template petitioner
 template: vehicles[i].loan_description_template_petitioner
@@ -2833,7 +2915,9 @@ data: !!omap
   - money market: "Money market funds"
   - other: "Other"
 ---
-only sets: securities[i].market_value
+only sets: 
+  - securities[i].market_value
+  - securities[i].recommended_debt
 id: describe securities
 reconsider: securities[i].display_name
 question: |
@@ -2917,31 +3001,31 @@ validation code: |
     securities[i].display_name = securities.terms_ordered.get(securities[i].source, securities[i].source)
   else:
     securities[i].display_name = securities[i].source_other
-  if securities[i].recommended_award == "split" and securities[i].award_percentage_choice == "other" and users[0] == petitioner:
+  if securities[i].recommended_award == "split" and securities[i].award_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     securities[i].award_percentage_petitioner = securities[i].award_percentage_other/100
     securities[i].award_percentage_respondent = 1- securities[i].award_percentage_other/100
-  elif securities[i].recommended_award == "split" and users[0] == petitioner:
+  elif securities[i].recommended_award == "split" and users[0].name.full() == petitioner.name.full():
     securities[i].award_percentage_petitioner = float(securities[i].award_percentage_choice)/100
     securities[i].award_percentage_respondent = 1- float(securities[i].award_percentage_choice)/100
-  elif securities[i].recommended_award == "split" and securities[i].award_percentage_choice == "other" and users[0] == respondent:
+  elif securities[i].recommended_award == "split" and securities[i].award_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     securities[i].award_percentage_respondent = securities[i].award_percentage_other/100
     securities[i].award_percentage_petitioner = 1- securities[i].award_percentage_other/100
-  elif securities[i].recommended_award == "split" and users[0] == respondent:
+  elif securities[i].recommended_award == "split" and users[0].name.full() == respondent.name.full():
     securities[i].award_percentage_respondent = float(securities[i].award_percentage_choice)/100
     securities[i].award_percentage_petitioner = 1- float(securities[i].award_percentage_choice)/100
   else:
     securities[i].award_percentage_petitioner = None
     securities[i].award_percentage_respondent = None
-  if securities[i].is_amount_owed and securities[i].recommended_debt == "split" and securities[i].user_percentage_choice == "other" and users[0] == petitioner:
+  if securities[i].is_amount_owed and securities[i].recommended_debt == "split" and securities[i].user_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     securities[i].petitioner_debt_percentage = securities[i].user_percentage_other/100
     securities[i].respondent_debt_percentage = 1 - securities[i].user_percentage_other/100
-  elif securities[i].is_amount_owed and securities[i].recommended_debt == "split" and users[0] == petitioner:
+  elif securities[i].is_amount_owed and securities[i].recommended_debt == "split" and users[0].name.full() == petitioner.name.full():
     securities[i].petitioner_debt_percentage = float(securities[i].user_percentage_choice)/100
     securities[i].respondent_debt_percentage = 1 - float(securities[i].user_percentage_choice)/100
-  elif securities[i].is_amount_owed and securities[i].recommended_debt == "split" and securities[i].user_percentage_choice == "other" and users[0] == respondent:
+  elif securities[i].is_amount_owed and securities[i].recommended_debt == "split" and securities[i].user_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     securities[i].respondent_debt_percentage = securities[i].user_percentage_other/100
     securities[i].petitioner_debt_percentage = 1 - securities[i].user_percentage_other/100
-  elif securities[i].is_amount_owed and securities[i].recommended_debt == "split" and users[0] == respondent:
+  elif securities[i].is_amount_owed and securities[i].recommended_debt == "split" and users[0].name.full() == respondent.name.full():
     securities[i].respondent_debt_percentage = float(securities[i].user_percentage_choice)/100
     securities[i].petitioner_debt_percentage = 1 - float(securities[i].user_percentage_choice)/100
   else:
@@ -2965,15 +3049,20 @@ template: securities[i].award_template_respondent
 content: |
   ${ thousands(securities[i].award_percentage_respondent * 100) + "% of " if securities[i].recommended_award == "split" else "" }${ securities[i].description_template }
 ---
+id: securities loan description template
+template: securities[i].loan_description_template
+content: |
+  ${ ((securities[i].lender + " ") if defined('securities[i].lender') else "") + "Loan" }
+---
 id: securities loan description template petitioner
 template: securities[i].loan_description_template_petitioner
 content: |
-  ${ thousands(securities[i].award_percentage_petitioner * 100) + "% of " if securities[i].recommended_award == "split" else "" }$${ space("securities[i].lender", prefix="", suffix=" ") + "Loan" }
+  ${ thousands(securities[i].award_percentage_petitioner * 100) + "% of " if securities[i].recommended_award == "split" else "" }${ space("securities[i].lender", prefix="", suffix=" ") + "Loan" }
 ---
 id: securities loan description template respondent
 template: securities[i].loan_description_template_respondent
 content: |
-  ${ thousands(securities[i].award_percentage_respondent * 100) + "% of " if securities[i].recommended_award == "split" else "" }$${ space("securities[i].lender", prefix="", suffix=" ") + "Loan" }
+  ${ thousands(securities[i].award_percentage_respondent * 100) + "% of " if securities[i].recommended_award == "split" else "" }${ space("securities[i].lender", prefix="", suffix=" ") + "Loan" }
 ---
 id: securities loan security description template
 template: securities[i].security_description_template
@@ -3016,7 +3105,9 @@ code: |
   personal_goods.other_display = "other personal possessions"
   personal_goods.display_name = "Personal possessions"
 ---
-only sets: personal_goods[i].market_value
+only sets: 
+  - personal_goods[i].market_value
+  - personal_goods[i].recommended_debt
 id: describe personal_goods
 reconsider: personal_goods[i].display_name
 question: |
@@ -3113,31 +3204,31 @@ validation code: |
     personal_goods[i].display_name = personal_goods.terms_ordered.get(personal_goods[i].source, personal_goods[i].source)
   else:
     personal_goods[i].display_name = personal_goods[i].source_other
-  if personal_goods[i].recommended_award == "split" and personal_goods[i].award_percentage_choice == "other" and users[0] == petitioner:
+  if personal_goods[i].recommended_award == "split" and personal_goods[i].award_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     personal_goods[i].award_percentage_petitioner = personal_goods[i].award_percentage_other/100
     personal_goods[i].award_percentage_respondent = 1- personal_goods[i].award_percentage_other/100
-  elif personal_goods[i].recommended_award == "split" and users[0] == petitioner:
+  elif personal_goods[i].recommended_award == "split" and users[0].name.full() == petitioner.name.full():
     personal_goods[i].award_percentage_petitioner = float(personal_goods[i].award_percentage_choice)/100
     personal_goods[i].award_percentage_respondent = 1- float(personal_goods[i].award_percentage_choice)/100
-  elif personal_goods[i].recommended_award == "split" and personal_goods[i].award_percentage_choice == "other" and users[0] == respondent:
+  elif personal_goods[i].recommended_award == "split" and personal_goods[i].award_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     personal_goods[i].award_percentage_respondent = personal_goods[i].award_percentage_other/100
     personal_goods[i].award_percentage_petitioner = 1- personal_goods[i].award_percentage_other/100
-  elif personal_goods[i].recommended_award == "split" and users[0] == respondent:
+  elif personal_goods[i].recommended_award == "split" and users[0].name.full() == respondent.name.full():
     personal_goods[i].award_percentage_respondent = float(personal_goods[i].award_percentage_choice)/100
     personal_goods[i].award_percentage_petitioner = 1- float(personal_goods[i].award_percentage_choice)/100
   else:
     personal_goods[i].award_percentage_petitioner = None
     personal_goods[i].award_percentage_respondent = None
-  if personal_goods[i].is_amount_owed and personal_goods[i].recommended_debt == "split" and personal_goods[i].user_percentage_choice == "other" and users[0] == petitioner:
+  if personal_goods[i].is_amount_owed and personal_goods[i].recommended_debt == "split" and personal_goods[i].user_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     personal_goods[i].petitioner_debt_percentage = personal_goods[i].user_percentage_other/100
     personal_goods[i].respondent_debt_percentage = 1 - personal_goods[i].user_percentage_other/100
-  elif personal_goods[i].is_amount_owed and personal_goods[i].recommended_debt == "split" and users[0] == petitioner:
+  elif personal_goods[i].is_amount_owed and personal_goods[i].recommended_debt == "split" and users[0].name.full() == petitioner.name.full():
     personal_goods[i].petitioner_debt_percentage = float(personal_goods[i].user_percentage_choice)/100
     personal_goods[i].respondent_debt_percentage = 1 - float(personal_goods[i].user_percentage_choice)/100
-  elif personal_goods[i].is_amount_owed and personal_goods[i].recommended_debt == "split" and personal_goods[i].user_percentage_choice == "other" and users[0] == respondent:
+  elif personal_goods[i].is_amount_owed and personal_goods[i].recommended_debt == "split" and personal_goods[i].user_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     personal_goods[i].respondent_debt_percentage = personal_goods[i].user_percentage_other/100
     personal_goods[i].petitioner_debt_percentage = 1 - personal_goods[i].user_percentage_other/100
-  elif personal_goods[i].is_amount_owed and personal_goods[i].recommended_debt == "split" and users[0] == respondent:
+  elif personal_goods[i].is_amount_owed and personal_goods[i].recommended_debt == "split" and users[0].name.full() == respondent.name.full():
     personal_goods[i].respondent_debt_percentage = float(personal_goods[i].user_percentage_choice)/100
     personal_goods[i].petitioner_debt_percentage = 1 - float(personal_goods[i].user_percentage_choice)/100
   else:
@@ -3193,7 +3284,9 @@ data: !!omap
   - certificates: "Certificates"
   - other: "Other"
 ---
-only sets: bank_assets[i].market_value
+only sets: 
+  - bank_assets[i].market_value
+  - bank_assets[i].recommended_debt
 id: describe bank_assets
 reconsider: bank_assets[i].display_name
 question: |
@@ -3262,16 +3355,16 @@ validation code: |
     bank_assets[i].display_name = bank_assets.terms_ordered.get(bank_assets[i].source, bank_assets[i].source)
   else:
     bank_assets[i].display_name = bank_assets[i].source_other
-  if bank_assets[i].recommended_award == "split" and bank_assets[i].award_percentage_choice == "other" and users[0] == petitioner:
+  if bank_assets[i].recommended_award == "split" and bank_assets[i].award_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     bank_assets[i].award_percentage_petitioner = bank_assets[i].award_percentage_other/100
     bank_assets[i].award_percentage_respondent = 1- bank_assets[i].award_percentage_other/100
-  elif bank_assets[i].recommended_award == "split" and users[0] == petitioner:
+  elif bank_assets[i].recommended_award == "split" and users[0].name.full() == petitioner.name.full():
     bank_assets[i].award_percentage_petitioner = float(bank_assets[i].award_percentage_choice)/100
     bank_assets[i].award_percentage_respondent = 1- float(bank_assets[i].award_percentage_choice)/100
-  elif bank_assets[i].recommended_award == "split" and bank_assets[i].award_percentage_choice == "other" and users[0] == respondent:
+  elif bank_assets[i].recommended_award == "split" and bank_assets[i].award_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     bank_assets[i].award_percentage_respondent = bank_assets[i].award_percentage_other/100
     bank_assets[i].award_percentage_petitioner = 1- bank_assets[i].award_percentage_other/100
-  elif bank_assets[i].recommended_award == "split" and users[0] == respondent:
+  elif bank_assets[i].recommended_award == "split" and users[0].name.full() == respondent.name.full():
     bank_assets[i].award_percentage_respondent = float(bank_assets[i].award_percentage_choice)/100
     bank_assets[i].award_percentage_petitioner = 1- float(bank_assets[i].award_percentage_choice)/100
   else:
@@ -3299,15 +3392,20 @@ template: bank_assets[i].description_template
 content: |
   ${ space("bank_assets[i].institution",prefix="", suffix=" ") + (redact(bank_assets[i].account_number) + " " if defined('bank_assets[i].account_number') else "") + bank_assets[i].display_name }
 ---
+id: bank_assets description template
+template: bank_assets[i].description_template
+content: |
+  ${ space("bank_assets[i].institution",prefix="", suffix=" ") + (redact(bank_assets[i].account_number) + " " if defined('bank_assets[i].account_number') else "") + bank_assets[i].display_name }
+---
 id: bank_assets award description template for petitioner
 template: bank_assets[i].award_template_petitioner
 content: |
-  ${ thousands(personal_goods[i].award_percentage_petitioner * 100) + "% of " if personal_goods[i].recommended_award == "split" else "" }${ space("bank_assets[i].institution",prefix="", suffix=" ") + (redact(bank_assets[i].account_number) + " " if defined('bank_assets[i].account_number') else "") + bank_assets[i].display_name }
+  ${ thousands(bank_assets[i].award_percentage_petitioner * 100) + "% of " if bank_assets[i].recommended_award == "split" else "" }${ space("bank_assets[i].institution",prefix="", suffix=" ") + (redact(bank_assets[i].account_number) + " " if defined('bank_assets[i].account_number') else "") + bank_assets[i].display_name }
 ---
 id: bank_assets award description template for respondent
 template: bank_assets[i].award_template_respondent
 content: |
-  ${ thousands(personal_goods[i].award_percentage_petitioner * 100) + "% of " if personal_goods[i].recommended_award == "split" else "" }${ space("bank_assets[i].institution",prefix="", suffix=" ") + (redact(bank_assets[i].account_number) + " " if defined('bank_assets[i].account_number') else "") + bank_assets[i].display_name }
+  ${ thousands(bank_assets[i].award_percentage_respondent * 100) + "% of " if bank_assets[i].recommended_award == "split" else "" }${ space("bank_assets[i].institution",prefix="", suffix=" ") + (redact(bank_assets[i].account_number) + " " if defined('bank_assets[i].account_number') else "") + bank_assets[i].display_name }
 ---
 comment: |
   RETIREMENT ACCOUNTS
@@ -3341,7 +3439,9 @@ code: |
   retirement_accounts.other_display = "other retirement accounts"
   retirement_accounts.display_name = "Retirement accounts"
 ---
-only sets: retirement_accounts[i].market_value
+only sets: 
+  - retirement_accounts[i].market_value
+  - retirement_accounts[i].recommended_debt
 id: describe retirement_accounts
 reconsider: retirement_accounts[i].display_name
 question: |
@@ -3410,16 +3510,16 @@ validation code: |
     retirement_accounts[i].display_name = retirement_accounts.terms_ordered.get(retirement_accounts[i].source, retirement_accounts[i].source)
   else:
     retirement_accounts[i].display_name = retirement_accounts[i].source_other
-  if retirement_accounts[i].recommended_award == "split" and retirement_accounts[i].award_percentage_choice == "other" and users[0] == petitioner:
+  if retirement_accounts[i].recommended_award == "split" and retirement_accounts[i].award_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     retirement_accounts[i].award_percentage_petitioner = retirement_accounts[i].award_percentage_other/100
     retirement_accounts[i].award_percentage_respondent = 1- retirement_accounts[i].award_percentage_other/100
-  elif retirement_accounts[i].recommended_award == "split" and users[0] == petitioner:
+  elif retirement_accounts[i].recommended_award == "split" and users[0].name.full() == petitioner.name.full():
     retirement_accounts[i].award_percentage_petitioner = float(retirement_accounts[i].award_percentage_choice)/100
     retirement_accounts[i].award_percentage_respondent = 1- float(retirement_accounts[i].award_percentage_choice)/100
-  elif retirement_accounts[i].recommended_award == "split" and retirement_accounts[i].award_percentage_choice == "other" and users[0] == respondent:
+  elif retirement_accounts[i].recommended_award == "split" and retirement_accounts[i].award_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     retirement_accounts[i].award_percentage_respondent = retirement_accounts[i].award_percentage_other/100
     retirement_accounts[i].award_percentage_petitioner = 1- retirement_accounts[i].award_percentage_other/100
-  elif retirement_accounts[i].recommended_award == "split" and users[0] == respondent:
+  elif retirement_accounts[i].recommended_award == "split" and users[0].name.full() == respondent.name.full():
     retirement_accounts[i].award_percentage_respondent = float(retirement_accounts[i].award_percentage_choice)/100
     retirement_accounts[i].award_percentage_petitioner = 1- float(retirement_accounts[i].award_percentage_choice)/100
   else:
@@ -3443,15 +3543,20 @@ template: retirement_accounts[i].award_template_respondent
 content: |
   ${ thousands(retirement_accounts[i].award_percentage_respondent * 100) + "% of " if retirement_accounts[i].recommended_award == "split" else "" }${ retirement_accounts[i].description_template }
 ---
+id: retirement_accounts loan description template 
+template: retirement_accounts[i].loan_description_template
+content: |
+  ${ space("retirement_accounts[i].lender", prefix="", suffix=" ") + "Loan" }
+---
 id: retirement_accounts loan description template petitioner
 template: retirement_accounts[i].loan_description_template_petitioner
 content: |
-  ${ thousands(retirement_accounts[i].award_percentage_petitioner * 100) + "% of " if retirement_accounts[i].recommended_award == "split" else "" }$${ space("retirement_accounts[i].lender", prefix="", suffix=" ") + "Loan" }
+  ${ thousands(retirement_accounts[i].award_percentage_petitioner * 100) + "% of " if retirement_accounts[i].recommended_award == "split" else "" }${ space("retirement_accounts[i].lender", prefix="", suffix=" ") + "Loan" }
 ---
 id: retirement_accounts loan description template respondent
 template: retirement_accounts[i].loan_description_template_respondent
 content: |
-  ${ thousands(retirement_accounts[i].award_percentage_respondent * 100) + "% of " if retirement_accounts[i].recommended_award == "split" else "" }$${ space("retirement_accounts[i].lender", prefix="", suffix=" ") + "Loan" }
+  ${ thousands(retirement_accounts[i].award_percentage_respondent * 100) + "% of " if retirement_accounts[i].recommended_award == "split" else "" }${ space("retirement_accounts[i].lender", prefix="", suffix=" ") + "Loan" }
 ---
 id: retirement_accounts loan security description template
 template: retirement_accounts[i].security_description_template
@@ -3551,7 +3656,9 @@ code: |
   farm.other_display = "other farm equipment, animal or crops"
   farm.display_name = "farm equipment, animal or crops"
 ---
-only sets: farm[i].market_value
+only sets: 
+  - farm[i].market_value
+  - farm[i].recommended_debt
 id: describe farm
 question: |
   Tell us about your farm
@@ -3637,31 +3744,31 @@ fields:
       variable: farm[i].award_percentage_choice
       is: other
 validation code: |
-  if farm[i].recommended_award == "split" and farm[i].award_percentage_choice == "other" and users[0] == petitioner:
+  if farm[i].recommended_award == "split" and farm[i].award_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     farm[i].award_percentage_petitioner = farm[i].award_percentage_other/100
     farm[i].award_percentage_respondent = 1- farm[i].award_percentage_other/100
-  elif farm[i].recommended_award == "split" and users[0] == petitioner:
+  elif farm[i].recommended_award == "split" and users[0].name.full() == petitioner.name.full():
     farm[i].award_percentage_petitioner = float(farm[i].award_percentage_choice)/100
     farm[i].award_percentage_respondent = 1- float(farm[i].award_percentage_choice)/100
-  elif farm[i].recommended_award == "split" and farm[i].award_percentage_choice == "other" and users[0] == respondent:
+  elif farm[i].recommended_award == "split" and farm[i].award_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     farm[i].award_percentage_respondent = farm[i].award_percentage_other/100
     farm[i].award_percentage_petitioner = 1- farm[i].award_percentage_other/100
-  elif farm[i].recommended_award == "split" and users[0] == respondent:
+  elif farm[i].recommended_award == "split" and users[0].name.full() == respondent.name.full():
     farm[i].award_percentage_respondent = float(farm[i].award_percentage_choice)/100
     farm[i].award_percentage_petitioner = 1- float(farm[i].award_percentage_choice)/100
   else:
     farm[i].award_percentage_petitioner = None
     farm[i].award_percentage_respondent = None
-  if farm[i].is_amount_owed and farm[i].recommended_debt == "split" and farm[i].user_percentage_choice == "other" and users[0] == petitioner:
+  if farm[i].is_amount_owed and farm[i].recommended_debt == "split" and farm[i].user_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     farm[i].petitioner_debt_percentage = farm[i].user_percentage_other/100
     farm[i].respondent_debt_percentage = 1 - farm[i].user_percentage_other/100
-  elif farm[i].is_amount_owed and farm[i].recommended_debt == "split" and users[0] == petitioner:
+  elif farm[i].is_amount_owed and farm[i].recommended_debt == "split" and users[0].name.full() == petitioner.name.full():
     farm[i].petitioner_debt_percentage = float(farm[i].user_percentage_choice)/100
     farm[i].respondent_debt_percentage = 1 - float(farm[i].user_percentage_choice)/100
-  elif farm[i].is_amount_owed and farm[i].recommended_debt == "split" and farm[i].user_percentage_choice == "other" and users[0] == respondent:
+  elif farm[i].is_amount_owed and farm[i].recommended_debt == "split" and farm[i].user_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     farm[i].respondent_debt_percentage = farm[i].user_percentage_other/100
     farm[i].petitioner_debt_percentage = 1 - farm[i].user_percentage_other/100
-  elif farm[i].is_amount_owed and farm[i].recommended_debt == "split" and users[0] == respondent:
+  elif farm[i].is_amount_owed and farm[i].recommended_debt == "split" and users[0].name.full() == respondent.name.full():
     farm[i].respondent_debt_percentage = float(farm[i].user_percentage_choice)/100
     farm[i].petitioner_debt_percentage = 1 - float(farm[i].user_percentage_choice)/100
   else:
@@ -3683,6 +3790,11 @@ id: farms award_template_respondent
 template: farm[i].award_template_respondent
 content: |
   ${ thousands(farm[i].award_percentage_respondent * 100) + "% of " if farm[i].recommended_award == "split" else "" }${ farm[i].description } farm
+---
+id: farms loan description template 
+template: farm[i].loan_description_template
+content: |
+  ${ space("farm[i].lender", prefix="", suffix=" ") + "Loan" }
 ---
 id: farms loan description template petitioner
 template: farm[i].loan_description_template_petitioner
@@ -3714,7 +3826,9 @@ code: |
   businesses.other_display = "other businesses"
   businesses.display_name = "businesses"
 ---
-only sets: businesses[i].market_value
+only sets: 
+  - businesses[i].market_value
+  - businesses[i].recommended_debt
 id: describe business
 question: |
   Tell us about your businesses
@@ -3800,31 +3914,31 @@ fields:
       variable: businesses[i].award_percentage_choice
       is: other
 validation code: |
-  if businesses[i].recommended_award == "split" and businesses[i].award_percentage_choice == "other" and users[0] == petitioner:
+  if businesses[i].recommended_award == "split" and businesses[i].award_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     businesses[i].award_percentage_petitioner = businesses[i].award_percentage_other/100
     businesses[i].award_percentage_respondent = 1- businesses[i].award_percentage_other/100
-  elif businesses[i].recommended_award == "split" and users[0] == petitioner:
+  elif businesses[i].recommended_award == "split" and users[0].name.full() == petitioner.name.full():
     businesses[i].award_percentage_petitioner = float(businesses[i].award_percentage_choice)/100
     businesses[i].award_percentage_respondent = 1- float(businesses[i].award_percentage_choice)/100
-  elif businesses[i].recommended_award == "split" and businesses[i].award_percentage_choice == "other" and users[0] == respondent:
+  elif businesses[i].recommended_award == "split" and businesses[i].award_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     businesses[i].award_percentage_respondent = businesses[i].award_percentage_other/100
     businesses[i].award_percentage_petitioner = 1- businesses[i].award_percentage_other/100
-  elif businesses[i].recommended_award == "split" and users[0] == respondent:
+  elif businesses[i].recommended_award == "split" and users[0].name.full() == respondent.name.full():
     businesses[i].award_percentage_respondent = float(businesses[i].award_percentage_choice)/100
     businesses[i].award_percentage_petitioner = 1- float(businesses[i].award_percentage_choice)/100
   else:
     businesses[i].award_percentage_petitioner = None
     businesses[i].award_percentage_respondent = None
-  if businesses[i].is_amount_owed and businesses[i].recommended_debt == "split" and businesses[i].user_percentage_choice == "other" and users[0] == petitioner:
+  if businesses[i].is_amount_owed and businesses[i].recommended_debt == "split" and businesses[i].user_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     businesses[i].petitioner_debt_percentage = businesses[i].user_percentage_other/100
     businesses[i].respondent_debt_percentage = 1 - businesses[i].user_percentage_other/100
-  elif businesses[i].is_amount_owed and businesses[i].recommended_debt == "split" and users[0] == petitioner:
+  elif businesses[i].is_amount_owed and businesses[i].recommended_debt == "split" and users[0].name.full() == petitioner.name.full():
     businesses[i].petitioner_debt_percentage = float(businesses[i].user_percentage_choice)/100
     businesses[i].respondent_debt_percentage = 1 - float(businesses[i].user_percentage_choice)/100
-  elif businesses[i].is_amount_owed and businesses[i].recommended_debt == "split" and businesses[i].user_percentage_choice == "other" and users[0] == respondent:
+  elif businesses[i].is_amount_owed and businesses[i].recommended_debt == "split" and businesses[i].user_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     businesses[i].respondent_debt_percentage = businesses[i].user_percentage_other/100
     businesses[i].petitioner_debt_percentage = 1 - businesses[i].user_percentage_other/100
-  elif businesses[i].is_amount_owed and businesses[i].recommended_debt == "split" and users[0] == respondent:
+  elif businesses[i].is_amount_owed and businesses[i].recommended_debt == "split" and users[0].name.full() == respondent.name.full():
     businesses[i].respondent_debt_percentage = float(businesses[i].user_percentage_choice)/100
     businesses[i].petitioner_debt_percentage = 1 - float(businesses[i].user_percentage_choice)/100
   else:
@@ -3846,6 +3960,11 @@ id: businesses award_template_respondent
 template: businesses[i].award_template_respondent
 content: |
   ${ thousands(businesses[i].award_percentage_respondent * 100) + "% of " if businesses[i].recommended_award == "split" else "" }${ businesses[i].description } business
+---
+id: businesses loan description template 
+template: businesses[i].loan_description_template
+content: |
+  ${ space("businesses[i].lender", prefix="", suffix=" ") + "Loan" }
 ---
 id: businesses loan description template petitioner
 template: businesses[i].loan_description_template_petitioner
@@ -3875,7 +3994,9 @@ code: |
   other_assets.other_display = "other assets"
   other_assets.display_name = "other assets"
 ---
-only sets: other_assets[i].market_value
+only sets: 
+  - other_assets[i].market_value
+  - other_assets[i].recommended_debt
 id: describe other_asset
 question: |
   Tell us about your other assets
@@ -3961,31 +4082,31 @@ fields:
       variable: other_assets[i].award_percentage_choice
       is: other
 validation code: |
-  if other_assets[i].recommended_award == "split" and other_assets[i].award_percentage_choice == "other" and users[0] == petitioner:
+  if other_assets[i].recommended_award == "split" and other_assets[i].award_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     other_assets[i].award_percentage_petitioner = other_assets[i].award_percentage_other/100
     other_assets[i].award_percentage_respondent = 1- other_assets[i].award_percentage_other/100
-  elif other_assets[i].recommended_award == "split" and users[0] == petitioner:
+  elif other_assets[i].recommended_award == "split" and users[0].name.full() == petitioner.name.full():
     other_assets[i].award_percentage_petitioner = float(other_assets[i].award_percentage_choice)/100
     other_assets[i].award_percentage_respondent = 1- float(other_assets[i].award_percentage_choice)/100
-  elif other_assets[i].recommended_award == "split" and other_assets[i].award_percentage_choice == "other" and users[0] == respondent:
+  elif other_assets[i].recommended_award == "split" and other_assets[i].award_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     other_assets[i].award_percentage_respondent = other_assets[i].award_percentage_other/100
     other_assets[i].award_percentage_petitioner = 1- other_assets[i].award_percentage_other/100
-  elif other_assets[i].recommended_award == "split" and users[0] == respondent:
+  elif other_assets[i].recommended_award == "split" and users[0].name.full() == respondent.name.full():
     other_assets[i].award_percentage_respondent = float(other_assets[i].award_percentage_choice)/100
     other_assets[i].award_percentage_petitioner = 1- float(other_assets[i].award_percentage_choice)/100
   else:
     other_assets[i].award_percentage_petitioner = None
     other_assets[i].award_percentage_respondent = None
-  if other_assets[i].is_amount_owed and other_assets[i].recommended_debt == "split" and other_assets[i].user_percentage_choice == "other" and users[0] == petitioner:
+  if other_assets[i].is_amount_owed and other_assets[i].recommended_debt == "split" and other_assets[i].user_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     other_assets[i].petitioner_debt_percentage = other_assets[i].user_percentage_other/100
     other_assets[i].respondent_debt_percentage = 1 - other_assets[i].user_percentage_other/100
-  elif other_assets[i].is_amount_owed and other_assets[i].recommended_debt == "split" and users[0] == petitioner:
+  elif other_assets[i].is_amount_owed and other_assets[i].recommended_debt == "split" and users[0].name.full() == petitioner.name.full():
     other_assets[i].petitioner_debt_percentage = float(other_assets[i].user_percentage_choice)/100
     other_assets[i].respondent_debt_percentage = 1 - float(other_assets[i].user_percentage_choice)/100
-  elif other_assets[i].is_amount_owed and other_assets[i].recommended_debt == "split" and other_assets[i].user_percentage_choice == "other" and users[0] == respondent:
+  elif other_assets[i].is_amount_owed and other_assets[i].recommended_debt == "split" and other_assets[i].user_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     other_assets[i].respondent_debt_percentage = other_assets[i].user_percentage_other/100
     other_assets[i].petitioner_debt_percentage = 1 - other_assets[i].user_percentage_other/100
-  elif other_assets[i].is_amount_owed and other_assets[i].recommended_debt == "split" and users[0] == respondent:
+  elif other_assets[i].is_amount_owed and other_assets[i].recommended_debt == "split" and users[0].name.full() == respondent.name.full():
     other_assets[i].respondent_debt_percentage = float(other_assets[i].user_percentage_choice)/100
     other_assets[i].petitioner_debt_percentage = 1 - float(other_assets[i].user_percentage_choice)/100
   else:
@@ -4007,6 +4128,11 @@ id: other_assets award_template_respondent
 template: other_assets[i].award_template_respondent
 content: |
   ${ thousands(other_assets[i].award_percentage_respondent * 100) + "% of " if other_assets[i].recommended_award == "split" else "" }${ other_assets[i].description }
+---
+id: other_assets loan description template 
+template: other_assets[i].loan_description_template
+content: |
+  ${ space("other_assets[i].lender", prefix="", suffix=" ") + "Loan" }
 ---
 id: other_assets loan description template petitioner
 template: other_assets[i].loan_description_template_petitioner
@@ -4091,6 +4217,7 @@ fields:
       - Other: other
 validation code: |
   life_insurance[i].has_possession = life_insurance[i].owner
+  life_insurance[i].ownership = life_insurance[i].owner
   life_insurance[i].is_amount_owed = False
 ---
 id: life_insurance description template
@@ -4177,6 +4304,8 @@ fields:
     required: False
 validation code: |
   interests_in_trust[i].has_possession = interests_in_trust[i].trustee
+  interests_in_trust[i].ownership = interests_in_trust[i].trustee
+  interests_in_trust[i].is_amount_owed = None
 ---
 id: interests_in_trust description template
 template: interests_in_trust[i].description_template
@@ -4257,6 +4386,22 @@ on change:
   real_estate[i].value: |
     undefine('joint_assets')
 ---
+id: joint_assets object
+generic object: ALIndividual
+objects:
+  - x.assets: ALAssetList.using(auto_gather=False,display_name="All assets")
+---
+code: |
+  users[0].assets.clear() 
+  other_parties[0].assets.clear()
+  for asset in joint_assets:
+    if asset.recommended_award == users[0].name.full() or asset.recommended_award == "split":
+      users[0].assets.append(asset)
+    if asset.recommended_award == other_parties[0].name.full() or asset.recommended_award == "split":
+      other_parties[0].assets.append(asset)
+  users[0].assets.gathered = True
+  other_parties[0].assets.gathered = True
+---
 ## DEBTS ##
 
 ---
@@ -4330,7 +4475,9 @@ code: |
   debts[i].complete = True
 ---
 id: individual debt information
-only sets: debts[i].balance
+only sets: 
+  - debts[i].balance
+  - debts[i].recommended_debt
 question: | 
   Tell us about your ${ debts[i].display_name }
 subquestion: |
@@ -4388,16 +4535,16 @@ validation code: |
     debts[i].display_name = debts.terms_ordered.get(debts[i].source, debts[i].source)
   else:
     debts[i].display_name = debts[i].source_other
-  if debts[i].recommended_debt == "split" and debts[i].user_percentage_choice == "other" and users[0] == petitioner:
+  if debts[i].recommended_debt == "split" and debts[i].user_percentage_choice == "other" and users[0].name.full() == petitioner.name.full():
     debts[i].petitioner_debt_percentage = debts[i].user_percentage_other/100
     debts[i].respondent_debt_percentage = 1 - debts[i].user_percentage_other/100
-  elif debts[i].recommended_debt == "split" and users[0] == petitioner:
+  elif debts[i].recommended_debt == "split" and users[0].name.full() == petitioner.name.full():
     debts[i].petitioner_debt_percentage = float(debts[i].user_percentage_choice)/100
     debts[i].respondent_debt_percentage = 1 - float(debts[i].user_percentage_choice)/100
-  elif debts[i].recommended_debt == "split" and debts[i].user_percentage_choice == "other" and users[0] == respondent:
+  elif debts[i].recommended_debt == "split" and debts[i].user_percentage_choice == "other" and users[0].name.full() == respondent.name.full():
     debts[i].respondent_debt_percentage = debts[i].user_percentage_other/100
     debts[i].petitioner_debt_percentage = 1 - debts[i].user_percentage_other/100
-  elif debts[i].recommended_debt == "split" and users[0] == respondent:
+  elif debts[i].recommended_debt == "split" and users[0].name.full() == respondent.name.full():
     debts[i].respondent_debt_percentage = float(debts[i].user_percentage_choice)/100
     debts[i].petitioner_debt_percentage = 1 - float(debts[i].user_percentage_choice)/100
   else:
@@ -4413,6 +4560,11 @@ id: backup code to set loan description and security for unsecured debts
 code: |
   debts[i].loan_description = space("debts[i].lender", prefix = "", suffix = " ") + showifdef('debts[i].display_name','loan')
   debts[i].security = "None"
+---
+id: debts loan description template
+template: debts.loan_description_template
+content: |
+  ${ space("debts[i].lender", prefix = "", suffix = " ") + showifdef('debts[i].display_name','loan') }
 ---
 generic object: ALAsset
 id: loan description and security default code
@@ -4463,19 +4615,17 @@ id: joint_debts object
 objects:
   - joint_debts: ALAssetList.using(auto_gather=False,display_name="All debts")
 ---
-reconsider: secured_debts
 id: combine secured debts and debts
+reconsider: secured_debts
 code: |
   joint_debts.clear()
   for debt in secured_debts:
     joint_debts.append(debt)
-    joint_debts[-1].loan_description = showifdef('debt.loan_description',"loan")  
   for debt in debts:
     joint_debts.append(debt)
-    joint_debts[-1].loan_description = showifdef('debt.loan_description',"loan")  
   joint_debts.gathered = True
 ---
-reconsider: joint_debts
+reconsider: joint_debts.gathered
 id: joint_debts review 
 question: All Debts
 subquestion: |
@@ -5771,13 +5921,13 @@ validation code: |
 id: code to present relevant service options
 code: |
   temp_service_type_choices = list()
-  if users[0] == petitioner :
+  if users[0].name.full() == petitioner.name.full():
     temp_service_type_choices.append({'label': other_parties[0].name_full()  + " has signed a verified Respondent’s Answer to Petition for Dissolution of Marriage, which is being filed with the Petition for Dissolution of Marriage. Therefore, do not issue a summons.","value":"none"})
   if other_parties[0].address.state == "MO":
     temp_service_type_choices.append({'label': other_parties[0].name_full() + " should be served with a summons at their home.","value":"home"})
-  if users[0] == petitioner and (not defined('other_parties[0].jobs.there_are_any') or (len(other_parties[0].jobs) > 0 or other_parties[0].has_self_employment_income) and other_parties[0].employer.address.state == "MO"):
+  if users[0].name.full() == petitioner.name.full() and (not defined('other_parties[0].jobs.there_are_any') or (len(other_parties[0].jobs) > 0 or other_parties[0].has_self_employment_income) and other_parties[0].employer.address.state == "MO"):
     temp_service_type_choices.append({'label': other_parties[0].name_full() + " should be served with a summons at their place of employment.","value":"work"})
-  if users[0] == petitioner and other_parties[0].address.state != "MO" and (not defined('other_parties[0].employer.address.address') or other_parties[0].employer.address.state != "MO"):
+  if users[0].name.full() == petitioner.name.full() and other_parties[0].address.state != "MO" and (not defined('other_parties[0].employer.address.address') or other_parties[0].employer.address.state != "MO"):
     temp_service_type_choices.append({'label': other_parties[0].name_full() + " cannot be served in Missouri. Therefore, service by registered mail is requested. A copy of the Affidavit for Service by Mail is attached to this form. See Missouri Supreme Court Rule 54.12(b).","value":"mail"})
   if not other_parties[0].address_known and not defined('other_parties[0].employer.address.address'):
     temp_service_type_choices.append({'label': "The address of " + other_parties[0].name_full() + " is unknown and cannot be found. Therefore, service by publication is requested. A copy of the Request for Service by Publication is attached to this form.", "value": "publication"})
@@ -5878,7 +6028,7 @@ subquestion: |
   
   Thank you ${users}. Your form is ready to download and deliver.
 
-  % if users[0] == petitioner:
+  % if users[0].name.full() == petitioner.name.full():
 
   [YOUTUBE Ic6miGHGsZA]
 
@@ -5893,10 +6043,10 @@ subquestion: |
   ${ action_button_html(url_action('review_form'), label='Edit answers', color='info') }
   
   
-  ${ al_user_bundle.download_list_html(use_previously_cached_files=False, include_full_pdf=True) }
+  ${ al_court_bundle.download_list_html(use_previously_cached_files=False, include_full_pdf=True) }
   
 
-  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+  ${ al_court_bundle.send_button_html(show_editable_checkbox=False) }
 
 progress: 100
 ---
@@ -6663,7 +6813,15 @@ review:
   show if: showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]')
 - Edit: 
     - real_estate.revisit
-    - is_additional_provisions_property_statement
+    - invalidate:
+      - asset_checkbox_review
+      - award_review
+      - debt_checkbox_review
+      - debt_review 
+      - is_additional_provisions_property_statement
+      - additional_provisions_property_statement
+    - recompute:
+      - property_statement_review
   button: |
     Does Petitioner own a house, condominium or other real estate?: **${ yesno(len([re for re in real_estate if petitioner.name.full() in re.ownership]) > 0) }**
 
@@ -6678,7 +6836,9 @@ review:
      - ${ asset.description_template }
     
     % endfor
-- Edit: vehicles.revisit
+- Edit: 
+    - vehicles.revisit
+    - is_additional_provisions_property_statement
   button: |
     Does Petitioner own a car, truck or motorcycle?: **${ yesno(len(list([re for re in vehicles.matches(source=['car','truck','motorcycle']) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])) > 0) }**
 
@@ -6709,8 +6869,13 @@ review:
     % endfor
 - Edit: 
     - bank_assets.revisit
+    - invalidate:
+      - asset_checkbox_review
+      - award_review
+      - is_additional_provisions_property_statement
+      - additional_provisions_property_statement
     - recompute:
-      - joint_assets
+      - property_statement_review
   button: |
     Does Petitioner have any bank accounts?: **${ yesno(len([re for re in bank_assets if petitioner.name.full() in re.ownership]) > 0) }**
 
@@ -6727,11 +6892,19 @@ review:
      - ${ asset.description_template }
     
     % endfor
-- Edit: retirement_accounts.revisit
+- Edit: 
+    - retirement_accounts.revisit
+    - invalidate:
+      - asset_checkbox_review
+      - award_review
+      - is_additional_provisions_property_statement
+      - additional_provisions_property_statement
+    - recompute:
+      - property_statement_review
   button: |
-    Does Petitioner have any right to receive any pension or retirement benefits other than Social Security?: **${ yesno(len(list([re for re in retirement_accounts.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_acconts_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])) > 0) }**
+    Does Petitioner have any right to receive any pension or retirement benefits other than Social Security?: **${ yesno(len(list([re for re in retirement_accounts.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_accounts_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])) > 0) }**
 
-    % for asset in [re for re in retirement_accounts.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_acconts_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+    % for asset in [re for re in retirement_accounts.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_accounts_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
      - ${ asset.description_template }
     
     % endfor
@@ -6743,9 +6916,9 @@ review:
     
     % endfor
 
-    Does Respondent have any right to receive any pension or retirement benefits other than Social Security?: **${ yesno(len(list([re for re in retirement_accounts.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_acconts_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])) > 0) }**
+    Does Respondent have any right to receive any pension or retirement benefits other than Social Security?: **${ yesno(len(list([re for re in retirement_accounts.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_accounts_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])) > 0) }**
 
-    % for asset in [re for re in retirement_accounts.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_acconts_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
+    % for asset in [re for re in retirement_accounts.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_accounts_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [respondent.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
      - ${ asset.description_template }
     
     % endfor
@@ -6756,7 +6929,17 @@ review:
      - ${ asset.description_template }
     
     % endfor
-- Edit: personal_goods.revisit
+- Edit: 
+    - personal_goods.revisit
+    - invalidate:
+      - asset_checkbox_review
+      - award_review
+      - debt_checkbox_review
+      - debt_review 
+      - is_additional_provisions_property_statement
+      - additional_provisions_property_statement
+    - recompute:
+      - property_statement_review
   button: |
     Does Petitioner have any furniture, appliances or other household goods worth more than $100?: **${ yesno(len(list([re for re in personal_goods.matches(source=["appliances", "computers", "electronics", "furnishings", "personal_goods_other"]) if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])) > 0) }**
 
@@ -6786,7 +6969,17 @@ review:
     
     % endfor
 
-- Edit: businesses.revisit
+- Edit: 
+    - businesses.revisit
+    - invalidate:
+      - asset_checkbox_review
+      - award_review
+      - debt_checkbox_review
+      - debt_review 
+      - is_additional_provisions_property_statement
+      - additional_provisions_property_statement
+    - recompute:
+      - property_statement_review
   button: |
     Does Petitioner own a business?: **${ yesno(len(list([re for re in businesses if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])) > 0) }**
 
@@ -6801,7 +6994,17 @@ review:
      - ${ asset.description_template }
     
     % endfor
-- Edit: securities.revisit
+- Edit: 
+    - securities.revisit
+    - invalidate:
+      - asset_checkbox_review
+      - award_review
+      - debt_checkbox_review
+      - debt_review 
+      - is_additional_provisions_property_statement
+      - additional_provisions_property_statement
+    - recompute:
+      - property_statement_review
   button: |
     Does Petitioner own any stocks or bond?: **${ yesno(len(list([re for re in securities if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])) > 0) }**
 
@@ -6816,7 +7019,15 @@ review:
      - ${ asset.description_template }
     
     % endfor
-- Edit: life_insurance.revisit
+- Edit: 
+    - life_insurance.revisit
+    - invalidate:
+      - asset_checkbox_review
+      - award_review
+      - is_additional_provisions_property_statement
+      - additional_provisions_property_statement
+    - recompute:
+      - property_statement_review
   button: |
     Does Petitioner have any life insurance that could be cashed in?: **${ yesno(len(list([re for re in life_insurance if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])) > 0) }**
 
@@ -6835,7 +7046,15 @@ review:
     Does anyone owe Petitioner any money?: **${ yesno(len(list([re for re in securities if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])) > 0) }**
     
     Does anyone owe Respondent any money?: **${ yesno(len(list([re for re in securities if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])) > 0) }**
-- Edit: debts_owed_to_you.revisit
+- Edit: 
+    - debts_owed_to_you.revisit
+    - invalidate:
+      - asset_checkbox_review
+      - award_review
+      - is_additional_provisions_property_statement
+      - additional_provisions_property_statement
+    - recompute:
+      - property_statement_review
   button: |
     Debts owed to you
     % for asset in [re for re in debts_owed_to_you if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
@@ -6848,7 +7067,15 @@ review:
      - ${ asset.description_template }
     
     % endfor
-- Edit: interest_in_contract.revisit
+- Edit: 
+    - interest_in_contract.revisit
+    - invalidate:
+      - asset_checkbox_review
+      - award_review
+      - is_additional_provisions_property_statement
+      - additional_provisions_property_statement
+    - recompute:
+      - property_statement_review
   button: |
     Interest in contract
     % for asset in [re for re in interest_in_contract if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]:
@@ -6862,7 +7089,15 @@ review:
      - ${ asset.description_template }
     
     % endfor
-- Edit: interest_in_litigation.revisit
+- Edit: 
+    - interest_in_litigation.revisit
+    - invalidate:
+      - asset_checkbox_review
+      - award_review
+      - is_additional_provisions_property_statement
+      - additional_provisions_property_statement
+    - recompute:
+      - property_statement_review
   button: |
     Does Petitioner have any lawsuits against anyone?: **${ yesno(len(list([re for re in interest_in_litigation if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])) > 0) }**
 
@@ -6877,7 +7112,17 @@ review:
      - ${ asset.description_template }
     
     % endfor
-- Edit: farm.revisit
+- Edit: 
+    - farm.revisit
+    - invalidate:
+      - asset_checkbox_review
+      - award_review
+      - debt_checkbox_review
+      - debt_review 
+      - is_additional_provisions_property_statement
+      - additional_provisions_property_statement
+    - recompute:
+      - property_statement_review
   button: |
     Does Petitioner have any farm equipment, animals or crops?: **${ yesno(len(list([re for re in farm if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]])) > 0) }**
 
@@ -6892,7 +7137,17 @@ review:
      - ${ asset.description_template }
     
     % endfor
-- Edit: interests_in_trust.revisit
+- Edit: 
+    - interests_in_trust.revisit
+    - invalidate:
+      - asset_checkbox_review
+      - award_review
+      - debt_checkbox_review
+      - debt_review 
+      - is_additional_provisions_property_statement
+      - additional_provisions_property_statement
+    - recompute:
+      - property_statement_review
   button: |
     Does Petitioner have any interest in any trusts?: **${ yesno(len(list([re for re in interests_in_trust if re.marital_property in ["Marital","Both"] or re.has_possession in [petitioner.name.full(),petitioner.name.full() + " + " + respondent.name.full()]]) > 0)) }**
 
@@ -7878,8 +8133,6 @@ reconsider:
 id: property statement review 
 question: Review the Property Statement
 subquestion: |
-
-
   ${ collapse_template(assets_checkboxes)}
 
   ${ collapse_template(assets_petitioner_award) }
@@ -7894,7 +8147,60 @@ subquestion: |
 
   ${ collapse_template(maintenance_review_template)}
 
-  ${ property_statement_attachment.as_pdf() }
+  ${ property_statement_bundle.as_pdf() }
+fields:
+  - Do you want to include additional provisions in the Statement of Property and Debt and Proposed Separation Agreement?: is_additional_provisions_property_statement
+    datatype: yesnoradio
+  - no label: additional_provisions_property_statement
+    datatype: area
+    show if: is_additional_provisions_property_statement
+---
+reconsider:
+  - joint_debts.gathered
+  - joint_assets.gathered
+question: Test
+id: asset checkbox review 
+subquestion: |
+continue button field: asset_checkbox_review
+---
+question: Test
+id: award review 
+subquestion: |
+continue button field: award_review
+---
+question: Test
+reconsider: joint_debts
+id: debt checkbox review 
+subquestion: |
+  ${ collapse_template(debts_checkboxes)}
+continue button field: debt_checkbox_review
+---
+question: Test
+id: debt assign review 
+subquestion: |
+   ${ collapse_template(debts_petitioner_award) }
+
+   ${ collapse_template(debts_respondent_award) }
+continue button field: debt_review
+---
+question: Test
+id: debt assign review 
+subquestion: |
+  ${ collapse_template(assets_checkboxes) }
+  
+  ${ collapse_template(assets_petitioner_award) }
+
+  ${ collapse_template(assets_respondent_award) } 
+  
+  ${ collapse_template(debts_checkboxes)}
+  
+  ${ collapse_template(debts_petitioner_award) }
+
+  ${ collapse_template(debts_respondent_award) }
+  
+  ${ collapse_template(maintenance_review_template)}
+
+  ${ property_statement_bundle.as_pdf() }
 fields:
   - Do you want to include additional provisions in the Statement of Property and Debt and Proposed Separation Agreement?: is_additional_provisions_property_statement
     datatype: yesnoradio
@@ -7939,11 +8245,11 @@ content: |
   
   ${ bank_assets.add_action(label="Add a bank account") } 
   
-  Does Petitioner have any right to receive any pension or retirement benefits other than Social Security? **${ yesno(len([asset for asset in joint_assets.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_acconts_other"]) if petitioner.name.full() in asset.ownership]) > 0) }**
+  Does Petitioner have any right to receive any pension or retirement benefits other than Social Security? **${ yesno(len([asset for asset in joint_assets.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_accounts_other"]) if petitioner.name.full() in asset.ownership]) > 0) }**
   
   Does Petitioner have an IRA or 401(k) or other retirement account? **${ yesno(len([asset for asset in joint_assets.matches(source=["ira"]) if petitioner.name.full() in asset.ownership]) > 0) }**
   
-  Does Respondent have any right to receive any pension or retirement benefits other than Social Security? **${ yesno(len([asset for asset in joint_assets.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_acconts_other"]) if respondent.name.full() in asset.ownership]) > 0) }**
+  Does Respondent have any right to receive any pension or retirement benefits other than Social Security? **${ yesno(len([asset for asset in joint_assets.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_accounts_other"]) if respondent.name.full() in asset.ownership]) > 0) }**
   
   Does Respondent have an IRA or 401(k) or other retirement account? **${ yesno(len([asset for asset in joint_assets.matches(source=["ira"]) if respondent.name.full() in asset.ownership]) > 0) }**
   
@@ -8061,7 +8367,7 @@ content: |
   ${ petitioner_award_table }
 ---
 table: petitioner_award_table
-rows: joint_assets
+rows: petitioner.assets
 columns:
   - Description: |
       row_item.award_template_petitioner
@@ -8072,8 +8378,6 @@ columns:
   - Property awarded to: row_item.recommended_award
 edit:
   - market_value
-filter:
-  row_item.recommended_award == petitioner.name.full() or row_item.recommended_award == "split"
 ---
 id: respondent assets template
 template: assets_respondent_award
@@ -8083,7 +8387,7 @@ content: |
   ${ respondent_award_table }
 ---
 table: respondent_award_table
-rows: joint_assets
+rows: respondent.assets
 columns:
   - Description: |
       row_item.award_template_respondent
@@ -8094,8 +8398,6 @@ columns:
   - Property awarded to: row_item.recommended_award
 edit:
   - market_value
-filter:
-  row_item.recommended_award == respondent.name.full() or row_item.recommended_award == "split"
 ---
 id: debts checkboxes
 template: debts_checkboxes
