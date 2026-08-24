@@ -13,7 +13,10 @@ from docassemble.base.util import (
     log,
     object_name_convert,
     value,
+    defined,
+    redact,
 )
+from docassemble.ALToolbox.misc import space, thousands
 from decimal import Decimal
 import re
 import datetime
@@ -618,6 +621,239 @@ class ALAsset(ALIncome):
             return Decimal(self.market_value)
         return Decimal(self.market_value) - Decimal(getattr(self, loan_attribute))
 
+    # ------------------------------------------------------------------
+    # Descriptions used by the Statement of Property and Debt
+    #
+    # These are properties rather than `template:` blocks in shared.yml.
+    # They have to be recomputed on every access, for two reasons:
+    #
+    #   1. `redact()` reads this_thread.misc['redact'], which docassemble
+    #      only sets while an attachment is being assembled.  A value cached
+    #      in the answer file (what a `code:` block would give us) could not
+    #      produce both the redacted and the unredacted Statement of
+    #      Property from one set of answers.
+    #   2. ALDocument.safe_value() resolves its argument through
+    #      showifdef(), which rejects any string containing parentheses.  So
+    #      these have to be plain attribute paths, not method calls.
+    #
+    # A property satisfies both: no parentheses at the call site, and
+    # evaluated fresh inside whichever attachment is being assembled.
+    #
+    # Wording varies by which list the asset lives in, so each shape below
+    # dispatches on `_list_name`.  Attributes wrapped in space() are
+    # optional (space() returns "" when they were never gathered); bare
+    # attribute references are required and will make docassemble ask for
+    # them.
+    # ------------------------------------------------------------------
+
+    @property
+    def _list_name(self) -> str:
+        """Name of the ALAssetList this asset was gathered into.
+
+        `joint_assets` and `petitioner.assets` hold references to the very
+        same objects, so instanceName still points at the list the asset was
+        created in (e.g. "real_estate[0]" -> "real_estate").  `.source` is
+        not usable here: for lists with subtypes it holds the subtype
+        ("house", "condominium") rather than the list name.
+        """
+        return object.__getattribute__(self, "instanceName").split("[")[0]
+
+    def _var(self, attribute: str) -> str:
+        """Full variable name of one of our attributes, for space()."""
+        return object.__getattribute__(self, "instanceName") + "." + attribute
+
+    def _split_prefix(self, party: str, basis: str = "award") -> str:
+        """The "NN% of " prefix used when an item is split between the parties.
+
+        Args:
+            party: "petitioner" or "respondent".
+            basis: "award" to use recommended_award/award_percentage_*,
+                "debt" to use recommended_debt/*_debt_percentage.
+        """
+        if basis == "award":
+            if self.recommended_award != "split":
+                return ""
+            percentage = getattr(self, "award_percentage_" + party)
+        else:
+            if self.recommended_debt != "split":
+                return ""
+            percentage = getattr(self, party + "_debt_percentage")
+        return thousands(percentage * 100) + "% of "
+
+    def _described(self) -> str:
+        """The plain description of the asset, without any split prefix."""
+        which = self._list_name
+        if which == "real_estate":
+            return (
+                self.display_name
+                + space(self._var("address"), prefix=" at ", suffix="")
+                + (
+                    " See attached legal description. "
+                    if self.legal_description != ""
+                    else ""
+                )
+            )
+        if which == "vehicles":
+            return (
+                space(self._var("year"), prefix="", suffix=" ")
+                + space(self._var("make"), prefix="", suffix=" ")
+                + space(self._var("model"), prefix="", suffix=" ")
+                + self.display_name
+            )
+        if which == "securities":
+            return (
+                space(self._var("name"), prefix="", suffix=" ")
+                + self._redacted_account_number()
+                + self.display_name
+            )
+        if which == "bank_assets":
+            return (
+                space(self._var("institution"), prefix="", suffix=" ")
+                + self._redacted_account_number()
+                + self.display_name
+            )
+        if which == "retirement_accounts":
+            return (
+                space(self._var("lender"), prefix="", suffix=" ") + self.display_name
+            )
+        if which == "personal_goods":
+            return self.display_name
+        if which == "farm":
+            return self.description + " farm"
+        if which == "businesses":
+            return self.description + " business"
+        if which == "other_assets":
+            return self.description
+        if which == "life_insurance":
+            return (
+                space(self._var("name"), prefix="", suffix=" ")
+                + space(self._var("type"), prefix="", suffix=" ")
+                + self._redacted_account_number()
+                + " life insurance policy"
+            )
+        if which == "interests_in_trust":
+            return (
+                space(self._var("name"), prefix="", suffix=" ")
+                + space(self._var("nature"), prefix="", suffix=" ")
+                + "Trust"
+            )
+        return self.description
+
+    def _redacted_account_number(self) -> str:
+        """Account number plus a trailing space, redacted when the document asks for it.
+
+        redact() is a no-op only while assembling an attachment whose
+        `redact:` evaluates False; everywhere else it blacks the value out.
+        """
+        if not defined(self._var("account_number")):
+            return ""
+        return redact(self.account_number) + " "
+
+    def _awarded(self) -> str:
+        """Description used in the "awarded to" columns.
+
+        Most lists reuse the plain description; the generic fallback for
+        lists without their own wording is the asset's name plus its type.
+        """
+        which = self._list_name
+        if which in (
+            "real_estate",
+            "vehicles",
+            "securities",
+            "bank_assets",
+            "retirement_accounts",
+            "personal_goods",
+            "farm",
+            "businesses",
+            "other_assets",
+        ):
+            return self._described()
+        return space(self._var("name"), prefix="", suffix=" ") + self.display_name
+
+    def _loan_described(self) -> str:
+        """Description of the loan secured by this asset."""
+        which = self._list_name
+        if which == "real_estate":
+            return space(self._var("lender"), prefix="", suffix=" ") + "Mortgage"
+        if which in ("vehicles", "retirement_accounts", "farm", "businesses", "other_assets"):
+            return space(self._var("lender"), prefix="", suffix=" ") + "Loan"
+        if defined(self._var("lender")):
+            return self.lender + " Loan"
+        return "Loan"
+
+    def _loan_split_basis(self) -> str:
+        """Which set of percentage fields the split loan prefix reads.
+
+        securities and retirement_accounts have always used the *award*
+        fields here rather than the debt fields.  Preserved deliberately so
+        the assembled forms do not change.
+        """
+        if self._list_name in ("securities", "retirement_accounts"):
+            return "award"
+        return "debt"
+
+    def _secured(self) -> str:
+        """Description of the property that secures a debt."""
+        which = self._list_name
+        if which == "real_estate":
+            return self.display_name + space(
+                self._var("address"), prefix=" at ", suffix=""
+            )
+        if which in (
+            "vehicles",
+            "securities",
+            "retirement_accounts",
+            "personal_goods",
+            "farm",
+            "businesses",
+            "other_assets",
+        ):
+            return self._described()
+        return space(self._var("name"), prefix="", suffix=" ") + self.display_name
+
+    @property
+    def description_template(self) -> str:
+        """Plain description of the asset."""
+        return self._described()
+
+    @property
+    def award_template_petitioner(self) -> str:
+        """Description of the asset as awarded to the petitioner."""
+        return self._split_prefix("petitioner") + self._awarded()
+
+    @property
+    def award_template_respondent(self) -> str:
+        """Description of the asset as awarded to the respondent."""
+        return self._split_prefix("respondent") + self._awarded()
+
+    @property
+    def loan_description_template(self) -> str:
+        """Description of the loan secured by the asset."""
+        return self._loan_described()
+
+    @property
+    def loan_description_template_petitioner(self) -> str:
+        """Description of the loan as assigned to the petitioner."""
+        return (
+            self._split_prefix("petitioner", basis=self._loan_split_basis())
+            + self._loan_described()
+        )
+
+    @property
+    def loan_description_template_respondent(self) -> str:
+        """Description of the loan as assigned to the respondent."""
+        return (
+            self._split_prefix("respondent", basis=self._loan_split_basis())
+            + self._loan_described()
+        )
+
+    @property
+    def security_description_template(self) -> str:
+        """Description of the property securing a debt."""
+        return self._secured()
+
+
+
 
 class ALAssetList(ALIncomeList):
     """
@@ -765,6 +1001,60 @@ class ALAssetList(ALIncomeList):
                 ):
                     owners.add(asset.owner)
         return owners
+
+
+    # ------------------------------------------------------------------
+    # Ownership filters
+    #
+    # The property statement and its review screens ask "does this party own
+    # anything of these kinds?" well over a hundred times per render. Doing
+    # that as `len([a for a in list.matches(source=[...]) if name in
+    # a.ownership]) > 0` builds a brand new ALIncomeList DAObject for every
+    # question, which is what made those screens slow. These filter in place
+    # and return plain Python values.
+    # ------------------------------------------------------------------
+
+    def owned_by(
+        self,
+        owner: str,
+        source: Optional[SourceType] = None,
+        exclude_source: Optional[SourceType] = None,
+    ) -> List[ALAsset]:
+        """Assets of the given source types whose ownership includes `owner`.
+
+        Returns a plain list, not an ALAssetList: this is for counting and
+        testing, not for gathering or display.
+
+        Args:
+            owner: full name of the party, as it appears in `.ownership`.
+            source: one source string or a list of them; None means any.
+            exclude_source: source strings to leave out.
+        """
+        satisfies_sources = _source_to_callable(source, exclude_source)
+        results = []
+        for item in self.elements:
+            if not hasattr(item, "source") or not satisfies_sources(item.source):
+                continue
+            ownership = getattr(item, "ownership", None)
+            if ownership and owner in ownership:
+                results.append(item)
+        return results
+
+    def any_owned_by(
+        self,
+        owner: str,
+        source: Optional[SourceType] = None,
+        exclude_source: Optional[SourceType] = None,
+    ) -> bool:
+        """True if `owner` owns at least one asset of the given source types."""
+        satisfies_sources = _source_to_callable(source, exclude_source)
+        for item in self.elements:
+            if not hasattr(item, "source") or not satisfies_sources(item.source):
+                continue
+            ownership = getattr(item, "ownership", None)
+            if ownership and owner in ownership:
+                return True
+        return False
 
 
 class ALVehicle(ALAsset):

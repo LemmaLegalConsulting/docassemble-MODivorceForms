@@ -511,12 +511,17 @@ code: |
 code: |
   if showifdef('doc_list_selected["property_statement_attachment"]'):
     nav.set_sections('property_statement_review')
+    # Refresh the derived lists once, on the way into this section, instead of
+    # with `reconsider:` on each review screen - that rebuilt both lists on
+    # every render of every screen, including redraws after a validation error.
+    reconsider('joint_assets', 'joint_debts')
     asset_checkbox_review
     award_review
     debt_checkbox_review
     debt_review
-    if not property_statement_bundle.generate_downloads_task.ready():
-      al_download_waiting_screen
+    # No document preview here any more; see the note on the "property statement
+    # review" block in shared.yml. Assembling the Statement of Property took
+    # 30-60 seconds even in the background, which is not a useful preview.
     is_additional_provisions_property_statement
   property_statement_review = True
   
@@ -563,7 +568,10 @@ code: |
           "reached_interview_end": True,
       },
   )
-  if not al_user_bundle.generate_downloads_task.ready():
+  # al_court_bundle, not al_user_bundle: the download screen renders
+  # al_court_bundle, and download_list_html() only reuses the background
+  # results of the bundle it is called on.
+  if not al_court_bundle.generate_downloads_task.ready():
     al_download_waiting_screen
   mo_divorce_forms_download
 ---
@@ -1286,15 +1294,6 @@ code: |
   else:
     income_statement_attachment.enabled = False
 ---
-id: property_statement enabled block for main interview
-code: |
-  if "property_statement_attachment" in doc_list_selected.true_values():
-    property_statement_redacted_attachment.enabled = True
-    property_statement_unredacted_attachment.enabled = True
-  else:
-    property_statement_redacted_attachment.enabled = False
-    property_statement_unredacted_attachment.enabled = False
----
 id: confidential_information_sheet enabled block for main interview
 code: |
   if "confidential_information_sheet_attachment" in doc_list_selected.true_values():
@@ -1384,7 +1383,7 @@ code: |
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_unredacted_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_unredacted_attachment, property_statement_redacted_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
-  - property_statement_bundle: ALDocumentBundle.using(elements=[property_statement_unredacted_attachment],  filename="property_statement_preview", title="Property Statement Preview", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment['unredacted'], redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment['unredacted'], property_statement_attachment['redacted'], redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - property_statement_bundle: ALDocumentBundle.using(elements=[property_statement_attachment['unredacted']],  filename="property_statement_preview", title="Property Statement Preview", enabled=True)
 ---

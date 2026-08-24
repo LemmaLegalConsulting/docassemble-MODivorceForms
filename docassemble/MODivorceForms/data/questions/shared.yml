@@ -2340,12 +2340,6 @@ fields:
 validation code:
   x[i].ownership = x[i].has_possession
 ---
-generic object: ALAsset
-id: vehicles description template
-template: x.description_template
-content: |
-  ${ x.description }
----
 id: generic review ALIncomeList
 generic object: ALIncomeList
 question: Do you want to list ${ x.display_name }?
@@ -2421,72 +2415,6 @@ columns:
 
 edit:
   - recommended_debt
----
-generic object: ALAssetList
-id: generic award_template_petitioner
-code: |
-  x[i].award_template_petitioner = (thousands(x[i].award_percentage_petitioner * 100) + "% of " if x[i].recommended_award == "split" else "") + space("x[i].name", prefix="", suffix=" ") + x[i].display_name
----
-generic object: ALAssetList
-id: generic award_template_petitioner 
-code: |
-  x[i].award_template_petitioner = (thousands(x[i].award_percentage_petitioner * 100) + "% of " if x[i].recommended_award == "split" else "") + space("x[i].name", prefix="", suffix=" ") + x[i].display_name
----
-generic object: ALAssetList
-id: generic award_template_petitioner
-code: |
-  x[i].award_template_petitioner = (thousands(x[i].award_percentage_petitioner * 100) + "% of " if x[i].recommended_award == "split" else "") + space("x[i].name", prefix="", suffix=" ") + x[i].display_name
----
-generic object: ALAssetList
-id: generic award_template_respondent
-code: |
-  x[i].award_template_respondent = (thousands(x[i].award_percentage_respondent * 100) + "% of " if x[i].recommended_award == "split" else "") + space("x[i].name", prefix="", suffix=" ") + x[i].display_name
----
-generic object: ALAssetList
-id: generic award_template_respondent
-code: |
-  x[i].award_template_respondent = (thousands(x[i].award_percentage_respondent * 100) + "% of " if x[i].recommended_award == "split" else "") + space("x[i].name", prefix="", suffix=" ") + x[i].display_name
----
-generic object: ALAssetList
-id: generic award_template_respondent
-code: |
-  x[i].award_template_respondent = (thousands(x[i].award_percentage_respondent * 100) + "% of " if x[i].recommended_award == "split" else "") + space("x[i].name", prefix="", suffix=" ") + x[i].display_name
----
-generic object: ALAsset
-id: generic award_template_petitioner
-template: x.award_template_petitioner
-content: |
-  ${ thousands(x.award_percentage_petitioner * 100) + "% of " if x.recommended_award == "split" else "" }${ space("x.name", prefix="", suffix=" ") + x.display_name }
----
-generic object: ALAsset
-id: generic award_template_respondent
-template: x.award_template_respondent
-content: |
-  ${ thousands(x.award_percentage_respondent * 100) + "% of " if x.recommended_award == "split" else "" }${ space("x.name", prefix="", suffix=" ") + x.display_name }
----
-generic object: ALAsset
-id: generic loan description template 
-template: x.loan_description_template
-content: |
-  ${ ((x.lender + " ") if defined('x.lender') else "") + "Loan" }
----
-generic object: ALAsset
-id: generic loan description template petitioner
-template: x.loan_description_template_petitioner
-content: |
-  ${ thousands(x.petitioner_debt_percentage * 100) + "% of " if x.recommended_debt == "split" else "" }${ space("x.lender", prefix="", suffix=" ") + "Loan" }
----
-generic object: ALAsset
-id: generic loan description template respondent
-template: x.loan_description_template_respondent
-content: |
-  ${ thousands(x.respondent_debt_percentage * 100) + "% of " if x.recommended_debt == "split" else "" }${ space("x.lender", prefix="", suffix=" ") + "Loan" }
----
-generic object: ALAsset
-id: generic loan security description template
-template: x.security_description_template
-content: |
-  ${ space("x.name", prefix="", suffix=" ") + x.display_name  }
 ---
 comment: |
   REAL ESTATE
@@ -2659,42 +2587,6 @@ validation code: |
     real_estate[i].respondent_debt_percentage = None
   real_estate[i].ownership = real_estate[i].title
 ---
-id: real_estate description template
-template: real_estate[i].description_template
-content: |
-  ${ real_estate[i].display_name + space('real_estate[i].address', prefix=' at ', suffix='')  + (" See attached legal description. " if real_estate[i].legal_description != "" else "") }
----
-id: real_estate award_template_petitioner
-template: real_estate[i].award_template_petitioner
-content: |
-  ${ thousands(real_estate[i].award_percentage_petitioner * 100) + "% of " if real_estate[i].recommended_award == "split" else "" }${ real_estate[i].display_name + space('real_estate[i].address', prefix=' at ', suffix='')  + (" See attached legal description. " if real_estate[i].legal_description != "" else "") }
----
-id: real_estate award_template_respondent
-template: real_estate[i].award_template_respondent
-content: |
-  ${ thousands(real_estate[i].award_percentage_respondent * 100) + "% of " if real_estate[i].recommended_award == "split" else "" }${ real_estate[i].display_name + space('real_estate[i].address', prefix=' at ', suffix='') + (" See attached legal description. " if real_estate[i].legal_description != "" else "") }
----
-id: real_estate loan description template petitioner
-template: real_estate[i].loan_description_template
-content: |
-  ${ space("real_estate[i].lender", prefix="", suffix=" ") + "Mortgage" }
----
-id: real_estate loan description template petitioner
-template: real_estate[i].loan_description_template_petitioner
-content: |
-  ${ thousands(real_estate[i].petitioner_debt_percentage * 100) + "% of " if real_estate[i].recommended_debt == "split" else "" }${ space("real_estate[i].lender", prefix="", suffix=" ") + "Mortgage" }
----
-id: real_estate loan description template respondent
-template: real_estate[i].loan_description_template_respondent
-content: |
-  ${ thousands(real_estate[i].respondent_debt_percentage * 100) + "% of " if real_estate[i].recommended_debt == "split" else "" }${ space("real_estate[i].lender", prefix="", suffix=" ") + "Mortgage" }
----
-
-id: real_estate loan security description template
-template: real_estate[i].security_description_template
-content: |
-  ${ real_estate[i].display_name + space('real_estate[i].address', prefix=' at ', suffix='') }
----
 id: marital_property_template
 template: marital_property_template
 subject: |
@@ -2853,41 +2745,6 @@ validation code: |
     vehicles[i].respondent_debt_percentage = None
   vehicles[i].ownership = vehicles[i].has_possession
 ---
-id: vehicles description template
-template: vehicles[i].description_template
-content: |
-  ${ space('vehicles[i].year',prefix="", suffix=" ") + space('vehicles[i].make',prefix="", suffix=" ") + space('vehicles[i].model',prefix="", suffix=" ") + vehicles[i].display_name }
----
-id: vehicles award_template_petitioner
-template: vehicles[i].award_template_petitioner
-content: |
-  ${ thousands(vehicles[i].award_percentage_petitioner * 100) + "% of " if vehicles[i].recommended_award == "split" else "" }${ space('vehicles[i].year',prefix="", suffix=" ") + space('vehicles[i].make',prefix="", suffix=" ") + space('vehicles[i].model',prefix="", suffix=" ") + vehicles[i].display_name }
----
-id: vehicles award_template_respondent
-template: vehicles[i].award_template_respondent
-content: |
-  ${ thousands(vehicles[i].award_percentage_respondent * 100) + "% of " if vehicles[i].recommended_award == "split" else "" }${ space('vehicles[i].year',prefix="", suffix=" ") + space('vehicles[i].make',prefix="", suffix=" ") + space('vehicles[i].model',prefix="", suffix=" ") + vehicles[i].display_name }
----
-id: vehicles loan description template 
-template: vehicles[i].loan_description_template
-content: |
-  ${ space("vehicles[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: vehicles loan description template petitioner
-template: vehicles[i].loan_description_template_petitioner
-content: |
-  ${ thousands(vehicles[i].petitioner_debt_percentage * 100) + "% of " if vehicles[i].recommended_debt == "split" else "" }${ space("vehicles[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: vehicles loan description template respondent
-template: vehicles[i].loan_description_template_respondent
-content: |
-  ${ thousands(vehicles[i].respondent_debt_percentage * 100) + "% of " if vehicles[i].recommended_debt == "split" else "" }${ space("vehicles[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: vehicles loan security description template
-template: vehicles[i].security_description_template
-content: |
-  ${ space('vehicles[i].year',prefix="", suffix=" ") + space('vehicles[i].make',prefix="", suffix=" ") + space('vehicles[i].model',prefix="", suffix=" ") + vehicles[i].display_name }
----
 comment: |
   SECURITIES
 id: securities object
@@ -3032,42 +2889,6 @@ validation code: |
     securities[i].petitioner_debt_percentage = None
     securities[i].respondent_debt_percentage = None
   securities[i].ownership = securities[i].has_possession
----
----
-id: securities description template
-template: securities[i].description_template
-content: |
-  ${ space("securities[i].name", prefix="", suffix=" ") + (redact(securities[i].account_number) + " " if defined('securities[i].account_number') else "") + securities[i].display_name }
----
-id: securities award_template_petitioner
-template: securities[i].award_template_petitioner
-content: |
-  ${ thousands(securities[i].award_percentage_petitioner * 100) + "% of " if securities[i].recommended_award == "split" else "" }${ securities[i].description_template }
----
-id: securities award_template_respondent
-template: securities[i].award_template_respondent
-content: |
-  ${ thousands(securities[i].award_percentage_respondent * 100) + "% of " if securities[i].recommended_award == "split" else "" }${ securities[i].description_template }
----
-id: securities loan description template
-template: securities[i].loan_description_template
-content: |
-  ${ ((securities[i].lender + " ") if defined('securities[i].lender') else "") + "Loan" }
----
-id: securities loan description template petitioner
-template: securities[i].loan_description_template_petitioner
-content: |
-  ${ thousands(securities[i].award_percentage_petitioner * 100) + "% of " if securities[i].recommended_award == "split" else "" }${ space("securities[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: securities loan description template respondent
-template: securities[i].loan_description_template_respondent
-content: |
-  ${ thousands(securities[i].award_percentage_respondent * 100) + "% of " if securities[i].recommended_award == "split" else "" }${ space("securities[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: securities loan security description template
-template: securities[i].security_description_template
-content: |
-  ${ securities[i].description_template }
 ---
 
 comment: |
@@ -3236,26 +3057,6 @@ validation code: |
     personal_goods[i].respondent_debt_percentage = None
   personal_goods[i].ownership = personal_goods[i].has_possession
 ---
-id: personal_goods description template
-template: personal_goods[i].description_template
-content: |
-  ${ personal_goods[i].display_name }
----
-id: personal_goods award_template_petitioner
-template: personal_goods[i].award_template_petitioner
-content: |
-  ${ thousands(personal_goods[i].award_percentage_petitioner * 100) + "% of " if personal_goods[i].recommended_award == "split" else "" }${ personal_goods[i].display_name }
----
-id: personal_goods award_template_respondent
-template: personal_goods[i].award_template_respondent
-content: |
-  ${ thousands(personal_goods[i].award_percentage_respondent * 100) + "% of " if personal_goods[i].recommended_award == "split" else "" }${ personal_goods[i].display_name }
----
-id: personal_goods loan security description template
-template: personal_goods[i].security_description_template
-content: |
-  ${ personal_goods[i].display_name }
----
 
 comment: |
   BANK ASSETS - no loans attached
@@ -3387,26 +3188,6 @@ columns:
 edit:
   - market_value
 ---
-id: bank_assets description template
-template: bank_assets[i].description_template
-content: |
-  ${ space("bank_assets[i].institution",prefix="", suffix=" ") + (redact(bank_assets[i].account_number) + " " if defined('bank_assets[i].account_number') else "") + bank_assets[i].display_name }
----
-id: bank_assets description template
-template: bank_assets[i].description_template
-content: |
-  ${ space("bank_assets[i].institution",prefix="", suffix=" ") + (redact(bank_assets[i].account_number) + " " if defined('bank_assets[i].account_number') else "") + bank_assets[i].display_name }
----
-id: bank_assets award description template for petitioner
-template: bank_assets[i].award_template_petitioner
-content: |
-  ${ thousands(bank_assets[i].award_percentage_petitioner * 100) + "% of " if bank_assets[i].recommended_award == "split" else "" }${ space("bank_assets[i].institution",prefix="", suffix=" ") + (redact(bank_assets[i].account_number) + " " if defined('bank_assets[i].account_number') else "") + bank_assets[i].display_name }
----
-id: bank_assets award description template for respondent
-template: bank_assets[i].award_template_respondent
-content: |
-  ${ thousands(bank_assets[i].award_percentage_respondent * 100) + "% of " if bank_assets[i].recommended_award == "split" else "" }${ space("bank_assets[i].institution",prefix="", suffix=" ") + (redact(bank_assets[i].account_number) + " " if defined('bank_assets[i].account_number') else "") + bank_assets[i].display_name }
----
 comment: |
   RETIREMENT ACCOUNTS
 id: retirement_accounts object
@@ -3527,41 +3308,6 @@ validation code: |
     retirement_accounts[i].award_percentage_respondent = None
   retirement_accounts[i].ownership = retirement_accounts[i].has_possession
   retirement_accounts[i].is_amount_owed = None
----
-id: retirement_accounts description template
-template: retirement_accounts[i].description_template
-content: |
-  ${ space("retirement_accounts[i].lender", prefix="", suffix=" ") + retirement_accounts[i].display_name }
----
-id: retirement_accounts award_template_petitioner
-template: retirement_accounts[i].award_template_petitioner
-content: |
-  ${ thousands(retirement_accounts[i].award_percentage_petitioner * 100) + "% of " if retirement_accounts[i].recommended_award == "split" else "" }${ retirement_accounts[i].description_template }
----
-id: retirement_accounts award_template_respondent
-template: retirement_accounts[i].award_template_respondent
-content: |
-  ${ thousands(retirement_accounts[i].award_percentage_respondent * 100) + "% of " if retirement_accounts[i].recommended_award == "split" else "" }${ retirement_accounts[i].description_template }
----
-id: retirement_accounts loan description template 
-template: retirement_accounts[i].loan_description_template
-content: |
-  ${ space("retirement_accounts[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: retirement_accounts loan description template petitioner
-template: retirement_accounts[i].loan_description_template_petitioner
-content: |
-  ${ thousands(retirement_accounts[i].award_percentage_petitioner * 100) + "% of " if retirement_accounts[i].recommended_award == "split" else "" }${ space("retirement_accounts[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: retirement_accounts loan description template respondent
-template: retirement_accounts[i].loan_description_template_respondent
-content: |
-  ${ thousands(retirement_accounts[i].award_percentage_respondent * 100) + "% of " if retirement_accounts[i].recommended_award == "split" else "" }${ space("retirement_accounts[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: retirement_accounts loan security description template
-template: retirement_accounts[i].security_description_template
-content: |
-  ${ retirement_accounts[i].description_template }
 ---
 
 comment: |
@@ -3776,41 +3522,6 @@ validation code: |
     farm[i].respondent_debt_percentage = None
   farm[i].ownership = farm[i].has_possession
 ---
-id: farms description template
-template: farm[i].description_template
-content: |
-  ${ farm[i].description } farm
----
-id: farms award_template_petitioner
-template: farm[i].award_template_petitioner
-content: |
-  ${ thousands(farm[i].award_percentage_petitioner * 100) + "% of " if farm[i].recommended_award == "split" else "" }${ farm[i].description } farm
----
-id: farms award_template_respondent
-template: farm[i].award_template_respondent
-content: |
-  ${ thousands(farm[i].award_percentage_respondent * 100) + "% of " if farm[i].recommended_award == "split" else "" }${ farm[i].description } farm
----
-id: farms loan description template 
-template: farm[i].loan_description_template
-content: |
-  ${ space("farm[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: farms loan description template petitioner
-template: farm[i].loan_description_template_petitioner
-content: |
-  ${ thousands(farm[i].petitioner_debt_percentage * 100) + "% of " if farm[i].recommended_debt == "split" else "" }${ space("farm[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: farms loan description template respondent
-template: farm[i].loan_description_template_respondent
-content: |
-  ${ thousands(farm[i].respondent_debt_percentage * 100) + "% of " if farm[i].recommended_debt == "split" else "" }${ space("farm[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: farms loan security description template
-template: farm[i].security_description_template
-content: |
-  ${ farm[i].description } farm
----
 comment: |
   BUSINESSES
 id: businesses object
@@ -3946,41 +3657,6 @@ validation code: |
     businesses[i].respondent_debt_percentage = None
   businesses[i].ownership = businesses[i].has_possession
 ---
-id: businesses description template
-template: businesses[i].description_template
-content: |
-  ${ businesses[i].description } business
----
-id: businesses award_template_petitioner
-template: businesses[i].award_template_petitioner
-content: |
-  ${ thousands(businesses[i].award_percentage_petitioner * 100) + "% of " if businesses[i].recommended_award == "split" else "" }${ businesses[i].description } business
----
-id: businesses award_template_respondent
-template: businesses[i].award_template_respondent
-content: |
-  ${ thousands(businesses[i].award_percentage_respondent * 100) + "% of " if businesses[i].recommended_award == "split" else "" }${ businesses[i].description } business
----
-id: businesses loan description template 
-template: businesses[i].loan_description_template
-content: |
-  ${ space("businesses[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: businesses loan description template petitioner
-template: businesses[i].loan_description_template_petitioner
-content: |
-  ${ thousands(businesses[i].petitioner_debt_percentage * 100) + "% of " if businesses[i].recommended_debt == "split" else "" }${ space("businesses[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: businesses loan description template respondent
-template: businesses[i].loan_description_template_respondent
-content: |
-  ${ thousands(businesses[i].respondent_debt_percentage * 100) + "% of " if businesses[i].recommended_debt == "split" else "" }${ space("businesses[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: businesses loan security description template
-template: businesses[i].security_description_template
-content: |
-  ${ businesses[i].description } business
----
 id: other_assets object
 objects:
   - other_assets: ALAssetList.using(complete_attribute='complete',there_is_another=False)
@@ -4114,41 +3790,6 @@ validation code: |
     other_assets[i].respondent_debt_percentage = None
   other_assets[i].ownership = other_assets[i].has_possession
 ---
-id: other_assets description template
-template: other_assets[i].description_template
-content: |
-  ${ other_assets[i].description }
----
-id: other_assets award_template_petitioner
-template: other_assets[i].award_template_petitioner
-content: |
-  ${ thousands(other_assets[i].award_percentage_petitioner * 100) + "% of " if other_assets[i].recommended_award == "split" else "" }${ other_assets[i].description }
----
-id: other_assets award_template_respondent
-template: other_assets[i].award_template_respondent
-content: |
-  ${ thousands(other_assets[i].award_percentage_respondent * 100) + "% of " if other_assets[i].recommended_award == "split" else "" }${ other_assets[i].description }
----
-id: other_assets loan description template 
-template: other_assets[i].loan_description_template
-content: |
-  ${ space("other_assets[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: other_assets loan description template petitioner
-template: other_assets[i].loan_description_template_petitioner
-content: |
-  ${ thousands(other_assets[i].petitioner_debt_percentage * 100) + "% of " if other_assets[i].recommended_debt == "split" else "" }${ space("other_assets[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: other_assets loan description template respondent
-template: other_assets[i].loan_description_template_respondent
-content: |
-  ${ thousands(other_assets[i].respondent_debt_percentage * 100) + "% of " if other_assets[i].recommended_debt == "split" else "" }${ space("other_assets[i].lender", prefix="", suffix=" ") + "Loan" }
----
-id: other_assets loan security description template
-template: other_assets[i].security_description_template
-content: |
-  ${ other_assets[i].description }
----
 id: life_insurance object
 objects:
   - life_insurance: ALAssetList.using(complete_attribute='complete',there_is_another=False)
@@ -4219,11 +3860,6 @@ validation code: |
   life_insurance[i].has_possession = life_insurance[i].owner
   life_insurance[i].ownership = life_insurance[i].owner
   life_insurance[i].is_amount_owed = False
----
-id: life_insurance description template
-template: life_insurance[i].description_template
-content: |
-  ${ space('life_insurance[i].name', prefix='',suffix=" ") + space('life_insurance[i].type', prefix='',suffix=" ") + (redact(life_insurance[i].account_number) + " " if defined('life_insurance[i].account_number') else "") + " life insurance policy" }
 ---
 id: life insurance table
 table: life_insurance.table
@@ -4306,11 +3942,6 @@ validation code: |
   interests_in_trust[i].has_possession = interests_in_trust[i].trustee
   interests_in_trust[i].ownership = interests_in_trust[i].trustee
   interests_in_trust[i].is_amount_owed = None
----
-id: interests_in_trust description template
-template: interests_in_trust[i].description_template
-content: |
-  ${ space("interests_in_trust[i].name",prefix="", suffix=" ") + space("interests_in_trust[i].nature",prefix="", suffix=" ") +"Trust" }
 ---
 id: interests_in_trust table
 table: interests_in_trust.table
@@ -4560,11 +4191,6 @@ id: backup code to set loan description and security for unsecured debts
 code: |
   debts[i].loan_description = space("debts[i].lender", prefix = "", suffix = " ") + showifdef('debts[i].display_name','loan')
   debts[i].security = "None"
----
-id: debts loan description template
-template: debts.loan_description_template
-content: |
-  ${ space("debts[i].lender", prefix = "", suffix = " ") + showifdef('debts[i].display_name','loan') }
 ---
 generic object: ALAsset
 id: loan description and security default code
@@ -5253,6 +4879,11 @@ fields:
 ---
 only sets: 
   - other_parties[0].benefits.selected_types
+  # A `datatype: checkboxes` field also has to be allowed to set `.gathered`,
+  # or docassemble's STRICT_MODE rejects the individual checkbox keys the
+  # server injects and the screen 500s.
+  - other_parties[0].benefits.selected_types.gathered
+  - other_parties[0].benefits.there_are_any
 id: are there public benefits for other_party
 generic object: ALIndividual
 question: |
@@ -5462,6 +5093,9 @@ fields:
 ---
 only sets: 
   - other_parties[0].other_incomes.selected_types
+  # See the note on the public-benefits question above.
+  - other_parties[0].other_incomes.selected_types.gathered
+  - other_parties[0].other_incomes.there_are_any
 generic object: ALIndividual
 id: are there other incomes for other party
 #other_incomes
@@ -6012,6 +5646,20 @@ subquestion: |
 event: al_download_waiting_screen
 reload: True
 ---
+comment: |
+  The finished documents are assembled in the background and cached in
+  al_court_bundle._downloadable_files. Going back to edit answers has to throw
+  that cache away, otherwise the download screen keeps serving the PDFs that
+  were built before the edit.
+id: edit answers from the download screen
+event: mo_divorce_forms_edit_answers
+code: |
+  undefine('al_court_bundle.generate_downloads_task')
+  undefine('al_court_bundle._downloadable_files')
+  undefine('property_statement_bundle.generate_preview_task')
+  undefine('property_statement_bundle._preview_file')
+  force_ask('review_form')
+---
 ########## DOWNLOAD
 id: download MO divorce forms
 event: mo_divorce_forms_download
@@ -6040,10 +5688,10 @@ subquestion: |
   
   View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
 
-  ${ action_button_html(url_action('review_form'), label='Edit answers', color='info') }
+  ${ action_button_html(url_action('mo_divorce_forms_edit_answers'), label='Edit answers', color='info') }
   
   
-  ${ al_court_bundle.download_list_html(use_previously_cached_files=False, include_full_pdf=True) }
+  ${ al_court_bundle.download_list_html(use_previously_cached_files=True, include_full_pdf=True) }
   
 
   ${ al_court_bundle.send_button_html(show_editable_checkbox=False) }
@@ -8127,27 +7775,48 @@ fields:
     datatype: area
     show if: is_additional_provisions_parenting_plan
 ---
-reconsider:
-  - joint_debts
-  - joint_assets
+comment: |
+  The PDF preview that used to be at the bottom of this screen has been removed.
+  Assembling the Statement of Property took ~30-60 seconds even when done in the
+  background, which is not a useful preview experience - the user sat on a
+  spinner before they could answer one yes/no question. The same information is
+  shown inline below instead, grouped into accordions so it is progressively
+  disclosed rather than dumped on the screen all at once.
+
+  To put the preview back:
+    ${ property_statement_bundle._preview_file }
+  and restore the generate_preview_task wait in main.yml.
 id: property statement review 
 question: Review the Property Statement
 subquestion: |
-  ${ collapse_template(assets_checkboxes)}
+  Here is what will go on your Statement of Property and Debt. Open any section
+  to check it.
 
-  ${ collapse_template(assets_petitioner_award) }
+  ${ start_accordion("Property owned by you and your spouse", showing=False) }
 
-  ${ collapse_template(assets_respondent_award) }
+  ${ display_template(assets_checkboxes, scrollable=False) }
 
-  ${ collapse_template(debts_checkboxes)}
+  ${ next_accordion("Property awarded to each of you") }
 
-  ${ collapse_template(debts_petitioner_award)}
+  ${ display_template(assets_petitioner_award, scrollable=False) }
 
-  ${ collapse_template(debts_respondent_award)}
+  ${ display_template(assets_respondent_award, scrollable=False) }
 
-  ${ collapse_template(maintenance_review_template)}
+  ${ next_accordion("Debts") }
 
-  ${ property_statement_bundle.as_pdf() }
+  ${ display_template(debts_checkboxes, scrollable=False) }
+
+  ${ next_accordion("Debts assigned to each of you") }
+
+  ${ display_template(debts_petitioner_award, scrollable=False) }
+
+  ${ display_template(debts_respondent_award, scrollable=False) }
+
+  ${ next_accordion("Maintenance") }
+
+  ${ display_template(maintenance_review_template, scrollable=False) }
+
+  ${ end_accordion() }
 fields:
   - Do you want to include additional provisions in the Statement of Property and Debt and Proposed Separation Agreement?: is_additional_provisions_property_statement
     datatype: yesnoradio
@@ -8155,9 +7824,6 @@ fields:
     datatype: area
     show if: is_additional_provisions_property_statement
 ---
-reconsider:
-  - joint_debts.gathered
-  - joint_assets.gathered
 question: Test
 id: asset checkbox review 
 subquestion: |
@@ -8169,7 +7835,6 @@ subquestion: |
 continue button field: award_review
 ---
 question: Test
-reconsider: joint_debts
 id: debt checkbox review 
 subquestion: |
   ${ collapse_template(debts_checkboxes)}
@@ -8183,52 +7848,27 @@ subquestion: |
    ${ collapse_template(debts_respondent_award) }
 continue button field: debt_review
 ---
-question: Test
-id: debt assign review 
-subquestion: |
-  ${ collapse_template(assets_checkboxes) }
-  
-  ${ collapse_template(assets_petitioner_award) }
-
-  ${ collapse_template(assets_respondent_award) } 
-  
-  ${ collapse_template(debts_checkboxes)}
-  
-  ${ collapse_template(debts_petitioner_award) }
-
-  ${ collapse_template(debts_respondent_award) }
-  
-  ${ collapse_template(maintenance_review_template)}
-
-  ${ property_statement_bundle.as_pdf() }
-fields:
-  - Do you want to include additional provisions in the Statement of Property and Debt and Proposed Separation Agreement?: is_additional_provisions_property_statement
-    datatype: yesnoradio
-  - no label: additional_provisions_property_statement
-    datatype: area
-    show if: is_additional_provisions_property_statement
----
 id: assets checkboxes
 template: assets_checkboxes
 subject: |
   Part 1 - Property Owned by Petitioner and Respondent
 content: |
-  Does Petitioner own a house, condominium or other real estate?: **${ yesno(len([asset for asset in joint_assets.matches(source =['house','condominium', 'leasehold','real_estate_other']) if petitioner.name.full() in asset.ownership]) > 0) }**
+  Does Petitioner own a house, condominium or other real estate?: **${ yesno(joint_assets.any_owned_by(petitioner.name.full(), source=['house','condominium', 'leasehold','real_estate_other'])) }**
   
-  Does Respondent own a house, condominium or other real estate?: **${ yesno(len([asset for asset in joint_assets.matches(source =['house','condominium', 'leasehold','real_estate_other']) if respondent.name.full() in asset.ownership]) > 0) }**
+  Does Respondent own a house, condominium or other real estate?: **${ yesno(joint_assets.any_owned_by(respondent.name.full(), source=['house','condominium', 'leasehold','real_estate_other'])) }**
   % if len(real_estate.complete_elements()) > 0:
   ${ real_estate.table }  
   % endif
   
   ${ real_estate.add_action(label="Add real estate") } 
   
-  Does Petitioner own a car, truck or motorcycle? **${ yesno(len([asset for asset in joint_assets.matches(source=['car','truck','motorcycle']) if petitioner.name.full() in asset.ownership]) > 0) }**
+  Does Petitioner own a car, truck or motorcycle? **${ yesno(joint_assets.any_owned_by(petitioner.name.full(), source=['car','truck','motorcycle'])) }**
   
-  Does Respondent own a car, truck or motorcycle? **${ yesno(len([asset for asset in joint_assets.matches(source=['car','truck','motorcycle']) if respondent.name.full() in asset.ownership]) > 0) }**
+  Does Respondent own a car, truck or motorcycle? **${ yesno(joint_assets.any_owned_by(respondent.name.full(), source=['car','truck','motorcycle'])) }**
   
-  Does Petitioner own a mobile home, trailer, boat or airplane? **${ yesno(len([asset for asset in joint_assets.matches(source=['mobile_home','trailer','boat','airplane','vehicles_other']) if petitioner.name.full() in asset.ownership]) > 0) }**
+  Does Petitioner own a mobile home, trailer, boat or airplane? **${ yesno(joint_assets.any_owned_by(petitioner.name.full(), source=['mobile_home','trailer','boat','airplane','vehicles_other'])) }**
   
-  Does Respondent own a mobile home, trailer, boat or airplane? **${ yesno(len([asset for asset in joint_assets.matches(source=['mobile_home','trailer','boat','airplane','vehicles_other']) if respondent.name.full() in asset.ownership]) > 0) }**
+  Does Respondent own a mobile home, trailer, boat or airplane? **${ yesno(joint_assets.any_owned_by(respondent.name.full(), source=['mobile_home','trailer','boat','airplane','vehicles_other'])) }**
   % if len(vehicles.complete_elements()) > 0:
   ${ vehicles.table }  
   % endif
@@ -8245,13 +7885,13 @@ content: |
   
   ${ bank_assets.add_action(label="Add a bank account") } 
   
-  Does Petitioner have any right to receive any pension or retirement benefits other than Social Security? **${ yesno(len([asset for asset in joint_assets.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_accounts_other"]) if petitioner.name.full() in asset.ownership]) > 0) }**
+  Does Petitioner have any right to receive any pension or retirement benefits other than Social Security? **${ yesno(joint_assets.any_owned_by(petitioner.name.full(), source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_accounts_other"])) }**
   
-  Does Petitioner have an IRA or 401(k) or other retirement account? **${ yesno(len([asset for asset in joint_assets.matches(source=["ira"]) if petitioner.name.full() in asset.ownership]) > 0) }**
+  Does Petitioner have an IRA or 401(k) or other retirement account? **${ yesno(joint_assets.any_owned_by(petitioner.name.full(), source=["ira"])) }**
   
-  Does Respondent have any right to receive any pension or retirement benefits other than Social Security? **${ yesno(len([asset for asset in joint_assets.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_accounts_other"]) if respondent.name.full() in asset.ownership]) > 0) }**
+  Does Respondent have any right to receive any pension or retirement benefits other than Social Security? **${ yesno(joint_assets.any_owned_by(respondent.name.full(), source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_accounts_other"])) }**
   
-  Does Respondent have an IRA or 401(k) or other retirement account? **${ yesno(len([asset for asset in joint_assets.matches(source=["ira"]) if respondent.name.full() in asset.ownership]) > 0) }**
+  Does Respondent have an IRA or 401(k) or other retirement account? **${ yesno(joint_assets.any_owned_by(respondent.name.full(), source=["ira"])) }**
   
   % if len(retirement_accounts.complete_elements()) > 0:
   ${ retirement_accounts.table }  
@@ -8259,13 +7899,13 @@ content: |
   
   ${ retirement_accounts.add_action(label="Add a retirement account") } 
   
-  Does Petitioner have any furniture, appliances or other household goods worth more than $100? **${ yesno(len([asset for asset in joint_assets.matches(source=["appliances", "computers", "electronics", "furnishings", "personal_goods_other"]) if petitioner.name.full() in asset.ownership]) > 0) }**
+  Does Petitioner have any furniture, appliances or other household goods worth more than $100? **${ yesno(joint_assets.any_owned_by(petitioner.name.full(), source=["appliances", "computers", "electronics", "furnishings", "personal_goods_other"])) }**
   
-  Does Petitioner have any jewelry, clothing or other personal items worth more than $100? **${ yesno(len([asset for asset in joint_assets.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc"]) if petitioner.name.full() in asset.ownership]) > 0) }**
+  Does Petitioner have any jewelry, clothing or other personal items worth more than $100? **${ yesno(joint_assets.any_owned_by(petitioner.name.full(), source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc"])) }**
   
-  Does Respondent have any furniture, appliances or other household goods worth more than $100? **${ yesno(len([asset for asset in joint_assets.matches(source=["appliances", "computers", "electronics", "furnishings", "personal_goods_other"]) if respondent.name.full() in asset.ownership]) > 0) }**
+  Does Respondent have any furniture, appliances or other household goods worth more than $100? **${ yesno(joint_assets.any_owned_by(respondent.name.full(), source=["appliances", "computers", "electronics", "furnishings", "personal_goods_other"])) }**
   
-  Does Respondent have any jewelry, clothing or other personal items worth more than $100? **${ yesno(len([asset for asset in joint_assets.matches(source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc"]) if respondent.name.full() in asset.ownership]) > 0) }**
+  Does Respondent have any jewelry, clothing or other personal items worth more than $100? **${ yesno(joint_assets.any_owned_by(respondent.name.full(), source=["jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc"])) }**
   
   % if len(personal_goods.complete_elements()) > 0:
   ${ personal_goods.table }  
@@ -8273,9 +7913,9 @@ content: |
   
   ${ personal_goods.add_action(label="Add personal goods") } 
   
-  Does Petitioner own a business? **${ yesno(len([asset for asset in joint_assets.matches(source=["businesses"]) if petitioner.name.full() in asset.ownership]) > 0) }**
+  Does Petitioner own a business? **${ yesno(joint_assets.any_owned_by(petitioner.name.full(), source=["businesses"])) }**
   
-  Does Respondent own a business? **${ yesno(len([asset for asset in joint_assets.matches(source=["businesses"]) if respondent.name.full() in asset.ownership]) > 0) }**
+  Does Respondent own a business? **${ yesno(joint_assets.any_owned_by(respondent.name.full(), source=["businesses"])) }**
   
   % if len(businesses.complete_elements()) > 0:
   ${ businesses.table }  
@@ -8283,9 +7923,9 @@ content: |
   
   ${ businesses.add_action(label="Add a business") } 
   
-  Does Petitioner own any stocks or bond? **${ yesno(len([asset for asset in joint_assets.matches(source=["stocks", "bonds", "notes", "mortgages", "money market", "securities_other" ]) if petitioner.name.full() in asset.ownership]) > 0) }**
+  Does Petitioner own any stocks or bond? **${ yesno(joint_assets.any_owned_by(petitioner.name.full(), source=["stocks", "bonds", "notes", "mortgages", "money market", "securities_other" ])) }**
   
-  Does Respondent own any stocks or bond? **${ yesno(len([asset for asset in joint_assets.matches(source=["stocks", "bonds", "notes", "mortgages", "money market", "securities_other" ]) if respondent.name.full() in asset.ownership]) > 0) }**
+  Does Respondent own any stocks or bond? **${ yesno(joint_assets.any_owned_by(respondent.name.full(), source=["stocks", "bonds", "notes", "mortgages", "money market", "securities_other" ])) }**
   
   % if len(securities.complete_elements()) > 0:
   ${ securities.table }  
@@ -8293,9 +7933,9 @@ content: |
   
   ${ securities.add_action(label="Add a security") }
   
-  Does Petitioner have any life insurance that could be cashed in? **${ yesno(len([asset for asset in joint_assets.matches(source=["life_insurance"]) if petitioner.name.full() in asset.ownership]) > 0) }**
+  Does Petitioner have any life insurance that could be cashed in? **${ yesno(joint_assets.any_owned_by(petitioner.name.full(), source=["life_insurance"])) }**
   
-  Does Respondent have any life insurance that could be cashed in? **${ yesno(len([asset for asset in joint_assets.matches(source=["life_insurance"]) if respondent.name.full() in asset.ownership]) > 0) }**
+  Does Respondent have any life insurance that could be cashed in? **${ yesno(joint_assets.any_owned_by(respondent.name.full(), source=["life_insurance"])) }**
   
   % if len(life_insurance.complete_elements()) > 0:
   ${ life_insurance.table }  
@@ -8303,9 +7943,9 @@ content: |
   
   ${ life_insurance.add_action(label="Add life insurance") }
   
-  Does anyone owe Petitioner any money? **${ yesno(len([asset for asset in joint_assets.matches(source=["interest_in_contract","debts-owed_to_you"]) if petitioner.name.full() in asset.ownership]) > 0) }**
+  Does anyone owe Petitioner any money? **${ yesno(joint_assets.any_owned_by(petitioner.name.full(), source=["interest_in_contract","debts-owed_to_you"])) }**
   
-  Does anyone owe Respondent any money? **${ yesno(len([asset for asset in joint_assets.matches(source=["interest_in_contract","debts-owed_to_you"]) if respondent.name.full() in asset.ownership]) > 0) }**
+  Does anyone owe Respondent any money? **${ yesno(joint_assets.any_owned_by(respondent.name.full(), source=["interest_in_contract","debts-owed_to_you"])) }**
   
   % if len(debts_owed_to_you.complete_elements()) > 0:
   ${ debts_owed_to_you.table }  
@@ -8319,9 +7959,9 @@ content: |
   
   ${ interest_in_contract.add_action(label="Add an interest in contract") } 
   
-  Does Petitioner have any lawsuits against anyone?**${ yesno(len([asset for asset in joint_assets.matches(source=["interest_in_litigation"]) if petitioner.name.full() in asset.ownership]) > 0) }**
+  Does Petitioner have any lawsuits against anyone?**${ yesno(joint_assets.any_owned_by(petitioner.name.full(), source=["interest_in_litigation"])) }**
   
-  Does Respondent have any lawsuits against anyone?**${ yesno(len([asset for asset in joint_assets.matches(source=["interest_in_litigation"]) if respondent.name.full() in asset.ownership]) > 0) }**
+  Does Respondent have any lawsuits against anyone?**${ yesno(joint_assets.any_owned_by(respondent.name.full(), source=["interest_in_litigation"])) }**
   
   % if len(interest_in_litigation.complete_elements()) > 0:
   ${ interest_in_litigation.table }  
@@ -8329,9 +7969,9 @@ content: |
   
   ${ interest_in_litigation.add_action(label="Add an interest in litigation") }  
   
-  Does Petitioner have any farm equipment, animals or crops? **${ yesno(len([asset for asset in joint_assets.matches(source=["farm"]) if petitioner.name.full() in asset.ownership]) > 0) }**
+  Does Petitioner have any farm equipment, animals or crops? **${ yesno(joint_assets.any_owned_by(petitioner.name.full(), source=["farm"])) }**
   
-  Does Respondent have any farm equipment, animals or crops? **${ yesno(len([asset for asset in joint_assets.matches(source=["farm"]) if respondent.name.full() in asset.ownership]) > 0) }**
+  Does Respondent have any farm equipment, animals or crops? **${ yesno(joint_assets.any_owned_by(respondent.name.full(), source=["farm"])) }**
   
   % if len(farm.complete_elements()) > 0:
   ${ farm.table }  
@@ -8339,9 +7979,9 @@ content: |
   
   ${ farm.add_action(label="Add a farm") } 
   
-  Does Petitioner have any interest in any trusts? **${ yesno(len([asset for asset in joint_assets.matches(source=["interests_in_trust"]) if petitioner.name.full() in asset.ownership]) > 0) }**
+  Does Petitioner have any interest in any trusts? **${ yesno(joint_assets.any_owned_by(petitioner.name.full(), source=["interests_in_trust"])) }**
   
-  Does Respondent have any interest in any trusts? **${ yesno(len([asset for asset in joint_assets.matches(source=["interests_in_trust"]) if respondent.name.full() in asset.ownership]) > 0) }**
+  Does Respondent have any interest in any trusts? **${ yesno(joint_assets.any_owned_by(respondent.name.full(), source=["interests_in_trust"])) }**
   
   % if len(interests_in_trust.complete_elements()) > 0:
   ${ interests_in_trust.table }  
@@ -8349,9 +7989,9 @@ content: |
   
   ${ interests_in_trust.add_action(label="Add an interest in trust") }
   
-  Does Petitioner have any other asset or property? **${ yesno(len([asset for asset in joint_assets.matches(source=["other_assets"]) if petitioner.name.full() in asset.ownership]) > 0) }**
+  Does Petitioner have any other asset or property? **${ yesno(joint_assets.any_owned_by(petitioner.name.full(), source=["other_assets"])) }**
   
-  Does Respondent have any other asset or property? **${ yesno(len([asset for asset in joint_assets.matches(source=["other_assets"]) if respondent.name.full() in asset.ownership]) > 0) }**
+  Does Respondent have any other asset or property? **${ yesno(joint_assets.any_owned_by(respondent.name.full(), source=["other_assets"])) }**
   
   % if len(other_assets.complete_elements()) > 0:
   ${ other_assets.table }  
