@@ -714,6 +714,7 @@ fields:
       variable: case_type
       is: Divorce
 ---
+id: child custody kickout
 event: custody_exit
 question: Child Custody
 subquestion: |
@@ -1308,7 +1309,7 @@ code: |
   else:
     redaction_certification_attachment.enabled = False
 ---
-id: redaction_certification enabled block for main interview
+id: parenting_plan_attachment enabled block for main interview
 code: |
   if "parenting_plan_attachment" in doc_list_selected.true_values():
     parenting_plan_attachment.enabled = True

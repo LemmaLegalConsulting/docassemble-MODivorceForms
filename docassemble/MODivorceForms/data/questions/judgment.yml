@@ -21,7 +21,7 @@ id: third party object
 objects:
   - third_party: ALIndividual
 ---
-id: guardian ad litem court appearance
+id: third party court appearance
 question: Third Party
 fields:
   - Another person will make an appearance: third_party_appears

@@ -32,6 +32,7 @@ code: |
   exchanges[i].information
   exchanges[i].complete = True
 ---
+id: exchanges there is another
 question: Do you want to add another exchange?
 subquestion: |
   % if float(exchanges.complete_elements()[-1].exchange_date) < 13: 
@@ -129,6 +130,7 @@ validation code: |
   else:
     exchange_parent = "users0"
 ---
+id: schedule intro
 question: Make your own schedule
 subquestion: |
   Each exchange should be written on the Weekend and Weekday Exchange Schedule. The parents
@@ -775,6 +777,7 @@ data from code:
       exchange_time2: |
         None
 ---
+id: biweekly_schedule_review
 question: Weekday and Weekend Exchange Schedule
 subquestion: |
   Enter the parent who is receiving custody and the specified time for each exchange.
@@ -1385,6 +1388,7 @@ attachment:
        ${ format_time(other_holidays[6].custody_to_time) }
        % endif
 ---
+id: holidays intro
 question: Holidays
 subquestion: |
   A different schedule can apply on holidays. The times each parent will have with the children during the holidays are set forth on the Holiday Exchange Schedule.
@@ -1526,6 +1530,7 @@ data:
     even_default: respondent
     odd_default: petitioner
 ---
+id: describe other holidays
 question: ${ holidays[i]["description"] }
 fields:
   - Even Numbered Years: holidays[i]['even_years']
@@ -1546,16 +1551,19 @@ fields:
 objects: 
   - other_holidays: DAList.using(object_type=DAObject, complete_attribute='complete')
 ---
+id: other holidays there are any
 question: Do you want to add any other holidays, including special holidays and occassions?
 fields:
   - Other holidays: other_holidays.there_are_any
     datatype: yesnoradio
 ---
+id: other holidays there is another
 question: Do you want to add any more holidays?
 fields:
   - Other holidays: other_holidays.there_is_another
     datatype: yesnoradio
 ---
+id: Other holidays information
 question: Other holidays information
 subquestion: |
   % if len(other_holidays.complete_elements()) > 0:
@@ -1584,6 +1592,7 @@ fields:
 continue button field: other_holidays[i].complete
 ---
 only sets: holidays_review
+id: holiday review if not holidays_default
 if: not holidays_default
 question: Holiday Exchange Schedule
 continue button field: holidays_review
@@ -1892,6 +1901,7 @@ code: |
   role_dictionary_full_name["respondent"]= respondent.name.full()
 ---
 only sets: holidays_review
+id: holidays_review if holidays_default
 if: holidays_default
 question: Holiday Exchange Schedule
 continue button field: holidays_review

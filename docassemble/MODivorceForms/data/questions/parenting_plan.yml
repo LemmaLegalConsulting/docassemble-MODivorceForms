@@ -61,11 +61,11 @@ fields:
       - The guardian ad litem
       - Other
 ---
-id: parenting plan author other object
+id: parenting plan A author other object
 objects: 
   - parenting_plan_A_author_other: ALIndividual
 ---
-id: other physical custody
+id: parenting plan A author other question
 reconsider:
   - people_choices
 
@@ -101,11 +101,11 @@ fields:
       - The guardian ad litem
       - Other
 ---
-id: parenting plan author other object
+id: parenting plan B author other object
 objects: 
   - parenting_plan_B_author_other: ALIndividual
 ---
-id: other physical custody
+id: parenting plan B author other question
 reconsider:
   - people_choices
 

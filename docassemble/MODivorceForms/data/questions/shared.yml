@@ -651,7 +651,7 @@ code: |
     respondent_race_identified = False
   
 ---
-id: Previous marriages info for other party
+id: Previous marriages info for self
 question: Previous marriages for ${ users[0].name_full() }
 fields:  
   - Previously married?: users[0].previously_married
@@ -1045,7 +1045,7 @@ code: |
   children[i].lived_with = None
 ---
 objects:
-  children[i].lived_with: ALIndividual
+  - children[i].lived_with: ALIndividual
 ---
 id: did child live with parents at separation?
 question: Residence at separation
@@ -1157,6 +1157,7 @@ columns:
 edit:
   - child_review
 ---
+id: review child
 continue button field: children[i].child_review
 question: Review ${ children[i].name.full() }
 review: 
@@ -2170,7 +2171,7 @@ subquestion: |
 
   For example,
 
-  [FILE insurance_cost_example.png,100%]
+  [FILE insurance_cost_example.png,100%, Example calculation of a child's share of the monthly health insurance premium]
 fields:
   - What are the monthly health insurance costs for ${ x.name_full() } pays for the children subject to this case?: x.health_insurance_costs
     datatype: currency
@@ -2364,7 +2365,7 @@ subquestion: |
   ${ x.add_action() }
 continue button field: x.review_items
 ---
-id: generic review ALAssetList
+id: review all joint assets
 generic object: ALAssetList
 question: Review all assets
 subquestion: |
@@ -2389,7 +2390,6 @@ id: generic table ALAssetList
 generic object: ALAssetList
 table: x.table
 rows: x
-redact: False
 columns:
   - Description: |
       row_item.description_template
@@ -3311,8 +3311,8 @@ validation code: |
 ---
 
 comment: |
-  Some assets do not have subtypes, and the user just says whether there are any assets and then 
-id: multiple assets question
+  Some assets do not have subtypes, and the user just says whether there are any assets and then
+id: multiple assets question progressive
 question: Do you have any other assets?
 fields:
   - Life insurance: life_insurance.there_are_any
@@ -3987,7 +3987,7 @@ id: debts_owed_to_you object
 objects:
   - debts_owed_to_you: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
-id: interests_in_trust other display
+id: debts_owed_to_you other display
 comment: |
   This keeps the text that may be changed near the top of the section.
   Used in:
@@ -4017,7 +4017,7 @@ on change:
   real_estate[i].value: |
     undefine('joint_assets')
 ---
-id: joint_assets object
+id: individual assets object
 generic object: ALIndividual
 objects:
   - x.assets: ALAssetList.using(auto_gather=False,display_name="All assets")
@@ -4340,7 +4340,7 @@ subquestion: |
 fields:
   - Job title: x[i].source
 ---
-id: name of one itemized job in list
+id: name of one itemized job in list for other party
 question: |
   What is the job title for the ${ordinal(i)} job for ${ other_parties[0] }?
 subquestion: |
@@ -4393,7 +4393,7 @@ fields:
   - Does ${ other_parties[0].name_full() } have a job?: other_parties[0].jobs.there_are_any
     datatype: yesnomaybe
 ---
-id: other parties jobs
+id: other parties jobs there is another
 question: Jobs
 fields:
   - Does ${ other_parties[0].name_full() } have another job?: other_parties[0].jobs.there_is_another
@@ -4489,7 +4489,7 @@ code: |
   x.to_add.there_are_any = True
 ---
 if: not x.to_add.complete_elements()
-id: job at least one wage
+id: job set new item name to wages
 generic object: ALItemizedJob
 code: |
   x.to_add.new_item_name = "wages"
@@ -4585,7 +4585,7 @@ validation code: |
   if x.to_add.new_item_name in x.to_add.complete_elements().keys():
     validation_error(f'You already told us about your <strong>{job_items_names.get(x.to_add.new_item_name, x.to_add.new_item_name) }</strong> that pays { currency( x.to_add[ x.to_add.new_item_name ].value )}. Pick a different name.')
 ---
-id: jobs details about tips commissions bonuses
+id: jobs details about tips commissions bonuses for other party
 generic object: ALItemizedJob
 question: |
   Other incomes from your job as a ${ other_parties[0].jobs[i].source }
@@ -4739,7 +4739,7 @@ fields:
   - Are you able to support yourself on your monthly income?: users[0].self_supporting
     datatype: yesnoradio
 ---
-id: self supporting
+id: self supporting other party
 generic object: ALIndividual
 question: Income for ${ other_parties[0].name_full() }
 fields:
@@ -4832,17 +4832,6 @@ generic object: ALIndividual
 objects:
   - x.benefits_ordered: DAOrderedDict.using(elements=x.benefits.terms_ordered, auto_gather=False, gathered=True)
 ---
-
-id: ALIncomeList there are any
-generic object: ALIncomeList
-code: |
-  if x.selected_types.any_true():
-    x.move_checks_to_list(selected_terms=x.terms_ordered, set_other=True)
-    x.there_are_any = True
-  else:
-    x.there_are_any = False
----
----
 id: selected types sets there_are_any
 generic object: ALIncomeList
 code: |
@@ -4852,7 +4841,7 @@ code: |
   else:
     x.there_are_any = False
 ---
-id: selected types sets there_are_any
+id: other parties expenses selected types sets there_are_any
 generic object: ALIncomeList
 code: |
   if not other_parties[0].expenses_unknown and other_parties[0].expenses.selected_types.any_true():
@@ -4948,7 +4937,7 @@ validation code: |
 
 ---
 if: x.benefits[i].source == "medicaid"
-id: public benefits info for list
+id: public benefits info for list medicaid
 generic object: ALIndividual
 reconsider: x.benefits[i].display_name
 question: |
@@ -5166,7 +5155,7 @@ validation code: |
 
 ---
 generic object: ALIndividual
-id: other income info for list
+id: other income info for list for other party
 #generic object: ALIncomeList
 reconsider: other_parties[0].other_incomes[i].display_name
 question: |
@@ -5357,7 +5346,7 @@ fields:
       x.expenses_ordered
 ---
 #expenses
-id: expenses types
+id: expenses types for other party
 question: |
   What kind of expenses does ${ other_parties[0].name_full() } have?
 subquestion: |
@@ -7761,7 +7750,7 @@ content: |
     Explain: ${ showifdef('relief_other') }
     % endif
 ---
-id: parenting plan review 
+id: parenting plan additional provisions review
 question: Review the Parenting Plan Statement
 subquestion: |
 
@@ -7771,7 +7760,7 @@ subquestion: |
 fields:
   - Do you want to include additional provisions pertaining to the support of the children?: is_additional_provisions_parenting_plan
     datatype: yesnoradio
-  - no label: additional_provisions_parenting_plan
+  - Additional provisions: additional_provisions_parenting_plan
     datatype: area
     show if: is_additional_provisions_parenting_plan
 ---
@@ -7820,7 +7809,7 @@ subquestion: |
 fields:
   - Do you want to include additional provisions in the Statement of Property and Debt and Proposed Separation Agreement?: is_additional_provisions_property_statement
     datatype: yesnoradio
-  - no label: additional_provisions_property_statement
+  - Additional provisions: additional_provisions_property_statement
     datatype: area
     show if: is_additional_provisions_property_statement
 ---
@@ -8078,7 +8067,7 @@ content: |
   
   ${ debts.add_action(label="Add a debt")  }
 ---
-id: maintenance_template
+id: maintenance_review_template
 template: maintenance_review_template
 subject: |
   Part Two - Maintenance and Other Provisions

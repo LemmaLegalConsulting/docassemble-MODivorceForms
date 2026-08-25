@@ -12,7 +12,7 @@ question: Additional provisions for the Property Statement
 fields:
   - Do you want to include additional provisions in the Statement of Property and Debt and Proposed Separation Agreement?: is_additional_provisions
     datatype: yesnoradio
-  - no label: additional_provisions
+  - Additional provisions: additional_provisions
     datatype: area
     show if: is_additional_provisions
 ---

@@ -49,7 +49,7 @@ subquestion: |
   % elif case.filed == "other_parties0_filed":
   You can find the county on the top of the petition:
   
-  [FILE petition_county.png, 100%]
+  [FILE petition_county.png, 100%, Example petition showing the county name printed at the top of the form]
   
   % endif
   
@@ -486,7 +486,7 @@ data:
         zip: 64650
         phone: (816) 586-2581
         rules: https://www.courts.mo.gov/file.jsp?id=29626
-        website: https://www.caldwellco.missouri.org/circuit-clerk/
+        website: https://www.courts.mo.gov/page.jsp?id=1673
         photo: Caldwell.jpeg
         schedule: |
           8 a.m. to 4:30 p.m. Monday through Friday, excluding state holidays 
@@ -767,7 +767,7 @@ data:
         state: Missouri
         zip: 65101
         phone: (573) 634-9150
-        rules: https://colecounty.org/DocumentCenter/View/6779/Local-Court-Rules-FINAL-Revised-12-20-2024?bidId=
+        rules: https://www.colecounty.org/395/Local-Court-Rules
         website: https://www.colecounty.org/336/Circuit-Court
         photo: Cole.jpeg
   Cooper County:
@@ -1898,7 +1898,7 @@ data:
         zip: 65655
         phone: (417) 679-4232
         rules: https://www.courts.mo.gov/file.jsp?id=85613
-        website: https://www.ozarkcounty.net/county-government
+        website: https://www.courts.mo.gov/page.jsp?id=1679
         photo: Ozark.jpeg
         schedule: |
           8 a.m. - noon and 12:30 - 4:30 p.m. Monday through Friday, excluding state holidays 
@@ -2259,9 +2259,9 @@ data:
     casenet_code: |-
        SYR
     legal_aid_program_website: |
-      http://www.lsosm.org/https://www.lawmo.org/
+      http://www.lsosm.org/
     legal_aid_program: |
-      Legal Services of Southern MissouriLegal Aid of Western Missouri
+      Legal Services of Southern Missouri
     courts: 
       - name: Ste. Genevieve County Courthouse
         address: 55 South 3rd Street
@@ -2281,9 +2281,9 @@ data:
     casenet_code: |-
        SAL
     legal_aid_program_website: |
-      http://www.lsosm.org/https://www.lawmo.org/
+      http://www.lsosm.org/
     legal_aid_program: |
-      Legal Services of Southern MissouriLegal Aid of Western Missouri
+      Legal Services of Southern Missouri
     courts: 
       - name: St. Francois County Courthouse
         address: 1 North Washington Street
@@ -2480,7 +2480,7 @@ data:
         zip: 65656
         phone: (417) 357-6511
         rules: https://www.courts.mo.gov/file.jsp?id=5154
-        website: http://www.stoneco-mo.us/circuitcourt.htm
+        website: https://www.stoneco-mo.us/CircuitCourt.htm
         photo: Stone.jpeg
         schedule: |
           7:30 a.m. to 4 p.m. Monday through Friday, excluding state holidays (Closed noon to 12:30 p.m. for lunch)
