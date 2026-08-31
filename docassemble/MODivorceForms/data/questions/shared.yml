@@ -775,7 +775,7 @@ validation code: |
       if x.county_length_of_residence_months > x.mo_length_of_residence_months:
         validation_error("Your residency in Missouri must be at least as long as your residency in a Missouri county.")
   elif x.county_length_of_residence_choice == 'year':
-    if x.mo_length_of_residence_choice == 'less_than_4' or x.mo_length_of_residence_choice == 'less_than_4':
+    if x.mo_length_of_residence_choice == 'less_than_4' or x.mo_length_of_residence_choice == 'more_than_4':
       validation_error("Your residency in Missouri must be at least as long as your residency in a Missouri county.")
     else:
       if x.county_length_of_residence_years > x.mo_length_of_residence_years:
@@ -913,6 +913,16 @@ code: |
 objects:
   - children: ALPeopleList.using(complete_attribute='complete')
 ---
+code: |
+  if showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]'):
+    children_of_marriage_minor = [chi for chi in children if chi.unemancipated and chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()]]
+  if doc_list_selected['petition_attachment']:
+    children_of_marriage = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()]]
+    children_of_marriage_born_after_not_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.birthdate >= marriage.recorded_date and not chi.adopted]
+    children_of_marriage_born_before_not_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.birthdate < marriage.recorded_date and not chi.adopted]
+    children_of_marriage_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.adopted]
+  children_list_create = True
+---
 id: are there children
 question: Children of the Marriage
 subquestion: |
@@ -996,6 +1006,21 @@ fields:
       - This child is self-supporting: self_supporting
       - This child is attending high school: high_school
       - This child is attending college or vocational school: college
+validation code: |
+  if children[i].special_factors['college']:
+    if children[i].birthdate.plus(years=21) > today():
+      children[i].unemancipated = True
+      children[i].unemancipated_reason = "Under 21 in college"
+    else:
+      children[i].unemancipated = False
+      children[i].unemancipated_reason = "Over 21"
+  else:
+    if children[i].birthdate.plus(years=18) > today():
+      children[i].unemancipated = True
+      children[i].unemancipated_reason = "Under 18"
+    else:
+      children[i].unemancipated = False
+      children[i].unemancipated_reason = "Over 18"
 ---
 id: back up number of children question if no need to collect all children
 question: How many minor children do you have with ${ other_parties[0] }?
@@ -2204,7 +2229,7 @@ fields:
     datatype: date
 continue button field: marriage_info
 validation code: |
-  if as_datetime(marriage.recorded_date) > today() or as_datetime(marriage.recorded_date) < users[0].birthdate:
+  if as_datetime(marriage.recorded_date) > today() or (defined('users[0].birthdate') and as_datetime(marriage.recorded_date) < users[0].birthdate):
     validation_error("Please enter a date in the past that isn't before the date you were born.")
 ---
 id: marriage object
@@ -2333,7 +2358,7 @@ fields:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
       - Other: other
-  - Recommended Award: x[i].recommended_award
+  - Who should get this property?: x[i].recommended_award
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
@@ -2592,7 +2617,7 @@ template: marital_property_template
 subject: |
   What is marital and nonmarital property?
 content: |
-  Marital property is property acquired during the mariage by either party together or separately. Nonmarital property is property acquired before the marriage or as a gift or inheritance.
+  Marital property is property acquired during the mariage by either party **together or separately**. Nonmarital property is property acquired before the marriage or as a gift or inheritance.
 ---
 comment: |
   VEHICLES
@@ -2703,7 +2728,7 @@ fields:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
       - Other: other
-  - Recommended Award: vehicles[i].recommended_award
+  - Who should get this property?: vehicles[i].recommended_award
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
@@ -2848,7 +2873,7 @@ fields:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
       - Other: other
-  - Recommended Award: securities[i].recommended_award
+  - Who should get this property?: securities[i].recommended_award
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
@@ -2926,6 +2951,19 @@ code: |
   personal_goods.other_display = "other personal possessions"
   personal_goods.display_name = "Personal possessions"
 ---
+id: ALAssetList selected values for there are any
+question: |
+  Personal Possessions
+subquestion: |   
+  Do you or your spouse own any personal possessions?
+
+  You do not need to list property if it is of minimal value. If the item of property is worth less than $100, you may omit it from your list.
+fields:
+  - no label: personal_goods.selected_types
+    datatype: checkboxes
+    code: |
+      personal_goods.ordered
+---
 only sets: 
   - personal_goods[i].market_value
   - personal_goods[i].recommended_debt
@@ -2998,7 +3036,7 @@ fields:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
       - Other: other
-  - Recommended Award: personal_goods[i].recommended_award
+  - Who should get this property?: personal_goods[i].recommended_award
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
@@ -3129,7 +3167,7 @@ fields:
       - ${ respondent.name.full() }
       - ${ petitioner.name.full() } & ${ respondent.name.full() }
       - Other: other
-  - Recommended Award: bank_assets[i].recommended_award
+  - Who should get this property?: bank_assets[i].recommended_award
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
@@ -3264,7 +3302,7 @@ fields:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
       - Other: other
-  - Recommended Award: retirement_accounts[i].recommended_award
+  - Who should get this property?: retirement_accounts[i].recommended_award
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
@@ -3467,7 +3505,7 @@ fields:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
       - Other: other
-  - Recommended Award: farm[i].recommended_award
+  - Who should get this property?: farm[i].recommended_award
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
@@ -3602,7 +3640,7 @@ fields:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
       - Other: other
-  - Recommended Award: businesses[i].recommended_award
+  - Who should get this property?: businesses[i].recommended_award
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
@@ -3735,7 +3773,7 @@ fields:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
       - Other: other
-  - Recommended Award: other_assets[i].recommended_award
+  - Who should get this property?: other_assets[i].recommended_award
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
@@ -3851,7 +3889,7 @@ fields:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
       - Other: other
-  - Recommended Award: life_insurance[i].recommended_award
+  - Who should get this property?: life_insurance[i].recommended_award
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
@@ -3930,7 +3968,7 @@ fields:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
       - Other: other
-  - Recommended Award: interests_in_trust[i].recommended_award
+  - Who should get this property?: interests_in_trust[i].recommended_award
     choices:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
@@ -3995,6 +4033,44 @@ comment: |
 code: |
   debts_owed_to_you.other_display = "other money owed to you"
   debts_owed_to_you.display_name = "money owed to you"
+---
+only sets: debts_owed_to_you[i].market_value
+id: describe debts owed to you
+question: |
+  Tell us about money owed to you
+subquestion: |
+
+  Make your best guess for the market value.
+  
+  % if i > 1:
+  You have already told us about your ${ comma_and_list(asset.description_template for asset in x.complete_elements()) }.
+  % elif i > 0:
+  You have already told us about your ${ comma_and_list(asset.description_template for asset in x.complete_elements()) }.
+  % endif
+fields:
+  - Description: debts_owed_to_you[i].description
+  - How much?: debts_owed_to_you[i].market_value
+    maxlength: 76
+    datatype: currency
+  - Is this marital or nonmarital property?: debts_owed_to_you[i].marital_property
+    choices:
+      - Marital
+      - Nonmarital
+      - Both
+  - note: |
+      ${ collapse_template(marital_property_template) }
+  - Who has possession?: debts_owed_to_you[i].has_possession
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+  - Who should get this property?: debts_owed_to_you[i].recommended_award
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+      - Other: other
+validation code:
+  debts_owed_to_you[i].ownership = debts_owed_to_you[i].has_possession
 ---
 id: joint_assets object
 objects:
@@ -5685,6 +5761,12 @@ subquestion: |
 
   ${ al_court_bundle.send_button_html(show_editable_checkbox=False) }
 
+  [YOUTUBE EstdZ2H_fN4]
+
+  % if showifdef('domestic_violence'):
+  [YOUTUBE QbJgtFB5GbA]
+  % endif 
+
 progress: 100
 ---
 id: instructions attachment block
@@ -5738,6 +5820,7 @@ objects:
 ---
 ############ REVIEW
 id: review screen
+reconsider: children_of_marriage_minor
 event: review_form
 question: Review your answers
 subquestion: |
@@ -6451,8 +6534,6 @@ review:
 - Edit: 
     - real_estate.revisit
     - invalidate:
-      - asset_checkbox_review
-      - award_review
       - debt_checkbox_review
       - debt_review 
       - is_additional_provisions_property_statement
@@ -6507,8 +6588,6 @@ review:
 - Edit: 
     - bank_assets.revisit
     - invalidate:
-      - asset_checkbox_review
-      - award_review
       - is_additional_provisions_property_statement
       - additional_provisions_property_statement
     - recompute:
@@ -6532,8 +6611,6 @@ review:
 - Edit: 
     - retirement_accounts.revisit
     - invalidate:
-      - asset_checkbox_review
-      - award_review
       - is_additional_provisions_property_statement
       - additional_provisions_property_statement
     - recompute:
@@ -6569,8 +6646,6 @@ review:
 - Edit: 
     - personal_goods.revisit
     - invalidate:
-      - asset_checkbox_review
-      - award_review
       - debt_checkbox_review
       - debt_review 
       - is_additional_provisions_property_statement
@@ -6609,8 +6684,6 @@ review:
 - Edit: 
     - businesses.revisit
     - invalidate:
-      - asset_checkbox_review
-      - award_review
       - debt_checkbox_review
       - debt_review 
       - is_additional_provisions_property_statement
@@ -6634,8 +6707,6 @@ review:
 - Edit: 
     - securities.revisit
     - invalidate:
-      - asset_checkbox_review
-      - award_review
       - debt_checkbox_review
       - debt_review 
       - is_additional_provisions_property_statement
@@ -6659,8 +6730,6 @@ review:
 - Edit: 
     - life_insurance.revisit
     - invalidate:
-      - asset_checkbox_review
-      - award_review
       - is_additional_provisions_property_statement
       - additional_provisions_property_statement
     - recompute:
@@ -6686,8 +6755,6 @@ review:
 - Edit: 
     - debts_owed_to_you.revisit
     - invalidate:
-      - asset_checkbox_review
-      - award_review
       - is_additional_provisions_property_statement
       - additional_provisions_property_statement
     - recompute:
@@ -6707,8 +6774,6 @@ review:
 - Edit: 
     - interest_in_contract.revisit
     - invalidate:
-      - asset_checkbox_review
-      - award_review
       - is_additional_provisions_property_statement
       - additional_provisions_property_statement
     - recompute:
@@ -6729,8 +6794,6 @@ review:
 - Edit: 
     - interest_in_litigation.revisit
     - invalidate:
-      - asset_checkbox_review
-      - award_review
       - is_additional_provisions_property_statement
       - additional_provisions_property_statement
     - recompute:
@@ -6752,8 +6815,6 @@ review:
 - Edit: 
     - farm.revisit
     - invalidate:
-      - asset_checkbox_review
-      - award_review
       - debt_checkbox_review
       - debt_review 
       - is_additional_provisions_property_statement
@@ -6777,8 +6838,6 @@ review:
 - Edit: 
     - interests_in_trust.revisit
     - invalidate:
-      - asset_checkbox_review
-      - award_review
       - debt_checkbox_review
       - debt_review 
       - is_additional_provisions_property_statement
@@ -6940,11 +6999,40 @@ review:
     
     Are you or your spouse currently pregnant?: **${ yesno(pregnant) }**
     
-- note: |
-    ${ children.table }
-    
-    ${ children.add_action() }
-  show if: showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]') or showifdef('doc_list_selected["petition_attachment"]')
+- Edit:
+    - children.revisit
+    - recompute:
+      - children_list_create
+  button: |
+
+    % if showifdef('doc_list_selected["petition_attachment"]'):
+    How many living children do you and your spouse have together that were born after the date of this marriage? **${  len(children_of_marriage_born_after_not_adopted) }** 
+    % for child in children_of_marriage_born_after_not_adopted:
+  
+    1. ${ child.name }
+    % endfor
+  
+    How many living children did you and your spouse adopt? **${ len(children_of_marriage_adopted) }**
+    % for child in children_of_marriage_adopted:
+  
+    1. ${ child.name }
+    % endfor
+  
+    How many living children do you and your spouse have together that were born before the date of this marriage? ${ len(children_of_marriage_born_before_not_adopted) } 
+    % for child in children_of_marriage_born_before_not_adopted:
+  
+    1. ${ child.name }
+    % endfor
+  
+    Total number of children included in petition: ${ len(children_of_marriage) }
+
+    Minor children included in parenting plan and other court filings: ${ len(children_of_marriage_minor) }
+    % elif showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
+
+    Minor children included in parenting plan and other court filings: ${ len(children_of_marriage_minor) }
+
+    % endif
+
 - raw html: |
     ${ next_accordion("Information about you", showing=False) }
 - Edit: 
@@ -6974,9 +7062,18 @@ review:
     Phone: ${ showifdef('users[0].phone_number') }
 
     Email: ${ showifdef('users[0].email') }
-- Edit: users[0].mo_length_of_residence_choice
+- Edit:
+    - invalidate:
+      - users[0].mo_length_of_residence_days
+      - users[0].mo_length_of_residence_months
+      - users[0].mo_length_of_residence_years
+      - users[0].county_length_of_residence_days
+      - users[0].county_length_of_residence_months
+      - users[0].county_length_of_residence_years
+    - users[0].mo_length_of_residence_choice
   button: |
-    How long have you lived in ${ state_name(users[0].address.state) }?: ${ users[0].mo_length_of_residence_choice }
+    How long have you lived in ${ state_name(users[0].address.state) }?: 
+    
     % if users[0].mo_length_of_residence_choice == "less_than_4":
       - Less than 4 months: **${ users[0].mo_length_of_residence_days } days**
     % elif users[0].mo_length_of_residence_choice == "more_than_4":
@@ -7075,9 +7172,17 @@ review:
     Phone: ${ showifdef('other_parties[0].phone_number') }
 
     Email: ${ showifdef('other_parties[0].email') }
-- Edit: other_parties[0].mo_length_of_residence_choice
+- Edit:
+    - invalidate:
+      - other_parties[0].mo_length_of_residence_days
+      - other_parties[0].mo_length_of_residence_months
+      - other_parties[0].mo_length_of_residence_years
+      - other_parties[0].county_length_of_residence_days
+      - other_parties[0].county_length_of_residence_months
+      - other_parties[0].county_length_of_residence_years
+    - other_parties[0].mo_length_of_residence_choice
   button: |
-    How long has your spouse lived in ${ state_name(other_parties[0].address.state) }?: ${ other_parties[0].mo_length_of_residence_choice }
+    How long has your spouse lived in ${ state_name(other_parties[0].address.state) }?: 
     % if other_parties[0].mo_length_of_residence_choice == "less_than_4":
       - Less than 4 months: **${ other_parties[0].mo_length_of_residence_days } days**
     % elif other_parties[0].mo_length_of_residence_choice == "more_than_4":
@@ -7618,7 +7723,6 @@ continue button field: parenting_plan_review
 id: petition review
 question: Preview petition
 subquestion: |
-  ${ petition_attachment.as_pdf() }
 
   ${ children_petition_template }
 
@@ -7715,23 +7819,25 @@ subject: Children in the Petition
 content: |
   The petition is different than other documents that you will file.  In the petition, you are supposed to list all children you have together, regardless of age.
 
-   How many living children do you and your spouse have together that were born after the date of this marriage? **${  len([child for child in children if child.parents[petitioner.name.full()] and child.parents[respondent.name.full()] and child.birthdate > marriage.recorded_date]) }** 
-  % for child in [child for child in children if child.parents[petitioner.name.full()] and child.parents[respondent.name.full()] and child.birthdate > marriage.recorded_date]:
+   How many living children do you and your spouse have together that were born after the date of this marriage? **${  len(children_of_marriage_born_after_not_adopted) }** 
+  % for child in children_of_marriage_born_after_not_adopted:
 
   1. ${ child.name }
   % endfor
 
-  How many living children did you and your spouse adopt? **${ len([child for child in children if child.parents[petitioner.name.full()] and child.parents[respondent.name.full()] and child.adopted == True]) }**
-  % for child in [child for child in children if child.parents[petitioner.name.full()] and child.parents[respondent.name.full()] and child.adopted == True]:
+  How many living children did you and your spouse adopt? **${ len(children_of_marriage_adopted) }**
+  % for child in children_of_marriage_adopted:
 
   1. ${ child.name }
   % endfor
 
-  How many living children do you and your spouse have together that were born before the date of this marriage? ${ len([child for child in children if child.parents[petitioner.name.full()] and child.parents[respondent.name.full()] and child.birthdate < marriage.recorded_date and child.adopted == False]) } 
-  % for child in [child for child in children if child.parents[petitioner.name.full()] and child.parents[respondent.name.full()] and child.birthdate < marriage.recorded_date and child.adopted == False]:
+  How many living children do you and your spouse have together that were born before the date of this marriage? ${ len(children_of_marriage_born_before_not_adopted) } 
+  % for child in children_of_marriage_born_before_not_adopted:
 
   1. ${ child.name }
   % endfor
+
+  Total number of children included in petition: ${ len(children_of_marriage) }
 ---
 id: relief_template
 template: relief_template
@@ -7812,16 +7918,6 @@ fields:
   - Additional provisions: additional_provisions_property_statement
     datatype: area
     show if: is_additional_provisions_property_statement
----
-question: Test
-id: asset checkbox review 
-subquestion: |
-continue button field: asset_checkbox_review
----
-question: Test
-id: award review 
-subquestion: |
-continue button field: award_review
 ---
 question: Test
 id: debt checkbox review 

@@ -1,6 +1,7 @@
 from docassemble.base.functions import states_list
 from docassemble.base.util import Address, validation_error
 
+__all__ = ['validate_us_state','not_name_change']
 
 def validate_us_state(address: Address) -> None:
     if (not hasattr(address,'country') or address.country == "US") and hasattr(address,'state') and not len(address.state) == 2:

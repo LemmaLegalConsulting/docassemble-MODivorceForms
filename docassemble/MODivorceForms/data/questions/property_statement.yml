@@ -66,12 +66,15 @@ comment: |
   configured index.
 code: |
   property_statement_attachment[i].overflow_fields["petitioner.assets"].overflow_trigger = 16
-  property_statement_attachment[i].overflow_fields["petitioner.assets"].label = "Petitioner Assets"
+  property_statement_attachment[i].overflow_fields["petitioner.assets"].label = "Additional Assets Awarded to " + petitioner.name.full()
   for row_number in range(16):
-    property_statement_attachment[i].overflow_fields["petitioner.assets[" + str(row_number) + "].award_template_petitioner"].overflow_trigger = 20
-    property_statement_attachment[i].overflow_fields["petitioner.assets[" + str(row_number) + "].award_template_petitioner"].label = "Petitioner asset description"
-    property_statement_attachment[i].overflow_fields["respondent.assets[" + str(row_number) + "].award_template_respondent"].overflow_trigger = 20
-    property_statement_attachment[i].overflow_fields["respondent.assets[" + str(row_number) + "].award_template_respondent"].label = "respondent asset description"
+    property_statement_attachment[i].overflow_fields["petitioner.assets[" + str(row_number) + "].award_template_petitioner"].overflow_trigger = 40
+    property_statement_attachment[i].overflow_fields["petitioner.assets[" + str(row_number) + "].award_template_petitioner"].label = "Complete description for asset listed for " + petitioner.name.full()
+  property_statement_attachment[i].overflow_fields["respondent.assets"].overflow_trigger = 16
+  property_statement_attachment[i].overflow_fields["respondent.assets"].label = "Additional Assets Awarded to " + respondent.name.full()
+  for row_number in range(16):
+    property_statement_attachment[i].overflow_fields["respondent.assets[" + str(row_number) + "].award_template_respondent"].overflow_trigger = 40
+    property_statement_attachment[i].overflow_fields["respondent.assets[" + str(row_number) + "].award_template_respondent"].label = "Complete description for asset listed for " + respondent.name.full()
   property_statement_attachment[i].overflow_fields.gathered = True
 ---
 attachment:

@@ -16,18 +16,30 @@ code: |
   case.case_name = petitioner.name.last + " v. " + respondent.name.last
 ---
 objects:
-  - confidential_information_sheet_attachment: ALDocument.using(title="Confidential Case Filing Information Sheet - Domestic Relations Cases", filename="confidential_information_sheet",  has_addendum=False, )
+  - confidential_information_sheet_attachment: DADict.using(object_type=ALDocument.using(has_addendum=True, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE), auto_gather=False, gathered=True)
 ---
-# Bundles group the ALDocuments into separate downloads, such as for court and for the user
-objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, confidential_information_sheet_attachment], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[confidential_information_sheet_attachment],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+id: confidential_information_sheet per-key document settings
+code: |
+  confidential_information_sheet_attachment[i].title = "Confidential Case Filing Information Sheet - Domestic Relations Cases"
+  confidential_information_sheet_attachment[i].filename = "confidential_information_sheet" if i == "redacted" else "confidential_information_sheet_unredacted"
+---
+id: confidential_information_sheet overflow fields
+code: |
+  confidential_information_sheet_attachment[i].overflow_fields["children_of_marriage_minor"].overflow_trigger = 10
+  confidential_information_sheet_attachment[i].overflow_fields["children_of_marriage_minor"].label = "Additional Minor Children"
+  confidential_information_sheet_attachment[i].overflow_fields.gathered = True
 ---
 attachment:
-  name: Confidential Case Filing Information Sheet - Domestic Relations Cases
-  filename: confidential_information_sheet
-  variable name: confidential_information_sheet_attachment[i]
+  variable name: confidential_information_sheet_attachment[i].addendum
+  docx template file: confidential_information_sheet_attachment_addendum.docx
+  redact: i == "redacted"
+---
+attachment:
+  name: Confidential Case Filing Information Sheet - Domestic Relations Cases ${ "Redacted" if i == "redacted" else "Unredacted" }
+  filename: confidential_information_sheet${ "" if i == "redacted" else "_unredacted" }
+  variable name: confidential_information_sheet_attachment[i][j]
   skip undefined: True
+  redact: i == "redacted"
   pdf template file: confidential_information_sheet.pdf
   editable: False
   fields:

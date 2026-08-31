@@ -514,9 +514,7 @@ code: |
     # Refresh the derived lists once, on the way into this section, instead of
     # with `reconsider:` on each review screen - that rebuilt both lists on
     # every render of every screen, including redraws after a validation error.
-    reconsider('joint_assets', 'joint_debts')
-    asset_checkbox_review
-    award_review
+    reconsider('joint_assets', 'joint_debts',  'petitioner.assets', 'respondent.assets')
     debt_checkbox_review
     debt_review
     # No document preview here any more; see the note on the "property statement
@@ -1284,9 +1282,13 @@ code: |
 id: petition enabled block for main interview
 code: |
   if "petition_attachment" in doc_list_selected.true_values():
-    petition_attachment.enabled = True
+    petition_attachment[i].enabled = True
   else:
-    petition_attachment.enabled = False
+    petition_attachment[i].enabled = False
+---
+id: property_statement enabled block
+code: |
+  property_statement_attachment[i].enabled = "property_statement_attachment" in doc_list_selected.true_values()
 ---
 id: income_statement enabled block for main interview
 code: |
@@ -1298,9 +1300,12 @@ code: |
 id: confidential_information_sheet enabled block for main interview
 code: |
   if "confidential_information_sheet_attachment" in doc_list_selected.true_values():
-    confidential_information_sheet_attachment.enabled = True
+    confidential_information_sheet_attachment[i].enabled = True
   else:
-    confidential_information_sheet_attachment.enabled = False
+    confidential_information_sheet_attachment[i].enabled = False
+---
+code: |
+  confidential_information_sheet_attachment.enabled = True
 ---
 id: redaction_certification enabled block for main interview
 code: |
@@ -1384,7 +1389,7 @@ code: |
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment['unredacted'], redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment['unredacted'], property_statement_attachment['redacted'], redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment['unredacted'], redaction_certification_attachment, confidential_information_sheet_attachment['unredacted'], income_statement_attachment, petition_attachment['unredacted'], judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment['unredacted'], property_statement_attachment['redacted'], redaction_certification_attachment, confidential_information_sheet_attachment['unredacted'], income_statement_attachment, petition_attachment['unredacted'], judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
   - property_statement_bundle: ALDocumentBundle.using(elements=[property_statement_attachment['unredacted']],  filename="property_statement_preview", title="Property Statement Preview", enabled=True)
 ---
