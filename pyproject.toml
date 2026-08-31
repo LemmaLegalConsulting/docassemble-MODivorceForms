@@ -13,7 +13,7 @@ authors = [
     { name = "Toby Fey", email = "tobyfey@protonmail.com" },
 ]
 dependencies = [
-    "docassemble.AssemblyLine>=4.6.0",
+    "docassemble.AssemblyLine>=4.7.0",
 ]
 
 [project.urls]

@@ -33,7 +33,7 @@ code: |
 code: |
   manual_reset = False
 ---
-mandatory: True
+initial: True
 code: |
   assets_list
   if not interview_data.defined("assets_data") or manual_reset:
@@ -53,6 +53,7 @@ code: |
   saved = False
 ---
 mandatory: True
+id: assets test download question
 question: Assets
 subquestion: |
 
@@ -267,20 +268,24 @@ id: terms_ordered edit
 question: Edit subtypes for ${ x.display_name }
 fields:
   - Field: i
-  - Label: x.terms_ordered[i]
-list_collect: True
+  - label: Label
+    field: x.terms_ordered[i]
+list collect: True
 ---
 ####### ATTRIBUTES
 id: attributes wuestion
 generic object: DAObject
 question: Attribute
 fields:
-  - Label: x.label
+  - label: Label
+    field: x.label
   - Required: x.required
     datatype: yesnoradio
-  - Datatype: x.datatype
+  - label: Datatype
+    field: x.datatype
     required: False
-  - Code: x.code
+  - label: Code
+    field: x.code
     required: False
   - Example: x.example
     required: False
@@ -300,7 +305,7 @@ allow reordering: True
 edit:
   - label
 ---
-id: attributes table
+id: attributes table 2
 generic object: DAObject
 table: x.attributes_table2
 rows: x.attributes

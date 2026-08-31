@@ -613,6 +613,7 @@ validation code: |
     retirement_accounts[i].display_name = retirement_accounts[i].source_other
   retirement_accounts[i].description = retirement_accounts[i].name + " " +retirement_accounts[i].display_name
 ---
+id: any other assets question
 question: Do you have any other assets?
 fields:
   - Life insurance: life_insurance.there_are_any
@@ -685,7 +686,7 @@ id: life_insurance object
 objects:
   - life_insurance: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
-id: bank_assets other display
+id: life_insurance other display
 comment: |
   This keeps the text that may be changed near the top of the section.
   Used in:
@@ -914,7 +915,7 @@ id: debts_owed_to_you object
 objects:
   - debts_owed_to_you: ALAssetList.using(complete_attribute='complete',there_is_another=False)
 ---
-id: interests_in_trust other display
+id: debts_owed_to_you other display
 comment: |
   This keeps the text that may be changed near the top of the section.
   Used in:
@@ -1020,6 +1021,7 @@ columns:
 edit:
   - lender
 ---
+id: debts question
 question: Debts 
 fields:
   - Who is the money owed to?: debts[i].lender
@@ -1035,6 +1037,7 @@ fields:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
 ---
+id: statement of property additional provisions
 question: Additional provisions
 fields:
   - no label: additional_provisions
@@ -1043,6 +1046,7 @@ fields:
 code: |
   notice_date = today()
 ---
+id: maintenance question
 question: Maintenance
 fields:
   - Who should maintenance be paid to?: maintenance_award
@@ -1052,6 +1056,7 @@ fields:
       - No maintenance: none
       - The court lacks jurisdiction: no_jurisdiction
 ---
+id: maintenance to petitioner question
 question: Maintenance to ${ petitioner.name.full() }
 fields:
   - How much?: maintenance_to_petitioner_amount
@@ -1059,6 +1064,7 @@ fields:
   - Should the maintenance be subject to modification?: maintenance_to_petitioner_modifiable
     datatype: yesnoradio
 ---
+id: maintenance to respondent question
 question: Maintenance to ${ respondent.name.full() }
 fields:
   - How much?: maintenance_to_respondent_amount
@@ -1066,6 +1072,7 @@ fields:
   - Should the maintenance be subject to modification?: maintenance_to_respondent_modifiable
     datatype: yesnoradio
 ---
+id: income withholding question
 question: Income Withholding
 fields:
   - Should income withholding be prepared by the person receiving maintenance?: maintenance_income_withholding

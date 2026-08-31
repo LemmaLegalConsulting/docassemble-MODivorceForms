@@ -82,7 +82,6 @@ id: interview order certificate of dissolution of marriage
 code: |
   # Set the allowed courts for this interview
   allowed_courts = []
-  var_doc_dict_loaded
   nav.set_section("right_tool") 
   section_right_tool
   nav.set_section("relief") 
@@ -96,9 +95,9 @@ code: |
   section_expenses
   section_assets
   section_debts
-  if len(set(var_doc_dict["form_14_calculations"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
     form_14_calculations
-  if len(set(var_doc_dict["use_presumed_child_support"]) & set(doc_list_selected.true_values())) > 0 and legal_custody != "Third Party" and physical_custody != "Third Party":
+  if showifdef('doc_list_selected["parenting_plan_attachment"]'):
     use_presumed_child_support
   section_service
   interview_order_mo_divorce_forms = True
@@ -152,12 +151,17 @@ code: |
   users.gather()
   doc_list_selected
   doc_list_dictionary
-  if len(set(var_doc_dict["relief"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]'):
     relief['custody']
     relief['change_name']
     relief['divide_property']
     relief['other']
-  
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]'):
+    if relief['maintenance']:
+      maintenance_amount
+      maintenance_income_withholding
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["fee_waiver_attachment"]'):
+    is_maintenance_currently_paid  
 
   section_relief = True
 ---
@@ -167,27 +171,24 @@ code: |
   nav.set_section("case_information")   
   if case.filed in ["user0_filed", "other_parties0_filed"]:
     use_case_net_for_online_docket
-  if len(set(var_doc_dict["case.county"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["notice_of_hearing_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["redaction_certification_attachment"]'):
     case.county # property_statement, petition, notice_of_hearing, form_17, certificate_of_dissolution
     case.court_name
     case.circuit 
   if defined('case.photo_filename'):
     case.photo.filename
   if case.filed in ["user0_filed", "other_parties0_filed"]:
-    if len(set(var_doc_dict["previous_petitions"]) & set(doc_list_selected.true_values())) > 0:
+    if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]'):
       previous_petitions # answer, petition
-    if len(set(var_doc_dict["case.docket_number"]) & set(doc_list_selected.true_values())) > 0:
+    if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["notice_of_hearing_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["redaction_certification_attachment"]'):
       case.docket_number_asked
-    if len(set(var_doc_dict["case.name_asked"]) & set(doc_list_selected.true_values())) > 0:
+    if showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["redaction_certification_attachment"]'):
       case.name_asked
-    if len(set(var_doc_dict["case.judge_asked"]) & set(doc_list_selected.true_values())) > 0:
+    if showifdef('doc_list_selected["fee_waiver_attachment"]'):
       case.judge_asked
-    if len(set(var_doc_dict["case.filing_date_asked"]) & set(doc_list_selected.true_values())) > 0:
+    if showifdef('doc_list_selected["confidential_information_sheet_attachment"]'):
       case.filing_date_asked # petition
-    if len(set(var_doc_dict["notice_date"]) & set(doc_list_selected.true_values())) > 0:
-      notice_date # property_statement.yml
-  if len(set(var_doc_dict["case.matter_type"]) & set(doc_list_selected.true_values())) > 0:
-    case.matter_type_asked # notice_of_hearing
+      case.matter_type_asked # notice_of_hearing
   if petitioner.attorney_involved: # petition, notice_of_hearing
     petitioner.attorney.name.first # petition
   if petitioner.attorney_involved:
@@ -209,14 +210,14 @@ code: |
     users[0].prior_name.name.first
   users[0].address.address # petition
   users[0].address.county
-  if users[0].address.state == "MO":
+  if showifdef('doc_list_selected["petition_attachment"]'):
     users[0].mo_length_of_residence_choice
   users[0].address.country
   users[0].email
   users[0].phone_number
-  if len(set(var_doc_dict["users_birthdate"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["redaction_certification_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]'):
     users[0].birthdate
-  if len(set(var_doc_dict["users_ssn"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["redaction_certification_attachment"]'):
     users[0].ssn
   if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
     users[0].gender # confidential_information_sheet
@@ -248,37 +249,36 @@ code: |
   other_parties[0].pronouns
   other_parties[0].email
   other_parties[0].phone_number
-  if len(set(var_doc_dict["users_birthdate"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["redaction_certification_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]'):
     other_parties[0].birthdate
-  if len(set(var_doc_dict["users_ssn"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["redaction_certification_attachment"]'):
     other_parties[0].ssn
   if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
     other_parties[0].race # certificate_of_dissolution
     other_parties[0].education_info
     other_parties[0].previously_married
-  if len(set(var_doc_dict["other_parties_active_duty"]) & set(doc_list_selected.true_values())) > 0:
-    other_parties[0].active_duty
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]'):
+    if other_parties[0].active_duty and other_parties[0] == respondent:
+      active_duty_warning
   section_other_party = True
 ---
 id: marriage interview order
 code: |  
   nav.set_section('marriage')
   
-  if len(set(var_doc_dict["marriage_info"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]'):
     marriage_info # certificate_of dissolution
     marriage.address.county # petition
     marriage.address.country
     marriage.address.state
     marriage.recorded_date
-  if 'petition_attachment' in doc_list_selected.true_values():
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]') :
     if not respondent.address.state == "MO":
       marriage.live_together_in_mo
-  if len(set(var_doc_dict["marriage.separation_date"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]'):
     marriage.separation_date
 
-  if 'petition_attachment' in doc_list_selected.true_values():
-    if other_allegations_exist:
-      other_allegations # petition
+
   
   section_marriage = True
 ---
@@ -288,7 +288,7 @@ code: |
 
   ## We want to ask about legal custody first, if needed.
   
-  if minor_children and len(set(var_doc_dict["legal_custody"]) & set(doc_list_selected.true_values())) > 0:
+  if minor_children and showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]'):
     presumption_video
     if legal_custody in ["petitioner","respondent"]:
       legal_custody_sole_explanation
@@ -300,20 +300,30 @@ code: |
     elif legal_custody != "Third Party" and physical_custody == "Third Party":
       third_party_custody_warning
 
-  if len(set(var_doc_dict["relief"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]'):
     relief['child_support']
-  child_support
   
-  if minor_children and len(set(var_doc_dict["children"]) & set(doc_list_selected.true_values())) > 0:
+  
+  if minor_children and (showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]')):
+    if child_support != "none": # certificate_of_dissolution
+      child_support_method_of_payment
+      child_support_start_date
     nav.set_section("children")
+
+  if showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]'): 
     children.gather()
-    if len(set(var_doc_dict["persons_lived_with"]) & set(doc_list_selected.true_values())) > 0:
+
+  if minor_children and (showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]')):
+    if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]'):
       persons_lived_with_preload # petition
       persons_lived_with.gather()
-  if len(set(var_doc_dict["children_number"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["form_14_attachment"]') or showifdef('doc_list_selected["fee_waiver_attachment"]'):
     number_of_children
 
-  if minor_children and len(set(var_doc_dict["legal_custody"]) & set(doc_list_selected.true_values())) > 0 and legal_custody != "Third Party" and physical_custody != "Third Party":
+  if minor_children and "answer_attachment" in doc_list_selected.true_values():
+    agree_with_parenting_plan
+  
+  if minor_children and (showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]')) and legal_custody != "Third Party" and physical_custody != "Third Party":
     if parenting_plan_A_author["Other"]:
       parenting_plan_A_author_other.name.first
     if communications["third_party"]:
@@ -348,15 +358,13 @@ code: |
     ask_about_dispute_resolution
     domestic_violence
   
-    if child_support != "none": # certificate_of_dissolution
-      child_support_method_of_payment
-      child_support_start_date
-
+    if parenting_plan_B_author["Other"]:
+      parenting_plan_B_author_other.name.first
     medical_insurance
     dental_insurance
     health_expenses_not_covered
   
-  if len(set(var_doc_dict["pay_work_childcare_expenses"]) & set(doc_list_selected.true_values())) > 0:
+  if minor_children and (showifdef('doc_list_selected["form_14_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]')):
     users[0].health_insurance_costs
     users[0].work_childcare_expenses
     users[0].extraordinary_medical_costs.gather()
@@ -366,13 +374,11 @@ code: |
     other_parties[0].extraordinary_medical_costs.gather()
     other_parties[0].extraordinary_childrearing_costs.gather()
 
-    if len(set(var_doc_dict["relief"]) & set(doc_list_selected.true_values())) > 0:
-      relief['maintenance']
-    is_maintenance_currently_paid
+
   if 'answer_attachment' in doc_list_selected.true_values():
     denials_exist
 
-  if minor_children and len(set(var_doc_dict["marriage_info"]) & set(doc_list_selected.true_values())) > 0:
+  if minor_children and showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]'):
   #    # if others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect: # form_17
   #      related_case_explanation
     additional_children_information
@@ -383,7 +389,7 @@ code: |
 ---
 code: |    
   nav.set_section('income')
-  if len(set(var_doc_dict["user_jobs"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
     users[0].jobs.gather() # income_statement.yml, fee_waiver, form_17
     if users[0].jobs.there_are_any or users[0].has_self_employment_income: # form_17
       users[0].employer.name.text
@@ -401,7 +407,7 @@ code: |
     users[0].other_children
     users[0].other_child_support_received
     users[0].monthly_gross_income # property_statement
-    if len(set(var_doc_dict["user_self_supporting"]) & set(doc_list_selected.true_values())) > 0:
+    if showifdef('doc_list_selected["petition_attachment"]'):
       users[0].self_supporting # property_statement
     other_parties[0].jobs.gather() # income_statement.yml, fee_waiver, form_17
     if other_parties[0].jobs.there_are_any or other_parties[0].has_self_employment_income: # form_17
@@ -422,28 +428,29 @@ code: |
     other_parties[0].other_children
     other_parties[0].other_child_support_received
     other_parties[0].monthly_gross_income # property_statement
-    if len(set(var_doc_dict["user_self_supporting"]) & set(doc_list_selected.true_values())) > 0:
+    if showifdef('doc_list_selected["petition_attachment"]'):
       other_parties[0].self_supporting # property_statement
   section_income = True
 ---
+reconsider: section_relief
 code: |    
   nav.set_section('expenses')
-  if len(set(var_doc_dict["user_expenses"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]'):
     users[0].expenses.gather()
     if len(users[0].expenses) > 0:
       users[0].expenses.review_items
-  if len(set(var_doc_dict["user_child_expenses"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
     users[0].maintenance_other_paid
     users[0].other_child_support_paid
     users[0].health_insurance_costs
     users[0].work_childcare_expenses
     users[0].extraordinary_medical_costs.gather()
     users[0].extraordinary_childrearing_costs.gather()
-  if len(set(var_doc_dict["other_party_expenses"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["income_statement_attachment"]'):
     other_parties[0].expenses.gather()
     if len(other_parties[0].expenses) > 0:
       other_parties[0].expenses.review_items
-  if len(set(var_doc_dict["other_party_child_expenses"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
     other_parties[0].maintenance_other_paid
     other_parties[0].other_child_support_paid
   section_expenses = True
@@ -451,22 +458,22 @@ code: |
 id: assets interview code
 code: |     
   nav.set_section('assets')  
-  if len(set(var_doc_dict["user_cash"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["fee_waiver_attachment"]'):
     users[0].cash
-  if len(set(var_doc_dict["real_estate"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]'):
     real_estate.gather() # property_statement, fee_waiver
     if len(real_estate.matches(source=['house'])) > 0:
       assets_warning
     if len(real_estate) > 0:
       real_estate.review_items
-  if len(set(var_doc_dict["vehicles"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]'):
     if len(vehicles) > 0:
       vehicles.review_items
     if len(personal_goods) > 0:
       personal_goods.review_items 
     if len(bank_assets) > 0:
       bank_assets.review_items 
-  if len(set(var_doc_dict["other_assets"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]'):
     if len(securities) > 0:
       securities.review_items 
     if len(retirement_accounts) > 0:
@@ -489,61 +496,46 @@ code: |
     if len(other_assets) > 0:
       other_assets.review_items 
     joint_assets.review_items
-    users[0].assets.gathered
-    other_parties[0].assets.gathered
-    is_additional_provisions
   section_assets = True
 ---
 id: debts interview code
 code: |       
   nav.set_section('debts')
-  if len(set(var_doc_dict["other_assets"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]'):
     secured_debts.gathered
     if len(debts) > 0:
       debts.review_items
     joint_debts.review_items
-    users[0].debts.gathered
-    other_parties[0].debts.gathered
   section_debts = True
+---
+code: |
+  if showifdef('doc_list_selected["property_statement_attachment"]'):
+    nav.set_sections('property_statement_review')
+    # Refresh the derived lists once, on the way into this section, instead of
+    # with `reconsider:` on each review screen - that rebuilt both lists on
+    # every render of every screen, including redraws after a validation error.
+    reconsider('joint_assets', 'joint_debts',  'petitioner.assets', 'respondent.assets')
+    debt_checkbox_review
+    debt_review
+    # No document preview here any more; see the note on the "property statement
+    # review" block in shared.yml. Assembling the Statement of Property took
+    # 30-60 seconds even in the background, which is not a useful preview.
+    is_additional_provisions_property_statement
+  property_statement_review = True
+  
 ---
 id: service interview code
 code: |     
   nav.set_section('service')
-  if len(set(var_doc_dict["service"]) & set(doc_list_selected.true_values())) > 0:
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["notice_of_hearing_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]'):
     people_served.gathered
     people_served[0].service_address_pdf
+  if other_parties[0].service_type == "publication":
+    location_attempts
+  elif other_parties[0].service_type == "mail":
+    mail_information
   filing_pleadings_video
-  al_court_bundle
   section_service = True
----
-id: documents with service
-variable name: var_doc_dict["service"]
-data:
-  - petition_attachment
-  - answer_attachment
-  - notice_of_hearing_attachment
-  - property_statement_attachment
-  - income_statement_attachment
----
-id: objects for dictionary that says which documents use the variable
-objects:
-  - var_doc_dict: DADict
----
-id: default documents if variable is undefined
-variable name: var_doc_dict[i]
-data:
-  - petition_attachment
-  - answer_attachment
-  - parenting_plan_attachment
-  - notice_of_hearing_attachment
-  - certificate_of_dissolution_attachment
-  - judgment_attachment
-  - property_statement_attachment
-  - income_statement_attachment
-  - fee_waiver_attachment
-  - confidential_information_sheet_attachment
-  - redaction_certification_attachment
-  - form_14_attachment
 ---
 ###################### Main order ######################
 comment: |
@@ -555,6 +547,16 @@ code: |
   al_intro_screen
   # mo_divorce_forms_intro
   interview_order_mo_divorce_forms
+  if 'petition_attachment' in doc_list_selected.true_values():
+    preview_additional_allegations  
+  if 'property_statement_attachment' in doc_list_selected.true_values():
+    property_statement_review
+  if 'parenting_plan_attachment' in doc_list_selected.true_values():
+    is_additional_provisions_parenting_plan
+  if task_not_yet_performed('show review'):
+    mark_task_as_performed('show review')
+    force_ask('review_form')
+  al_court_bundle
   signature_date
   # Store anonymous data for analytics / statistics
   store_variables_snapshot(
@@ -564,10 +566,12 @@ code: |
           "reached_interview_end": True,
       },
   )
-  if not al_user_bundle.generate_downloads_task.ready():
+  # al_court_bundle, not al_user_bundle: the download screen renders
+  # al_court_bundle, and download_list_html() only reuses the background
+  # results of the bundle it is called on.
+  if not al_court_bundle.generate_downloads_task.ready():
     al_download_waiting_screen
   mo_divorce_forms_download
-
 ---
 include:
   - property_statement.yml
@@ -658,6 +662,8 @@ subquestion: |
   Step 3. Download and print the final form. You will need to deliver it 
   on your own.
   % endif
+
+  [YOUTUBE C8JyTYsIWEA]
   
   This site is not a lawyer. If you would like a lawyer, find [your local
   legal aid provider](https://www.lsc.gov/what-legal-aid/find-legal-aid).
@@ -706,6 +712,7 @@ fields:
       variable: case_type
       is: Divorce
 ---
+id: child custody kickout
 event: custody_exit
 question: Child Custody
 subquestion: |
@@ -721,6 +728,7 @@ subquestion: |
   
   [Missouri Supreme Court Website](https://www.courts.mo.gov/page.jsp?id=611)
 ---
+id: Bankruptcy
 question: Bankruptcy
 fields: 
   - Are you or your spouse currently in a bankruptcy proceeding?: in_bankruptcy
@@ -734,6 +742,7 @@ code: |
     users[0].in_bankruptcy = True
     other_parties[0].in_bankruptcy = True
 ---
+id: bankruptcy_kickout
 event: bankruptcy_kickout
 question: Bankruptcy
 subquestion: |
@@ -756,11 +765,13 @@ subquestion: |
   You may want to consider talking to a lawyer if your spouse is asking the court for maintenance or child support that you don't agree with.
 continue button field: respondent_personal_jurisdiction_warning
 ---
+id: jurisdiction_kickout
 event: jurisdiction_kickout
 question: No jurisdiction
 subquestion: |
   Missouri law requires that at least one party in the divorce live in Missouri for at least 90 days before filing divorce.  Since neither you nor your spouse has lived in Missouri for 90 days, this tool is not appropriate for you.
 ---
+id: respondent_jurisdiction_kickout
 event: respondent_jurisdiction_kickout
 question: No jurisdiction
 subquestion: |
@@ -809,8 +820,7 @@ question: Mediation
 subquestion: |
   You may be surprised how much you and your spouse can work things out for yourselves through mediation!  
 
-   Video on how mediation works, example below.
-  <iframe width="480" height="270" src="https://www.powtoon.com/embed/dvKxPdVmlhD/" frameborder="0" allowfullscreen></iframe>
+  [YOUTUBE xEriGbSPsRw]
   
   ### How to find a mediator
   
@@ -827,12 +837,16 @@ continue button field: mediation_info
 id: Children kickout question
 question: Children
 fields:
-  - "Do you and your spouse have children, including adopted children?": minor_children
+  - "Do you and your spouse have children, including adopted children?": has_children
     datatype: yesnoradio
+  - "Do you and your spouse have children under 18 (or under 21 if in college), including adopted children?": minor_children
+    datatype: yesnoradio
+    js show if:   |
+      val("has_children") === true 
   - Do you and your spouse have any children that were born before your marriage?: minor_children_before_marriage
     datatype: yesnoradio
     js show if:   |
-      val("minor_children") === true 
+      val("has_children") === true 
   - note: |
        Sometimes when a child is born to two people before they get married, the court will require a separate case to establish paternity (even if everybody agrees).  However, most courts will move forward with just the divorce, assuming that paternity is acknowledged through the marriage.  For now, we'll move forward with the understanding that the paternity has been acknowledged.  However, a judge may direct you to file something else or speak to an attorney.
     js show if:   |
@@ -840,7 +854,7 @@ fields:
   - Have you or your spouse physically given birth to a child with another partner during your marriage?: child_outside_marriage
     datatype: yesnoradio
     js show if:   |
-      val("minor_children") === false || val("minor_children_before_marriage") === true || val("minor_children_before_marriage") === false
+      val("has_children") === false || val("minor_children_before_marriage") === true || val("minor_children_before_marriage") === false
   - note: |
       Missouri law automatically assumes that the husband is the father of the child unless a separate case is filed establishing paternity of the biological father and non-paternity of the husband, even if the biological father is the one on the birth certificate.  It would be in your best interest to [find an attorney](https://www.courts.mo.gov/page.jsp?id=611).  
     js show if:   |
@@ -850,11 +864,13 @@ fields:
     js show if:   |
       val("child_outside_marriage") === true || val("child_outside_marriage") === false
 validation code: |
-  if not minor_children:
+  if not has_children:
     minor_children_before_marriage = False
-  if minor_children:
+  if has_children:
     children.there_are_any = True
   else:
+    minor_children = False
+    minor_children_before_marriage = False
     children.there_are_any = False
 ---
 id: separation date
@@ -864,6 +880,7 @@ fields:
   - "Did you and your spouse live together in Missouri?": marriage.live_together_in_mo
     datatype: yesnoradio
 ---
+reconsider: doc_list_choices
 id: document choice
 question: Documents you need
 subquestion: |
@@ -885,6 +902,8 @@ under: |
    - A Next Steps document with instructions and guidance
    - A Redaction Certification, which is required for any document filed in a case
 
+  [YOUTUBE mUQoXFwO5fU]
+  
   % if case.filed in ["user0_filed","not_filed"] and other_parties[0].address.state != "MO":
   You may also receive documents to help serve the other party because they do not live in Missouri.
   % endif
@@ -1031,7 +1050,11 @@ subquestion: |
 id: active duty warning
 question: Servicemember Civil Relief Act
 subquestion: |
-  Pursuant to the Servicemembers Civil Relief Act (SCRA), military members on active duty are able to request that the case be “paused” until they return. It might be in your best interest to discuss this with an attorney. 
+  Pursuant to the Servicemembers Civil Relief Act (SCRA), military members on active duty are able to request that the case be “paused” until they return. 
+  
+  Important: This pause is not automatic. The court will only pause the case if the active-duty service member explicitly requests it.
+  
+  It might be in your best interest to discuss this with an attorney. 
 
   [Missouri Supreme Court Website](https://www.courts.mo.gov/page.jsp?id=611)
 continue button field: active_duty_warning
@@ -1055,14 +1078,8 @@ id: Presumption of Custody
 question: Presumption of 50/50 Custody
 subquestion: |
   RSMo 452.375 & 454.1005 Video
-    <iframe width="480" height="270" src="https://www.powtoon.com/embed/dvKxPdVmlhD/" frameborder="0" allowfullscreen></iframe>
+    [YOUTUBE V82Yvl2aENg]
 continue button field: presumption_video
----
-id: Parenting Plan
-question: Parenting Plan
-subquestion: |
-  Calendar Month w/ 5 weekends feature
-continue button field: parenting_plan
 ---
 id: interview order with children
 code: |
@@ -1093,6 +1110,7 @@ continue button field: assets_warning
 ---
 id: Service
 question: Service of ${ other_parties[0].name_full() }
+subquestion: |
 fields:
   - Has ${ other_parties[0].name_full() } been served?: respondent_served
     datatype: yesnoradio
@@ -1119,6 +1137,10 @@ continue button field: service_by_publication_information
 id: Personal Service Information Screen
 question:  In Person Service
 subquestion: |
+
+  
+  [YOUTUBE aKmt5aRQg-E]
+
   Your spouse can be served:
 
   * Where they’re staying;
@@ -1141,7 +1163,8 @@ continue button field: personal_service_information
 id: Filing Pleadings Video Screen
 question: Video on filing pleadings
 subquestion: |
-  <iframe width="480" height="270" src="https://www.powtoon.com/embed/dvKxPdVmlhD/" frameborder="0" allowfullscreen></iframe>
+  [YOUTUBE S4LdshEM3h8]
+
 
   % if defined('case.address.address'):
   Your courthouse is located at ${ case.address.on_one_line() } in ${ nice_county_name(case) }.
@@ -1195,6 +1218,7 @@ code: |
   addresses_to_search = [user.address for user in users.complete_elements()]
 
 ---
+id: users revisit
 continue button field: users.revisit
 question: |
   Edit users
@@ -1258,9 +1282,13 @@ code: |
 id: petition enabled block for main interview
 code: |
   if "petition_attachment" in doc_list_selected.true_values():
-    petition_attachment.enabled = True
+    petition_attachment[i].enabled = True
   else:
-    petition_attachment.enabled = False
+    petition_attachment[i].enabled = False
+---
+id: property_statement enabled block
+code: |
+  property_statement_attachment[i].enabled = "property_statement_attachment" in doc_list_selected.true_values()
 ---
 id: income_statement enabled block for main interview
 code: |
@@ -1269,19 +1297,15 @@ code: |
   else:
     income_statement_attachment.enabled = False
 ---
-id: property_statement enabled block for main interview
-code: |
-  if "property_statement_attachment" in doc_list_selected.true_values():
-    property_statement_attachment.enabled = True
-  else:
-    property_statement_attachment.enabled = False
----
 id: confidential_information_sheet enabled block for main interview
 code: |
   if "confidential_information_sheet_attachment" in doc_list_selected.true_values():
-    confidential_information_sheet_attachment.enabled = True
+    confidential_information_sheet_attachment[i].enabled = True
   else:
-    confidential_information_sheet_attachment.enabled = False
+    confidential_information_sheet_attachment[i].enabled = False
+---
+code: |
+  confidential_information_sheet_attachment.enabled = True
 ---
 id: redaction_certification enabled block for main interview
 code: |
@@ -1290,7 +1314,7 @@ code: |
   else:
     redaction_certification_attachment.enabled = False
 ---
-id: redaction_certification enabled block for main interview
+id: parenting_plan_attachment enabled block for main interview
 code: |
   if "parenting_plan_attachment" in doc_list_selected.true_values():
     parenting_plan_attachment.enabled = True
@@ -1311,9 +1335,16 @@ code: |
   else:
     service_by_mail_affidavit_attachment.enabled = False
 ---
+id: service_by_publication enabled block for main interview
+code: |
+  if case.filed in ['not_filed'] and respondent.service_type == "publication":
+    service_by_publication_attachment.enabled = True
+  else:
+    service_by_publication_attachment.enabled = False
+---
 id: form 14 enabled block for main interview
 code: |
-  if "form_14_attachment" in doc_list_selected.true_values() and not "parenting_plan_attachment" in doc_list_selected.true_values():
+  if "form_14_attachment" in doc_list_selected.true_values() or "parenting_plan_attachment" in doc_list_selected.true_values():
     form_14_attachment.enabled = True
   else:
     form_14_attachment.enabled = False
@@ -1358,6 +1389,7 @@ code: |
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment, redaction_certification_attachment, confidential_information_sheet_attachment, income_statement_attachment, petition_attachment, judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment['unredacted'], redaction_certification_attachment, confidential_information_sheet_attachment['unredacted'], income_statement_attachment, petition_attachment['unredacted'], judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment['unredacted'], property_statement_attachment['redacted'], redaction_certification_attachment, confidential_information_sheet_attachment['unredacted'], income_statement_attachment, petition_attachment['unredacted'], judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - property_statement_bundle: ALDocumentBundle.using(elements=[property_statement_attachment['unredacted']],  filename="property_statement_preview", title="Property Statement Preview", enabled=True)
 ---

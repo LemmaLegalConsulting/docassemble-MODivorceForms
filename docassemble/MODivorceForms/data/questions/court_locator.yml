@@ -2,6 +2,7 @@
 include:
   - shared.yml
 ---
+id: selected court display
 mandatory: False
 question: ${ selected_court }
 ---
@@ -81,6 +82,7 @@ data:
   confidential_information_sheet_attachment: Confidential information sheet
   redaction_certification_attachment: Redaction certification
 ---
+id: download next steps
 mandatory: True
 question: Download ${ info_displayed }
 attachment:
@@ -91,6 +93,7 @@ attachment:
   valid formats:
     - pdf
 ---
+id: next steps testing questions
 question: Next Steps testing questions
 fields:
   - Petitioner or respondent: case.filed

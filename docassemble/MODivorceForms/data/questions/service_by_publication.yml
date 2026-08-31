@@ -1,0 +1,84 @@
+id: service by publication follow up
+question: Service by Publication
+subquestion: |
+  If attempts to serve your spouse in person have failed, you can file a request to serve them by publication.
+  
+  What to know about service by publication:
+  
+  * A notice will be posted in your local legal newspaper, also called a paper of record, informing your spouse that you have filed for divorce.
+  * The court may be unable to award monetary relief such as maintenance or child support.
+fields:
+  - When was the last time you talked with ${ other_parties[0].name_full() }?: last_time_talked
+    required: False
+  - When was the last time you saw ${ other_parties[0].name_full() }?: last_time_seen
+    required: False
+  - How did you attempt to locate ${ other_parties[0].name_full() }?: location_attempts
+    datatype: checkboxes
+    choices:
+      - I have contacted family and friends of ${ other_parties[0].name_full() }, but they were unable to tell me where ${ other_parties[0].pronoun_subjective() } can be located: friends
+      - I have looked in the telephone book for the telephone number and/or address of ${ other_parties[0].name_full() }: phonebook
+      - I have attempted to have ${ other_parties[0].name_full() } personally served, but ${ other_parties[0].pronoun_subjective() } could not be found: personal_service
+      - I have searched the internet for the telephone number and/or address of ${ other_parties[0].name_full() }: internet
+      - I have contacted people at the former employer of ${ other_parties[0].name_full() } in an attempt to find ${ other_parties[0].pronoun_possessive("whereabouts") }.: former_employer
+      - I have talked to ${ other_parties[0].name_full() } but ${ other_parties[0].pronoun_subjective() } refused to give me any information about ${ other_parties[0].pronoun_possessive("location") }.: talked_to
+      - Other: other
+  - What friends or family did you contact?: family_and_friends_contacted
+    datatype: area
+    show if: location_attempts['friends']
+  - What other way did you attempt to contact ${ other_parties[0].pronoun() }?: other_attempt
+    show if: location_attempts['other']
+  - What is the name of the newspaper where you will publish service?: newspaper
+  - note: |
+      This notice will not be published in your typical newspaper. Search for legal newspapers in your specific county to answer this question.
+---
+attachment:
+  filename: service_by_publication
+  variable name: service_by_publication_attachment[i]
+  skip undefined: True
+  pdf template file: service_by_publication.pdf
+  fields:
+    - "county_list": ${ case.county }
+    - "petitionersfirstname": ${ petitioner.name.first }
+    - "petitionersmiddlename": ${ petitioner.name.middle }
+    - "petitionerslastname": ${ petitioner.name.last }
+    - "petitionerssuffixjrsriii": ${ petitioner.name.suffix }
+    - "casenumber": ${ case.docket_number }
+    - "respondentsfirstname": ${ respondent.name.first }
+    - "respondentsmiddlename": ${ respondent.name.middle }
+    - "respondentslastname": ${ respondent.name.last }
+    - "respondentssuffixjrsriii": ${ respondent.name.suffix }
+    - "divisionnumber": ${ case.division_number }
+    - "partytobeservedfirstname": ${ other_parties[0].name.first }
+    - "partytobeservedmiddlename": ${ other_parties[0].name.middle }
+    - "partytobeservedlastname": ${ other_parties[0].name.last }
+    - "partytobeservedcity": ${ other_parties[0].address.city }
+    - "partytobeservedstate": ${ other_parties[0].address.state }
+    - "partytobeservedzip": ${ other_parties[0].address.zip }
+    - "attorneymissouribarnumber": ${ users[0].attorney.bar_number }
+    - "assistanceofattorney": ${ users[0].attorney_involved and users[0].type_of_assistance == "assistance" }
+    - "partytobeservedsuffixjrsriii": ${ other_parties[0].name.suffix }
+    - "partytobeservedstreetaddress": ${ other_parties[0].address.line_one() }
+    - "partytobeservedtelephonenumber": ${ phone_number_formatted(other_parties[0].phone_number) }
+    - "partytobeservedmobiletelephonenumber": ${ phone_number_formatted(other_parties[0].mobile) }
+    - "partytobeservedemailaddress": ${ other_parties[0].email }
+    - "namesfamilyfriendscontacted": ${ location_attempts['friends'] }
+    - "lasttimeseen": ${ last_time_seen }
+    - "lasttimetalked": ${ last_time_talked }
+    - "phonebook": ${ location_attempts['phonebook'] }
+    - "attemptedpersonallyserved": ${ location_attempts['personal_service'] }
+    - "internetsearch": ${ location_attempts['internet'] }
+    - "formemployer": ${ location_attempts['former_employer'] }
+    - "talkedtoparty": ${ location_attempts['talked_to'] }
+    - "other": ${ location_attempts['other'] }
+    - "familyandfriendscontacted": ${ family_and_friends_contacted }
+    - "otherattempt": ${ other_attempt }
+    - "attorneyprintname": ${ users[0].attorney.name.full() }
+    - "attorneystreet": ${ users[0].attorney.address.line_one() }
+    - "attorneycity": ${ users[0].attorney.address.city }
+    - "attorneystate": ${ users[0].attorney.address.state }
+    - "attorneyzip": ${ users[0].attorney.address.zip }
+    - "attorneytelephonenumber": ${ users[0].attorney.phone }
+    - "attorneyfaxnumber": ${ users[0].attorney.fax }
+    - "attorneyemailaddressoptional": ${ users[0].attorney.email }
+    - "nameofnewspaper": ${ newspaper }
+

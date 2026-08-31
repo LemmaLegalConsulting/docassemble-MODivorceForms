@@ -218,6 +218,7 @@ edit:
 ---
 
 generic object: DAObject
+id: loan description type
 question: Loan description type for ${ x.display_name }
 subquestion: |
  [TARGET description_review_target]
@@ -301,6 +302,7 @@ content: |
 target: description_review_target
 ---
 generic object: DAObject
+id: security description type
 question: Security description type for ${ x.display_name }
 subquestion: |
  [TARGET security_description_review_target]
@@ -371,6 +373,7 @@ target: security_description_review_target
 ---
 
 generic object: DAObject
+id: asset description type
 question: Asset description type for ${ x.display_name }
 subquestion: |
  [TARGET asset_description_review_target]
