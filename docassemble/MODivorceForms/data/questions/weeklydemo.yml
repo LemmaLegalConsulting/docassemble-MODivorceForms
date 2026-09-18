@@ -1,22 +1,6 @@
 modules:
   - .function_import
 ---
-mandatory: True
-code: |
-  case.filed
-  exchanges.gather()
-  biweekly_schedule_review
-  if not holidays_default:
-    for key in holidays.keys():
-      if holidays[key]['different']:
-        holidays[key]['even_years']
-  holidays_review
-  other_holidays.gather()
-  mo_divorce_forms_download
----
-include:
-  - shared.yml
----
 objects: 
   - exchanges: DAList.using(object_type=DAObject,there_are_any=True,complete_attribute="complete")
 ---

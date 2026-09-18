@@ -194,18 +194,31 @@ fields:
 ---
 id: Judgment and Decree of Dissolution of Marriage object
 objects:
-  - judgment_attachment: ALDocument.using(title="Judgment and Decree of Dissolution of Marriage", filename="judgment", has_addendum=False, )
+  - judgment_attachment: DADict.using(object_type=ALDocument.using(has_addendum=True, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE), auto_gather=False, gathered=True)
 ---
-id: Judgment and Decree of Dissolution of Marriage enabled
+id: judgment per-key document settings
 code: |
-  judgment_attachment.enabled = True
+  judgment_attachment[i].title = "Judgment and Decree of Dissolution of Marriage"
+  judgment_attachment[i].filename = "judgment" if i == "redacted" else "confidential_information_sheet_unredacted"
+---
+id: judgment overflow fields
+code: |
+  judgment_attachment[i].overflow_fields["children_of_marriage"].overflow_trigger = 5
+  judgment_attachment[i].overflow_fields["children_of_marriage"].label = "Additional Minor Children"
+  judgment_attachment[i].overflow_fields.gathered = True
+---
+attachment:
+  variable name: judgment_attachment[i].addendum
+  docx template file: judgment_attachment_addendum.docx
+  redact: i == "redacted"
 ---
 id: Judgment and Decree of Dissolution of Marriage attachment
 attachment:
-  name: Judgment and Decree of Dissolution of Marriage
-  filename: judgment
-  variable name: judgment_attachment[i]
+  name: Judgment and Decree of Dissolution of Marriage ${ "Redacted" if i == "redacted" else "Unredacted" }
+  filename: judgment${ "" if i == "redacted" else "_unredacted" }
+  variable name: judgment_attachment[i][j]
   skip undefined: True
+  redact: i == "redacted"
   pdf template file: judgment.pdf
   editable: False
   fields:
@@ -218,8 +231,8 @@ attachment:
       - "respondent_name_middle": ${ respondent.name.middle } 
       - "respondent_name_last": ${ respondent.name.last } 
       - "respondent_name_suffix": ${ respondent.name.suffix } 
-      - "petitioner_ssn": ${ petitioner.ssn } 
-      - "respondent_ssn": ${ respondent.ssn } 
+      - "petitioner_ssn": ${ redact(petitioner.ssn) } 
+      - "respondent_ssn": ${ redact(respondent.ssn) } 
       - "respondent_active_duty": ${ not respondent.active_duty }
       - "respondent_active_duty": ${ respondent.active_duty }
       - "case_personal_jurisdiction_over_respondent": ${ (respondent.lives_in_missouri and respondent.resident_for_90_days) or marriage.live_together_in_mo } 
@@ -236,148 +249,148 @@ attachment:
       - "children4": ${ number_of_children > 0 } 
       - "children5": ${ number_of_children if number_of_children > 0 else "" } 
       - "children0_name_first": |
-          % if True or len([child for child in children if not child.special_factors['self_supporting']]) > 0:
-          ${ [child for child in children if not child.special_factors['self_supporting']][0].name.first }
+          % if len(children_of_marriage) > 0:
+          ${ redact(children_of_marriage[0].name.first) }
           % endif
       - "children0_name_suffix": |
-          % if len(children) > 0:
-          ${ children[0].name.suffix }
+          % if len(children_of_marriage) > 0:
+          ${ redact(children_of_marriage[0].name.suffix) }
           % endif
       - "children0_age": |
-          % if len(children) > 0:
-          ${ round(date_difference(as_datetime(children[0].birthdate),today()).years,0) }
+          % if len(children_of_marriage) > 0:
+          ${ round(date_difference(as_datetime(children_of_marriage[0].birthdate),today()).years,0) }
           % endif
       - "children0_ssn": |
-          % if len(children) > 0:
-          ${ "{:.0f}".format(children[0].ssn) }
+          % if len(children_of_marriage) > 0:
+          ${ redact("{:.0f}".format(children_of_marriage[0].ssn)) }
           % endif
       - "children0_name_middle": |
-          % if len(children) > 0:
-          ${ children[0].name.middle }
+          % if len(children_of_marriage) > 0:
+          ${ redact(children_of_marriage[0].name.middle) }
           % endif
       - "children0_name_last": |
-          % if len(children) > 0:
-          ${ children[0].name.last }
+          % if len(children_of_marriage) > 0:
+          ${ redact(children_of_marriage[0].name.last) }
           % endif
       - "children1_name_first": |
-          % if len(children) > 1:
-          ${ children[1].name.first }
+          % if len(children_of_marriage) > 1:
+          ${ redact(children_of_marriage[1].name.first) }
           % endif
       - "children1_age": |
-          % if len(children) > 1:
-          ${ children[1].name.suffix }
+          % if len(children_of_marriage) > 1:
+          ${ redact(children_of_marriage[1].name.suffix) }
           % endif
       - "children1_name_middle": |
-          % if len(children) > 1:
-          ${ children[1].name.middle }
+          % if len(children_of_marriage) > 1:
+          ${ redact(children_of_marriage[1].name.middle) }
           % endif
       - "children1_name_ssn": |
-          % if len(children) > 1:
-          ${ "{:.0f}".format(children[1].ssn) }
+          % if len(children_of_marriage) > 1:
+          ${ redact("{:.0f}".format(children_of_marriage[1].ssn)) }
           % endif
       - "children1_name_name_last": |
-          % if len(children) > 1:
-          ${ children[1].name.last }
+          % if len(children_of_marriage) > 1:
+          ${ redact(children_of_marriage[1].name.last) }
           % endif
       - "children1_name_suffix": |
-          % if len(children) > 1:
-          ${ round(date_difference(as_datetime(children[1].birthdate),today()).years,0) }
+          % if len(children_of_marriage) > 1:
+          ${ round(date_difference(as_datetime(children_of_marriage[1].birthdate),today()).years,0) }
           % endif
       - "children2_name_middle": |
-          % if len(children) > 2:
-          ${ children[2].name.middle }
+          % if len(children_of_marriage) > 2:
+          ${ redact(children_of_marriage[2].name.middle) }
           % endif
       - "children2_name_suffix": |
-          % if len(children) > 2:
-          ${ "round(date_difference(as_datetime(children[2].birthdate),today()).years,0)" }
+          % if len(children_of_marriage) > 2:
+          ${ "round(date_difference(as_datetime(children_of_marriage[2].birthdate),today()).years,0)" }
           % endif
       - "children2_name_first": |
-          % if len(children) > 2:
-          ${ children[2].name.first }
+          % if len(children_of_marriage) > 2:
+          ${ redact(children_of_marriage[2].name.first) }
           % endif
       - "children2_name_last": |
-          % if len(children) > 2:
-          ${ children[2].name.last }
+          % if len(children_of_marriage) > 2:
+          ${ redact(children_of_marriage[2].name.last) }
           % endif
       - "children2_name_age": |
-          % if len(children) > 2:
-          ${ children[2].name.suffix }
+          % if len(children_of_marriage) > 2:
+          ${ redact(children_of_marriage[2].name.suffix) }
           % endif
       - "children2_ssn": |
-          % if len(children) > 2:
-          ${ "{:.0f}".format(children[2].ssn) }
+          % if len(children_of_marriage) > 2:
+          ${ redact("{:.0f}".format(children_of_marriage[2].ssn)) }
           % endif
       - "children3_name_middle": |
-          % if len(children) > 3:
-          ${ children[3].name.middle }
+          % if len(children_of_marriage) > 3:
+          ${ redact(children_of_marriage[3].name.middle) }
           % endif
       - "children3_name_first": |
-          % if len(children) > 3:
-          ${ children[3].name.first }
+          % if len(children_of_marriage) > 3:
+          ${ redact(children_of_marriage[3].name.first) }
           % endif
       - "children3_name_last": |
-          % if len(children) > 3:
-          ${ children[3].name.last }
+          % if len(children_of_marriage) > 3:
+          ${ redact(children_of_marriage[3].name.last) }
           % endif
       - "children3_name_suffix": |
-          % if len(children) > 3:
-          ${ children[3].name.suffix }
+          % if len(children_of_marriage) > 3:
+          ${ redact(children_of_marriage[3].name.suffix) }
           % endif
       - "children3_age": |
-          % if len(children) > 3:
-          ${ round(date_difference(as_datetime(children[3].birthdate),today()).years,0) }
+          % if len(children_of_marriage) > 3:
+          ${ round(date_difference(as_datetime(children_of_marriage[3].birthdate),today()).years,0) }
           % endif
       - "children3_ssn": |
-          % if len(children) > 3:
-          ${ "{:.0f}".format(children[3].ssn) }
+          % if len(children_of_marriage) > 3:
+          ${ redact("{:.0f}".format(children_of_marriage[3].ssn)) }
           % endif
       - "children4_name_first": |
-          % if len(children) > 4:
-          ${ children[4].name.first }
+          % if len(children_of_marriage) > 4:
+          ${ redact(children_of_marriage[4].name.first) }
           % endif
       - "children4_age": |
-          % if len(children) > 4:
-          ${ "{:.0f}".format(children[4].ssn) }
+          % if len(children_of_marriage) > 4:
+          ${ redact("{:.0f}".format(children_of_marriage[4].ssn)) }
           % endif
       - "children4_name_suffix": |
-          % if len(children) > 4:
-          ${ round(date_difference(as_datetime(children[4].birthdate),today()).years,0) }
+          % if len(children_of_marriage) > 4:
+          ${ round(date_difference(as_datetime(children_of_marriage[4].birthdate),today()).years,0) }
           % endif
       - "children4_ssn": |
-          % if len(children) > 4:
-          ${ children[4].name.suffix }
+          % if len(children_of_marriage) > 4:
+          ${ redact(children_of_marriage[4].name.suffix) }
           % endif
       - "children4_name_middle": |
-          % if len(children) > 4:
-          ${ children[4].name.middle }
+          % if len(children_of_marriage) > 4:
+          ${ redact(children_of_marriage[4].name.middle) }
           % endif
       - "children4_name_last": |
-          % if len(children) > 4:
-          ${ children[4].name.last }
+          % if len(children_of_marriage) > 4:
+          ${ redact(children_of_marriage[4].name.last) }
           % endif
       - "children5_name_first": |
-          % if len(children) > 5:
-          ${ children[5].name.first }
+          % if len(children_of_marriage) > 5:
+          ${ redact(children_of_marriage[5].name.first) }
           % endif
       - "children5_name_middle": |
-          % if len(children) > 5:
-          ${ children[5].name.middle }
+          % if len(children_of_marriage) > 5:
+          ${ redact(children_of_marriage[5].name.middle) }
           % endif
       - "children5_name_last": |
-          % if len(children) > 5:
-          ${ children[5].name.last }
+          % if len(children_of_marriage) > 5:
+          ${ redact(children_of_marriage[5].name.last) }
           % endif
       - "children5_age": |
-          % if len(children) > 5:
-          ${ round(date_difference(as_datetime(children[5].birthdate),today()).years,0) }
+          % if len(children_of_marriage) > 5:
+          ${ round(date_difference(as_datetime(children_of_marriage[5].birthdate),today()).years,0) }
           % endif
       - "children5_ssn": |
-          % if len(children) > 5:
-          ${ "{:.0f}".format(children[5].ssn) }
+          % if len(children_of_marriage) > 5:
+          ${ redact("{:.0f}".format(children_of_marriage[5].ssn)) }
           % endif
       - "children5_name_suffix": |
-          % if len(children) > 5:
-          ${ children[5].name.suffix }
+          % if len(children_of_marriage) > 5:
+          ${ redact(children_of_marriage[5].name.suffix) }
           % endif
       - "other_parties1": ${ case.filed ==  "other_parties0_filed" } 
       - "petitioner_full_name": ${ case.filed in  ["user0_filed","not_filed"] } 

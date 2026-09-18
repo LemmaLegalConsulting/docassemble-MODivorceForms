@@ -775,7 +775,7 @@ class ALAsset(ALIncome):
         which = self._list_name
         if which == "real_estate":
             return space(self._var("lender"), prefix="", suffix=" ") + "Mortgage"
-        if which in ("vehicles", "retirement_accounts", "farm", "businesses", "other_assets"):
+        if which in ("vehicles", "personal_goods", "securities", "farm", "businesses", "other_assets", "debts"):
             return space(self._var("lender"), prefix="", suffix=" ") + "Loan"
         if defined(self._var("lender")):
             return self.lender + " Loan"

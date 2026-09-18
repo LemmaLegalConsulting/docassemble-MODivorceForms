@@ -36,11 +36,35 @@ fields:
 ---
 id: Respondent's Answer to Petition for Dissolution of Marriage object
 objects:
-  - answer_attachment: ALDocument.using(title="Respondent's Answer to Petition for Dissolution of Marriage", filename="answer", has_addendum=False, )
+  - answer_attachment: DADict.using(object_type=ALDocument.using(has_addendum=True, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE), auto_gather=False, gathered=True)
+---
+id: answer_attachment per-key document settings
+code: |
+  answer_attachment[i].title = "Answer"
+  answer_attachment[i].filename = "answer" if i == "redacted" else "answer_unredacted"
+---
+id: petition overflow fields
+code: |
+  answer_attachment[i].overflow_fields["persons_lived_with"].overflow_trigger = 3
+  answer_attachment[i].overflow_fields["persons_lived_with"].label = "Additional Addresses"
+  answer_attachment[i].overflow_fields["denials"].overflow_trigger = 840
+  answer_attachment[i].overflow_fields["denials"].label = "Denials"
+  answer_attachment[i].overflow_fields["relief_other"].overflow_trigger = 540
+  answer_attachment[i].overflow_fields["relief_other"].label = "Other Relief"
+  answer_attachment[i].overflow_fields["children_of_marriage"].overflow_trigger = 4
+  answer_attachment[i].overflow_fields["children_of_marriage"].label = "Additional Children"
+  answer_attachment[i].overflow_fields.gathered = True
 ---
 attachment:
-  filename: answer
-  variable name: answer_attachment[i]
+  variable name: answer_attachment[i].addendum
+  docx template file: answer_attachment_addendum.docx
+  redact: i == "redacted"
+---
+attachment:
+  name: Answer ${ "Redacted" if i == "redacted" else "Unredacted" }
+  filename: answer${ "" if i == "redacted" else "_unredacted" }
+  variable name: answer_attachment[i][j]
+  redact: i == "redacted"
   skip undefined: True
   pdf template file: answer.pdf
   fields:
@@ -58,7 +82,7 @@ attachment:
       - "raHowManyPetitions1": ${ previous_petitions == "1" } 
       - "raHowManyPetitions2": ${ previous_petitions == "2" } 
       - "raHowManyPetitions3": ${ previous_petitions == "3" } 
-      - "raDenials1": ${ denials } 
+      - "raDenials1": ${ answer_attachment[i].safe_value('denials') } 
       - "raRespondentsStreet": ${ respondent.address.address } 
       - "raRespondentsZip": ${ respondent.address.zip } 
       - "raRespondentCity": ${ respondent.address.city } 
@@ -71,172 +95,172 @@ attachment:
       - "raRespondentActiveDutyOrNot3": ${ respondent.active_duty and not waive_rights } 
       - "raPetitionersSsnLastFour": ${ redact(petitioner.ssn) } 
       - "raFirstChildFirstName": |
-          % if len(children) > 0:
-          ${ redact(children[0].name.first) }
+          % if len(children_of_marriage) > 0:
+          ${ redact(children_of_marriage[0].name.first) }
           % endif
       - "raFirstChildMiddleName": |
-          % if len(children) > 0:
-          ${ redact(children[0].name.middle) }
+          % if len(children_of_marriage) > 0:
+          ${ redact(children_of_marriage[0].name.middle) }
           % endif
       - "raFirstChildLastName": |
-          % if len(children) > 0:
-          ${ redact(children[0].name.last) }
+          % if len(children_of_marriage) > 0:
+          ${ redact(children_of_marriage[0].name.last) }
           % endif
       - "raFirstChildSuffix": |
-          % if len(children) > 0:
-          ${ redact(children[0].name.suffix) }
+          % if len(children_of_marriage) > 0:
+          ${ redact(children_of_marriage[0].name.suffix) }
           % endif
       - "raFirstChildsAge": |
-          % if len(children) > 0:
-          % if date_difference(as_datetime(children[0].birthdate),today()).years >= 1:
-          ${ "{:.0f}".format(date_difference(as_datetime(children[0].birthdate),today()).years) }
+          % if len(children_of_marriage) > 0:
+          % if date_difference(as_datetime(children_of_marriage[0].birthdate),today()).years >= 1:
+          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[0].birthdate),today()).years) }
           % else:
-          ${ "{:.0f}".format(date_difference(as_datetime(children[0].birthdate),today()).months) + " months" }
+          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[0].birthdate),today()).months) + " months" }
           % endif
           % endif
       - "raLastFourSsnFirstChild": |
-          % if len(children) > 0:
-          ${ redact("{:.0f}".format(children[0].ssn)) }
+          % if len(children_of_marriage) > 0:
+          ${ redact("{:.0f}".format(children_of_marriage[0].ssn)) }
           % endif
       - "raSecondChildFirstName": |
-          % if len(children) > 1:
-          ${ redact(children[1].name.first) }
+          % if len(children_of_marriage) > 1:
+          ${ redact(children_of_marriage[1].name.first) }
           % endif
       - "raSecondChildMiddleName": |
-          % if len(children) > 1:
-          ${ redact(children[1].name.middle) }
+          % if len(children_of_marriage) > 1:
+          ${ redact(children_of_marriage[1].name.middle) }
           % endif
       - "raSecondChildAge": |
-          % if len(children) > 1:
-          % if date_difference(as_datetime(children[1].birthdate),today()).years >= 1:
-          ${ "{:.0f}".format(date_difference(as_datetime(children[1].birthdate),today()).years) }
+          % if len(children_of_marriage) > 1:
+          % if date_difference(as_datetime(children_of_marriage[1].birthdate),today()).years >= 1:
+          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[1].birthdate),today()).years) }
           % else:
-          ${ "{:.0f}".format(date_difference(as_datetime(children[1].birthdate),today()).months) + " months" }
+          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[1].birthdate),today()).months) + " months" }
           % endif
           % endif
       - "raLastFourSsnSecondChild": |
-          % if len(children) > 1:
-          ${ redact("{:.0f}".format(children[1].ssn)) }
+          % if len(children_of_marriage) > 1:
+          ${ redact("{:.0f}".format(children_of_marriage[1].ssn)) }
           % endif
       - "raSecondChildLastName": |
-          % if len(children) > 1:
-          ${ redact(children[1].name.last) }
+          % if len(children_of_marriage) > 1:
+          ${ redact(children_of_marriage[1].name.last) }
           % endif
       - "raSecondChildSuffix": |
-          % if len(children) > 1:
-          ${ redact(children[1].name.suffix) }
+          % if len(children_of_marriage) > 1:
+          ${ redact(children_of_marriage[1].name.suffix) }
           % endif
       - "raThirdChildSuffix": |
-          % if len(children) > 2:
-          ${ redact(children[2].name.suffix) }
+          % if len(children_of_marriage) > 2:
+          ${ redact(children_of_marriage[2].name.suffix) }
           % endif
       - "raThirdChildAge": |
-          % if len(children) > 2:
-          % if date_difference(as_datetime(children[2].birthdate),today()).years >= 1:
-          ${ "{:.0f}".format(date_difference(as_datetime(children[2].birthdate),today()).years) }
+          % if len(children_of_marriage) > 2:
+          % if date_difference(as_datetime(children_of_marriage[2].birthdate),today()).years >= 1:
+          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[2].birthdate),today()).years) }
           % else:
-          ${ "{:.0f}".format(date_difference(as_datetime(children[2].birthdate),today()).months) + " months" }
+          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[2].birthdate),today()).months) + " months" }
           % endif
           % endif
       - "raLastFourSsnThirdChild": |
-          % if len(children) > 2:
-          ${ redact("{:.0f}".format(children[2].ssn)) }
+          % if len(children_of_marriage) > 2:
+          ${ redact("{:.0f}".format(children_of_marriage[2].ssn)) }
           % endif
       - "raThirdChildFirstName": |
-          % if len(children) > 2:
-          ${ redact(children[2].name.first) }
+          % if len(children_of_marriage) > 2:
+          ${ redact(children_of_marriage[2].name.first) }
           % endif
       - "raThirdChildMiddleName": |
-          % if len(children) > 2:
-          ${ redact(children[2].name.middle) }
+          % if len(children_of_marriage) > 2:
+          ${ redact(children_of_marriage[2].name.middle) }
           % endif
       - "raThirdChildLastName": |
-          % if len(children) > 2:
-          ${ redact(children[2].name.last) }
+          % if len(children_of_marriage) > 2:
+          ${ redact(children_of_marriage[2].name.last) }
           % endif
       - "raFourthChildFirstName": |
-          % if len(children) > 3:
-          ${ redact(children[3].name.first) }
+          % if len(children_of_marriage) > 3:
+          ${ redact(children_of_marriage[3].name.first) }
           % endif
       - "raFourthChildMiddleName": |
-          % if len(children) > 3:
-          ${ redact(children[3].name.middle) }
+          % if len(children_of_marriage) > 3:
+          ${ redact(children_of_marriage[3].name.middle) }
           % endif
       - "raFourthChildLastName": |
-          % if len(children) > 3:
-          ${ redact(children[3].name.last) }
+          % if len(children_of_marriage) > 3:
+          ${ redact(children_of_marriage[3].name.last) }
           % endif
       - "raFourthChildSuffix": |
-          % if len(children) > 3:
-          ${ redact(children[3].name.suffix) }
+          % if len(children_of_marriage) > 3:
+          ${ redact(children_of_marriage[3].name.suffix) }
           % endif
       - "raFourthChildAge": |
-          % if len(children) > 3:
-          % if date_difference(as_datetime(children[3].birthdate),today()).years >= 1:
-          ${ "{:.0f}".format(date_difference(as_datetime(children[3].birthdate),today()).years) }
+          % if len(children_of_marriage) > 3:
+          % if date_difference(as_datetime(children_of_marriage[3].birthdate),today()).years >= 1:
+          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[3].birthdate),today()).years) }
           % else:
-          ${ "{:.0f}".format(date_difference(as_datetime(children[3].birthdate),today()).months) + " months" }
+          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[3].birthdate),today()).months) + " months" }
           % endif
           % endif
       - "raLastFourSsnFourthChild": |
-          % if len(children) > 3:
-          ${ redact("{:.0f}".format(children[3].ssn)) }
+          % if len(children_of_marriage) > 3:
+          ${ redact("{:.0f}".format(children_of_marriage[3].ssn)) }
           % endif
       - "raFifthChildFirstName": |
-          % if len(children) > 4:
-          ${ redact(children[4].name.first) }
+          % if len(children_of_marriage) > 4:
+          ${ redact(children_of_marriage[4].name.first) }
           % endif
       - "raFifthChildSuffix": |
-          % if len(children) > 4:
-          ${ redact(children[4].name.suffix) }
+          % if len(children_of_marriage) > 4:
+          ${ redact(children_of_marriage[4].name.suffix) }
           % endif
       - "raFifthChildAge": |
-          % if len(children) > 4:
-          % if date_difference(as_datetime(children[4].birthdate),today()).years >= 1:
-          ${ "{:.0f}".format(date_difference(as_datetime(children[4].birthdate),today()).years) }
+          % if len(children_of_marriage) > 4:
+          % if date_difference(as_datetime(children_of_marriage[4].birthdate),today()).years >= 1:
+          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[4].birthdate),today()).years) }
           % else:
-          ${ "{:.0f}".format(date_difference(as_datetime(children[4].birthdate),today()).months) + " months" }
+          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[4].birthdate),today()).months) + " months" }
           % endif
           % endif
       - "raLastFourSsnFifthChild": |
-          % if len(children) > 4:
-          ${ redact("{:.0f}".format(children[4].ssn)) }
+          % if len(children_of_marriage) > 4:
+          ${ redact("{:.0f}".format(children_of_marriage[4].ssn)) }
           % endif
       - "raFifthChildMiddleName": |
-          % if len(children) > 4:
-          ${ redact(children[4].name.middle) }
+          % if len(children_of_marriage) > 4:
+          ${ redact(children_of_marriage[4].name.middle) }
           % endif
       - "raFifthChildLastName": |
-          % if len(children) > 4:
-          ${ redact(children[4].name.last) }
+          % if len(children_of_marriage) > 4:
+          ${ redact(children_of_marriage[4].name.last) }
           % endif
       - "raSixthChildMiddleName": |
-          % if len(children) > 5:
-          ${ redact(children[5].name.middle) }
+          % if len(children_of_marriage) > 5:
+          ${ redact(children_of_marriage[5].name.middle) }
           % endif
       - "raSixthChildLastName": |
-          % if len(children) > 5:
-          ${ redact(children[5].name.last) }
+          % if len(children_of_marriage) > 5:
+          ${ redact(children_of_marriage[5].name.last) }
           % endif
       - "raSixthChildSuffix": |
-          % if len(children) > 5:
-          ${ redact(children[5].name.suffix) }
+          % if len(children_of_marriage) > 5:
+          ${ redact(children_of_marriage[5].name.suffix) }
           % endif
       - "raSixthChildAge": |
-          % if len(children) > 5:
-          % if date_difference(as_datetime(children[5].birthdate),today()).years >= 1:
-          ${ "{:.0f}".format(date_difference(as_datetime(children[5].birthdate),today()).years) }
+          % if len(children_of_marriage) > 5:
+          % if date_difference(as_datetime(children_of_marriage[5].birthdate),today()).years >= 1:
+          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[5].birthdate),today()).years) }
           % else:
-          ${ "{:.0f}".format(date_difference(as_datetime(children[5].birthdate),today()).months) + " months" }
+          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[5].birthdate),today()).months) + " months" }
           % endif
           % endif
       - "raLastFourSsnSixthChild": |
-          % if len(children) > 5:
-          ${ redact("{:.0f}".format(children[5].ssn)) }
+          % if len(children_of_marriage) > 5:
+          ${ redact("{:.0f}".format(children_of_marriage[5].ssn)) }
           % endif
       - "raSixthChildFirstName": |
-          % if len(children) > 5:
-          ${ redact(children[5].name.first) }
+          % if len(children_of_marriage) > 5:
+          ${ redact(children_of_marriage[5].name.first) }
           % endif
       - "raPerson1ChildrenLivedWithPast5YearsFirstName": ${ persons_lived_with[0].name.first } 
       - "raPerson1ChildrenLivedWithPast5YearsMiddleName": ${ persons_lived_with[0].name.middle } 
@@ -322,16 +346,16 @@ attachment:
       - "raRequestReliefCustody": ${ relief["custody"] } 
       - "raRequestReliefSupportOfTheChildren": ${ relief["child_support"] } 
       - "raRequestReliefDivideMaritalPropertyAndDebts": ${ relief["divide_property"] } 
-      - "raRequestReliefAwardMaintenanceToMe": ${ relief["maintenance"] and maintenance_awarded_to == "respondent" } 
-      - "raRequestReliefAwardMaintenanceToSpouse": ${ relief["maintenance"] and maintenance_awarded_to == "petitioner" } 
+      - "raRequestReliefAwardMaintenanceToMe": ${ relief["maintenance"] and maintenance_awarded_to == respondent.name.full() } 
+      - "raRequestReliefAwardMaintenanceToSpouse": ${ relief["maintenance"] and maintenance_awarded_to == petitioner.name.full() } 
       - "raRequestReliefChangeName": ${ relief["change_name"] } 
       - "raRequestReliefFormerSuffix": ${ respondent.prior_name.name.suffix if relief['change_name'] else ""  } 
       - "raRequestReliefFormerFirstName": ${ respondent.prior_name.name.first if relief['change_name'] else "" } 
       - "raRequestReliefFormerMiddleName": ${ respondent.prior_name.name.last if relief['change_name'] else "" } 
       - "raRequestReliefFormerLastName": ${ respondent.prior_name.name.last if relief['change_name'] else ""  } 
       - "raRequestReliefOther": ${ relief["other"] } 
-      - "raRequestReliefOtherRequests1": ${ relief_other } 
-      - "raDateOfNotice": ${ service.date } 
+      - "raRequestReliefOtherRequests1": ${ answer_attachment[i].safe_value('relief_other') } 
+      - "raDateOfNotice": ${ format_date(service.date, format='M/d/yyyy') } 
       - "raNameRow1": ${ people_served[0].name_full() } 
       - "raServiceContactInformationRow1": ${ people_served[0].service_address_pdf }
       - "raNameRow2": |

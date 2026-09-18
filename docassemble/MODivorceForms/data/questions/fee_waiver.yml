@@ -1,19 +1,37 @@
 ---
 id: Motion and Affidavit in Support of Request to Proceed As a Poor Person object
 objects:
-  - fee_waiver_attachment: ALDocument.using(title="Motion and Affidavit in Support of Request to Proceed As a Poor Person", filename="fee_waiver", has_addendum=False, )
+  - fee_waiver_attachment: DADict.using(object_type=ALDocument.using(has_addendum=True, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE), auto_gather=False, gathered=True)
 ---
-id: Motion and Affidavit in Support of Request to Proceed As a Poor Person enabled
+id: fee_waiver_attachment per-key document settings
 code: |
-  fee_waiver_attachment.enabled = True
+  fee_waiver_attachment[i].title = "Motion and Affidavit in Support of Request to Proceed As a Poor Person"
+  fee_waiver_attachment[i].filename = "fee_waiver" if i == "redacted" else "fee_waiver_attachment_unredacted"
+---
+id: fee_waiver overflow fields
+code: |
+  fee_waiver_attachment[i].overflow_fields["vehicles_owned"].overflow_trigger = 2
+  fee_waiver_attachment[i].overflow_fields["vehicles_owned"].label = "Additional vehicles"
+  fee_waiver_attachment[i].overflow_fields["additional_possessions"].overflow_trigger = 3
+  fee_waiver_attachment[i].overflow_fields["additional_possessions"].label = "Additional possessions"
+  fee_waiver_attachment[i].overflow_fields["other_debts"].overflow_trigger = 6
+  fee_waiver_attachment[i].overflow_fields["other_debts"].label = "Other debts"
+  fee_waiver_attachment[i].overflow_fields.gathered = True
+
+---
+attachment:
+  variable name: fee_waiver_attachment[i].addendum
+  docx template file: fee_waiver_attachment_addendum.docx
+  redact: i == "redacted"
 ---
 id: Motion and Affidavit in Support of Request to Proceed As a Poor Person attachment
 attachment:
-  name: Motion and Affidavit in Support of Request to Proceed As a Poor Person
-  filename: fee_waiver
-  variable name: fee_waiver_attachment[i]
+  name: Motion and Affidavit in Support of Request to Proceed As a Poor Person ${ "Redacted" if i == "redacted" else "Unredacted" }
+  filename: fee_waiver${ "" if i == "redacted" else "_unredacted" }
+  variable name: fee_waiver_attachment[i][j]
   skip undefined: False
   pdf template file: fee_waiver.pdf
+  redact: i == "redacted"
   editable: False
   fields:
     - "Judicial_Circuit_Court_Number": ${ case.circuit } 
@@ -28,15 +46,15 @@ attachment:
     - "If_Married_Spouses_name": ${ other_parties[0].name_full() } 
     - "Number_of_dependents": ${ number_of_children } 
     - "Gross_Salary": ${ "{:.2f}".format(int(users[0].jobs.total(times_per_year=12)) + users[0].self_employment_income,symbol='') } 
-    - "Mortgage_or_Rent_Payment_Amount": ${ "{:.2f}".format(int(users[0].expenses.total(source=['rent'], times_per_year=12)) + sum([house.monthly_payment for house in users[0].debts.matches(source=['house'])]))  } 
-    - "Mortgage": ${ len(users[0].debts.matches(source=['house'])) > 0 } 
+    - "Mortgage_or_Rent_Payment_Amount": ${ "{:.2f}".format(int(users[0].expenses.total(source=['rent'], times_per_year=12)) + sum([house.monthly_payment for house in users[0].debts_owned.matches(source=['house'])]))  } 
+    - "Mortgage": ${ len(users[0].debts_owned.matches(source=['house'])) > 0 } 
     - "Rent_Payment": ${ len(users[0].expenses.matches(source=['rent'])) > 0 } 
     - "Public_Assistance": ${ "{:.2f}".format(users[0].benefits.total(source=['tanf'], times_per_year=12)) } 
     - "Utilities_Amount": ${ "{:.2f}".format(users[0].expenses.total(source=['utilities'], times_per_year=12)) } 
     - "Retirement_Pension": ${ "{:.2f}".format(users[0].other_incomes.total(source=['retirement','pension'], times_per_year=12)) } 
     - "Food_Amount": ${ "{:.2f}".format(users[0].expenses.total(source=['food'], times_per_year=12)) } 
     - "Social_Security": ${ "{:.2f}".format(users[0].benefits.total(source=['ssi'], times_per_year=12) + users[0].other_incomes.total(source=['social security'], times_per_year=12) ) } 
-    - "Payment_on_Debts_and_Credit_Cards": ${ "{:.2f}".format(sum([debt.monthly_payment for debt in users[0].debts.matches(source=None, exclude_source=['house'])])) } 
+    - "Payment_on_Debts_and_Credit_Cards": ${ "{:.2f}".format(sum([debt.monthly_payment for debt in users[0].debts_owned.matches(source=None, exclude_source=['house'])])) } 
     - "Child_Support": ${ "{:.2f}".format(showifdef('users[0].other_child_support_received',0) + showifdef('users[0].child_support_received',0)) } 
     - "Child_Support_Expense": ${ "{:.2f}".format(showifdef('users[0].other_child_support_paid',0) + showifdef('users[0].child_support_paid',0)) } 
     - "Maintenance_Income": ${ "{:.2f}".format(users[0].maintenance_other_received + users[0].maintenance_received) } 
@@ -46,22 +64,22 @@ attachment:
     - "Other_income_to_be_considered": ${ comma_and_list(item.source_other for item in users[0].other_incomes.matches(source=['other'])) } 
     - "Medical_expenses_to_be_considered": ${ comma_and_list([expense.description for expense in users[0].expenses.matches(source="medical")]) } 
     - "Total_Monthly_Income": ${ "{:.2f}".format(int(users[0].jobs.total(times_per_year=12)) + users[0].self_employment_income + int(users[0].benefits.total(source=['tanf','ssi'], times_per_year=12)) + int(users[0].other_incomes.total(times_per_year=12)) + showifdef('users[0].other_child_support_received',0) + showifdef('users[0].child_support_received',0) + users[0].maintenance_other_received + users[0].maintenance_received) } 
-    - "Total_Monthly_Expenses": ${ "{:.2f}".format(int(users[0].expenses.total(source=['rent', 'mortgage'], times_per_year=12)) + int(sum([debt.monthly_payment for debt in users[0].debts])) + int(users[0].expenses.total(source=['utilities'], times_per_year=12)) + int(users[0].expenses.total(source=['food'], times_per_year=12)) + int(users[0].expenses.total(source=['debt_payment'], times_per_year=12)) + showifdef('users[0].other_child_support_paid',0) + showifdef('users[0].child_support_paid',0) + int(users[0].maintenance_paid + users[0].maintenance_other_paid) + int(users[0].expenses.total(source=['medical'], times_per_year=12)) + int(users[0].health_insurance_costs) + int(users[0].extraordinary_medical_costs.total(times_per_year=12))) } 
+    - "Total_Monthly_Expenses": ${ "{:.2f}".format(int(users[0].expenses.total(source=['rent', 'mortgage'], times_per_year=12)) + int(sum([debt.monthly_payment for debt in users[0].debts_owned])) + int(users[0].expenses.total(source=['utilities'], times_per_year=12)) + int(users[0].expenses.total(source=['food'], times_per_year=12)) + int(users[0].expenses.total(source=['debt_payment'], times_per_year=12)) + showifdef('users[0].other_child_support_paid',0) + showifdef('users[0].child_support_paid',0) + int(users[0].maintenance_paid + users[0].maintenance_other_paid) + int(users[0].expenses.total(source=['medical'], times_per_year=12)) + int(users[0].health_insurance_costs) + int(users[0].extraordinary_medical_costs.total(times_per_year=12))) } 
     - "Cash_on_Hand": ${ users[0].cash } 
-    - "Home_Loan_Balance": ${ "{:.2f}".format(users[0].debts.balance(source=['house','condominium', 'leasehold','real estate other']))} 
-    - "Automobile_Loan": ${ "{:.2f}".format(users[0].debts.balance(source=['car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other'])) } 
-    - "Checking_Account": ${ "{:.2f}".format(users[0].assets.market_value(source=['checking account'])) } 
-    - "Credit_Card_Balance s ": ${ "{:.2f}".format(users[0].debts.balance(source='credit_card_debt'))  } 
-    - "Savings_Account": ${ "{:.2f}".format(users[0].assets.market_value(source=['savings account'])) } 
-    - "Value_of_Home": ${ "{:.2f}".format(real_estate_owned.market_value(source=['house'])) }
+    - "Home_Loan_Balance": ${ "{:.2f}".format(users[0].debts_owned.balance(source=['house','condominium', 'leasehold','real estate other']))} 
+    - "Automobile_Loan": ${ "{:.2f}".format(users[0].debts_owned.balance(source=['car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other'])) } 
+    - "Checking_Account": ${ "{:.2f}".format(users[0].assets_owned.market_value(source=['checking account'])) } 
+    - "Credit_Card_Balance_s": ${ "{:.2f}".format(users[0].debts_owned.balance(source=['credit_card_debt']))  } 
+    - "Savings_Account": ${ "{:.2f}".format(users[0].assets_owned.market_value(source=['savings account', "time deposit", "money market", "certificates", "bank assets other"])) } 
+    - "Value_of_Home": ${ "{:.2f}".format(users[0].assets_owned.market_value(source=['house'])) }
     - "Other_debts_to_be_considered_1": ${ other_debts[0].loan_description_template if len(other_debts) > 0 else "" } 
     - "Debts_Other_debts_to_be_considered_1": ${ "{:.2f}".format(other_debts[0].balance) if len(other_debts) > 0 else "" }
-    - "Value_of_Other_Real_Estate": ${ "{:.2f}".format(real_estate_owned.market_value(source=['condominium', 'leasehold','real estate other'])) } 
+    - "Value_of_Other_Real_Estate": ${ "{:.2f}".format(users[0].assets_owned.market_value(source=['condominium', 'leasehold','real estate other'])) } 
     - "Debts_Other_debts_to_be_considered_2": ${ "{:.2f}".format(other_debts[1].balance) if len(other_debts) > 1 else "" }
     - "Other_debts_to_be_considered_2": ${ other_debts[1].loan_description_template if len(other_debts) > 1 else "" } 
     - "Value_of_Automobiles": ${ "{:.2f}".format(vehicles_owned.market_value(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane',"vehicles other"])) } 
     - "Debts_Other_debts_to_be_considered_3": ${ "{:.2f}".format(other_debts[2].balance) if len(other_debts) > 2 else "" }
-    - "Other_debts to be considered 3": ${ other_debts[2].loan_description_template if len(other_debts) > 2 else "" } 
+    - "Other_debts_to_be_considered_3": ${ other_debts[2].loan_description_template if len(other_debts) > 2 else "" } 
     - "field_1_yrmake": ${ vehicles_owned[0].description_template if len(vehicles_owned) > 0 else "" } 
     - "Debts_Other_debts_to_be_considered_4": ${ "{:.2f}".format(other_debts[3].balance) if len(other_debts) > 3 else "" }
     - "Other_debts_to_be_considered_4": ${ other_debts[3].loan_description_template if len(other_debts) > 3 else "" } 
@@ -70,12 +88,12 @@ attachment:
     - "Debts_Other_debts_to_be_considered_5": ${ "{:.2f}".format(other_debts[4].balance) if len(other_debts) > 4 else "" } 
     - "Other_debts_to_be_considered_6": ${ other_debts[5].loan_description_template if len(other_debts) > 5 else "" } 
     - "Debts_Other_debts_to_be_considered_6": ${ "{:.2f}".format(other_debts[5].balance) if len(other_debts) > 5 else "" }
-    - "Possessions_list_1": ${ other_assets_owned[0].description_template if len(other_assets_owned) > 0 else "" } 
-    - "Enter_Assests_Approximate_value_of_personal_possessions_item_1": ${ "{:.2f}".format(other_assets_owned[0].market_value) if len(other_assets_owned) > 0 else "" } 
-    - "Enter_Assests_Approximate_value_of_personal_possessions_item_2": ${ "{:.2f}".format(other_assets_owned[1].market_value) if len(other_assets_owned) > 1 else "" } 
-    - "Possessions_list_2": ${ other_assets_owned[1].description_template if len(other_assets_owned) > 1 else "" } 
-    - "Possessions_list_3": ${ other_assets_owned[2].description_template if len(other_assets_owned) > 2 else "" } 
-    - "Enter_Assests_Approximate_value_of_personal_possessions_item_3": ${ "{:.2f}".format(other_assets_owned[2].market_value) if len(other_assets_owned) > 2 else "" } 
-    - "Total_Assets": ${ "{:.2f}".format(users[0].cash + int(users[0].assets.market_value())) } 
-    - "Total_Debts": ${ "{:.2f}".format(users[0].debts.balance()) } 
+    - "Possessions_list_1": ${ additional_possessions[0].description_template if len(additional_possessions) > 0 else "" } 
+    - "Enter_Assests_Approximate_value_of_personal_possessions_item_1": ${ "{:.2f}".format(additional_possessions[0].market_value) if len(additional_possessions) > 0 else "" } 
+    - "Enter_Assests_Approximate_value_of_personal_possessions_item_2": ${ "{:.2f}".format(additional_possessions[1].market_value) if len(additional_possessions) > 1 else "" } 
+    - "Possessions_list_2": ${ additional_possessions[1].description_template if len(additional_possessions) > 1 else "" } 
+    - "Possessions_list_3": ${ additional_possessions[2].description_template if len(additional_possessions) > 2 else "" } 
+    - "Enter_Assests_Approximate_value_of_personal_possessions_item_3": ${ "{:.2f}".format(additional_possessions[2].market_value) if len(additional_possessions) > 2 else "" } 
+    - "Total_Assets": ${ "{:.2f}".format(users[0].cash + int(users[0].assets_owned.market_value())) } 
+    - "Total_Debts": ${ "{:.2f}".format(users[0].debts_owned.balance()) } 
 ---

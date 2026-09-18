@@ -1,14 +1,4 @@
 ---
-code: |
-  marriage.dissolution_type = "Dissolution"
----
-id: children in household at separation
-question: Children in household at separation
-fields:
-  - Number of Children under 18 in this Household as of ${ marriage.separation_date }: marriage_last_resided_number_children
-    maxlength: 8
-    required: False
----
 comment: |
   This block should not be used because this information will be completed by the court
 id: case information for certificate of dissolution
@@ -31,7 +21,7 @@ objects:
 ---
 id: Certificate of dissolution of marriage attachment
 attachment:
-  name: Certificate of dissolution of marriage
+  name: Certificate of dissolution of marriage 
   filename: certificate_of_dissolution
   variable name: certificate_of_dissolution_attachment[i]
   skip undefined: True
@@ -42,7 +32,7 @@ attachment:
       - "users1_name_middle": ${ users[0].name.middle } 
       - "users1_name_last": ${ users[0].name.last } 
       - "users1_prior_name": ${ users[0].prior_name } 
-      - "users1_ssn": ${ redact(users[0].ssn) } 
+      - "users1_ssn": ${ redact("{:.0f}".format(users[0].ssn)) } 
       - "users1_address_city": ${ users[0].address.city } 
       - "users1_address_state": ${ users[0].address.state } 
       - "users1_address_zip": ${ users[0].address.zip } 
@@ -53,11 +43,11 @@ attachment:
       - "users2_name_middle": ${ other_parties[0].name.middle } 
       - "users2_name_last": ${ other_parties[0].name.last } 
       - "users2_prior_name": ${ other_parties[0].prior_name } 
-      - "users2_ssn": ${ redact(other_parties[0].ssn) } 
+      - "users2_ssn": ${ redact("{:.0f}".format(other_parties[0].ssn)) }
       - "users2_address_city": ${ other_parties[0].address.city } 
       - "users2_address_state": ${ other_parties[0].address.state } 
       - "users2_address_zip": ${ other_parties[0].address.zip } 
-      - "users2_address_county": ${ other_parties[0].address.county } 
+      - "users2_address_county": ${ nice_county_name(other_parties[0].address) } 
       - "users2_birthdate": ${ redact(format_date(other_parties[0].birthdate, format='M/d/yyyy')) } 
       - "users2_birthplace": ${ other_parties[0].birthplace } 
       - "marriage_address_city": ${ marriage.address.city } 
@@ -67,9 +57,9 @@ attachment:
       - "is_users1_petitioner": ${ case.filed in ["user0_filed","not_filed"] } 
       - "is_users2_petitioner": ${ case.filed == "other_parties0_filed" } 
       - "is_joint_petitioners": ${ case.filed == "joint" } 
-      - "marriage_last_resided_number_children_none": ${ len([item for item in children if item.under_18_in_household == True]) == 0 } 
+      - "marriage_last_resided_number_children_none": ${ number_of_children == 0 } 
       - "is_other_petitioner": ${ case.filed } 
-      - "marriage_last_resided_number_children": ${ len([item for item in children if item.under_18_in_household == True]) } 
+      - "marriage_last_resided_number_children": ${ number_of_children } 
       - "is_other_petitioner_description": ${ case.filed_other } 
       - "marriage_last_resided_date": ${ format_date(marriage.separation_date, format='M/d/yyyy') } 
       - "petitioner_attorney": ${ petitioner.attorney.name_full() } 
