@@ -76,9 +76,9 @@ id: petition overflow fields
 code: |
   petition_attachment[i].overflow_fields["persons_lived_with"].overflow_trigger = 3
   petition_attachment[i].overflow_fields["persons_lived_with"].label = "39. Additional Addresses"
-  petition_attachment[i].overflow_fields["children_explanation"].overflow_trigger = 120
+  petition_attachment[i].overflow_fields["children_explanation"].overflow_trigger = 45
   petition_attachment[i].overflow_fields["children_explanation"].label = "44. Additional Information"
-  petition_attachment[i].overflow_fields["other_allegations"].overflow_trigger = 120
+  petition_attachment[i].overflow_fields["other_allegations"].overflow_trigger = 45
   petition_attachment[i].overflow_fields["other_allegations"].label = "47. Other Allegations"
   petition_attachment[i].overflow_fields["children_of_marriage"].overflow_trigger = 4
   petition_attachment[i].overflow_fields["children_of_marriage"].label = "Additional Children"

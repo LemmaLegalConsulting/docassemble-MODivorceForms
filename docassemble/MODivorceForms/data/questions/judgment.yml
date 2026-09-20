@@ -199,11 +199,11 @@ objects:
 id: judgment per-key document settings
 code: |
   judgment_attachment[i].title = "Judgment and Decree of Dissolution of Marriage"
-  judgment_attachment[i].filename = "judgment" if i == "redacted" else "confidential_information_sheet_unredacted"
+  judgment_attachment[i].filename = "judgment" if i == "redacted" else "judgment_unredacted"
 ---
 id: judgment overflow fields
 code: |
-  judgment_attachment[i].overflow_fields["children_of_marriage"].overflow_trigger = 5
+  judgment_attachment[i].overflow_fields["children_of_marriage"].overflow_trigger = 6
   judgment_attachment[i].overflow_fields["children_of_marriage"].label = "Additional Minor Children"
   judgment_attachment[i].overflow_fields.gathered = True
 ---

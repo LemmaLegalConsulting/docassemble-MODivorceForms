@@ -5762,8 +5762,8 @@ fields:
     js show if: |
       val("is_maintenance_currently_paid")
     choices:
-      - ${ petitioner.name_full() } is paid maintenance by ${ respondent.name_full() }: petitioner.name_full()
-      - ${ respondent.name_full() } is paid maintenance by ${ petitioner.name_full() }: respondent.name_full()
+      - ${ petitioner.name_full() } is paid maintenance by ${ respondent.name_full() }: ${ petitioner.name_full() }
+      - ${ respondent.name_full() } is paid maintenance by ${ petitioner.name_full() }: ${ respondent.name_full() }
     datatype: radio
   - How much per month?: maintenance_currently_paid_amount
     datatype: currency

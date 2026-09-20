@@ -594,37 +594,37 @@ code: |
 ---
 id: parenting_plan overflow fields
 code: |
-  parenting_plan_attachment[i].overflow_fields["legal_custody_sole_explanation"].overflow_trigger = 120
+  parenting_plan_attachment[i].overflow_fields["legal_custody_sole_explanation"].overflow_trigger = 240
   parenting_plan_attachment[i].overflow_fields["legal_custody_sole_explanation"].label = "6. Explanation for Sole Legal Custody"
-  parenting_plan_attachment[i].overflow_fields["dispute_resolution"].overflow_trigger = 120
+  parenting_plan_attachment[i].overflow_fields["dispute_resolution"].overflow_trigger = 420
   parenting_plan_attachment[i].overflow_fields["dispute_resolution"].label = "9. Dispute Resolution Procedure"
   parenting_plan_attachment[i].overflow_fields["visitation_reason"].overflow_trigger = 80
   parenting_plan_attachment[i].overflow_fields["visitation_reason"].label = "10. Supervised Visitation"
   parenting_plan_attachment[i].overflow_fields["other_holidays"].overflow_trigger = 7
   parenting_plan_attachment[i].overflow_fields["other_holidays"].label = "12. Other Holidays"
-  parenting_plan_attachment[i].overflow_fields["vacation_info"].overflow_trigger = 80
+  parenting_plan_attachment[i].overflow_fields["vacation_info"].overflow_trigger = 400
   parenting_plan_attachment[i].overflow_fields["vacation_info"].label = "13. Vacation Schedule"
-  parenting_plan_attachment[i].overflow_fields["location_of_exchange_school_not_in_session"].overflow_trigger = 80
+  parenting_plan_attachment[i].overflow_fields["location_of_exchange_school_not_in_session"].overflow_trigger = 240
   parenting_plan_attachment[i].overflow_fields["location_of_exchange_school_not_in_session"].label = "14. Location of Exchange When School Not in Session"
-  parenting_plan_attachment[i].overflow_fields["location_of_exchange_specific_location"].overflow_trigger = 80
+  parenting_plan_attachment[i].overflow_fields["location_of_exchange_specific_location"].overflow_trigger = 320
   parenting_plan_attachment[i].overflow_fields["location_of_exchange_specific_location"].label = "14. Location of Exchange"
   parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_medical_costs"].overflow_trigger = 3
   parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_medical_costs"].label = "8. Extraordinary medical costs for " + support_payer.name.full()
-  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_medical_costs"].overflow_trigger = 7
+  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_medical_costs"].overflow_trigger = 3
   parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_medical_costs"].label = "8. Extraordinary medical costs for " + support_recipient.name.full() + " Included in Form 14"
   parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_childrearing_costs_in_14"].overflow_trigger = 3
   parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_childrearing_costs_in_14"].label = "13a. Extraordinary Childcare Costs for " + support_payer.name.full() + " Included in Form 14"
-  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_in_14"].overflow_trigger = 7
+  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_in_14"].overflow_trigger = 3
   parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_in_14"].label = "8. Extraordinary medical costs for " + support_recipient.name.full()
   parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_childrearing_costs_not_in_14"].overflow_trigger = 3
   parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_childrearing_costs_not_in_14"].label = "13a. Extraordinary Childcare Costs for " + support_payer.name.full() + " Included in Form 14"
-  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_not_in_14"].overflow_trigger = 7
+  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_not_in_14"].overflow_trigger = 3
   parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_not_in_14"].label = "8. Extraordinary medical costs for " + support_recipient.name.full()
-  parenting_plan_attachment[i].overflow_fields["use_presumed_child_support_explanation"].overflow_trigger = 120
+  parenting_plan_attachment[i].overflow_fields["use_presumed_child_support_explanation"].overflow_trigger = 320
   parenting_plan_attachment[i].overflow_fields["use_presumed_child_support_explanation"].label = "15. Presumed Child Support Explanation"
-  parenting_plan_attachment[i].overflow_fields["additional_provisions"].overflow_trigger = 120
+  parenting_plan_attachment[i].overflow_fields["additional_provisions"].overflow_trigger = 480
   parenting_plan_attachment[i].overflow_fields["additional_provisions"].label = "20. Additional Provisions"
-  parenting_plan_attachment[i].overflow_fields["children_of_marriage_minor"].overflow_trigger = 4
+  parenting_plan_attachment[i].overflow_fields["children_of_marriage_minor"].overflow_trigger = 6
   parenting_plan_attachment[i].overflow_fields["children_of_marriage_minor"].label = "Additional Children"
   parenting_plan_attachment[i].overflow_fields.gathered = True
 ---
@@ -664,7 +664,7 @@ attachment:
       - "pAuthorsOtherSuffixA": ${ parenting_plan_A_author_other.name.suffix } 
       - "pAuthorsOtherLastNameA": ${ parenting_plan_A_author_other.name.last } 
       - "pAuthorsOtherFirstNameA": ${ parenting_plan_A_author_other.name.first } 
-      - "pChildrenNumber": ${ len(number_of_children) } 
+      - "pChildrenNumber": ${ number_of_children } 
       - "pFirstChildsAge": |
           % if len(children_of_marriage_minor) > 0:
           % if date_difference(starting=children_of_marriage_minor[0].birthdate,ending=today()).years > 1:
@@ -1341,8 +1341,8 @@ attachment:
           ${ thousands(support_payer.extraordinary_childrearing_costs_in_14[0].total(times_per_year = 12), show_decimals=True) }
           % endif 
       - "pbExtraChildCostsParentPayingSupportForm141": |
-          % if len(support_payer.extraordinary_childrearing_costs_not_in_14) > 0:
-          ${ "{:.0f}".format(support_payer.extraordinary_childrearing_costs_not_in_14[0].percentage) }
+          % if len(support_payer.extraordinary_childrearing_costs_in_14) > 0:
+          ${ support_payer.extraordinary_childrearing_costs_in_14[0].description }
           % endif 
       - "pbExtraChildCostsParentPayingSupportAmt2": |
           % if len(support_payer.extraordinary_childrearing_costs_in_14) > 1:
@@ -1367,8 +1367,8 @@ attachment:
           ${ thousands(support_recipient.extraordinary_childrearing_costs_in_14[0].total(times_per_year = 12), show_decimals=True) }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportForm141": |
-          % if len(support_recipient.extraordinary_childrearing_costs_in_14) > 1:
-          ${ support_recipient.extraordinary_childrearing_costs_in_14[1].description }
+          % if len(support_recipient.extraordinary_childrearing_costs_in_14) > 0:
+          ${ support_recipient.extraordinary_childrearing_costs_in_14[0].description }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportAmt2": |
           % if len(support_recipient.extraordinary_childrearing_costs_in_14) > 1:

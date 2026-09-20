@@ -43,15 +43,15 @@ code: |
   answer_attachment[i].title = "Answer"
   answer_attachment[i].filename = "answer" if i == "redacted" else "answer_unredacted"
 ---
-id: petition overflow fields
+id: answer overflow fields
 code: |
   answer_attachment[i].overflow_fields["persons_lived_with"].overflow_trigger = 3
   answer_attachment[i].overflow_fields["persons_lived_with"].label = "Additional Addresses"
-  answer_attachment[i].overflow_fields["denials"].overflow_trigger = 840
+  answer_attachment[i].overflow_fields["denials"].overflow_trigger = 650
   answer_attachment[i].overflow_fields["denials"].label = "Denials"
-  answer_attachment[i].overflow_fields["relief_other"].overflow_trigger = 540
+  answer_attachment[i].overflow_fields["relief_other"].overflow_trigger = 480
   answer_attachment[i].overflow_fields["relief_other"].label = "Other Relief"
-  answer_attachment[i].overflow_fields["children_of_marriage"].overflow_trigger = 4
+  answer_attachment[i].overflow_fields["children_of_marriage"].overflow_trigger = 6
   answer_attachment[i].overflow_fields["children_of_marriage"].label = "Additional Children"
   answer_attachment[i].overflow_fields.gathered = True
 ---
@@ -351,7 +351,7 @@ attachment:
       - "raRequestReliefChangeName": ${ relief["change_name"] } 
       - "raRequestReliefFormerSuffix": ${ respondent.prior_name.name.suffix if relief['change_name'] else ""  } 
       - "raRequestReliefFormerFirstName": ${ respondent.prior_name.name.first if relief['change_name'] else "" } 
-      - "raRequestReliefFormerMiddleName": ${ respondent.prior_name.name.last if relief['change_name'] else "" } 
+      - "raRequestReliefFormerMiddleName": ${ respondent.prior_name.name.middle if relief['change_name'] else "" } 
       - "raRequestReliefFormerLastName": ${ respondent.prior_name.name.last if relief['change_name'] else ""  } 
       - "raRequestReliefOther": ${ relief["other"] } 
       - "raRequestReliefOtherRequests1": ${ answer_attachment[i].safe_value('relief_other') } 
