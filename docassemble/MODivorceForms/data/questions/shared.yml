@@ -1039,6 +1039,20 @@ code: |
   users[0].other_children = 0
   other_parties[0].other_children = 0
 ---
+code: |
+  if not minor_children:
+    number_of_children = 0
+    children_of_marriage_minor = 0
+  if showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]'):
+    children_of_marriage_minor = [chi for chi in children if chi.unemancipated and chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()]]
+    number_of_children = len(children_of_marriage_minor)
+  if 'petition_attachment' in doc_list_selected.true_values():
+    children_of_marriage = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()]]
+    children_of_marriage_born_after_not_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.birthdate >= marriage.recorded_date and not chi.adopted]
+    children_of_marriage_born_before_not_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.birthdate < marriage.recorded_date and not chi.adopted]
+    children_of_marriage_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.adopted]
+  children_list_create = True
+---
 comment: |
   The petition requires you to put the primary person that the child has in the last 60 days.  
 sets: children[i].lived_with.name.first
@@ -1650,6 +1664,15 @@ fields:
       - ${ other_parties[0] }
     default: ${ support_recipient }
 ---
+id: table for tax dependency
+table: children_of_marriage_minor_tax_table
+rows: children_of_marriage_minor
+columns:
+  - Who should claim in even years?: |
+      row_item.tax_dependency_even
+edit:
+  - tax_dependency_even
+---
 id: other parent
 reconsider:
   - people_choices
@@ -1938,7 +1961,7 @@ columns:
   - Description: |
       row_item.description
   - Amount of extraordinary medical cost: |
-      row_item.extraordinary_medical_cost
+      thousands(row_item.value)
   - Times per year pays this cost: |
       row_item.times_per_year
 edit:
@@ -2045,8 +2068,8 @@ code: |
       x.extraordinary_childrearing_costs_in_14.append(cost)
     else:
       x.extraordinary_childrearing_costs_not_in_14.append(cost)
-  x.extraordinary_childrearing_costs_in_14.gathered
-  x.extraordinary_childrearing_costs_not_in_14.gathered
+  x.extraordinary_childrearing_costs_in_14.gathered = True
+  x.extraordinary_childrearing_costs_not_in_14.gathered = True
     
 ---
 id: extraordinary childcare expenses table
@@ -2473,6 +2496,9 @@ code: |
 code: |
   other_debts = users[0].debts_owned.matches(source=["appliances", "computers", "electronics", "furnishings", "personal_goods_other","jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc", "businesses", "stocks", "bonds", "notes", "mortgages", "money market", "securities_other", "farm", "other_assets", "personal_loans", "medical_debt", "student_loans","other"], exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])
   other_debts.gathered = True
+---
+objects:
+  - additional_possessions: ALAssetList.using(auto_gather=False)
 ---
 code: |
   additional_possessions.clear()
@@ -5755,20 +5781,18 @@ subquestion: |
   If maintenance was awarded earlier in the case, you can answer yes.  But in most cases there will not already be an award of maintenance.
 
 fields:
-  - Is any maintenance currently paid by ${ petitioner.name_full() } or ${ respondent.name_full() } to the other?: is_maintenance_currently_paid
+  - Is any maintenance currently paid by ${ petitioner.name.full() } or ${ respondent.name.full() } to the other?: is_maintenance_currently_paid
     datatype: yesnoradio
     default: False
   - Who is currently paid maintenance?: maintenance_currently_paid_to
-    js show if: |
-      val("is_maintenance_currently_paid")
+    show if: is_maintenance_currently_paid
     choices:
-      - ${ petitioner.name_full() } is paid maintenance by ${ respondent.name_full() }: ${ petitioner.name_full() }
-      - ${ respondent.name_full() } is paid maintenance by ${ petitioner.name_full() }: ${ respondent.name_full() }
+      - ${ petitioner.name_full() } is paid maintenance by ${ respondent.name.full() }: ${ petitioner.name.full() }
+      - ${ respondent.name_full() } is paid maintenance by ${ petitioner.name.full() }: ${ respondent.name.full() }
     datatype: radio
   - How much per month?: maintenance_currently_paid_amount
     datatype: currency
-    js show if: |
-      val('maintenance_currently_paid_to') === petitioner.name.full() || val('maintenance_currently_paid_to') === respondent.name.full()
+    show if: is_maintenance_currently_paid
 validation code: |
   if is_maintenance_currently_paid:
     if maintenance_currently_paid_to == petitioner.name.full():
@@ -5998,7 +6022,9 @@ objects:
 ---
 ############ REVIEW
 id: review screen
-reconsider: children_of_marriage_minor
+reconsider: 
+  - children_of_marriage_minor
+  - children_of_marriage_minor_tax_table
 event: review_form
 question: Review your answers
 subquestion: |
@@ -6121,7 +6147,7 @@ review:
     Communication methods: ${ showifdef('communications') }
 - Edit: communications_other
   button: |
-    **Communication**
+    **Third Person for Party Communication**
 
     Existing person: ${ showifdef('communications_other') }
 
@@ -6680,15 +6706,11 @@ review:
     How should child support be paid?: ${ showifdef('child_support_method_of_payment') }
 
     Should child support be paid at the Family Support Payment Center or directly to ${ support_recipient.name_full() }: ${ showifdef('child_support_location_of_payment') }
-- Edit: children.revisit
-  button: |
+- note: |
     **Income Tax Dependents**
-    
-    Child | Even Years | Odd Years
-    ------|------------|----------
-    % for child in [chi for chi in children if chi.unemancipated]:
-    ${ child.name_full() } | ${ child.tax_dependency_even } | ${ child.tax_dependency_odd } 
-    % endfor
+
+    ${ children_of_marriage_minor_tax_table }
+
 - raw html: |
     ${ end_accordion() }
   show if: minor_children and (showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]')or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'))
@@ -6719,14 +6741,14 @@ review:
     Does Petitioner own a house, condominium or other real estate?: **${ yesno(len([re for re in real_estate if petitioner.name.full() in re.ownership]) > 0) }**
 
     % for asset in [re for re in real_estate if petitioner.name.full() in re.ownership]:
-     - ${ asset.description_template() }
+     - ${ asset.description_template }
     
     % endfor
 
     Does Respondent own a house, condominium or other real estate?: **${ yesno(len([re for re in real_estate if respondent.name.full() in re.ownership]) > 0) }**
     
     % for asset in [re for re in real_estate if respondent.name.full() in re.ownership]:
-     - ${ asset.description_template() }
+     - ${ asset.description_template }
     
     % endfor
 - Edit: 
@@ -7044,28 +7066,28 @@ review:
     Does Petitioner owe a mortgage on a house or condominium or land?:  **${ yesno(len(petitioner.debts_owned.matches(source=['house','condominium', 'leasehold','real_estate_other'])) > 0)}**
 
     % for debt in petitioner.debts_owned.matches(source=['house','condominium', 'leasehold','real_estate_other']):
-    ${ debt.loan_description_template }
+    - ${ debt.loan_description_template }
 
     % endfor
     
     Does Respondent owe a mortgage on a house or condominium or land?:  **${ yesno(len(respondent.debts_owned.matches(source=['house','condominium', 'leasehold','real_estate_other'])) > 0)}**
 
     % for debt in respondent.debts_owned.matches(source=['house','condominium', 'leasehold','real_estate_other']):
-    ${ debt.loan_description_template }
+    - ${ debt.loan_description_template }
 
     % endfor
     
     Does Petitioner owe money on a car?: **${ yesno(len(petitioner.debts_owned.matches(source=['car', 'truck','motorcycle','mobile_home','trailer', 'boat','airplane',"vehicles_other"])) > 0) }**
 
     % for debt in petitioner.debts_owned.matches(source=['car', 'truck','motorcycle','mobile_home','trailer', 'boat','airplane',"vehicles_other"]):
-    ${ debt.loan_description_template }
+    - ${ debt.loan_description_template }
 
     % endfor
     
     Does Respondent owe money on a car?: **${ yesno(len(respondent.debts_owned.matches(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane',"vehicles_other"])) > 0) }**
 
     % for debt in respondent.debts_owned.matches(source=['car','truck','motorcycle','mobile_home','trailer','boat','airplane',"vehicles_other"]):
-    ${ debt.loan_description_template }
+    - ${ debt.loan_description_template }
 
     % endfor
 
@@ -7296,7 +7318,7 @@ review:
     You said your highest level of education was **${ users[0].education }**.  This entered into the form in the following way:
     
      - Your highest level of elementary education: **${ users[0].education_elementary }**
-     - Your highest level of secondary education: **${ showifdef(users[0].education_college) }**
+     - Your highest level of secondary education: **${ showifdef('users[0].education_college') }**
 
 - Edit: 
     - users[0].active_duty
@@ -7407,7 +7429,7 @@ review:
     You said your spouse's highest level of education was **${ other_parties[0].education }**.  This entered into the form in the following way:
     
      - Your spouse's highest level of elementary education: **${ other_parties[0].education_elementary }**
-     - Your spouse's highest level of secondary education: **${ showifdef(other_parties[0].education_college) }**
+     - Your spouse's highest level of secondary education: **${ showifdef('other_parties[0].education_college') }**
 - Edit: 
     - other_parties[0].active_duty
     - section_user_info
@@ -7659,8 +7681,6 @@ review:
 ---
 id: parenting plan review
 question: Review the Parenting Plan
-subquestion: |
-  ${ parenting_plan_attachment.as_pdf() }
     
 review:
   - raw html: |
@@ -8063,7 +8083,7 @@ id: parenting plan additional provisions review
 question: Review the Parenting Plan Statement
 subquestion: |
 
-  ${ parenting_plan_attachment.as_pdf() }
+  ${ parenting_plan_attachment['unredacted'].as_pdf() }
 
 
 fields:

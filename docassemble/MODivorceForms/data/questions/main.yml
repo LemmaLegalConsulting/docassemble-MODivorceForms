@@ -564,7 +564,7 @@ code: |
   if task_not_yet_performed('show review'):
     mark_task_as_performed('show review')
     force_ask('review_form')
-  al_court_bundle3
+  new_test2
   signature_date
   # Store anonymous data for analytics / statistics
   store_variables_snapshot(
@@ -581,9 +581,8 @@ code: |
     al_download_waiting_screen
   mo_divorce_forms_download
 ---
-code: |
-  reconsider('al_user_bundle')
-  al_court_bundle3 = True
+question: Test
+continue button field: new_test2
 ---
 include:
   - property_statement.yml
