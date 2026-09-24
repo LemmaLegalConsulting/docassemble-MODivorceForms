@@ -5961,6 +5961,11 @@ subquestion: |
 
   ${ action_button_html(url_action('mo_divorce_forms_edit_answers'), label='Edit answers', color='info') }
 
+  % if case.filed in ["user0_filed","other_parties0_filed"]:
+  You will need to print two copies of each unredacted document and one copy of each redacted document. One set of unredacted documents should be mailed directly to the other party. The other set of unredacted documents should be filed with the court, along with the redacted documents.
+  
+  % endif
+
   Here is a copy of the documents without redactions
     
   ${ al_user_bundle.download_list_html(use_previously_cached_files=True, include_full_pdf=True) }
