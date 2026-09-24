@@ -55,8 +55,8 @@ fields:
   - Check all that apply: parenting_plan_A_author
     datatype: checkboxes
     choices:
-      - ${ petitioner }: petitioner
-      - ${ respondent }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
       - The court
       - The guardian ad litem
       - Other
@@ -95,8 +95,8 @@ fields:
   - Check all that apply: parenting_plan_B_author
     datatype: checkboxes
     choices:
-      - ${ petitioner }: petitioner
-      - ${ respondent }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
       - The court
       - The guardian ad litem
       - Other
@@ -152,8 +152,8 @@ fields:
   - Where should an exchange occur if a specific location for an exchange is not stated on the schedule?: location_of_exchange
     choices:
       - "All exchanges shall occur at the children’s school or child care provider when school or child care is in session.": school
-      - ${ petitioner.possessive('residence')  }: petitioner_residence
-      - ${ respondent.possessive('residence')  }: respondent_residence
+      - ${ petitioner.possessive('residence')  }: ${ petitioner.name.full() }
+      - ${ respondent.possessive('residence')  }: ${ respondent.name.full() }
       - "The parent receiving custody of the children shall pick up the children at the other parent’s residence.": pick_up
       - Other location: other
   - When should the exchange occur?: time_of_exchange
@@ -198,14 +198,14 @@ validation code: |
        default_exchange_time2 = time_of_exchange2
      else:
        default_exchange_time2 = None
-   if location_of_exchange == "petitioner_residence":
-     default_exchange_method = "petitioner_residence"
+   if location_of_exchange == petitioner.name.full():
+     default_exchange_method = petitioner.name.full()
      default_exchange_time = time_of_exchange
      default_exchange_location = "house"
      default_add_pick_up_from_school = False
      default_exchange_time2 = None
-   if location_of_exchange == "respondent_residence":
-     default_exchange_method = "respondent_residence"
+   if location_of_exchange == respondent.name.full():
+     default_exchange_method = respondent.name.full()
      default_exchange_time = time_of_exchange
      default_exchange_location = "house"
      default_add_pick_up_from_school = False
@@ -243,8 +243,8 @@ fields:
     datatype: yesnoradio
   - Who has committed the domestic violence?: domestic_violence_committed_by
     choices:
-      - ${ petitioner }: petitioner
-      - ${ respondent }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
       - Both: both
     show if: domestic_violence
   - note: |
@@ -672,60 +672,60 @@ use objects: True
 data:
   mlk:
     description: "Martin Luther King Day"
-    even_default: petitioner
-    odd_default: respondent
+    even_default: ${ petitioner.name.full() }
+    odd_default: ${ respondent.name.full() }
   president:
     description: "President’s Day"
-    even_default: respondent
-    odd_default: petitioner
+    even_default: ${ respondent.name.full() }
+    odd_default: ${ petitioner.name.full() }
   memorial:
     description: "Memorial Day"
-    even_default: petitioner
-    odd_default: respondent
+    even_default: ${ petitioner.name.full() }
+    odd_default: ${ respondent.name.full() }
   independence:
     description: "Independence Day"
-    even_default: respondent
-    odd_default: petitioner
+    even_default: ${ respondent.name.full() }
+    odd_default: ${ petitioner.name.full() }
   labor:
     description: "Labor Day"
-    even_default: petitioner
-    odd_default: respondent
+    even_default: ${ petitioner.name.full() }
+    odd_default: ${ respondent.name.full() }
   thanksgiving:
     description: "Thanksgiving"
-    even_default: respondent
-    odd_default: petitioner
+    even_default: ${ respondent.name.full() }
+    odd_default: ${ petitioner.name.full() }
   halloween:
     description: "Halloween"
-    even_default: petitioner
-    odd_default: respondent
+    even_default: ${ petitioner.name.full() }
+    odd_default: ${ respondent.name.full() }
   xmas_eve:
     description: "Christmas Eve"
-    even_default: respondent
-    odd_default: petitioner
+    even_default: ${ respondent.name.full() }
+    odd_default: ${ petitioner.name.full() }
   xmas_day:
     description: "Christmas Day"
-    even_default: petitioner
-    odd_default: respondent
+    even_default: ${ petitioner.name.full() }
+    odd_default: ${ respondent.name.full() }
   mother:
     description: "Mother’s Day"
-    even_default: respondent
-    odd_default: petitioner
+    even_default: ${ respondent.name.full() }
+    odd_default: ${ petitioner.name.full() }
   father:
     description: "Father’s Day"
-    even_default: petitioner
-    odd_default: respondent
+    even_default: ${ petitioner.name.full() }
+    odd_default: ${ respondent.name.full() }
   petitioner_birthday:
     description: "Petitioner’s Birthday"
-    even_default: petitioner
-    odd_default: petitioner
+    even_default: ${ petitioner.name.full() }
+    odd_default: ${ petitioner.name.full() }
   respondent_birthday:
     description: "Respondent’s Birthday"
-    even_default: respondent
-    odd_default: respondent
+    even_default: ${ respondent.name.full() }
+    odd_default: ${ respondent.name.full() }
   children_birthday:
     description: "Child(ren)'s Birthday"
-    even_default: respondent
-    odd_default: petitioner
+    even_default: ${ respondent.name.full() }
+    odd_default: ${ petitioner.name.full() }
 ---
 id: describe other holidays
 question: ${ holidays[i]["description"] }
@@ -775,13 +775,13 @@ fields:
  - Even Numbered Years: other_holidays[i].even_years
    datatype: radio
    choices:
-     - ${ petitioner.name.first }: petitioner
-     - ${ respondent.name.first }: respondent
+     - ${ petitioner.name.full() }
+     - ${ respondent.name.full() }
  - Odd Numbered Years: other_holidays[i].odd_years
    datatype: radio
    choices:
-     - ${ petitioner.name.first }: petitioner
-     - ${ respondent.name.first }: respondent
+     - ${ petitioner.name.full() }
+     - ${ respondent.name.full() }
  - Physical custody from: other_holidays[i].custody_from_time
    datatype: time
  - Physical custody to: other_holidays[i].custody_to_time
@@ -839,14 +839,14 @@ fields:
       ${ holidays["children_birthday"]["description"] } | [FIELD holidays["children_birthday"]["even_years"]] | [FIELD holidays["children_birthday"]["odd_years"]] | [FIELD holidays["children_birthday"]["custody_from_time"]] | [FIELD holidays["children_birthday"]["custody_to_time"]]
   - no label: holidays["mlk"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["mlk"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["mlk"]["custody_from_time"]
@@ -859,14 +859,14 @@ fields:
     required: False
   - no label: holidays["president"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["president"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["president"]["custody_from_time"]
@@ -879,14 +879,14 @@ fields:
     required: False
   - no label: holidays["memorial"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["memorial"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["memorial"]["custody_from_time"]
@@ -899,14 +899,14 @@ fields:
     required: False
   - no label: holidays["independence"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["independence"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["independence"]["custody_from_time"]
@@ -919,14 +919,14 @@ fields:
     required: False
   - no label: holidays["labor"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["labor"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["labor"]["custody_from_time"]
@@ -939,14 +939,14 @@ fields:
     required: False
   - no label: holidays["thanksgiving"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["thanksgiving"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["thanksgiving"]["custody_from_time"]
@@ -959,14 +959,14 @@ fields:
     required: False
   - no label: holidays["halloween"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["halloween"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["halloween"]["custody_from_time"]
@@ -979,14 +979,14 @@ fields:
     required: False
   - no label: holidays["xmas_eve"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["xmas_eve"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["xmas_eve"]["custody_from_time"]
@@ -999,14 +999,14 @@ fields:
     required: False
   - no label: holidays["xmas_day"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["xmas_day"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["xmas_day"]["custody_from_time"]
@@ -1019,14 +1019,14 @@ fields:
     required: False
   - no label: holidays["mother"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["mother"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["mother"]["custody_from_time"]
@@ -1039,14 +1039,14 @@ fields:
     required: False
   - no label: holidays["father"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["father"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["father"]["custody_from_time"]
@@ -1059,14 +1059,14 @@ fields:
     required: False
   - no label: holidays["petitioner_birthday"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["petitioner_birthday"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["petitioner_birthday"]["custody_from_time"]
@@ -1079,14 +1079,14 @@ fields:
     required: False
   - no label: holidays["respondent_birthday"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["respondent_birthday"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["respondent_birthday"]["custody_from_time"]
@@ -1099,14 +1099,14 @@ fields:
     required: False
   - no label: holidays["children_birthday"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["children_birthday"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     required: False
   - no label: holidays["children_birthday"]["custody_from_time"]
@@ -1148,14 +1148,14 @@ fields:
       ${ holidays["children_birthday"]["description"] } | [FIELD holidays["children_birthday"]["even_years"]] | [FIELD holidays["children_birthday"]["odd_years"]] | [FIELD holidays["children_birthday"]["custody_from_time"]] | [FIELD holidays["children_birthday"]["custody_to_time"]]
   - no label: holidays["mlk"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["mlk"]["even_default"] } 
   - no label: holidays["mlk"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["mlk"]["odd_default"] }
   - no label: holidays["mlk"]["custody_from_time"]
@@ -1168,14 +1168,14 @@ fields:
     default: "7 pm"
   - no label: holidays["president"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["president"]["even_default"] }
   - no label: holidays["president"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["president"]["odd_default"] }
   - no label: holidays["president"]["custody_from_time"]
@@ -1188,14 +1188,14 @@ fields:
     default: "7 pm"
   - no label: holidays["memorial"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["memorial"]["even_default"] }
   - no label: holidays["memorial"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["memorial"]["odd_default"] }
   - no label: holidays["memorial"]["custody_from_time"]
@@ -1208,14 +1208,14 @@ fields:
     default: "7 pm"
   - no label: holidays["independence"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["independence"]["even_default"] }
   - no label: holidays["independence"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["independence"]["odd_default"] }
   - no label: holidays["independence"]["custody_from_time"]
@@ -1228,14 +1228,14 @@ fields:
     default: "7 pm"
   - no label: holidays["labor"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["labor"]["even_default"] }
   - no label: holidays["labor"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["labor"]["odd_default"] }
   - no label: holidays["labor"]["custody_from_time"]
@@ -1248,14 +1248,14 @@ fields:
     default: "7 pm"
   - no label: holidays["thanksgiving"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["thanksgiving"]["even_default"] }
   - no label: holidays["thanksgiving"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["thanksgiving"]["odd_default"] }
   - no label: holidays["thanksgiving"]["custody_from_time"]
@@ -1268,14 +1268,14 @@ fields:
     default: "7 pm"
   - no label: holidays["halloween"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["halloween"]["even_default"] }
   - no label: holidays["halloween"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["halloween"]["odd_default"] }
   - no label: holidays["halloween"]["custody_from_time"]
@@ -1288,14 +1288,14 @@ fields:
     default: "7 pm"
   - no label: holidays["xmas_eve"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["xmas_eve"]["even_default"] }
   - no label: holidays["xmas_eve"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["xmas_eve"]["odd_default"] }
   - no label: holidays["xmas_eve"]["custody_from_time"]
@@ -1308,14 +1308,14 @@ fields:
     default: "7 pm"
   - no label: holidays["xmas_day"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["xmas_day"]["even_default"] }
   - no label: holidays["xmas_day"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["xmas_day"]["odd_default"] }
   - no label: holidays["xmas_day"]["custody_from_time"]
@@ -1328,14 +1328,14 @@ fields:
     default: "7 pm"
   - no label: holidays["mother"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["mother"]["even_default"] }
   - no label: holidays["mother"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["mother"]["odd_default"] }
   - no label: holidays["mother"]["custody_from_time"]
@@ -1348,14 +1348,14 @@ fields:
     default: "7 pm"
   - no label: holidays["father"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["father"]["even_default"] }
   - no label: holidays["father"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["father"]["odd_default"] }
   - no label: holidays["father"]["custody_from_time"]
@@ -1368,14 +1368,14 @@ fields:
     default: "7 pm"
   - no label: holidays["petitioner_birthday"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["petitioner_birthday"]["even_default"] }
   - no label: holidays["petitioner_birthday"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["petitioner_birthday"]["odd_default"] }
   - no label: holidays["petitioner_birthday"]["custody_from_time"]
@@ -1388,14 +1388,14 @@ fields:
     default: "7 pm"
   - no label: holidays["respondent_birthday"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["respondent_birthday"]["even_default"] }
   - no label: holidays["respondent_birthday"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["respondent_birthday"]["odd_default"] }
   - no label: holidays["respondent_birthday"]["custody_from_time"]
@@ -1408,14 +1408,14 @@ fields:
     default: "7 pm"
   - no label: holidays["children_birthday"]["even_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["children_birthday"]["even_default"] }
   - no label: holidays["children_birthday"]["odd_years"]
     choices:
-      - ${ petitioner.name.first }: petitioner
-      - ${ respondent.name.first }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
     inline width: 3em
     default: ${ holidays["children_birthday"]["odd_default"] }
   - no label: holidays["children_birthday"]["custody_from_time"]
@@ -1678,16 +1678,16 @@ attachment:
       - "paCommunicationThirdPersonSuffix": ${ communications_other.name.suffix } 
       - "paDisputeResolution1": ${ parenting_plan_attachment[i].safe_value('dispute_resolution') } 
       - "paPhysicalCustodyJoint": ${ physical_custody == "Joint" } 
-      - "paJointPhysCustAddressPetitioner": ${ physical_custody_address == "petitioner" } 
-      - "paJointPhysCustAddressRespondent": ${ physical_custody_address == "respondent" } 
-      - "paPhysicalCustodySoleWithVisit": ${ physical_custody in ["petitioner","respondent"] and visitation == False } 
-      - "paSolePhysCustWithVisitPetitioner": ${ physical_custody in ["petitioner"] and visitation == False } 
-      - "paSolePhysCustWithVisitRespondent": ${ physical_custody in ["respondent"] and visitation == False } 
-      - "paPhysicalCustodySoleSupVisit": ${ physical_custody in ["petitioner","respondent"] and visitation == True } 
-      - "paSolePhysCustSupVisitPetitioner": ${ physical_custody == "petitioner" and visitation == True } 
-      - "paSolePhysCustSupVisitRespondent": ${ physical_custody == "respondent" and visitation == True } 
-      - "paNoUnsupVisitPetitioner": ${ physical_custody in ["respondent"] and visitation == True } 
-      - "paNoUnsupVisitRespondent": ${ physical_custody in ["petitioner"] and visitation == True } 
+      - "paJointPhysCustAddressPetitioner": ${ physical_custody_address == petitioner.name.full() } 
+      - "paJointPhysCustAddressRespondent": ${ physical_custody_address == respondent.name.full() } 
+      - "paPhysicalCustodySoleWithVisit": ${ physical_custody in [petitioner.name.full(), respondent.name.full()] and visitation == False } 
+      - "paSolePhysCustWithVisitPetitioner": ${ physical_custody in [petitioner.name.full()] and visitation == False } 
+      - "paSolePhysCustWithVisitRespondent": ${ physical_custody in [respondent.name.full()] and visitation == False } 
+      - "paPhysicalCustodySoleSupVisit": ${ physical_custody in [petitioner.name.full(),respondent.name.full()] and visitation == True } 
+      - "paSolePhysCustSupVisitPetitioner": ${ physical_custody == petitioner.name.full() and visitation == True } 
+      - "paSolePhysCustSupVisitRespondent": ${ physical_custody == respondent.name.full() and visitation == True } 
+      - "paNoUnsupVisitPetitioner": ${ physical_custody in [respondent.name.full()] and visitation == True } 
+      - "paNoUnsupVisitRespondent": ${ physical_custody in [petitioner.name.full()] and visitation == True } 
       - "paNoUnsupervisedVisitReason": ${ parenting_plan_attachment[i].safe_value('visitation_reason') } 
       - "paSupVisitationFirstName": ${ visitation_supervisor.name.first } 
       - "paSupVisitationMiddleName": ${ visitation_supervisor.name.middle } 
@@ -1712,60 +1712,60 @@ attachment:
       - "paScheduleWeekTwoThursday": ${ biweekly_schedule[11] } 
       - "paScheduleWeekTwoFriday": ${ biweekly_schedule[12] } 
       - "paScheduleWeekTwoSaturday": ${ biweekly_schedule[13] } 
-      - "paMLKdayEven": ${ role_dictionary_full_name[holidays["mlk"]["even_years"]] } 
-      - "paMLKdayOdd": ${ role_dictionary_full_name[holidays["mlk"]["odd_years"]] } 
+      - "paMLKdayEven": ${ holidays["mlk"]["even_years"] } 
+      - "paMLKdayOdd": ${ holidays["mlk"]["odd_years"] } 
       - "paMLKdayStartTime": ${ format_time(holidays["mlk"]["custody_from_time"]) } 
       - "paMLKdayEndTime": ${ format_time(holidays["mlk"]["custody_to_time"]) } 
-      - "paPresidentsDayEven": ${ role_dictionary_full_name[holidays["president"]["even_years"]] } 
-      - "paPresidentsDayOdd": ${ role_dictionary_full_name[holidays["president"]["odd_years"]] } 
+      - "paPresidentsDayEven": ${ holidays["president"]["even_years"] } 
+      - "paPresidentsDayOdd": ${ holidays["president"]["odd_years"] } 
       - "paPresidentsDayStartTime": ${ format_time(holidays["president"]["custody_from_time"]) } 
       - "paPresidentsDayEndTime": ${ format_time(holidays["president"]["custody_to_time"]) } 
-      - "paMemorialDayEven": ${ role_dictionary_full_name[holidays["memorial"]["even_years"]] } 
-      - "paMemorialDayOdd": ${ role_dictionary_full_name[holidays["memorial"]["odd_years"]] } 
+      - "paMemorialDayEven": ${ holidays["memorial"]["even_years"] } 
+      - "paMemorialDayOdd": ${ holidays["memorial"]["odd_years"] } 
       - "paMemorialDayStartTime": ${ format_time(holidays["memorial"]["custody_from_time"]) } 
       - "paMemorialDayEndTime": ${ format_time(holidays["memorial"]["custody_to_time"]) } 
-      - "paIndependenceDayEven": ${ role_dictionary_full_name[holidays["independence"]["even_years"]] } 
-      - "paIndependenceDayOdd": ${ role_dictionary_full_name[holidays["independence"]["odd_years"]] } 
+      - "paIndependenceDayEven": ${ holidays["independence"]["even_years"] } 
+      - "paIndependenceDayOdd": ${ holidays["independence"]["odd_years"] } 
       - "paIndependenceDayStartTime": ${ format_time(holidays["independence"]["custody_from_time"]) } 
       - "paIndependenceDayEndTime": ${ format_time(holidays["independence"]["custody_to_time"]) } 
-      - "paLaborDayEven": ${ role_dictionary_full_name[holidays["labor"]["even_years"]] } 
-      - "paLaborDayOdd": ${ role_dictionary_full_name[holidays["labor"]["odd_years"]] } 
+      - "paLaborDayEven": ${ holidays["labor"]["even_years"] } 
+      - "paLaborDayOdd": ${ holidays["labor"]["odd_years"] } 
       - "paLaborDayStartTime": ${ format_time(holidays["labor"]["custody_from_time"]) } 
       - "paLaborDayEndTime": ${ format_time(holidays["labor"]["custody_to_time"]) } 
-      - "paThanksgivingEven": ${ role_dictionary_full_name[holidays["thanksgiving"]["even_years"]] } 
-      - "paThanksgivingOdd": ${ role_dictionary_full_name[holidays["thanksgiving"]["odd_years"]] } 
+      - "paThanksgivingEven": ${ holidays["thanksgiving"]["even_years"] } 
+      - "paThanksgivingOdd": ${ holidays["thanksgiving"]["odd_years"] } 
       - "paThanksgivingStartTime": ${ format_time(holidays["thanksgiving"]["custody_from_time"]) } 
       - "paThanksgivingEndTime": ${ format_time(holidays["thanksgiving"]["custody_to_time"]) } 
-      - "paHalloweenEven": ${ role_dictionary_full_name[holidays["halloween"]["even_years"]] } 
-      - "paHalloweenOdd": ${ role_dictionary_full_name[holidays["halloween"]["odd_years"]] } 
+      - "paHalloweenEven": ${ holidays["halloween"]["even_years"] } 
+      - "paHalloweenOdd": ${ holidays["halloween"]["odd_years"] } 
       - "paHalloweenStartTime": ${ format_time(holidays["halloween"]["custody_from_time"]) } 
       - "paHalloweenEndTime": ${ format_time(holidays["halloween"]["custody_to_time"]) } 
-      - "paChristmasEveEven": ${ role_dictionary_full_name[holidays["xmas_eve"]["even_years"]] } 
-      - "paChristmasEveOdd": ${ role_dictionary_full_name[holidays["xmas_eve"]["odd_years"]] } 
+      - "paChristmasEveEven": ${ holidays["xmas_eve"]["even_years"] } 
+      - "paChristmasEveOdd": ${ holidays["xmas_eve"]["odd_years"] } 
       - "paChristmasEveEndTime": ${ format_time(holidays["xmas_eve"]["custody_from_time"]) } 
       - "paChristmasEveStartTime": ${ format_time(holidays["xmas_eve"]["custody_to_time"]) } 
-      - "paChristmasDayEven": ${ role_dictionary_full_name[holidays["xmas_day"]["even_years"]] } 
-      - "paChristmasDayOdd": ${ role_dictionary_full_name[holidays["xmas_day"]["odd_years"]] } 
+      - "paChristmasDayEven": ${ holidays["xmas_day"]["even_years"] } 
+      - "paChristmasDayOdd": ${ holidays["xmas_day"]["odd_years"] } 
       - "paChristmasDayStartTime": ${ format_time(holidays["xmas_day"]["custody_from_time"]) } 
       - "paChristmasDayEndTime": ${ format_time(holidays["xmas_day"]["custody_to_time"]) } 
-      - "paMothersDayEven": ${ role_dictionary_full_name[holidays["mother"]["even_years"]] } 
-      - "paMothersDayOdd": ${ role_dictionary_full_name[holidays["mother"]["odd_years"]] } 
+      - "paMothersDayEven": ${ holidays["mother"]["even_years"] } 
+      - "paMothersDayOdd": ${ holidays["mother"]["odd_years"] } 
       - "paMothersDayStartTime": ${ format_time(holidays["mother"]["custody_from_time"]) } 
       - "paMothersDayEndTime": ${ format_time(holidays["mother"]["custody_to_time"]) } 
-      - "paFathersDayEven": ${ role_dictionary_full_name[holidays["father"]["even_years"]] } 
-      - "paFathersDayOdd": ${ role_dictionary_full_name[holidays["father"]["odd_years"]] } 
+      - "paFathersDayEven": ${ holidays["father"]["even_years"] } 
+      - "paFathersDayOdd": ${ holidays["father"]["odd_years"] } 
       - "paFathersDayStartTime": ${ format_time(holidays["father"]["custody_from_time"]) } 
       - "paFathersDayEndTime": ${ format_time(holidays["father"]["custody_to_time"]) } 
-      - "paPetitionersBirthdayEven": ${ role_dictionary_full_name[holidays["petitioner_birthday"]["even_years"]] } 
-      - "paPetitionersBirthdayOdd": ${ role_dictionary_full_name[holidays["petitioner_birthday"]["odd_years"]] } 
+      - "paPetitionersBirthdayEven": ${ holidays["petitioner_birthday"]["even_years"] } 
+      - "paPetitionersBirthdayOdd": ${ holidays["petitioner_birthday"]["odd_years"] } 
       - "paPetitionersBirthdayStartTime": ${ format_time(holidays["petitioner_birthday"]["custody_from_time"]) } 
       - "paPetitionersBirthdayEndTime": ${ format_time(holidays["petitioner_birthday"]["custody_to_time"]) } 
-      - "paRespondentsBirthdayEven": ${ role_dictionary_full_name[holidays["respondent_birthday"]["even_years"]] } 
-      - "paRespondentsBirthdayOdd": ${ role_dictionary_full_name[holidays["respondent_birthday"]["odd_years"]] } 
+      - "paRespondentsBirthdayEven": ${ holidays["respondent_birthday"]["even_years"] } 
+      - "paRespondentsBirthdayOdd": ${ holidays["respondent_birthday"]["odd_years"] } 
       - "paRespondentsBirthdayStartTime": ${ format_time(holidays["respondent_birthday"]["custody_from_time"]) } 
       - "paRespondentsBirthdayEndTime": ${ format_time(holidays["respondent_birthday"]["custody_to_time"]) } 
-      - "paChildrensBirthdaysEven": ${ role_dictionary_full_name[holidays["children_birthday"]["even_years"]]  } 
-      - "paChildrensBirthdaysOdd": ${ role_dictionary_full_name[holidays["children_birthday"]["odd_years"]] } 
+      - "paChildrensBirthdaysEven": ${ holidays["children_birthday"]["even_years"]  } 
+      - "paChildrensBirthdaysOdd": ${ holidays["children_birthday"]["odd_years"] } 
       - "paChildrensBirthdaysStartTime": ${ format_time(holidays["children_birthday"]["custody_from_time"]) } 
       - "paChildrensBirthdayEndTime": ${ format_time(holidays["children_birthday"]["custody_to_time"]) } 
       - "paOtherHolidays1": |
@@ -1914,9 +1914,9 @@ attachment:
       - "paVacationInfo1": ${ parenting_plan_attachment[i].safe_value('vacation_info') } 
       - "paLocationExchangesSchool": ${ location_of_exchange == "school" } 
       - "paLocationExchangesSchoolNotInSession1": ${ parenting_plan_attachment[i].safe_value('location_of_exchange_school_not_in_session') } 
-      - "paLocationExchangesResidence": ${ location_of_exchange in ["respondent_residence", "petitioner_residence"] } 
-      - "paLocationExchangesResidencePetitioner": ${ location_of_exchange == "petitioner_residence" } 
-      - "paLocationExchangesResidenceRespondent": ${ location_of_exchange == "respondent_residence" } 
+      - "paLocationExchangesResidence": ${ location_of_exchange in [respondent.name.full(), petitioner.name.full()] } 
+      - "paLocationExchangesResidencePetitioner": ${ location_of_exchange == petitioner.name.full() } 
+      - "paLocationExchangesResidenceRespondent": ${ location_of_exchange == respondent.name.full() } 
       - "paLocationExchangesPickUp": ${ location_of_exchange == "pick_up" } 
       - "paLocationExchangesSpecific": ${ location_of_exchange == "other" } 
       - "paLocationExchangesOther1": ${ parenting_plan_attachment[i].safe_value('location_of_exchange_specific_location') } 
@@ -1925,17 +1925,17 @@ attachment:
       - "paPhoneContactPm": ${ phone_contact_pm } 
       - "paPhoneContactNoRestrictions": ${ not phone_contact } 
       - "paPatternDomesticViolenceNone": ${ domestic_violence == False } 
-      - "paPatternDomViolencePetitioner": ${ domestic_violence_committed_by == "petitioner" } 
-      - "paPatternDomViolenceRespondent": ${ domestic_violence_committed_by == "respondent" } 
-      - "paPatternDomesticViolenceOne": ${ domestic_violence_committed_by in ['petitioner','respondent'] } 
+      - "paPatternDomViolencePetitioner": ${ domestic_violence_committed_by == petitioner.name.full() } 
+      - "paPatternDomViolenceRespondent": ${ domestic_violence_committed_by == respondent.name.full() } 
+      - "paPatternDomesticViolenceOne": ${ domestic_violence_committed_by in [petitioner.name.full(), respondent.name.full()] } 
       - "paPatternDomesticViolenceBoth": ${ domestic_violence_committed_by == "both" } 
       - "paDomesticViolenceNone": ${ domestic_violence == False } 
       - "paDomesticViolenceNoRecords": ${ educational_records_include_victim_address == False and domestic_violence } 
-      - "paDomViolencePetitionerNoRecords": ${ educational_records_include_victim_address == False and domestic_violence_committed_by in ['petitioner'] } 
-      - "paDomViolenceRespondentNoRecords": ${ educational_records_include_victim_address == False and domestic_violence_committed_by in ['respondent'] } 
+      - "paDomViolencePetitionerNoRecords": ${ educational_records_include_victim_address == False and domestic_violence_committed_by in [petitioner.name.full()] } 
+      - "paDomViolenceRespondentNoRecords": ${ educational_records_include_victim_address == False and domestic_violence_committed_by in [respondent.name.full()] } 
       - "paDomesticViolenceRecords": ${ educational_records_include_victim_address == True and domestic_violence } 
-      - "paDomViolencePetitionerRecords": ${ educational_records_include_victim_address == True and domestic_violence_committed_by in ['petitioner'] } 
-      - "paDomViolenceRespondentRecords": ${ educational_records_include_victim_address == True and domestic_violence_committed_by in ['respondent'] } 
+      - "paDomViolencePetitionerRecords": ${ educational_records_include_victim_address == True and domestic_violence_committed_by in [petitioner.name.full()] } 
+      - "paDomViolenceRespondentRecords": ${ educational_records_include_victim_address == True and domestic_violence_committed_by in [respondent.name.full()] } 
       - "countyList2": ${ case.county } 
       - "petitionersFirstName2": ${ petitioner.name.first } 
       - "petitionersMiddleName2": ${ petitioner.name.middle } 
@@ -2102,10 +2102,10 @@ attachment:
           % if len(children_of_marriage_minor) > 5:
           ${ redact(children_of_marriage_minor[5].name.suffix) }
           % endif
-      - "pbParentPayRespondent": ${ child_support == "respondent" } 
-      - "pbParentPaidPetitioner": ${ child_support == "respondent" } 
-      - "pbParentPaidRespondent": ${ child_support == "petitioner" } 
-      - "pbParentPayPetitioner": ${ child_support == "petitioner" } 
+      - "pbParentPayRespondent": ${ child_support == respondent.name.full() } 
+      - "pbParentPaidPetitioner": ${ child_support == respondent.name.full() } 
+      - "pbParentPaidRespondent": ${ child_support == petitioner.name.full() } 
+      - "pbParentPayPetitioner": ${ child_support == petitioner.name.full() } 
       - "pbParentPayNone": ${ child_support == "none" } 
       - "pbParentPayingForm14Only": ${ child_support == "none" } 
       - "pbParentPayingForm14Only": ${ } 
@@ -2282,8 +2282,8 @@ attachment:
           % if len(support_recipient.extraordinary_childrearing_costs_not_in_14) > 2:
           ${ support_recipient.extraordinary_childrearing_costs_not_in_14[2].description }
           % endif 
-      - "pbParentPayingSupportForm14Respondent": ${ child_support in ["petitioner", "none","third_party"] } 
-      - "pbParentPayingSupportForm14Petitioner": ${ child_support in ["respondent"] } 
+      - "pbParentPayingSupportForm14Respondent": ${ child_support in [petitioner.name.full(), "none","third_party"] } 
+      - "pbParentPayingSupportForm14Petitioner": ${ child_support in [respondent.name.full()] } 
       - "pbChildrenNumber": ${ "1" } 
       - "lineOneColOne": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) } 
       - "lineOneColTwo": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) } 

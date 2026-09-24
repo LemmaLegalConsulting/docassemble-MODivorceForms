@@ -3,8 +3,12 @@ include:
   - docassemble.ALToolbox:al_income.yml
   - county.yml
   - weekly_scheduler.yml
-  - weeklydemo.yml
   - service_by_publication.yml
+---
+id: turned off listen feature
+mandatory: True
+code: |
+  speak_text = False
 ---
 modules:
   - .al_income
@@ -915,6 +919,27 @@ code: |
     children_of_marriage_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.adopted]
   children_list_create = True
 ---
+objects:
+  - children_of_marriage_minor: ALPeopleList.using(auto_gather=False)
+  - children_of_marriage: ALPeopleList.using(auto_gather=False)
+---
+code: |
+  children_of_marriage_minor.clear()
+  children_of_marriage.clear()
+  if not minor_children:
+    number_of_children = 0
+  if any(key in doc_list_selected.true_values() for key in ["answer_attachment", "petition_attachment", "judgment_attachment","parenting_plan_attachment", "confidential_information_sheet_attachment"]):
+    children_of_marriage_minor.extend([chi for chi in children if chi.unemancipated and chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()]])  
+  if 'petition_attachment' in doc_list_selected.true_values():
+    children_of_marriage.extend([chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()]])
+    children_of_marriage_born_after_not_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.birthdate >= marriage.recorded_date and not chi.adopted]
+    children_of_marriage_born_before_not_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.birthdate < marriage.recorded_date and not chi.adopted]
+    children_of_marriage_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.adopted]
+  children_of_marriage_minor.gathered = True
+  number_of_children = len(children_of_marriage_minor)
+  children_of_marriage.gathered = True
+  children_list_create = True
+---
 id: are there children
 question: Children of the Marriage
 subquestion: |
@@ -1038,20 +1063,6 @@ code: |
   number_of_children = 0
   users[0].other_children = 0
   other_parties[0].other_children = 0
----
-code: |
-  if not minor_children:
-    number_of_children = 0
-    children_of_marriage_minor = 0
-  if showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]'):
-    children_of_marriage_minor = [chi for chi in children if chi.unemancipated and chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()]]
-    number_of_children = len(children_of_marriage_minor)
-  if 'petition_attachment' in doc_list_selected.true_values():
-    children_of_marriage = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()]]
-    children_of_marriage_born_after_not_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.birthdate >= marriage.recorded_date and not chi.adopted]
-    children_of_marriage_born_before_not_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.birthdate < marriage.recorded_date and not chi.adopted]
-    children_of_marriage_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.adopted]
-  children_list_create = True
 ---
 comment: |
   The petition requires you to put the primary person that the child has in the last 60 days.  
@@ -1419,8 +1430,8 @@ fields:
   - Who should have legal custody of ${ children[i].name_full() }?: children[i].legal_custody
     datatype: radio
     choices:
-      - ${ petitioner }: petitioner
-      - ${ respondent }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
       - Both spouses jointly: Joint
       - Third party: Third Party
     default: ${ legal_custody }
@@ -1668,8 +1679,12 @@ id: table for tax dependency
 table: children_of_marriage_minor_tax_table
 rows: children_of_marriage_minor
 columns:
+  - Child: row_item.name.full()
   - Who should claim in even years?: |
       row_item.tax_dependency_even
+  - Who should claim in odd years?: |
+      row_item.tax_dependency_odd
+delete buttons: False
 edit:
   - tax_dependency_even
 ---
@@ -1872,8 +1887,8 @@ code: |
 id: child support options
 code: |
   temp_child_support_choices = list()
-  temp_child_support_choices.append(petitioner.name_full())  
-  temp_child_support_choices.append(respondent.name_full())
+  temp_child_support_choices.append(petitioner.name.full())  
+  temp_child_support_choices.append(respondent.name.full())
   if defined('physical_custody') and physical_custody == "Third Party":
     temp_child_support_choices.append({"third_party":physical_custody_other.name_full()})
   temp_child_support_choices.append({"none":"No child support awarded"})
@@ -2195,8 +2210,8 @@ fields:
   - Who should maintain and pay the cost of medical insurance for the benefit of the children?: medical_insurance
     datatype: radio
     choices:
-      - ${ petitioner }: ${ petitioner }
-      - ${ respondent }: ${ respondent }
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
       - Neither parent: none
                       
 ---
@@ -2206,8 +2221,8 @@ fields:
   - Who should maintain and pay the cost of dental insurance for the benefit of the children?: dental_insurance
     datatype: radio
     choices:
-      - ${ petitioner }: ${ petitioner }
-      - ${ respondent }: ${ respondent }
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
       - Neither parent: none
                       
 ---
@@ -5844,8 +5859,7 @@ fields:
 id: code to service address 
 code: |
   if other_parties[0].service_type == "work":
-    other_parties[0].hours_of_employment
-    other_parties[0].service_address = other_parties[0].employer.address
+    other_parties[0].service_address = other_parties[0].employer.address.address
     other_parties[0].service_address_pdf = other_parties[0].employer.address.on_one_line()
   elif other_parties[0].service_type in ['home','mail']:
     other_parties[0].service_address = other_parties[0].address
@@ -5853,7 +5867,8 @@ code: |
   elif other_parties[0].service_type == "none":
     other_parties[0].service_address_pdf = "Waiver of service"
   else:
-    other_parties[0].service_address_pdf = other_parties[0].address
+    other_parties[0].service_address = other_parties[0].address.address
+    other_parties[0].service_address_pdf = other_parties[0].address.on_one_line()
 ---
 id: Respondent hours of employment
 generic object: ALIndividual
@@ -5956,6 +5971,9 @@ subquestion: |
     
   ${ al_user_bundle.download_list_html(use_previously_cached_files=True, include_full_pdf=True) }
 
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+
+
   Here is a copy of the documents with redactions
   
   ${ al_court_bundle.download_list_html(use_previously_cached_files=True, include_full_pdf=True) }
@@ -6023,7 +6041,6 @@ objects:
 ############ REVIEW
 id: review screen
 reconsider: 
-  - children_of_marriage_minor
   - children_of_marriage_minor_tax_table
 event: review_form
 question: Review your answers
@@ -7198,11 +7215,13 @@ review:
     Are you or your spouse currently pregnant?: **${ yesno(pregnant) }**
     
 - Edit:
+    - undefine:
+      - children_of_marriage
+      - children_of_marriage_minor
     - children.revisit
     - recompute:
       - children_list_create
   button: |
-
     % if showifdef('doc_list_selected["petition_attachment"]'):
     How many living children do you and your spouse have together that were born after the date of this marriage? **${  len(children_of_marriage_born_after_not_adopted) }** 
     % for child in children_of_marriage_born_after_not_adopted:
@@ -7618,7 +7637,7 @@ review:
       - other_attempt
     - recompute:
       - section_service
-      - al_user_bundle
+      - al_court_bundle
   button: |
     **Service to ${ other_parties[0].name_full() }?**
 

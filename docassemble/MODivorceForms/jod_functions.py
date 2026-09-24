@@ -1,7 +1,9 @@
+import json
 from docassemble.base.functions import states_list
-from docassemble.base.util import Address, validation_error
+from functools import lru_cache
+from docassemble.base.util import Address, validation_error, path_and_mimetype
 
-__all__ = ['validate_us_state','not_name_change']
+__all__ = ['validate_us_state','not_name_change', 'child_support_obligation']
 
 def validate_us_state(address: Address) -> None:
     if (not hasattr(address,'country') or address.country == "US") and hasattr(address,'state') and not len(address.state) == 2:
@@ -14,3 +16,12 @@ def validate_us_state(address: Address) -> None:
 
 def not_name_change(case):
     return case.type != "name_change"
+
+@lru_cache(maxsize=1)
+def _schedule():
+    path, _ = path_and_mimetype("docassemble.MODivorceForms:data/sources/basic_child_support_schedule.json")
+    with open(path) as f:
+        return json.load(f)
+
+def child_support_obligation(num_children, income_index):
+    return _schedule()[str(num_children)][f"{income_index:.0f}"]["obligation"]
