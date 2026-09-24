@@ -312,6 +312,9 @@ code: |
     children.gather()
   children_list_create
   number_of_children
+  if showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
+    users[0].other_children
+    other_parties[0].other_children
 
   if minor_children and (showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]')):
     if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]'):
@@ -403,7 +406,6 @@ code: |
     if len(users[0].other_incomes) > 0:
       users[0].other_incomes.review_items
     users[0].maintenance_other_received
-    users[0].other_children
     users[0].other_child_support_received
     users[0].monthly_gross_income # property_statement
     if showifdef('doc_list_selected["petition_attachment"]'):
@@ -424,7 +426,6 @@ code: |
     if len(other_parties[0].other_incomes) > 0:
       other_parties[0].other_incomes.review_items
     other_parties[0].maintenance_other_received
-    other_parties[0].other_children
     other_parties[0].other_child_support_received
     other_parties[0].monthly_gross_income # property_statement
     if showifdef('doc_list_selected["petition_attachment"]'):

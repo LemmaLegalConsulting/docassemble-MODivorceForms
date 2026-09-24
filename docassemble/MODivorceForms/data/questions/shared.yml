@@ -1048,21 +1048,19 @@ fields:
 if: defined('children.gathered') 
 code: |
   number_of_children = 0
-  users[0].other_children = 0
-  other_parties[0].other_children = 0
+  users[0].other_children_default = 0
+  other_parties[0].other_children_default = 0
   for child in children:
     if child.parents[users[0].name.full()] and child.parents[other_parties[0].name.full()] and not child.unemancipated:
       number_of_children += 1
     elif child.parents[users[0].name.full()] and not child.unemancipated:
-      users[0].other_children += 1
+      users[0].other_children_default += 1
     elif child.parents[other_parties[0].name.full()] and not child.unemancipated:
-      other_parties[0].other_children += 1
+      other_parties[0].other_children_default += 1
 ---
 if: not minor_children
 code: |
   number_of_children = 0
-  users[0].other_children = 0
-  other_parties[0].other_children = 0
 ---
 comment: |
   The petition requires you to put the primary person that the child has in the last 60 days.  
@@ -1766,13 +1764,9 @@ generic object: ALIndividual
 question: Other minor children for ${ x.name_full() }
 fields:
   - "How many minor children does ${ x.name_full() } have with someone other than ${ x.spouse.name.full() }?": x.other_children
+    default: ${ showifdef('x.other_children_default')}
     datatype: integer
     min: 0    
----
-if: not minor_children_before_marriage
-generic object: ALIndividual
-code: |
-  x.other_children = 0
 ---
 id: Additional information about children
 question: Additional information about children
