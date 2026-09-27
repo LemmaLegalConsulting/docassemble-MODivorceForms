@@ -539,14 +539,12 @@ code: |
   if any(key in doc_list_selected.true_values() for key in ["answer_attachment", "petition_attachment", "notice_of_hearing_attachment", "property_statement_attachment", "income_statement_attachment"]):
     people_served.gathered
     people_served[0].service_address_pdf
-  test_service1
   if other_parties[0].service_type == "publication":
     location_attempts
   elif other_parties[0].service_type == "mail":
     mail_information
   elif other_parties[0].service_type == "work":
     other_parties[0].hours_of_employment
-  test_service2
   section_service = True
 ---
 question: Test Service1
@@ -1384,7 +1382,7 @@ code: |
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment['unredacted'], notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment['unredacted'], redaction_certification_attachment, confidential_information_sheet_attachment['unredacted'], income_statement_attachment, petition_attachment['unredacted'], judgment_attachment['unredacted'], fee_waiver_attachment['unredacted'], service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment['unredacted'], form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment['redacted'], notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment['redacted'], redaction_certification_attachment, confidential_information_sheet_attachment['redacted'], income_statement_attachment, petition_attachment['redacted'], judgment_attachment['redacted'], fee_waiver_attachment['redacted'], service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment['redacted'], form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment['unredacted'], certificate_of_dissolution_attachment, property_statement_attachment['unredacted'], redaction_certification_attachment, confidential_information_sheet_attachment['unredacted'], income_statement_attachment, petition_attachment['unredacted'], fee_waiver_attachment['unredacted'], service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment['unredacted'], form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6, notice_of_hearing_attachment, judgment_attachment['unredacted']], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment['redacted'], certificate_of_dissolution_attachment, property_statement_attachment['redacted'], redaction_certification_attachment, confidential_information_sheet_attachment['redacted'], income_statement_attachment, petition_attachment['redacted'], fee_waiver_attachment['redacted'], service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment['redacted'], form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6, notice_of_hearing_attachment, judgment_attachment['redacted']],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
   - property_statement_bundle: ALDocumentBundle.using(elements=[property_statement_attachment['unredacted']],  filename="property_statement_preview", title="Property Statement Preview", enabled=True)
 ---

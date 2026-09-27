@@ -688,9 +688,9 @@ class ALAsset(ALIncome):
                 self.display_name
                 + space(self._var("address"), prefix=" at ", suffix="")
                 + (
-                    " See attached legal description. "
-                    if self.legal_description != ""
-                    else ""
+                    " See attached deed. "
+                    if self.legal_description_attach 
+                    else self.legal_description
                 )
             )
         if which == "vehicles":
@@ -699,6 +699,7 @@ class ALAsset(ALIncome):
                 + space(self._var("make"), prefix="", suffix=" ")
                 + space(self._var("model"), prefix="", suffix=" ")
                 + self.display_name
+                + self._redacted_account_number()
             )
         if which == "securities":
             return (
@@ -714,7 +715,7 @@ class ALAsset(ALIncome):
             )
         if which == "retirement_accounts":
             return (
-                space(self._var("lender"), prefix="", suffix=" ") + self.display_name
+                space(self._var("name"), prefix="", suffix=" ") + self.display_name
             )
         if which == "personal_goods":
             return self.display_name
@@ -722,6 +723,8 @@ class ALAsset(ALIncome):
             return self.description + " farm"
         if which == "businesses":
             return self.description + " business"
+        if which == "debts_owed_to_you":
+            return self.description + " debt"
         if which == "other_assets":
             return self.description
         if which == "life_insurance":
@@ -729,13 +732,19 @@ class ALAsset(ALIncome):
                 space(self._var("name"), prefix="", suffix=" ")
                 + space(self._var("type"), prefix="", suffix=" ")
                 + self._redacted_account_number()
-                + " life insurance policy"
+                + " life insurance policy "
+                + space(self._var("percent_vested"), prefix="", suffix=" percent vested")
             )
         if which == "interests_in_trust":
             return (
                 space(self._var("name"), prefix="", suffix=" ")
                 + space(self._var("nature"), prefix="", suffix=" ")
                 + "Trust"
+                + (
+                    " See attached trust instrument. "
+                    if self.trust_attachment
+                    else ""
+                )
             )
         return self.description
 

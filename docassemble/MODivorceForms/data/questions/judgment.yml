@@ -234,7 +234,7 @@ attachment:
       - "petitioner_ssn": ${ redact(petitioner.ssn) } 
       - "respondent_ssn": ${ redact(respondent.ssn) } 
       - "respondent_active_duty": ${ not respondent.active_duty }
-      - "respondent_active_duty": ${ respondent.active_duty }
+      - "respondent_active_duty2": ${ respondent.active_duty }
       - "case_personal_jurisdiction_over_respondent": ${ (respondent.lives_in_missouri and respondent.resident_for_90_days) or marriage.live_together_in_mo } 
       - "case_personal_jurisdiction_over_respondent_no": ${ not ((respondent.lives_in_missouri and respondent.resident_for_90_days) or marriage.live_together_in_mo) } 
       - "petitioner_resident_for_90 days": ${ petitioner.resident_for_90_days } 
@@ -258,7 +258,7 @@ attachment:
           % endif
       - "children0_age": |
           % if len(children_of_marriage) > 0:
-          ${ round(date_difference(as_datetime(children_of_marriage[0].birthdate),today()).years,0) }
+          ${ thousands(date_difference(as_datetime(children_of_marriage[0].birthdate),today()).years,0) }
           % endif
       - "children0_ssn": |
           % if len(children_of_marriage) > 0:
@@ -292,9 +292,9 @@ attachment:
           % if len(children_of_marriage) > 1:
           ${ redact(children_of_marriage[1].name.last) }
           % endif
-      - "children1_name_suffix": |
+      - "children1_suffix": |
           % if len(children_of_marriage) > 1:
-          ${ round(date_difference(as_datetime(children_of_marriage[1].birthdate),today()).years,0) }
+          ${ thousands(date_difference(as_datetime(children_of_marriage[1].birthdate),today()).years,0) }
           % endif
       - "children2_name_middle": |
           % if len(children_of_marriage) > 2:
@@ -302,7 +302,7 @@ attachment:
           % endif
       - "children2_name_suffix": |
           % if len(children_of_marriage) > 2:
-          ${ "round(date_difference(as_datetime(children_of_marriage[2].birthdate),today()).years,0)" }
+          ${ thousands(date_difference(as_datetime(children_of_marriage[2].birthdate),today()).years,0) }
           % endif
       - "children2_name_first": |
           % if len(children_of_marriage) > 2:
@@ -338,7 +338,7 @@ attachment:
           % endif
       - "children3_age": |
           % if len(children_of_marriage) > 3:
-          ${ round(date_difference(as_datetime(children_of_marriage[3].birthdate),today()).years,0) }
+          ${ thousands(date_difference(as_datetime(children_of_marriage[3].birthdate),today()).years,0) }
           % endif
       - "children3_ssn": |
           % if len(children_of_marriage) > 3:
@@ -354,7 +354,7 @@ attachment:
           % endif
       - "children4_name_suffix": |
           % if len(children_of_marriage) > 4:
-          ${ round(date_difference(as_datetime(children_of_marriage[4].birthdate),today()).years,0) }
+          ${ thousands(date_difference(as_datetime(children_of_marriage[4].birthdate),today()).years,0) }
           % endif
       - "children4_ssn": |
           % if len(children_of_marriage) > 4:
@@ -382,7 +382,7 @@ attachment:
           % endif
       - "children5_age": |
           % if len(children_of_marriage) > 5:
-          ${ round(date_difference(as_datetime(children_of_marriage[5].birthdate),today()).years,0) }
+          ${ thousands(date_difference(as_datetime(children_of_marriage[5].birthdate),today()).years,0) }
           % endif
       - "children5_ssn": |
           % if len(children_of_marriage) > 5:

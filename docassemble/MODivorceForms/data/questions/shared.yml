@@ -961,6 +961,8 @@ code: |
   children[i].name.first
   if showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]'):
     children[i].birthdate
+  if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
+    children[i].gender
   if 'petition_attachment' in doc_list_selected.true_values():
     if children[i].unemancipated:
       children[i].lived_with.name.first
@@ -1044,19 +1046,7 @@ question: How many minor children do you have with ${ other_parties[0] }?
 fields:
   - Number of children: number_of_children
     datatype: number
----
-if: defined('children.gathered') 
-code: |
-  number_of_children = 0
-  users[0].other_children_default = 0
-  other_parties[0].other_children_default = 0
-  for child in children:
-    if child.parents[users[0].name.full()] and child.parents[other_parties[0].name.full()] and not child.unemancipated:
-      number_of_children += 1
-    elif child.parents[users[0].name.full()] and not child.unemancipated:
-      users[0].other_children_default += 1
-    elif child.parents[other_parties[0].name.full()] and not child.unemancipated:
-      other_parties[0].other_children_default += 1
+
 ---
 if: not minor_children
 code: |
@@ -1235,6 +1225,9 @@ review:
       This child is attending college or vocational school
       % endif
       % endif
+  - Edit: children[i].gender
+    button: |
+      Gender: ${ children[i].gender }
   - Edit: children[i].lived_with.name.first
     button: |
       Lives with:
@@ -2611,8 +2604,13 @@ fields:
       is: other
   - Address: real_estate[i].address
     required: False
+  - Will you attach a copy of the deed?: real_estate[i].legal_description_attach
+    datatype: yesnoradio
   - Legal description: real_estate[i].legal_description
     required: False
+    show if:
+      variable: real_estate[i].legal_description_attach
+      is: False
   - What is its market value? How much would you get if you sold it?: real_estate[i].market_value
     maxlength: 76
     datatype: currency
@@ -2792,7 +2790,7 @@ fields:
     required: False
   - Model: vehicles[i].model
     required: False
-  - Vehicle Identification Number: vehicles[i].vin
+  - Vehicle Identification Number: vehicles[i].account_number
     required: False
   - What is its market value? How much would you get if you sold it?: vehicles[i].market_value
     maxlength: 76
@@ -4087,9 +4085,8 @@ fields:
       - ${ petitioner.name.full() }
       - ${ respondent.name.full() }
       - Other: other
-  - Copy of trust instrument: interests_in_trust[i].file
-    datatype: file
-    required: False
+  - Will you attach a copy of the trust instrument?: interests_in_trust[i].trust_attachment
+    datatype: yesnoradio
 validation code: |
   interests_in_trust[i].has_possession = interests_in_trust[i].trustee
   interests_in_trust[i].ownership = interests_in_trust[i].trustee
@@ -5032,24 +5029,43 @@ data:
   social_security: Social security
   medicare: Medicare
 ---
-generic object: ALIndividual
+id: set monthly gross_income for user
 code: |
-  if x.has_self_employment_income:
-    x.monthly_gross_income = float(x.jobs.total(times_per_year=12)) + float(x.benefits.total(times_per_year=12)) + float(x.other_incomes.total(times_per_year=12)) + x.self_employment_income
+  if users[0].has_self_employment_income:
+    users[0].monthly_gross_income = float(users[0].jobs.total(times_per_year=12)) + float(users[0].benefits.total(times_per_year=12)) + float(users[0].other_incomes.total(times_per_year=12)) + users[0].self_employment_income
   else:
-    x.monthly_gross_income = float(x.jobs.total(times_per_year=12)) + float(x.benefits.total(times_per_year=12)) + float(x.other_incomes.total(times_per_year=12))
+    users[0].monthly_gross_income = float(users[0].jobs.total(times_per_year=12)) + float(users[0].benefits.total(times_per_year=12)) + float(users[0].other_incomes.total(times_per_year=12))
 ---
-
+id: set monthly gross_income for other parties
 code: |
-  if other_parties[0].jobs.there_are_any == None and other_parties[0].benefits.there_are_any == None and other_parties[0].has_self_employment_income == None:
-    other_parties[0].monthly_gross_income = float(2600)
-    other_parties[0].assumed_monthly_gross_income = True
-  elif other_parties[0].has_self_employment_income:
-    other_parties[0].monthly_gross_income = float(other_parties[0].jobs.total(times_per_year=12)) + float(other_parties[0].benefits.total(times_per_year=12)) + float(other_parties[0].other_incomes.total(times_per_year=12)) + other_parties[0].self_employment_income
-    other_parties[0].assumed_monthly_gross_income = False
+  if other_parties[0].jobs.there_are_any == None and other_parties[0].use_assumed_monthly_income:
+    other_parties[0].job_income = other_parties[0].assumed_monthly_income
   else:
-    other_parties[0].monthly_gross_income = float(other_parties[0].jobs.total(times_per_year=12)) + float(other_parties[0].benefits.total(times_per_year=12)) + float(other_parties[0].other_incomes.total(times_per_year=12))
-    other_parties[0].assumed_monthly_gross_income = False
+    other_parties[0].job_income = float(other_parties[0].jobs.total(times_per_year=12))
+  if other_parties[0].has_self_employment_income:
+    other_parties[0].temp_self_employment_income = other_parties[0].self_employment_income
+  else:
+    other_parties[0].temp_self_employment_income = 0
+  other_parties[0].monthly_gross_income = other_parties[0].job_income + float(other_parties[0].benefits.total(times_per_year=12)) + float(other_parties[0].other_incomes.total(times_per_year=12)) + other_parties[0].temp_self_employment_income
+---
+id: question allowing user to change presumed income for other party
+question: Monthly income
+subquestion:
+  If you don't know if ${ other_parties[0].name_full() } has a job, you can assume that ${ other_parties[0].name.full() } had a monthly income of $2600, which is minimum wage, working 40 hours per week. 
+
+  You could also assume that ${ other_parties[0].name_full() } makes the same amount that they made in their last job.  If so, you can change the amount and the explanation.
+
+fields:
+  - Do you want to use an assumed monthly income?: other_parties[0].use_assumed_monthly_income
+    datatype: yesnoradio
+  - What amount?: other_parties[0].assumed_monthly_income
+    datatype: number
+    default: 2600
+    show if: other_parties[0].use_assumed_monthly_income
+  - Reason for assumed monthly income: other_parties[0].assumed_monthly_income_explanation
+    default: Income is assumed based on minimum wage, working 40 hours per week.
+    show if: other_parties[0].use_assumed_monthly_income
+  
 ---
 ################################# PUBLIC BENEFITS ##############################
 comment: |
@@ -5999,7 +6015,7 @@ attachment:
 ---
 id: instructions object
 objects:
-  - mo_divorce_forms_Post_interview_instructions: ALDocument.using(title="Instructions", filename="certificate_of_dissolution_of_marri_next_steps.docx", enabled=True, has_addendum=False)
+  - mo_divorce_forms_Post_interview_instructions: ALDocument.using(title="Instructions", filename="mo_divorce_forms_next_steps.docx", enabled=True, has_addendum=False)
 ---
 id: service by mail notice attachment block
 attachment:
@@ -6567,11 +6583,10 @@ review:
     % endif
 - note: |
     Your spouse's monthly gross income: **$${ thousands(other_parties[0].monthly_gross_income) }**
+- Edit: support_payer.use_assumed_monthly_income
+  button: |
+    Because you don't know if ${ support_payer.name_full() } has a job, you are assuming that ${ support_payer.name.full() } has a monthly job income of ${ support_payer.assumed_monthly_income } because ${ support_payer.assumed_monthly_income_explanation }
 
-    % if other_parties[0].assumed_monthly_gross_income:
-    You said you don't know about any source of income for your spouse, so we can assume that your spouse has an income based on minimum wage, working 40 hours per week.
-
-    % endif
 - Edit: 
     - other_parties[0].jobs.revisit
     - invalidate:

@@ -284,8 +284,8 @@ subquestion: |
 
   This is calculated using a monthly gross income of $${ thousands(support_payer.monthly_gross_income) }.
 
-  % if showifdef('support_payer.assumed_monthly_gross_income'):
-  Because you didn't know if ${ support_payer.name_full() } has a job or any other income, we assumed that ${ support_payer.name.full() } had a monthly income of minimum wage, working 40 hours per week. 
+  % if showifdef('support_payer.use_assumed_monthly_income'):
+  Because you don't know if ${ support_payer.name_full() } has a job, you are assuming that ${ support_payer.name.full() } has a monthly job income of ${ support_payer.assumed_monthly_income } because ${ support_payer.assumed_monthly_income_explanation }
 
   % endif
 
