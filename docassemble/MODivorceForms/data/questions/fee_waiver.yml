@@ -39,9 +39,9 @@ attachment:
     - "Judge_or_Division": ${ showifdef('case.docket_number') } 
     - "Case_Number": ${ showifdef('case.judge') } 
     - "Petitioner_Name": ${ petitioner.name_full() } 
-    - "Petitioners_AddressTelephone": ${ petitioner.address.block() + "\n" + showifdef('petitioner.phone_number')  } 
+    - "Petitioners_AddressTelephone": ${ petitioner.address.block() + ("\n" + phone_number_formatted(petitioner.phone_number) if defined('petitioner.phone_number') else "")  } 
     - "Respondent_Name": ${ respondent.name_full()} 
-    - "Respondents_AddressTelephone": ${ respondent.address.block() + "\n" + showifdef('respondent.phone_number') } 
+    - "Respondents_AddressTelephone": ${ respondent.address.block() + ("\n" + phone_number_formatted(respondent.phone_number) if defined('respondent.phone_number') else "") } 
     - "Marital_Status": ${ "Married" }
     - "If_Married_Spouses_name": ${ other_parties[0].name_full() } 
     - "Number_of_dependents": ${ number_of_children } 

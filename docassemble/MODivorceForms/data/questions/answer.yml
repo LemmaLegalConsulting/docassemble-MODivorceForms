@@ -115,7 +115,7 @@ attachment:
           % if date_difference(as_datetime(children_of_marriage[0].birthdate),today()).years >= 1:
           ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[0].birthdate),today()).years) }
           % else:
-          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[0].birthdate),today()).months) + " months" }
+          ${ date_difference(starting=children_of_marriage[0].birthdate, ending=today()).describe(specificity='month', nice=False) }
           % endif
           % endif
       - "raLastFourSsnFirstChild": |
@@ -135,7 +135,7 @@ attachment:
           % if date_difference(as_datetime(children_of_marriage[1].birthdate),today()).years >= 1:
           ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[1].birthdate),today()).years) }
           % else:
-          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[1].birthdate),today()).months) + " months" }
+          ${ date_difference(starting=children_of_marriage[1].birthdate, ending=today()).describe(specificity='month', nice=False) }
           % endif
           % endif
       - "raLastFourSsnSecondChild": |
@@ -157,7 +157,7 @@ attachment:
       - "raThirdChildAge": |
           % if len(children_of_marriage) > 2:
           % if date_difference(as_datetime(children_of_marriage[2].birthdate),today()).years >= 1:
-          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[2].birthdate),today()).years) }
+          ${ date_difference(starting=children_of_marriage[2].birthdate, ending=today()).describe(specificity='month', nice=False) }
           % else:
           ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[2].birthdate),today()).months) + " months" }
           % endif
@@ -199,7 +199,7 @@ attachment:
           % if date_difference(as_datetime(children_of_marriage[3].birthdate),today()).years >= 1:
           ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[3].birthdate),today()).years) }
           % else:
-          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[3].birthdate),today()).months) + " months" }
+          ${ date_difference(starting=children_of_marriage[3].birthdate, ending=today()).describe(specificity='month', nice=False) }
           % endif
           % endif
       - "raLastFourSsnFourthChild": |
@@ -219,7 +219,7 @@ attachment:
           % if date_difference(as_datetime(children_of_marriage[4].birthdate),today()).years >= 1:
           ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[4].birthdate),today()).years) }
           % else:
-          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[4].birthdate),today()).months) + " months" }
+          ${ date_difference(starting=children_of_marriage[4].birthdate, ending=today()).describe(specificity='month', nice=False) }
           % endif
           % endif
       - "raLastFourSsnFifthChild": |
@@ -251,7 +251,7 @@ attachment:
           % if date_difference(as_datetime(children_of_marriage[5].birthdate),today()).years >= 1:
           ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[5].birthdate),today()).years) }
           % else:
-          ${ "{:.0f}".format(date_difference(as_datetime(children_of_marriage[5].birthdate),today()).months) + " months" }
+          ${ date_difference(starting=children_of_marriage[5].birthdate, ending=today()).describe(specificity='month', nice=False) }
           % endif
           % endif
       - "raLastFourSsnSixthChild": |

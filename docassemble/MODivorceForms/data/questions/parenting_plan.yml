@@ -428,7 +428,6 @@ code: |
 ---  
 id: form 14 calculations
 reconsider:
-  - number_of_children
   - support_payer.form_14_starting_calculations
   - support_recipient.form_14_starting_calculations
 code: |
@@ -1500,9 +1499,9 @@ attachment:
       - "respondentsLastName": ${ respondent.name.last } 
       - "respondentsFirstName": ${ respondent.name.first } 
       - "pDivisionNumber": ${ case.division_number } 
-      - "pAuthorsBothParentsA": ${ parenting_plan_A_author["petitioner"] and parenting_plan_A_author["respondent"] } 
-      - "pAuthorsPetitionerA": ${ parenting_plan_A_author["petitioner"] and not parenting_plan_A_author["respondent"] } 
-      - "pAuthorsRespondentA": ${ parenting_plan_A_author["respondent"] and not parenting_plan_A_author["petitioner"] } 
+      - "pAuthorsBothParentsA": ${ parenting_plan_A_author[petitioner.name.full()] and parenting_plan_A_author[respondent.name.full()] } 
+      - "pAuthorsPetitionerA": ${ parenting_plan_A_author[petitioner.name.full()] and not parenting_plan_A_author[respondent.name.full()] } 
+      - "pAuthorsRespondentA": ${ parenting_plan_A_author[respondent.name.full()] and not parenting_plan_A_author[petitioner.name.full()] } 
       - "pAuthorsCourtA": ${ parenting_plan_A_author["The court"] } 
       - "pAuthorsGuardianAdLitemA": ${ parenting_plan_A_author["The guardian ad litem"] } 
       - "PAuthorsOtherA": ${ parenting_plan_A_author["Other"] } 
@@ -1514,7 +1513,7 @@ attachment:
       - "pFirstChildsAge": |
           % if len(children_of_marriage_minor) > 0:
           % if date_difference(starting=children_of_marriage_minor[0].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children_of_marriage_minor[0].birthdate,ending=today()).years) }
+          ${ int(date_difference(starting=children_of_marriage_minor[0].birthdate,ending=today()).years) }
           % else:
           ${ date_difference(starting=children_of_marriage_minor[0].birthdate,ending=today()).describe(specificity='month') }
           % endif
@@ -1538,7 +1537,7 @@ attachment:
       - "pSecondChildsAge": |
           % if len(children_of_marriage_minor) > 1:
           % if date_difference(starting=children_of_marriage_minor[1].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children_of_marriage_minor[1].birthdate,ending=today()).years) }
+          ${ int(date_difference(starting=children_of_marriage_minor[1].birthdate,ending=today()).years) }
           % else:
           ${ date_difference(starting=children_of_marriage_minor[1].birthdate, ending=today()).describe(specificity='month') }
           % endif
@@ -1578,7 +1577,7 @@ attachment:
       - "pThirdChildsAge": |
           % if len(children_of_marriage_minor) > 2:
           % if date_difference(starting=children_of_marriage_minor[2].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children_of_marriage_minor[2].birthdate,ending=today()).years) }
+          ${ int(date_difference(starting=children_of_marriage_minor[2].birthdate,ending=today()).years) }
           % else:
           ${ date_difference(starting=children_of_marriage_minor[2].birthdate, ending=today()).describe(specificity='month') }
           % endif
@@ -1590,7 +1589,7 @@ attachment:
       - "pFourthChildsAge": |
           % if len(children_of_marriage_minor) > 3:
           % if date_difference(starting=children_of_marriage_minor[3].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children_of_marriage_minor[3].birthdate,ending=today()).years) }
+          ${ int(date_difference(starting=children_of_marriage_minor[3].birthdate,ending=today()).years) }
           % else:
           ${ date_difference(starting=children_of_marriage_minor[3].birthdate, ending=today()).describe(specificity='month') }
           % endif
@@ -1610,7 +1609,7 @@ attachment:
       - "pFifthChildsAge": |
           % if len(children_of_marriage_minor) > 4:
           % if date_difference(starting=children_of_marriage_minor[4].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children_of_marriage_minor[4].birthdate,ending=today()).years) }
+          ${ int(date_difference(starting=children_of_marriage_minor[4].birthdate,ending=today()).years) }
           % else:
           ${ date_difference(starting=children_of_marriage_minor[4].birthdate, ending=today()).describe(specificity='month') }
           % endif
@@ -1638,7 +1637,7 @@ attachment:
       - "pSixthChildsAge": |
           % if len(children_of_marriage_minor) > 5:
           % if date_difference(starting=children_of_marriage_minor[5].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children_of_marriage_minor[5].birthdate,ending=today()).years) }
+          ${ int(date_difference(starting=children_of_marriage_minor[5].birthdate,ending=today()).years) }
           % else:
           ${ date_difference(starting=children_of_marriage_minor[5].birthdate, ending=today()).describe(specificity='month') }
           % endif
@@ -1947,9 +1946,9 @@ attachment:
       - "respondentsLastName2": ${ respondent.name.last } 
       - "respondentsFirstName2": ${ respondent.name.first } 
       - "pDivisionNumber2": ${ case.division_number } 
-      - "pAuthorsBothParentsB": ${ parenting_plan_B_author["petitioner"] and parenting_plan_B_author["respondent"]  } 
-      - "pAuthorsPetitionerB": ${ parenting_plan_B_author["petitioner"] and not parenting_plan_B_author["respondent"] } 
-      - "pAuthorsRespondentB": ${ parenting_plan_B_author["respondent"] and not parenting_plan_B_author["petitioner"] } 
+      - "pAuthorsBothParentsB": ${ parenting_plan_B_author[petitioner.name.full()] and parenting_plan_B_author[respondent.name.full()]  } 
+      - "pAuthorsPetitionerB": ${ parenting_plan_B_author[petitioner.name.full()] and not parenting_plan_B_author[respondent.name.full()] } 
+      - "pAuthorsRespondentB": ${ parenting_plan_B_author[respondent.name.full()] and not parenting_plan_B_author[petitioner.name.full()] } 
       - "pAuthorsCourtB": ${ parenting_plan_B_author["The court"] } 
       - "pAuthorsGuardianAdLitemB": ${ parenting_plan_B_author["The guardian ad litem"] } 
       - "PAuthorsOtherB": ${ parenting_plan_B_author["Other"] } 
@@ -1961,7 +1960,7 @@ attachment:
       - "pFirstChildsAge2": |
           % if len(children_of_marriage_minor) > 0:
           % if date_difference(starting=children_of_marriage_minor[0].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children_of_marriage_minor[0].birthdate,ending=today()).years) }
+          ${ int(date_difference(starting=children_of_marriage_minor[0].birthdate,ending=today()).years) }
           % else:
           ${ date_difference(starting=children_of_marriage_minor[0].birthdate, ending=today()).describe(specificity='month') }
           % endif
@@ -1985,7 +1984,7 @@ attachment:
       - "pSecondChildsAge2": |
           % if len(children_of_marriage_minor) > 1:
           % if date_difference(starting=children_of_marriage_minor[1].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children_of_marriage_minor[1].birthdate,ending=today()).years) }
+          ${ int(date_difference(starting=children_of_marriage_minor[1].birthdate,ending=today()).years) }
           % else:
           ${ date_difference(starting=children_of_marriage_minor[1].birthdate, ending=today()).describe(specificity='month') }
           % endif
@@ -2009,7 +2008,7 @@ attachment:
       - "pThirdChildsAge2": |
           % if len(children_of_marriage_minor) > 2:
           % if date_difference(starting=children_of_marriage_minor[2].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children_of_marriage_minor[2].birthdate,ending=today()).years) }
+          ${ int(date_difference(starting=children_of_marriage_minor[2].birthdate,ending=today()).years) }
           % else:
           ${ date_difference(starting=children_of_marriage_minor[2].birthdate, ending=today()).describe(specificity='month') }
           % endif
@@ -2033,7 +2032,7 @@ attachment:
       - "pFourthChildsAge2": |
           % if len(children_of_marriage_minor) > 3:
           % if date_difference(starting=children_of_marriage_minor[3].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children_of_marriage_minor[3].birthdate,ending=today()).years) }
+          ${ int(date_difference(starting=children_of_marriage_minor[3].birthdate,ending=today()).years) }
           % else:
           ${ date_difference(starting=children_of_marriage_minor[3].birthdate, ending=today()).describe(specificity='month') }
           % endif
@@ -2057,7 +2056,7 @@ attachment:
       - "pFifthChildsAge2": |
           % if len(children_of_marriage_minor) > 4:
           % if date_difference(starting=children_of_marriage_minor[4].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children_of_marriage_minor[4].birthdate,ending=today()).years) }
+          ${ int(date_difference(starting=children_of_marriage_minor[4].birthdate,ending=today()).years) }
           % else:
           ${ date_difference(starting=children_of_marriage_minor[4].birthdate, ending=today()).describe(specificity='month') }
           % endif
@@ -2081,7 +2080,7 @@ attachment:
       - "pSixthChildsAge2": |
           % if len(children_of_marriage_minor) > 5:
           % if date_difference(starting=children_of_marriage_minor[5].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children_of_marriage_minor[5].birthdate,ending=today()).years) }
+          ${ int(date_difference(starting=children_of_marriage_minor[5].birthdate,ending=today()).years) }
           % else:
           ${ date_difference(starting=children_of_marriage_minor[5].birthdate, ending=today()).describe(specificity='month') }
           % endif
@@ -2360,7 +2359,7 @@ attachment:
       - "pbCourtOrderSupportOne": ${ number_of_children > 0 } 
       - "pbSupportStartDateJudgment": ${ child_support_start_date == "judgment_date" } 
       - "pbSupportStartDateSpecific": ${ child_support_start_date == "specific_date" } 
-      - "pbSupportStartDateSpecified": ${ child_support_start_date_other_date } 
+      - "pbSupportStartDateSpecified": ${ format_date(child_support_start_date_other_date, format='MM/dd/yyyy') } 
       - "pbTaxDependentsChildOneName": |
           % if len(children_of_marriage_minor) > 0:
           ${ redact(children_of_marriage_minor[0].name_full()) }

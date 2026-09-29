@@ -44,6 +44,10 @@ code: |
         temp_people_choices.append(child.other_parent)
       if defined('child.birth_certificate_other.name.first'):
         temp_people_choices.append(child.birth_certificate_other)
+      if defined('child.legal_custody_other.name.first'):
+        temp_people_choices.append(child.legal_custody_other)
+      if defined('child.physical_custody_other.name.first'):
+        temp_people_choices.append(child.physical_custody_other)
   if defined('persons_lived_with'):
     for person in persons_lived_with.complete_elements():
       if person != users[0] and person != other_parties[0]:
@@ -69,6 +73,10 @@ code: |
         temp_people_choices.append(child.other_parent)
       if defined('child.birth_certificate_other.name.first'):
         temp_people_choices.append(child.birth_certificate_other)
+      if defined('child.legal_custody_other.name.first'):
+        temp_people_choices.append(child.legal_custody_other)
+      if defined('child.physical_custody_other.name.first'):
+        temp_people_choices.append(child.physical_custody_other)
   if defined('persons_lived_with'):
     for person in persons_lived_with:
       if person != users[0] and person != other_parties[0]:
@@ -179,6 +187,18 @@ fields:
       ${ petitioner.name } v. ${ respondent.name }
     
 continue button field: case.name_asked
+---
+id: case.division_number
+question: Case information - Division Number
+subquestion: |
+
+   collapse_template(case.division_casenet_template) 
+
+fields:
+  - Division Number: case.division_number
+    required: False
+    
+continue button field: case.division_number_asked
 ---
 id: case.name_casenet_template
 template: case.name_casenet_template
@@ -912,8 +932,9 @@ code: |
   if showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]'):
     children_of_marriage_minor = [chi for chi in children if chi.unemancipated and chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()]]
     number_of_children = len(children_of_marriage_minor)
-  if 'petition_attachment' in doc_list_selected.true_values():
+  if 'petition_attachment' in doc_list_selected.true_values() or 'answer_attachment' in doc_list_selected.true_values():
     children_of_marriage = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()]]
+  if 'petition_attachment' in doc_list_selected.true_values():
     children_of_marriage_born_after_not_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.birthdate >= marriage.recorded_date and not chi.adopted]
     children_of_marriage_born_before_not_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.birthdate < marriage.recorded_date and not chi.adopted]
     children_of_marriage_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.adopted]
@@ -930,8 +951,9 @@ code: |
     number_of_children = 0
   if any(key in doc_list_selected.true_values() for key in ["answer_attachment", "petition_attachment", "judgment_attachment","parenting_plan_attachment", "confidential_information_sheet_attachment"]):
     children_of_marriage_minor.extend([chi for chi in children if chi.unemancipated and chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()]])  
-  if 'petition_attachment' in doc_list_selected.true_values():
+  if 'petition_attachment' in doc_list_selected.true_values() or 'answer_attachment' in doc_list_selected.true_values():
     children_of_marriage.extend([chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()]])
+  if 'petition_attachment' in doc_list_selected.true_values():
     children_of_marriage_born_after_not_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.birthdate >= marriage.recorded_date and not chi.adopted]
     children_of_marriage_born_before_not_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.birthdate < marriage.recorded_date and not chi.adopted]
     children_of_marriage_adopted = [chi for chi in children if chi.parents[petitioner.name.full()] and chi.parents[respondent.name.full()] and chi.adopted]
@@ -1013,7 +1035,7 @@ id: additional child information
 question: Additional information about ${ children[i].name_full() }
 fields:
   - Last four digits of Social Security Number: children[i].ssn
-    datatype: number
+    maxlength: 4
     required: False
   - Birthdate: children[i].birthdate
     datatype: ThreePartsDate
@@ -5866,6 +5888,11 @@ fields:
       variable: other_parties[0].service_type
       is: publication
 ---
+id: code to set service to mail if user is respondent
+if: case.filed in ['other_parties0_filed']
+code: |
+  other_parties[0].service_type = "home"
+---
 id: code to service address 
 code: |
   if other_parties[0].service_type == "work":
@@ -5939,12 +5966,9 @@ comment: |
 id: edit answers from the download screen
 event: mo_divorce_forms_edit_answers
 code: |
-  undefine('al_court_bundle.generate_downloads_task')
+  undefine('all_downloads_task')
   undefine('al_court_bundle._downloadable_files')
-  undefine('al_user_bundle.generate_downloads_task')
   undefine('al_user_bundle._downloadable_files')
-  undefine('property_statement_bundle.generate_preview_task')
-  undefine('property_statement_bundle._preview_file')
   force_ask('review_form')
 ---
 ########## DOWNLOAD

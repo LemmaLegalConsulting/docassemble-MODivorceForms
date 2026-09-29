@@ -207,7 +207,7 @@ attachment:
       - "locationMarriageLicense1": ${ marriage.address.country in ["US",""] } 
       - "locationMarriageLicense2": ${ marriage.address.country not in ["US",""] } 
       - "locationMarriageLicenseCountry": ${ marriage.address.country if marriage.address.country != "US" else ""  } 
-      - "dateOfSeparation": ${ marriage.separation_date } 
+      - "dateOfSeparation": ${ format_date(marriage.separation_date,format='MM/dd/yyyy') } 
       - "canMarriageBePreserved1": ${ marriage.can_be_preserved } 
       - "canMarriageBePreserved2": ${ not marriage.can_be_preserved } 
       - "isMarriageIrretrievablyBroken1": ${ marriage.is_broken } 
@@ -262,7 +262,7 @@ attachment:
           % if date_difference(starting=children_of_marriage[0].birthdate,ending=today()).years > 1:
           ${ "{:.0f}".format(date_difference(starting=children_of_marriage[0].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children_of_marriage[0].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage[0].birthdate, ending=today()).describe(specificity='month', nice=False) }
           % endif
           % endif
       - "childOneMarriedOrNot": |
@@ -462,7 +462,7 @@ attachment:
           % if date_difference(starting=children_of_marriage[1].birthdate,ending=today()).years > 1:
           ${ "{:.0f}".format(date_difference(starting=children_of_marriage[1].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children_of_marriage[1].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage[1].birthdate, ending=today()).describe(specificity='month', nice=False) }
           % endif
           % endif
       - "childTwoMarriedOrNot": |
@@ -662,7 +662,7 @@ attachment:
           % if date_difference(starting=children_of_marriage[2].birthdate,ending=today()).years > 1:
           ${ "{:.0f}".format(date_difference(starting=children_of_marriage[2].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children_of_marriage[2].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage[2].birthdate, ending=today()).describe(specificity='month', nice=False) }
           % endif
           % endif
       - "childThreeMarriedOrNot": |
@@ -862,7 +862,7 @@ attachment:
           % if date_difference(starting=children_of_marriage[3].birthdate,ending=today()).years > 1:
           ${ "{:.0f}".format(date_difference(starting=children_of_marriage[3].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children_of_marriage[3].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage[3].birthdate, ending=today()).describe(specificity='month', nice=False) }
           % endif
           % endif
       - "childFourMarriedOrNot": |
@@ -1139,8 +1139,8 @@ attachment:
       - "petitionersAttorneysBarNumber": ${ petitioner.attorney.bar_number } 
       - "petitionersAttorneyPrintName": ${ petitioner.attorney.name_full() } 
       - "petitionersAttorneyStreet": ${ petitioner.attorney.address.line_one() } 
-      - "petitionersAttorneyCity": ${ petitioner.attorney.address.state } 
-      - "petitionersAttorneyState": ${ petitioner.attorney.address.city } 
+      - "petitionersAttorneyState": ${ petitioner.attorney.address.state } 
+      - "petitionersAttorneyCity": ${ petitioner.attorney.address.city } 
       - "petitionersAttorneyZip": ${ petitioner.attorney.address.zip } 
       - "petitionersAttorneyPhone": ${ phone_number_formatted(petitioner.attorney.phone_number) } 
       - "petitionersAttorneyFaxNumber": ${ "" } 

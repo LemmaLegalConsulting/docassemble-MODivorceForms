@@ -157,11 +157,11 @@ code: |
     relief['change_name']
     relief['divide_property']
     relief['other']
-  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]'):
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]'):
     if relief['maintenance']:
       maintenance_amount
       maintenance_income_withholding
-  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["fee_waiver_attachment"]'):
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["fee_waiver_attachment"]'):
     is_maintenance_currently_paid  
 
   section_relief = True
@@ -182,6 +182,8 @@ code: |
       previous_petitions # answer, petition
     case.docket_number_asked
     case.name_asked
+    if showifdef('doc_list_selected["answer_attachment"]'):
+      case.division_number_asked
     if showifdef('doc_list_selected["fee_waiver_attachment"]'):
       case.judge_asked
     if showifdef('doc_list_selected["confidential_information_sheet_attachment"]'):
@@ -521,7 +523,7 @@ code: |
 ---
 code: |
   if showifdef('doc_list_selected["property_statement_attachment"]') or showifdef('doc_list_selected["fee_waiver_attachment"]'):
-    nav.set_sections('property_statement_review')
+    nav.set_section('review')
     # Refresh the derived lists once, on the way into this section, instead of
     # with `reconsider:` on each review screen - that rebuilt both lists on
     # every render of every screen, including redraws after a validation error.
@@ -578,12 +580,27 @@ code: |
   # al_court_bundle, and download_list_html() only reuses the background
   # results of the bundle it is called on.
   if not all_downloads_task.ready():
+    if date_difference(starting=all_downloads_started,ending=current_datetime()).minutes >= 10:
+      log("mo_create_all_downloads still not ready after 10 minutes")
+      mo_download_failed_screen
     al_download_waiting_screen
+  if all_downloads_task.failed():
+    download_task_error = all_downloads_task.result()
+    log("mo_create_all_downloads failed: " + str(download_task_error.error_type) + ": " + str(download_task_error.error_message))
+    log(str(download_task_error.error_trace))
+    mo_download_failed_screen
   mo_divorce_forms_download
 ---
----
 code: |
+  all_downloads_started = current_datetime()
   all_downloads_task = background_action('mo_create_all_downloads')
+---
+id: download failed
+event: mo_download_failed_screen
+question: |
+  Something went wrong making your documents
+subquestion: |
+  ${ action_button_html(url_action('mo_divorce_forms_edit_answers'), label='Go back and review your answers', color='primary') }
 ---
 event: mo_create_all_downloads
 code: |
