@@ -8147,6 +8147,29 @@ content: |
 id: parenting plan additional provisions review
 question: Review the Parenting Plan Statement
 subquestion: |
+  % if 'parenting_plan_attachment' in doc_list_selected.true_values():
+
+  Here is what will go in your Parenting Plan. Open any section to check it.
+
+  ${ start_accordion("Custody and visitation", showing=False) }
+
+  ${ display_template(pp_custody_review_template, scrollable=False) }
+
+  ${ next_accordion("Exchange schedule") }
+
+  ${ display_template(pp_schedule_review_template, scrollable=False) }
+
+  ${ next_accordion("Other provisions") }
+
+  ${ display_template(pp_other_provisions_review_template, scrollable=False) }
+
+  ${ next_accordion("Support, insurance and child care") }
+
+  ${ display_template(pp_support_review_template, scrollable=False) }
+
+  ${ end_accordion() }
+
+  % endif
 
   Your Parenting Plan will be assembled after you finish reviewing your answers.
 
@@ -8156,6 +8179,199 @@ fields:
   - Additional provisions: additional_provisions_parenting_plan
     datatype: area
     show if: is_additional_provisions_parenting_plan
+---
+comment: |
+  Review templates for the parenting plan additional provisions screen.
+  Every line is guarded with defined() so that nothing is asked for while the
+  review is being displayed: a value that has not been answered (because the
+  user's earlier answers skipped that question) is simply left out.
+template: pp_custody_review_template
+content: |
+  % if defined('legal_custody'):
+  **Legal custody**: ${ legal_custody }
+  % if defined('legal_custody_all_children'):
+  (applies to all children: ${ word(yesno(legal_custody_all_children)) })
+  % endif
+
+  % endif
+  % if defined('legal_custody_other.name.first'):
+  Sole legal custody to third party: ${ legal_custody_other.name.full() }
+
+  % endif
+  % if defined('legal_custody_sole_explanation'):
+  Reason for sole legal custody: ${ legal_custody_sole_explanation }
+
+  % endif
+  % if defined('communications'):
+  Communication between parents: ${ communications }
+
+  % endif
+  % if defined('dispute_resolution'):
+  Other way to resolve disagreements: ${ dispute_resolution }
+
+  % endif
+  % if defined('physical_custody'):
+  **Physical custody**: ${ physical_custody }
+  % if defined('physical_custody_all_children'):
+  (applies to all children: ${ word(yesno(physical_custody_all_children)) })
+  % endif
+
+  % endif
+  % if defined('physical_custody_other.name.first'):
+  Sole physical custody to third party: ${ physical_custody_other.name.full() }
+
+  % endif
+  % if defined('physical_custody_sole_explanation'):
+  Reason for sole physical custody: ${ physical_custody_sole_explanation }
+
+  % endif
+  % if defined('visitation'):
+  Supervised visitation: ${ word(yesno(visitation)) }
+
+  % endif
+  % if defined('visitation_supervisor.name.first'):
+  Visitation supervisor: ${ visitation_supervisor.name.full() }
+
+  % endif
+  % if defined('domestic_violence'):
+  Pattern of domestic violence between the parents: ${ word(yesno(domestic_violence)) }
+
+  % if domestic_violence and defined('domestic_violence_committed_by'):
+  Committed by: ${ domestic_violence_committed_by }
+
+  % endif
+  % endif
+---
+template: pp_schedule_review_template
+content: |
+  % if defined('biweekly_schedule'):
+  **Weekday and weekend exchange schedule**
+
+  % for week in [1, 2]:
+  % for day_number, day_name in enumerate(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']):
+  % if defined('biweekly_schedule[' + str((week - 1) * 7 + day_number) + ']'):
+   - ${ day_name } week ${ week }: ${ value('biweekly_schedule[' + str((week - 1) * 7 + day_number) + ']') }
+  % endif
+  % endfor
+  % endfor
+
+  % endif
+  % if defined('holidays'):
+  <%
+  different_holidays = [holidays[k].get('description', k) for k in list(getattr(holidays, 'elements', holidays).keys()) if defined('holidays["' + k + '"]["different"]') and value('holidays["' + k + '"]["different"]')]
+  %>
+  % if different_holidays:
+  **Holidays with a different schedule**
+
+  % for holiday_description in different_holidays:
+   - ${ holiday_description }
+  % endfor
+
+  % endif
+  % endif
+---
+template: pp_other_provisions_review_template
+content: |
+  % if defined('location_of_exchange'):
+  Where an exchange should occur if the schedule does not say: ${ location_of_exchange }
+
+  % endif
+  % if defined('time_of_exchange'):
+  When the exchange should occur: ${ time_of_exchange }
+
+  % endif
+  % if defined('location_of_exchange_school_not_in_session'):
+  Where the exchange should occur when school or child care is not in session: ${ location_of_exchange_school_not_in_session }
+
+  % endif
+  % if defined('location_of_exchange_specific_location'):
+  Specific exchange location: ${ location_of_exchange_specific_location }
+
+  % endif
+  % if defined('add_pick_up_from_school'):
+  Pick-up for the other parent: ${ word(yesno(add_pick_up_from_school)) }
+  % if add_pick_up_from_school and defined('time_of_exchange2'):
+  Time of the pick-up: ${ time_of_exchange2 }
+  % endif
+
+  % endif
+  % if defined('phone_contact'):
+  Restrictions on the time to contact the children by phone: ${ word(yesno(phone_contact)) }
+  % if phone_contact and defined('phone_contact_am'):
+  Earliest: ${ phone_contact_am }
+  % endif
+  % if phone_contact and defined('phone_contact_pm'):
+  Latest: ${ phone_contact_pm }
+  % endif
+
+  % endif
+  % if defined('others_with_physical_custody'):
+  Someone else has or claims custody or visitation rights: ${ word(yesno(others_with_physical_custody)) }
+
+  % endif
+  % if defined('other_custody_proceeding'):
+  Other custody proceeding pending: ${ word(yesno(other_custody_proceeding)) }
+
+  % endif
+  % if defined('other_litigation'):
+  Other litigation about custody: ${ word(yesno(other_litigation)) }
+
+  % endif
+  % if defined('abuse_or_neglect'):
+  Child a victim of abuse or neglect: ${ word(yesno(abuse_or_neglect)) }
+
+  % endif
+  % if defined('family_support_order'):
+  Orders entered by the Family Support Division: ${ word(yesno(family_support_order)) }
+
+  % endif
+---
+template: pp_support_review_template
+content: |
+  % if defined('medical_insurance'):
+  Medical insurance paid by: ${ medical_insurance }
+
+  % endif
+  % if defined('dental_insurance'):
+  Dental insurance paid by: ${ dental_insurance }
+
+  % endif
+  % if defined('health_expenses_not_covered'):
+  Health expenses not covered by insurance paid by: ${ health_expenses_not_covered }
+  % if defined('health_expenses_not_covered_reimburse') and health_expenses_not_covered_reimburse and defined('health_expenses_not_covered_reimburse_percentage'):
+  (other parent reimburses ${ health_expenses_not_covered_reimburse_percentage }%)
+  % endif
+
+  % endif
+  % if defined('pay_work_childcare_expenses'):
+  Work-related child care expenses: ${ pay_work_childcare_expenses }
+  % if pay_work_childcare_expenses == "pay_percentage" and defined('pay_work_childcare_expenses_percentage'):
+  (percentage reimbursed: ${ pay_work_childcare_expenses_percentage }%)
+  % endif
+
+  % endif
+  % if defined('use_presumed_child_support'):
+  Court orders the presumed child support amount: ${ use_presumed_child_support }
+  % if use_presumed_child_support == "no" and defined('use_presumed_child_support_explanation'):
+  Why it is unjust or inappropriate: ${ use_presumed_child_support_explanation }
+  % endif
+
+  % endif
+  % if defined('child_support_start_date'):
+  Child support starts: ${ child_support_start_date }
+  % if child_support_start_date == "specific_date" and defined('child_support_start_date_other_date'):
+  (${ child_support_start_date_other_date })
+  % endif
+
+  % endif
+  % if defined('child_support_method_of_payment'):
+  Method of payment: ${ child_support_method_of_payment }
+
+  % endif
+  % if defined('child_support_location_of_payment'):
+  Payment location: ${ child_support_location_of_payment }
+
+  % endif
 ---
 comment: |
   The PDF preview that used to be at the bottom of this screen has been removed.
