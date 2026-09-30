@@ -1467,8 +1467,8 @@ code: |
   parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_not_in_14"].label = "8. Extraordinary medical costs for " + support_recipient.name.full()
   parenting_plan_attachment[i].overflow_fields["use_presumed_child_support_explanation"].overflow_trigger = 320
   parenting_plan_attachment[i].overflow_fields["use_presumed_child_support_explanation"].label = "15. Presumed Child Support Explanation"
-  parenting_plan_attachment[i].overflow_fields["additional_provisions"].overflow_trigger = 480
-  parenting_plan_attachment[i].overflow_fields["additional_provisions"].label = "20. Additional Provisions"
+  parenting_plan_attachment[i].overflow_fields["additional_provisions_parenting_plan"].overflow_trigger = 480
+  parenting_plan_attachment[i].overflow_fields["additional_provisions_parenting_plan"].label = "20. Additional Provisions"
   parenting_plan_attachment[i].overflow_fields["children_of_marriage_minor"].overflow_trigger = 6
   parenting_plan_attachment[i].overflow_fields["children_of_marriage_minor"].label = "Additional Children"
   parenting_plan_attachment[i].overflow_fields.gathered = True
@@ -2437,5 +2437,5 @@ attachment:
       - "pbMethodChildSupportNotInBestInterestFPSC": ${ child_support_method_of_payment == "no_not_in_best_interest" and child_support_location_of_payment == "fpsc" } 
       - "pbMethodChildSupportAgreementDirectPayment": ${ child_support_method_of_payment == "no_agreement" and child_support_location_of_payment == "direct_payment" } 
       - "pbMethodChildSupportNotInBestInterestDirectPayment": ${ child_support_method_of_payment == "no_not_in_best_interest" and child_support_location_of_payment == "direct_payment" } 
-      - "pbAdditionalProvisionsSupport1": ${ parenting_plan_attachment[i].safe_value('additional_provisions') } 
+      - "pbAdditionalProvisionsSupport1": ${ parenting_plan_attachment[i].safe_value('additional_provisions_parenting_plan') } 
 ---
