@@ -1563,6 +1563,8 @@ question: Visitation
 fields:
   - Should visitation with ${ respondent if physical_custody == petitioner.name.full() else petitioner } be supervised?: visitation
     datatype: yesnoradio
+  - "Why would unsupervised visitation endanger the children's physical health or impair their emotional development?": visitation_reason
+    show if: visitation
 ---
 id: visitation follow up
 if: visitation
@@ -3085,7 +3087,7 @@ code: |
   personal_goods.other_display = "other personal possessions"
   personal_goods.display_name = "Personal possessions"
 ---
-id: ALAssetList selected values for there are any
+id: personal_goods selected values for there are any
 question: |
   Personal Possessions
 subquestion: |   
@@ -6237,6 +6239,12 @@ review:
     **Visitation**
 
     Should visitation with ${ respondent if physical_custody == petitioner.name.full() else petitioner } be supervised?: ${ word(yesno(visitation)) }
+
+    % if visitation:
+    Unsupervised visitation would endanger the children's physical health or impair their emotional development because:
+    
+    ${ visitation_reason }
+    % endif
 - Edit: visitation_supervisor
   button: |
     **Visitation**
