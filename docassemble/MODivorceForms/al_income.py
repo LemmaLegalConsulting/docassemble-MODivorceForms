@@ -268,7 +268,11 @@ class ALIncomeList(DAList):
         # Always make sure we're working with a set
         satifies_sources = _source_to_callable(source, exclude_source)
         # Construct the filtered list
+        # The first positional argument is the object's instance name. Passing one stops
+        # DAObject.__init__ from calling inspect.stack() to guess it, which costs ~0.5s
+        # per call when this runs inside a deep Mako template render.
         return ALIncomeList(
+            str(getattr(self, "instanceName", "income_list")) + ".matches()",
             elements=[item for item in self.elements if satifies_sources(item.source)],
             object_type=self.object_type,
         )

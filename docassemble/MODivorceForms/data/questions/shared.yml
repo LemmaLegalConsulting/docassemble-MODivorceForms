@@ -8140,8 +8140,7 @@ id: parenting plan additional provisions review
 question: Review the Parenting Plan Statement
 subquestion: |
 
-  ${ parenting_plan_attachment['unredacted'].as_pdf() }
-
+  Your Parenting Plan will be assembled after you finish reviewing your answers.
 
 fields:
   - Do you want to include additional provisions pertaining to the support of the children?: is_additional_provisions_parenting_plan

@@ -290,12 +290,12 @@ code: |
   
   if minor_children and showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]'):
     presumption_video
-    if legal_custody in ["petitioner","respondent"]:
+    if legal_custody in [petitioner.name.full(), respondent.name.full()]:
       legal_custody_sole_explanation
     elif legal_custody == "Third Party":
       third_party_custody_warning
 
-    if legal_custody != "Third Party" and physical_custody in ["petitioner","respondent"] and visitation:
+    if legal_custody != "Third Party" and physical_custody in [petitioner.name.full(), respondent.name.full()] and visitation:
       visitation_supervisor.name.first
     elif legal_custody != "Third Party" and physical_custody == "Third Party":
       third_party_custody_warning

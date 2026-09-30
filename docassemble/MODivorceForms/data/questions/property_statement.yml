@@ -2340,7 +2340,7 @@ attachment:
       - "withhold_income": ${ maintenance_income_withholding if relief["maintenance"] else None } 
       - "no_withholding_income": ${ not maintenance_income_withholding if relief["maintenance"] else None } 
       - "no_withholding_reason_1": ${ maintenance_income_withholding_reason if relief["maintenance"] and not maintenance_income_withholding else ""  } 
-      - "additional_provision_1": ${ additional_provisions if showifdef('is_additional_provisions') else "" } 
+      - "additional_provision_1": ${ showifdef('additional_provisions_property_statement', '') if showifdef('is_additional_provisions_property_statement') else "" } 
       - "oath_date": ${ showifdef('notice_date') } 
       - "party_service_1": ${ other_parties[0].name_full() } 
       - "party_service_address_1": |

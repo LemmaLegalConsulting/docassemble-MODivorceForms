@@ -203,8 +203,8 @@ code: |
 ---
 id: judgment overflow fields
 code: |
-  judgment_attachment[i].overflow_fields["children_of_marriage"].overflow_trigger = 6
-  judgment_attachment[i].overflow_fields["children_of_marriage"].label = "Additional Minor Children"
+  judgment_attachment[i].overflow_fields["children_of_marriage_minor"].overflow_trigger = 6
+  judgment_attachment[i].overflow_fields["children_of_marriage_minor"].label = "Additional Minor Children"
   judgment_attachment[i].overflow_fields.gathered = True
 ---
 attachment:
