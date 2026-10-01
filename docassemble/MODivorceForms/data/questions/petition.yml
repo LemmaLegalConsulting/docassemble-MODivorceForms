@@ -49,22 +49,7 @@ fields:
 
 ---
 ## CHILDREN  
----
-if: not children[i].birth_certificate[users[0].name.full()] or not not children[i].birth_certificate[other_parties[0].name.full()]
-id: adoption question
-question: Is ${ children[i].name.full() } adopted by one or both parents?
-fields:
-  - Is ${ children[i].name.full() } adopted by ${ users[0].name.full() }?: children[i].adopted_by_user
-    datatype: yesnoradio
-    show if:
-      code: |
-        not children[i].birth_certificate[users[0].name.full()] 
-  - Is ${ children[i].name.full() } adopted by ${ other_parties[0].name.full() }?: children[i].adopted_by_other_party
-    datatype: yesnoradio
-    show if:
-      code: |
-        not children[i].birth_certificate[other_parties[0].name.full()] 
-continue button field: adopted_question
+
 ---
 id: adoption question simple
 question: Is ${ children[i].name.full() } adopted by one or both parents?
@@ -85,18 +70,15 @@ code: |
 id: Petition for Dissolution of Marriage object
 objects:
   - petition_attachment: DADict.using(object_type=ALDocument.using(has_addendum=True, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE), auto_gather=False, gathered=True)
----
-id: Petition for Dissolution of Marriage enabled
-code: |
-  petition_attachment[i].enabled = True
+
 ---
 id: petition overflow fields
 code: |
   petition_attachment[i].overflow_fields["persons_lived_with"].overflow_trigger = 3
   petition_attachment[i].overflow_fields["persons_lived_with"].label = "39. Additional Addresses"
-  petition_attachment[i].overflow_fields["children_explanation"].overflow_trigger = 120
+  petition_attachment[i].overflow_fields["children_explanation"].overflow_trigger = 45
   petition_attachment[i].overflow_fields["children_explanation"].label = "44. Additional Information"
-  petition_attachment[i].overflow_fields["other_allegations"].overflow_trigger = 120
+  petition_attachment[i].overflow_fields["other_allegations"].overflow_trigger = 45
   petition_attachment[i].overflow_fields["other_allegations"].label = "47. Other Allegations"
   petition_attachment[i].overflow_fields["children_of_marriage"].overflow_trigger = 4
   petition_attachment[i].overflow_fields["children_of_marriage"].label = "Additional Children"
@@ -118,6 +100,7 @@ attachment:
   editable: False
   fields:
       - "countyList": ${ case.county } 
+      - "case_number": ${ case.docket_number }
       - "petitionersFirstName1": ${ petitioner.name.first } 
       - "petitionersMiddleName1": ${ petitioner.name.middle } 
       - "petitionersLastName1": ${ petitioner.name.last } 
@@ -159,7 +142,7 @@ attachment:
       - "petitionerStateOfResidenceYears": ${ petitioner.mo_length_of_residence_years } 
       - "petitionerStateOfResidenceMonths": ${ petitioner.mo_length_of_residence_months } 
       - "petitonerStateOfResidenceDays": ${ petitioner.mo_length_of_residence_days } 
-      - "petitionersCountyOfResidenceName": ${ petitioner.address.county } 
+      - "petitionersCountyOfResidenceName": ${ nice_county_name(petitioner.address) } 
       - "petitionersCountyOfResidenceYears": ${ petitioner.county_length_of_residence_years } 
       - "petitionersCountyOfResidenceMonths": ${ petitioner.county_length_of_residence_months } 
       - "petitionersCountyOfResidenceDays": ${ petitioner.county_length_of_residence_days } 
@@ -196,7 +179,7 @@ attachment:
       - "respondentsStateOfResidenceYears": ${ respondent.mo_length_of_residence_years } 
       - "respondentsStateOfResidenceMonths": ${ respondent.mo_length_of_residence_months } 
       - "respondentsStateOfResidenceDays": ${ respondent.mo_length_of_residence_days } 
-      - "respondentsCountyOfResidenceName": ${ respondent.address.county } 
+      - "respondentsCountyOfResidenceName": ${ nice_county_name(respondent.address) } 
       - "respondentsCountyOfResidenceYears": ${ respondent.county_length_of_residence_years } 
       - "respondentsCountyOfResidenceMonths": ${ respondent.county_length_of_residence_months } 
       - "respondentsCountyOfResidenceDays": ${ respondent.county_length_of_residence_days } 
@@ -204,9 +187,9 @@ attachment:
       - "didCoupleLiveInMissouri2": ${ not marriage.live_together_in_mo } 
       - "didCoupleLiveInMissouri3": ${ other_parties[0].address.state == "MO" } 
       - "respondentsEmploymentStatus1": ${ len(respondent.jobs) > 0 } 
-      - "respondentsEmploymentStatus2": ${ respondent.jobs.there_are_any == False and respondent.has_self_employment_income == False} 
+      - "respondentsEmploymentStatus2": ${ respondent.jobs.there_are_any == False and not respondent.has_self_employment_income } 
       - "respondentsEmploymentStatus3": ${ len(respondent.jobs) == 0 and respondent.has_self_employment_income } 
-      - "respondentsEmploymentStatus4": ${ not len(respondent.jobs) > 0 and not respondent.has_self_employment_income and not (respondent.jobs.there_are_any == False and respondent.has_self_employment_income == False)  } 
+      - "respondentsEmploymentStatus4": ${ respondent.jobs.there_are_any == None and not respondent.has_self_employment_income } 
       - "respondentEmployedOrSelfEmployed": ${ "Unknown" if not len(respondent.jobs) > 0 and not respondent.has_self_employment_income and not (respondent.jobs.there_are_any == False and respondent.has_self_employment_income == False) else showifdef('respondent.employer.name.text') } 
       - "respondentsEmploymentStreet": ${ "" if not len(respondent.jobs) > 0 and not respondent.has_self_employment_income and not (respondent.jobs.there_are_any == False and respondent.has_self_employment_income == False) else respondent.employer.address.address } 
       - "respondentsEmploymentState": ${ "" if not len(respondent.jobs) > 0 and not respondent.has_self_employment_income and not (respondent.jobs.there_are_any == False and respondent.has_self_employment_income == False) else respondent.employer.address.state } 
@@ -221,10 +204,10 @@ attachment:
       - "dateOfMarriage": ${ format_date(marriage.recorded_date, format='MM/dd/yyyy') } 
       - "locationMarriageLicenseState": ${ state_name(marriage.address.state) } 
       - "locationMarriageLicenseCounty": ${ nice_county_name(marriage.address) } 
-      - "locationMarriageLicense1": ${ marriage.address.country == "US" } 
-      - "locationMarriageLicense2": ${ marriage.address.country != "US" } 
+      - "locationMarriageLicense1": ${ marriage.address.country in ["US",""] } 
+      - "locationMarriageLicense2": ${ marriage.address.country not in ["US",""] } 
       - "locationMarriageLicenseCountry": ${ marriage.address.country if marriage.address.country != "US" else ""  } 
-      - "dateOfSeparation": ${ marriage.separation_date } 
+      - "dateOfSeparation": ${ format_date(marriage.separation_date,format='MM/dd/yyyy') } 
       - "canMarriageBePreserved1": ${ marriage.can_be_preserved } 
       - "canMarriageBePreserved2": ${ not marriage.can_be_preserved } 
       - "isMarriageIrretrievablyBroken1": ${ marriage.is_broken } 
@@ -260,26 +243,26 @@ attachment:
           % endif
       - "childOneStreet": |
           % if len(children_of_marriage) > 0:
-          ${ children_of_marriage[0].address.line_one() }
+          ${ redact(children_of_marriage[0].address.line_one()) }
           % endif
       - "childOneCity": |
           % if len(children_of_marriage) > 0:
-          ${ children_of_marriage[0].address.city }
+          ${ redact(children_of_marriage[0].address.city) }
           % endif
       - "childOneState": |
           % if len(children_of_marriage) > 0:
-          ${ children_of_marriage[0].address.state }
+          ${ redact(children_of_marriage[0].address.state) }
           % endif
       - "childOneZip": |
           % if len(children_of_marriage) > 0:
-          ${ children_of_marriage[0].address.zip }
+          ${ redact(children_of_marriage[0].address.zip) }
           % endif
       - "childOneAge": |
           % if len(children_of_marriage) > 0:
           % if date_difference(starting=children_of_marriage[0].birthdate,ending=today()).years > 1:
           ${ "{:.0f}".format(date_difference(starting=children_of_marriage[0].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children_of_marriage[0].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage[0].birthdate, ending=today()).describe(specificity='month', nice=False) }
           % endif
           % endif
       - "childOneMarriedOrNot": |
@@ -320,11 +303,11 @@ attachment:
           % endif
       - "childOneLegalCustody1": |
           % if len(children_of_marriage) > 0:
-          ${ children_of_marriage[0].legal_custody == "petitioner" }
+          ${ children_of_marriage[0].legal_custody == petitioner.name.full() }
           % endif
       - "childOneLegalCustody2": |
           % if len(children_of_marriage) > 0:
-          ${ children_of_marriage[0].legal_custody == "respondent" }
+          ${ children_of_marriage[0].legal_custody == respondent.name.full() }
           % endif
       - "childOneLegalCustody3": |
           % if len(children_of_marriage) > 0:
@@ -352,11 +335,11 @@ attachment:
           % endif
       - "childOnePhysicalCustody1": |
           % if len(children_of_marriage) > 0:
-          ${ children_of_marriage[0].physical_custody == "petitioner" }
+          ${ children_of_marriage[0].physical_custody == petitioner.name.full() }
           % endif
       - "childOnePhysicalCustody2": |
           % if len(children_of_marriage) > 0:
-          ${ children_of_marriage[0].physical_custody == "respondent" }
+          ${ children_of_marriage[0].physical_custody == respondent.name.full() }
           % endif
       - "childOnePhysicalCustody3": |
           % if len(children_of_marriage) > 0:
@@ -460,26 +443,26 @@ attachment:
           % endif
       - "childTwoStreet": |
           % if len(children_of_marriage) > 1:
-          ${ children_of_marriage[1].address.line_one() }
+          ${ redact(children_of_marriage[1].address.line_one()) }
           % endif
       - "childTwoCity": |
           % if len(children_of_marriage) > 1:
-          ${ children_of_marriage[1].address.city }
+          ${ redact(children_of_marriage[1].address.city) }
           % endif
       - "childTwoState": |
           % if len(children_of_marriage) > 1:
-          ${ children_of_marriage[1].address.state }
+          ${ redact(children_of_marriage[1].address.state) }
           % endif
       - "childTwoZip": |
           % if len(children_of_marriage) > 1:
-          ${ children_of_marriage[1].address.zip }
+          ${ redact(children_of_marriage[1].address.zip) }
           % endif
       - "childTwoAge": |
           % if len(children_of_marriage) > 1:
           % if date_difference(starting=children_of_marriage[1].birthdate,ending=today()).years > 1:
           ${ "{:.0f}".format(date_difference(starting=children_of_marriage[1].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children_of_marriage[1].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage[1].birthdate, ending=today()).describe(specificity='month', nice=False) }
           % endif
           % endif
       - "childTwoMarriedOrNot": |
@@ -520,11 +503,11 @@ attachment:
           % endif
       - "childTwoLegalCustody1": |
           % if len(children_of_marriage) > 1:
-          ${ children_of_marriage[1].legal_custody == "petitioner" }
+          ${ children_of_marriage[1].legal_custody == petitioner.name.full() }
           % endif
       - "childTwoLegalCustody2": |
           % if len(children_of_marriage) > 1:
-          ${ children_of_marriage[1].legal_custody == "respondent" }
+          ${ children_of_marriage[1].legal_custody == respondent.name.full() }
           % endif
       - "childTwoLegalCustody3": |
           % if len(children_of_marriage) > 1:
@@ -552,11 +535,11 @@ attachment:
           % endif
       - "childTwoPhysicalCustody1": |
           % if len(children_of_marriage) > 1:
-          ${ children_of_marriage[1].physical_custody == "petitioner" }
+          ${ children_of_marriage[1].physical_custody == petitioner.name.full() }
           % endif
       - "childTwoPhysicalCustody2": |
           % if len(children_of_marriage) > 1:
-          ${ children_of_marriage[1].physical_custody == "respondent" }
+          ${ children_of_marriage[1].physical_custody == respondent.name.full() }
           % endif
       - "childTwoPhysicalCustody3": |
           % if len(children_of_marriage) > 1:
@@ -660,26 +643,26 @@ attachment:
           % endif
       - "childThreeStreet": |
           % if len(children_of_marriage) > 2:
-          ${ children_of_marriage[2].address.line_one() }
+          ${ redact(children_of_marriage[2].address.line_one()) }
           % endif
       - "childThreeCity": |
           % if len(children_of_marriage) > 2:
-          ${ children_of_marriage[2].address.city }
+          ${ redact(children_of_marriage[2].address.city) }
           % endif
       - "childThreeState": |
           % if len(children_of_marriage) > 2:
-          ${ children_of_marriage[2].address.state }
+          ${ redact(children_of_marriage[2].address.state) }
           % endif
       - "childThreeZip": |
           % if len(children_of_marriage) > 2:
-          ${ children_of_marriage[2].address.zip }
+          ${ redact(children_of_marriage[2].address.zip) }
           % endif
       - "childThreeAge": |
           % if len(children_of_marriage) > 2:
           % if date_difference(starting=children_of_marriage[2].birthdate,ending=today()).years > 1:
           ${ "{:.0f}".format(date_difference(starting=children_of_marriage[2].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children_of_marriage[2].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage[2].birthdate, ending=today()).describe(specificity='month', nice=False) }
           % endif
           % endif
       - "childThreeMarriedOrNot": |
@@ -720,11 +703,11 @@ attachment:
           % endif
       - "childThreeLegalCustody1": |
           % if len(children_of_marriage) > 2:
-          ${ children_of_marriage[2].legal_custody == "petitioner" }
+          ${ children_of_marriage[2].legal_custody == petitioner.name.full() }
           % endif
       - "childThreeLegalCustody2": |
           % if len(children_of_marriage) > 2:
-          ${ children_of_marriage[2].legal_custody == "respondent" }
+          ${ children_of_marriage[2].legal_custody == respondent.name.full() }
           % endif
       - "childThreeLegalCustody3": |
           % if len(children_of_marriage) > 2:
@@ -752,11 +735,11 @@ attachment:
           % endif
       - "childThreePhysicalCustody1": |
           % if len(children_of_marriage) > 2:
-          ${ children_of_marriage[2].physical_custody == "petitioner" }
+          ${ children_of_marriage[2].physical_custody == petitioner.name.full() }
           % endif
       - "childThreePhysicalCustody2": |
           % if len(children_of_marriage) > 2:
-          ${ children_of_marriage[2].physical_custody == "respondent" }
+          ${ children_of_marriage[2].physical_custody == respondent.name.full() }
           % endif
       - "childThreePhysicalCustody3": |
           % if len(children_of_marriage) > 2:
@@ -860,26 +843,26 @@ attachment:
           % endif
       - "childFourStreet": |
           % if len(children_of_marriage) > 3:
-          ${ children_of_marriage[3].address.line_one() }
+          ${ redact(children_of_marriage[3].address.line_one()) }
           % endif
       - "childFourCity": |
           % if len(children_of_marriage) > 3:
-          ${ children_of_marriage[3].address.city }
+          ${ redact(children_of_marriage[3].address.city) }
           % endif
       - "childFourState": |
           % if len(children_of_marriage) > 3:
-          ${ children_of_marriage[3].address.state }
+          ${ redact(children_of_marriage[3].address.state) }
           % endif
       - "childFourZip": |
           % if len(children_of_marriage) > 3:
-          ${ children_of_marriage[3].address.zip }
+          ${ redact(children_of_marriage[3].address.zip) }
           % endif
       - "childFourAge": |
           % if len(children_of_marriage) > 3:
           % if date_difference(starting=children_of_marriage[3].birthdate,ending=today()).years > 1:
           ${ "{:.0f}".format(date_difference(starting=children_of_marriage[3].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children_of_marriage[3].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage[3].birthdate, ending=today()).describe(specificity='month', nice=False) }
           % endif
           % endif
       - "childFourMarriedOrNot": |
@@ -920,11 +903,11 @@ attachment:
           % endif
       - "childFourLegalCustody1": |
           % if len(children_of_marriage) > 3:
-          ${ children_of_marriage[3].legal_custody == "petitioner" }
+          ${ children_of_marriage[3].legal_custody == petitioner.name.full() }
           % endif
       - "childFourLegalCustody2": |
           % if len(children_of_marriage) > 3:
-          ${ children_of_marriage[3].legal_custody == "respondent" }
+          ${ children_of_marriage[3].legal_custody == respondent.name.full() }
           % endif
       - "childFourLegalCustody3": |
           % if len(children_of_marriage) > 3:
@@ -952,11 +935,11 @@ attachment:
           % endif
       - "childFourPhysicalCustody1": |
           % if len(children_of_marriage) > 3:
-          ${ children_of_marriage[3].physical_custody == "petitioner" }
+          ${ children_of_marriage[3].physical_custody == petitioner.name.full() }
           % endif
       - "childFourPhysicalCustody2": |
           % if len(children_of_marriage) > 3:
-          ${ children_of_marriage[3].physical_custody == "respondent" }
+          ${ children_of_marriage[3].physical_custody == respondent.name.full() }
           % endif
       - "childFourPhysicalCustody3": |
           % if len(children_of_marriage) > 3:
@@ -1118,18 +1101,18 @@ attachment:
       - "participatedInOtherLitigationCustody2": ${ not other_litigation } 
       - "haveChildrenBeenVictimAbuseOrNeglect1": ${ abuse_or_neglect } 
       - "haveChildrenBeenVictimAbuseOrNeglect2": ${ not abuse_or_neglect } 
-      - "explanationIfAnsweredYesToFortyThroughFortyThree": ${ petition_attachment.safe_value('children_explanation') } 
+      - "explanationIfAnsweredYesToFortyThroughFortyThree": ${ petition_attachment[i].safe_value('children_explanation') } 
       - "anyOrdersEnteredByFSD1": ${ family_support_order } 
       - "anyOrdersEnteredByFSD2": ${ not family_support_order } 
       - "areYouOrSpouseReceivingTanf1": ${ len(petitioner.benefits.matches(source=['tanf'])) > 0 or len(respondent.benefits.matches(source=['tanf'])) > 0 } 
       - "areYouOrSpouseReceivingTanf2": ${ len(petitioner.benefits.matches(source=['tanf'])) == 0 and len(respondent.benefits.matches(source=['tanf'])) == 0 } 
-      - "otherAllegations": ${ petition_attachment.safe_value('other_allegations') } 
+      - "otherAllegations": ${ petition_attachment[i].safe_value('other_allegations') } 
       - "requestReliefDissolution": ${ True } 
       - "requestReliefCustody": ${ relief['custody'] } 
       - "requestReliefSupportOfTheChildren": ${ relief['child_support'] } 
       - "requestReliefDivideMaritalPropertyAndDebts": ${ relief['divide_property'] } 
-      - "requestReliefAwardMaintenanceToMe": ${ relief['maintenance'] and maintenance_awarded_to == "petitioner" } 
-      - "requestReliefAwardMaintenanceToSpouse": ${ relief['maintenance'] and maintenance_awarded_to == "respondent" } 
+      - "requestReliefAwardMaintenanceToMe": ${ relief['maintenance'] and maintenance_awarded_to == petitioner.name.full() } 
+      - "requestReliefAwardMaintenanceToSpouse": ${ relief['maintenance'] and maintenance_awarded_to == respondent.name.full() } 
       - "requestReliefChangeName": ${ relief['change_name'] } 
       - "requestReliefFormerFirstName": ${ users[0].prior_name.name.first if relief['change_name'] else "" } 
       - "requestReliefFormerMiddleName": ${ users[0].prior_name.name.middle if relief['change_name'] else "" } 
@@ -1151,13 +1134,13 @@ attachment:
       - "serviceOnSpouseEmployersZip": ${ respondent.service_address.zip if other_parties[0].service_type == "work" else "" } 
       - "serviceOnSpouseEmployersState": ${ respondent.service_address.state if other_parties[0].service_type == "work" else "" } 
       - "serviceOnSpouse4": ${ other_parties[0].service_type == "mail" } 
-      - "ifYouOrSpouseReceiveTanf": ${ len(petitioner.benefits.matches(source=['tanf'])) > 0 or len(respondent.benefits.matches(source=['tanf'])) > 0  } 
+      - "ifYouOrSpouseReceiveTanf": ${ len(children_of_marriage) > 0 and (len(petitioner.benefits.matches(source=['tanf'])) > 0 or len(respondent.benefits.matches(source=['tanf'])) > 0)  } 
       - "petitionersAttorneycCheckbox": ${ petitioner.attorney.assistance } 
       - "petitionersAttorneysBarNumber": ${ petitioner.attorney.bar_number } 
       - "petitionersAttorneyPrintName": ${ petitioner.attorney.name_full() } 
       - "petitionersAttorneyStreet": ${ petitioner.attorney.address.line_one() } 
-      - "petitionersAttorneyCity": ${ petitioner.attorney.address.state } 
-      - "petitionersAttorneyState": ${ petitioner.attorney.address.city } 
+      - "petitionersAttorneyState": ${ petitioner.attorney.address.state } 
+      - "petitionersAttorneyCity": ${ petitioner.attorney.address.city } 
       - "petitionersAttorneyZip": ${ petitioner.attorney.address.zip } 
       - "petitionersAttorneyPhone": ${ phone_number_formatted(petitioner.attorney.phone_number) } 
       - "petitionersAttorneyFaxNumber": ${ "" } 

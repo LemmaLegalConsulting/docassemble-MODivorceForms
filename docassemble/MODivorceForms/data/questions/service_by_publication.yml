@@ -1,5 +1,5 @@
 id: service by publication follow up
-question: Service by Publication
+question: Service by publication
 subquestion: |
   If attempts to serve your spouse in person have failed, you can file a request to serve them by publication.
   
@@ -77,8 +77,8 @@ attachment:
     - "attorneycity": ${ users[0].attorney.address.city }
     - "attorneystate": ${ users[0].attorney.address.state }
     - "attorneyzip": ${ users[0].attorney.address.zip }
-    - "attorneytelephonenumber": ${ users[0].attorney.phone }
-    - "attorneyfaxnumber": ${ users[0].attorney.fax }
+    - "attorneytelephonenumber": ${ phone_number_formatted(users[0].attorney.phone) }
+    - "attorneyfaxnumber": ${ phone_number_formatted(users[0].attorney.fax) }
     - "attorneyemailaddressoptional": ${ users[0].attorney.email }
     - "nameofnewspaper": ${ newspaper }
 

@@ -65,8 +65,8 @@ attachment:
       - "petitioner_email": ${ petitioner.email } 
       - "P_Male": ${ petitioner.gender == "male" } 
       - "P_Female": ${ petitioner.gender == "female" } 
-      - "P DOB": ${ format_date(petitioner.birthdate, format='M/d/yyyy') } 
-      - "P_SSN": ${ petitioner.ssn } 
+      - "P DOB": ${ redact(format_date(petitioner.birthdate, format='M/d/yyyy')) } 
+      - "P_SSN": ${ redact("{:.0f}".format(petitioner.ssn)) } 
       - "P Race American Indian or Alaska Native": ${ petitioner.race == "American Indian or Alaska Native" } 
       - "P Race Asian": ${ petitioner.race == "Asian" } 
       - "P Race Black or African American": ${ petitioner.race == "Black or African American" } 
@@ -105,10 +105,10 @@ attachment:
       - "respondent_address_city": ${ respondent.address.city } 
       - "respondent_phone": ${ phone_number_formatted(respondent.phone_number) } 
       - "respondent_email": ${ respondent.email } 
-      - "respondent_birthdate": ${ format_date(respondent.birthdate, format='M/d/yyyy') } 
+      - "respondent_birthdate": ${ redact(format_date(respondent.birthdate, format='M/d/yyyy')) } 
       - "respondent_gender_female": ${ respondent.gender == "female" } 
       - "respondent_gender_male": ${ respondent.gender == "male" } 
-      - "respondent_ssn": ${ respondent.ssn } 
+      - "respondent_ssn": ${ redact("{:.0f}".format(respondent.ssn)) } 
       - "R Race American Indian or Alaska Native": ${ respondent.race == "American Indian or Alaska Native" } 
       - "R Race Asian": ${ respondent.race == "Asian" } 
       - "R Race White": ${ respondent.race == "White" } 
@@ -132,74 +132,23 @@ attachment:
       - "R_Attorney Name": ${ respondent.attorney } 
       - "R_Bar ID": ${ respondent.attorney.bar_number } 
       - "R_Attorney Party Type Code": ${ respondent.attorney.party_type_code } 
-      - "Party Type Code_3": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].party_type_code }
-          % endif
-      - "Party Type Description_3": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].party_type_description }
-          % endif
-      - "Last Name_3": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].name.last if other_parties[1].person_type == "person" else "" }
-          % endif
-      - "First Name_3": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].name.first if other_parties[1].person_type == "person" else "" }
-          % endif
-      - "Middle Name_3": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].name.middle if other_parties[1].person_type == "person" else "" }
-          % endif
-      - "Suffix_3": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].name.suffix if other_parties[1].person_type == "person" else "" }
-          % endif
-      - "Organization_3": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].name.text if other_parties[1].person_type == "business" else "" }
-          % endif
-      - "Address_3": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].address.line_one() }
-          % endif
-      - "Zip_3": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].address.zip }
-          % endif
-      - "City_3": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].address.city }
-          % endif
-      - "State_3": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].address.state }
-          % endif
-      - "Contact Telephone Number_3": |
-          % if len(other_parties) > 1:
-          ${ phone_number_formatted(other_parties[1].phone_number) }
-          % endif
-      - "Email_Address_3": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].email }
-          % endif
-      - "Female_3": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].gender == "female" }
-          % endif
-      - "Male_3": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].gender == "male" }
-          % endif
-      - "DOB_3": |
-          % if len(other_parties) > 1:
-          ${ format_date(other_parties[1].birthdate, format='M/d/yyyy') }
-          % endif
-      - "SSN_3": |
-          % if len(other_parties) > 1:
-          ${ "{:.0f}".format(other_parties[1].ssn) }
-          % endif
+      - "Party Type Code_3": ${ "" }
+      - "Party Type Description_3": ${ "" }
+      - "Last Name_3": ${ "" }
+      - "First Name_3": ${ "" }
+      - "Middle Name_3": ${ "" }
+      - "Suffix_3": ${ "" }
+      - "Organization_3": ${ "" }
+      - "Address_3": ${ "" }
+      - "Zip_3": ${ "" }
+      - "City_3": ${ "" }
+      - "State_3": ${ "" }
+      - "Contact Telephone Number_3": ${ "" }
+      - "Email_Address_3": ${ "" }
+      - "Female_3": ${ "" }
+      - "Male_3": ${ "" }
+      - "DOB_3": ${ "" }
+      - "SSN_3": ${ "" }
       - "Race American Indian or Alaska Native_3": ${ False } 
       - "Race Asian_3": ${ False } 
       - "Race White_3": ${ False } 
@@ -218,86 +167,26 @@ attachment:
       - "Source Another State Agency_3": ${ False } 
       - "Source Drivers License_3": ${ False } 
       - "Source Unknown_3": ${ False } 
-      - "Attorney Name_3": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].attorney }
-          % endif
-      - "Bar ID_3": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].attorney.bar_number }
-          % endif
-      - "other_parties1_attorney_party_type_code": |
-          % if len(other_parties) > 1:
-          ${ other_parties[1].attorney.party_type_code }
-          % endif
-      - "other_parties2_party_type_code": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].party_type_code }
-          % endif
-      - "other_parties2_party_type_description": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].party_type_description }
-          % endif
-      - "other_parties2_name_last": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].name.last if other_parties[2].person_type == "person" else "" }
-          % endif
-      - "other_parties2_name_first": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].name.first if other_parties[2].person_type == "person" else "" }
-          % endif
-      - "other_parties2_name_middle": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].name.middle if other_parties[2].person_type == "person" else "" }
-          % endif
-      - "other_parties2_name_suffix": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].name.suffix if other_parties[2].person_type == "person" else "" }
-          % endif
-      - "other_parties2_name_text": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].name.text if other_parties[2].person_type == "business" else "" }
-          % endif
-      - "other_parties2_address": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].address.line_one() }
-          % endif
-      - "other_parties2_address_zip": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].address.zip }
-          % endif
-      - "other_parties2_address_state": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].address.state }
-          % endif
-      - "other_parties2_address_city": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].address.city }
-          % endif
-      - "other_parties2_phone": |
-          % if len(other_parties) > 2:
-          ${ phone_number_formatted(other_parties[2].phone_number) }
-          % endif
-      - "other_parties2_email": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].email }
-          % endif
-      - "other_parties2_gender_female": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].gender == "female" }
-          % endif
-      - "other_parties2_gender_male": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].gender == "male" }
-          % endif
-      - "other_parties2_birthdate": |
-          % if len(other_parties) > 2:
-          ${ format_date(other_parties[2].birthdate, format='M/d/yyyy') }
-          % endif
-      - "other_parties2_ssn": |
-          % if len(other_parties) > 2:
-          ${ "{:.0f}".format(other_parties[2].ssn) }
-          % endif
+      - "Attorney Name_3": ${ "" }
+      - "Bar ID_3": ${ "" }
+      - "other_parties1_attorney_party_type_code": ${ "" }
+      - "other_parties2_party_type_code": ${ "" }
+      - "other_parties2_party_type_description": ${ "" }
+      - "other_parties2_name_last": ${ "" }
+      - "other_parties2_name_first": ${ "" }
+      - "other_parties2_name_middle": ${ "" }
+      - "other_parties2_name_suffix": ${ "" }
+      - "other_parties2_name_text": ${ "" }
+      - "other_parties2_address": ${ "" }
+      - "other_parties2_address_zip": ${ "" }
+      - "other_parties2_address_state": ${ "" }
+      - "other_parties2_address_city": ${ "" }
+      - "other_parties2_phone": ${ "" }
+      - "other_parties2_email": ${ "" }
+      - "other_parties2_gender_female": ${ "" }
+      - "other_parties2_gender_male": ${ "" }
+      - "other_parties2_birthdate": ${ "" }
+      - "other_parties2_ssn": ${ "" }
       - "Race American Indian or Alaska Native_4": ${ False } 
       - "Race Asian_4": ${ False } 
       - "Race White_4": ${ False } 
@@ -316,19 +205,10 @@ attachment:
       - "Source Another State Agency_4": ${ False } 
       - "Source Drivers License_4": ${ False } 
       - "Source Unknown_4": ${ False } 
-      - "other_parties2_attorney": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].attorney }
-          % endif
-      - "other_parties2_attorney_bar_number": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].attorney.bar_number }
-          % endif
-      - "other_parties2_attorney_party_type_code": |
-          % if len(other_parties) > 2:
-          ${ other_parties[2].attorney.party_type_code }
-          % endif
-      - "chbx more than 4 parties": ${ len(other_parties) > 4 } 
+      - "other_parties2_attorney": ${ "" }
+      - "other_parties2_attorney_bar_number": ${ "" }
+      - "other_parties2_attorney_party_type_code": ${ "" }
+      - "chbx more than 4 parties": ${ False } 
       - "petitioner_employersj_name_text": ${ petitioner.employer.name.text } 
       - "petitioner_employersj_address_address": ${ petitioner.employer.address.address } 
       - "petitioner_employersj_address_state": ${ petitioner.employer.address.state } 
@@ -344,206 +224,206 @@ attachment:
       - "respondent_employersj_phone_number": ${ phone_number_formatted(respondent.employer.phone_number) } 
       - "respondent_employersj_email": ${ respondent.employer.email } 
       - "children0": |
-          % if len(children) > 0:
-          ${ children[0].name_full() }
+          % if len(children_of_marriage_minor) > 0:
+          ${ redact(children_of_marriage_minor[0].name_full()) }
           % endif
       - "children0_gender_female": |
-          % if len(children) > 0:
-          ${ children[0].gender }
+          % if len(children_of_marriage_minor) > 0:
+          ${ redact(children_of_marriage_minor[0].gender) }
           % endif
       - "children0_gender_male": |
-          % if len(children) > 0:
-          ${ children[0].gender }
+          % if len(children_of_marriage_minor) > 0:
+          ${ redact(children_of_marriage_minor[0].gender) }
           % endif
       - "children0_ssn": |
-          % if len(children) > 0:
-          ${ "{:.0f}".format(children[0].ssn) }
+          % if len(children_of_marriage_minor) > 0:
+          ${ redact("{:.0f}".format(children_of_marriage_minor[0].ssn)) }
           % endif
       - "children0_birthdate": |
-          % if len(children) > 0:
-          ${ format_date(children[0].birthdate, format='M/d/yyyy') }
+          % if len(children_of_marriage_minor) > 0:
+          ${ redact(format_date(children_of_marriage_minor[0].birthdate, format='M/d/yyyy')) }
           % endif
       - "children1": |
-          % if len(children) > 1:
-          ${ children[1].name_full() }
+          % if len(children_of_marriage_minor) > 1:
+          ${ redact(children_of_marriage_minor[1].name_full()) }
           % endif
       - "children1_gender_male": |
-          % if len(children) > 1:
-          ${ children[1].gender }
+          % if len(children_of_marriage_minor) > 1:
+          ${ redact(children_of_marriage_minor[1].gender) }
           % endif
       - "children1_gender_female": |
-          % if len(children) > 1:
-          ${ children[1].gender }
+          % if len(children_of_marriage_minor) > 1:
+          ${ redact(children_of_marriage_minor[1].gender) }
           % endif
       - "children1_ssn": |
-          % if len(children) > 1:
-          ${ "{:.0f}".format(children[1].ssn) }
+          % if len(children_of_marriage_minor) > 1:
+          ${ redact("{:.0f}".format(children_of_marriage_minor[1].ssn)) }
           % endif
       - "children1_birthdate": |
-          % if len(children) > 1:
-          ${ format_date(children[1].birthdate, format='M/d/yyyy') }
+          % if len(children_of_marriage_minor) > 1:
+          ${ redact(format_date(children_of_marriage_minor[1].birthdate, format='M/d/yyyy')) }
           % endif
       - "children2": |
-          % if len(children) > 2:
-          ${ children[2].name_full() }
+          % if len(children_of_marriage_minor) > 2:
+          ${ redact(children_of_marriage_minor[2].name_full()) }
           % endif
       - "children2_gender_female": |
-          % if len(children) > 2:
-          ${ children[2].gender }
+          % if len(children_of_marriage_minor) > 2:
+          ${ redact(children_of_marriage_minor[2].gender) }
           % endif
       - "children2_gender_male": |
-          % if len(children) > 2:
-          ${ children[2].gender }
+          % if len(children_of_marriage_minor) > 2:
+          ${ redact(children_of_marriage_minor[2].gender) }
           % endif
       - "children2_ssn": |
-          % if len(children) > 2:
-          ${ "{:.0f}".format(children[2].ssn) }
+          % if len(children_of_marriage_minor) > 2:
+          ${ redact("{:.0f}".format(children_of_marriage_minor[2].ssn)) }
           % endif
       - "children2_birthdate": |
-          % if len(children) > 2:
-          ${ format_date(children[2].birthdate, format='M/d/yyyy') }
+          % if len(children_of_marriage_minor) > 2:
+          ${ redact(format_date(children_of_marriage_minor[2].birthdate, format='M/d/yyyy')) }
           % endif
       - "children3": |
-          % if len(children) > 3:
-          ${ children[3].name_full() }
+          % if len(children_of_marriage_minor) > 3:
+          ${ redact(children_of_marriage_minor[3].name_full()) }
           % endif
       - "children3_gender_male": |
-          % if len(children) > 3:
-          ${ children[3].gender }
+          % if len(children_of_marriage_minor) > 3:
+          ${ redact(children_of_marriage_minor[3].gender) }
           % endif
       - "children3_gender_female": |
-          % if len(children) > 3:
-          ${ children[3].gender }
+          % if len(children_of_marriage_minor) > 3:
+          ${ redact(children_of_marriage_minor[3].gender) }
           % endif
       - "children3_birthdate": |
-          % if len(children) > 3:
-          ${ format_date(children[3].birthdate, format='M/d/yyyy') }
+          % if len(children_of_marriage_minor) > 3:
+          ${ redact(format_date(children_of_marriage_minor[3].birthdate, format='M/d/yyyy')) }
           % endif
       - "children3_ssn": |
-          % if len(children) > 3:
-          ${ "{:.0f}".format(children[3].ssn) }
+          % if len(children_of_marriage_minor) > 3:
+          ${ redact("{:.0f}".format(children_of_marriage_minor[3].ssn)) }
           % endif
       - "children4": |
-          % if len(children) > 4:
-          ${ children[4].name_full() }
+          % if len(children_of_marriage_minor) > 4:
+          ${ redact(children_of_marriage_minor[4].name_full()) }
           % endif
       - "children4_gender_female": |
-          % if len(children) > 4:
-          ${ children[4].gender }
+          % if len(children_of_marriage_minor) > 4:
+          ${ redact(children_of_marriage_minor[4].gender) }
           % endif
       - "children4_gender_male": |
-          % if len(children) > 4:
-          ${ children[4].gender }
+          % if len(children_of_marriage_minor) > 4:
+          ${ redact(children_of_marriage_minor[4].gender) }
           % endif
       - "children4_ssn": |
-          % if len(children) > 4:
-          ${ "{:.0f}".format(children[4].ssn) }
+          % if len(children_of_marriage_minor) > 4:
+          ${ redact("{:.0f}".format(children_of_marriage_minor[4].ssn)) }
           % endif
       - "children4_birthdate": |
-          % if len(children) > 4:
-          ${ format_date(children[4].birthdate, format='M/d/yyyy') }
+          % if len(children_of_marriage_minor) > 4:
+          ${ redact(format_date(children_of_marriage_minor[4].birthdate, format='M/d/yyyy')) }
           % endif
       - "children5": |
-          % if len(children) > 5:
-          ${ children[5].name_full() }
+          % if len(children_of_marriage_minor) > 5:
+          ${ redact(children_of_marriage_minor[5].name_full()) }
           % endif
       - "children5_gender_female": |
-          % if len(children) > 5:
-          ${ children[5].gender }
+          % if len(children_of_marriage_minor) > 5:
+          ${ redact(children_of_marriage_minor[5].gender) }
           % endif
       - "children5_gender_male": |
-          % if len(children) > 5:
-          ${ children[5].gender }
+          % if len(children_of_marriage_minor) > 5:
+          ${ redact(children_of_marriage_minor[5].gender) }
           % endif
       - "children5_birthdate": |
-          % if len(children) > 5:
-          ${ format_date(children[5].birthdate, format='M/d/yyyy') }
+          % if len(children_of_marriage_minor) > 5:
+          ${ redact(format_date(children_of_marriage_minor[5].birthdate, format='M/d/yyyy')) }
           % endif
       - "children5_ssn": |
-          % if len(children) > 5:
-          ${ "{:.0f}".format(children[5].ssn) }
+          % if len(children_of_marriage_minor) > 5:
+          ${ redact("{:.0f}".format(children_of_marriage_minor[5].ssn)) }
           % endif
       - "children6": |
-          % if len(children) > 6:
-          ${ children[6].name_full() }
+          % if len(children_of_marriage_minor) > 6:
+          ${ redact(children_of_marriage_minor[6].name_full()) }
           % endif
       - "children6_gender_male": |
-          % if len(children) > 6:
-          ${ children[6].gender }
+          % if len(children_of_marriage_minor) > 6:
+          ${ redact(children_of_marriage_minor[6].gender) }
           % endif
       - "children6_gender_female": |
-          % if len(children) > 6:
-          ${ children[6].gender }
+          % if len(children_of_marriage_minor) > 6:
+          ${ redact(children_of_marriage_minor[6].gender) }
           % endif
       - "children6_ssn": |
-          % if len(children) > 6:
-          ${ "{:.0f}".format(children[6].ssn) }
+          % if len(children_of_marriage_minor) > 6:
+          ${ redact("{:.0f}".format(children_of_marriage_minor[6].ssn)) }
           % endif
       - "children6_birthdate": |
-          % if len(children) > 6:
-          ${ format_date(children[6].birthdate, format='M/d/yyyy') }
+          % if len(children_of_marriage_minor) > 6:
+          ${ redact(format_date(children_of_marriage_minor[6].birthdate, format='M/d/yyyy')) }
           % endif
       - "children7": |
-          % if len(children) > 7:
-          ${ children[7].name_full() }
+          % if len(children_of_marriage_minor) > 7:
+          ${ redact(children_of_marriage_minor[7].name_full()) }
           % endif
       - "children7_gender_female": |
-          % if len(children) > 7:
-          ${ children[7].gender }
+          % if len(children_of_marriage_minor) > 7:
+          ${ redact(children_of_marriage_minor[7].gender) }
           % endif
       - "children7_gender_male": |
-          % if len(children) > 7:
-          ${ children[7].gender }
+          % if len(children_of_marriage_minor) > 7:
+          ${ redact(children_of_marriage_minor[7].gender) }
           % endif
       - "children7_birthdate": |
-          % if len(children) > 7:
-          ${ format_date(children[7].birthdate, format='M/d/yyyy') }
+          % if len(children_of_marriage_minor) > 7:
+          ${ redact(format_date(children_of_marriage_minor[7].birthdate, format='M/d/yyyy')) }
           % endif
       - "children7_ssn": |
-          % if len(children) > 7:
-          ${ "{:.0f}".format(children[7].ssn) }
+          % if len(children_of_marriage_minor) > 7:
+          ${ redact("{:.0f}".format(children_of_marriage_minor[7].ssn)) }
           % endif
       - "children8": |
-          % if len(children) > 8:
-          ${ children[8].name_full() }
+          % if len(children_of_marriage_minor) > 8:
+          ${ redact(children_of_marriage_minor[8].name_full()) }
           % endif
       - "children8_ssn": |
-          % if len(children) > 8:
-          ${ "{:.0f}".format(children[8].ssn) }
+          % if len(children_of_marriage_minor) > 8:
+          ${ redact("{:.0f}".format(children_of_marriage_minor[8].ssn)) }
           % endif
       - "children8_gender_female": |
-          % if len(children) > 8:
-          ${ children[8].gender }
+          % if len(children_of_marriage_minor) > 8:
+          ${ redact(children_of_marriage_minor[8].gender) }
           % endif
       - "children8_gender_male": |
-          % if len(children) > 8:
-          ${ children[8].gender }
+          % if len(children_of_marriage_minor) > 8:
+          ${ redact(children_of_marriage_minor[8].gender) }
           % endif
       - "children8_birthdate": |
-          % if len(children) > 8:
-          ${ format_date(children[8].birthdate, format='M/d/yyyy') }
+          % if len(children_of_marriage_minor) > 8:
+          ${ redact(format_date(children_of_marriage_minor[8].birthdate, format='M/d/yyyy')) }
           % endif
       - "children9": |
-          % if len(children) > 9:
-          ${ children[9].name_full() }
+          % if len(children_of_marriage_minor) > 9:
+          ${ redact(children_of_marriage_minor[9].name_full()) }
           % endif
       - "children9_gender_female": |
-          % if len(children) > 9:
-          ${ children[9].gender }
+          % if len(children_of_marriage_minor) > 9:
+          ${ redact(children_of_marriage_minor[9].gender) }
           % endif
       - "children9_gender_male": |
-          % if len(children) > 9:
-          ${ children[9].gender }
+          % if len(children_of_marriage_minor) > 9:
+          ${ redact(children_of_marriage_minor[9].gender) }
           % endif
       - "children9_birthdate": |
-          % if len(children) > 9:
-          ${ format_date(children[9].birthdate, format='M/d/yyyy') }
+          % if len(children_of_marriage_minor) > 9:
+          ${ redact(format_date(children_of_marriage_minor[9].birthdate, format='M/d/yyyy')) }
           % endif
       - "children9_ssn": |
-          % if len(children) > 9:
-          ${ "{:.0f}".format(children[9].ssn) }
+          % if len(children_of_marriage_minor) > 9:
+          ${ redact("{:.0f}".format(children_of_marriage_minor[9].ssn)) }
           % endif
-      - "children_more_than_10": ${ len(children) > 10 } 
+      - "children_more_than_10": ${ len(children_of_marriage_minor) > 10 } 
       - "submitted_by": ${ users[0].attorney.name_full() if users[0].attorney_involved else  users[0].name_full() } 
       - "submitted_by_bar_number": ${ users[0].attorney.bar_number } 
       - "submitted_by_address": ${  users[0].attorney.address if users[0].attorney_involved else users[0].address } 

@@ -95,11 +95,12 @@ code: |
   section_expenses
   section_assets
   section_debts
-  if showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
+  if (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party") or showifdef('doc_list_selected["form_14_attachment"]'):
     form_14_calculations
-  if showifdef('doc_list_selected["parenting_plan_attachment"]'):
+  if any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party":
     use_presumed_child_support
   section_service
+  al_court_bundle
   interview_order_mo_divorce_forms = True
 ---
 id: right tool interview order
@@ -156,11 +157,11 @@ code: |
     relief['change_name']
     relief['divide_property']
     relief['other']
-  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]'):
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]'):
     if relief['maintenance']:
       maintenance_amount
       maintenance_income_withholding
-  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["fee_waiver_attachment"]'):
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["fee_waiver_attachment"]'):
     is_maintenance_currently_paid  
 
   section_relief = True
@@ -171,24 +172,23 @@ code: |
   nav.set_section("case_information")   
   if case.filed in ["user0_filed", "other_parties0_filed"]:
     use_case_net_for_online_docket
-  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["notice_of_hearing_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["redaction_certification_attachment"]'):
-    case.county # property_statement, petition, notice_of_hearing, form_17, certificate_of_dissolution
-    case.court_name
-    case.circuit 
+  case.county # property_statement, petition, notice_of_hearing, form_17, certificate_of_dissolution
+  case.court_name
+  case.circuit 
   if defined('case.photo_filename'):
     case.photo.filename
   if case.filed in ["user0_filed", "other_parties0_filed"]:
     if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]'):
       previous_petitions # answer, petition
-    if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["notice_of_hearing_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["redaction_certification_attachment"]'):
-      case.docket_number_asked
-    if showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["redaction_certification_attachment"]'):
-      case.name_asked
+    case.docket_number_asked
+    case.name_asked
+    if showifdef('doc_list_selected["answer_attachment"]'):
+      case.division_number_asked
     if showifdef('doc_list_selected["fee_waiver_attachment"]'):
       case.judge_asked
     if showifdef('doc_list_selected["confidential_information_sheet_attachment"]'):
       case.filing_date_asked # petition
-      case.matter_type_asked # notice_of_hearing
+  case.matter_type_asked # notice_of_hearing
   if petitioner.attorney_involved: # petition, notice_of_hearing
     petitioner.attorney.name.first # petition
   if petitioner.attorney_involved:
@@ -215,9 +215,9 @@ code: |
   users[0].address.country
   users[0].email
   users[0].phone_number
-  if showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["redaction_certification_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]'):
+  if showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["petition_attachment"]'):
     users[0].birthdate
-  if showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["redaction_certification_attachment"]'):
+  if showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["petition_attachment"]'):
     users[0].ssn
   if 'confidential_information_sheet_attachment' in doc_list_selected.true_values():
     users[0].gender # confidential_information_sheet
@@ -249,9 +249,9 @@ code: |
   other_parties[0].pronouns
   other_parties[0].email
   other_parties[0].phone_number
-  if showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["redaction_certification_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]'):
+  if showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]'):
     other_parties[0].birthdate
-  if showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["redaction_certification_attachment"]'):
+  if showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["petition_attachment"]'):
     other_parties[0].ssn
   if 'certificate_of_dissolution_attachment' in doc_list_selected.true_values():
     other_parties[0].race # certificate_of_dissolution
@@ -290,40 +290,45 @@ code: |
   
   if minor_children and showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]'):
     presumption_video
-    if legal_custody in ["petitioner","respondent"]:
+    if legal_custody in [petitioner.name.full(), respondent.name.full()]:
       legal_custody_sole_explanation
     elif legal_custody == "Third Party":
       third_party_custody_warning
+      legal_custody_other.name.first
 
-    if legal_custody != "Third Party" and physical_custody in ["petitioner","respondent"] and visitation:
+    if legal_custody != "Third Party" and physical_custody in [petitioner.name.full(), respondent.name.full()] and visitation:
       visitation_supervisor.name.first
-    elif legal_custody != "Third Party" and physical_custody == "Third Party":
+    if physical_custody == "Third Party":
       third_party_custody_warning
+      physical_custody_other.name.first
 
   if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]'):
     relief['child_support']
   
   
-  if minor_children and (showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]')):
+  if minor_children and (any(key in doc_list_selected.true_values() for key in ["answer_attachment", "certificate_of_dissolution_attachment",  "confidential_information_sheet_attachment", "petition_attachment", "income_statement_attachment","form_14_attachment", "judgment_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party")):
     if child_support != "none": # certificate_of_dissolution
       child_support_method_of_payment
       child_support_start_date
     nav.set_section("children")
 
-  if showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]'): 
+  if any(key in doc_list_selected.true_values() for key in ["answer_attachment", "certificate_of_dissolution_attachment",  "confidential_information_sheet_attachment", "petition_attachment", "income_statement_attachment", "judgment_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party"):
     children.gather()
+  children_list_create
+  number_of_children
+  if any(key in doc_list_selected.true_values() for key in ["fee_waiver_attachment",  "petition_attachment", "income_statement_attachment", "form_14_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party"):
+    users[0].other_children
+    other_parties[0].other_children
 
-  if minor_children and (showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]')):
-    if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]'):
-      persons_lived_with_preload # petition
-      persons_lived_with.gather()
-  if showifdef('doc_list_selected["form_14_attachment"]') or showifdef('doc_list_selected["fee_waiver_attachment"]'):
-    number_of_children
+  if minor_children and any(key in doc_list_selected.true_values() for key in ["answer_attachment", "petition_attachment"]):
+    persons_lived_with_preload # petition
+    persons_lived_with.gather()
+    
 
   if minor_children and "answer_attachment" in doc_list_selected.true_values():
     agree_with_parenting_plan
   
-  if minor_children and (showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]')) and legal_custody != "Third Party" and physical_custody != "Third Party":
+  if minor_children and showifdef('doc_list_selected["parenting_plan_attachment"]') and legal_custody != "Third Party" and physical_custody != "Third Party":
     if parenting_plan_A_author["Other"]:
       parenting_plan_A_author_other.name.first
     if communications["third_party"]:
@@ -364,7 +369,7 @@ code: |
     dental_insurance
     health_expenses_not_covered
   
-  if minor_children and (showifdef('doc_list_selected["form_14_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]')):
+  if minor_children and (any(key in doc_list_selected.true_values() for key in ["form_14_attachment", "income_statement_attachment"]) or (any(key in doc_list_selected.true_values() for key in [ "parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party")):
     users[0].health_insurance_costs
     users[0].work_childcare_expenses
     users[0].extraordinary_medical_costs.gather()
@@ -378,9 +383,7 @@ code: |
   if 'answer_attachment' in doc_list_selected.true_values():
     denials_exist
 
-  if minor_children and showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]'):
-  #    # if others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect: # form_17
-  #      related_case_explanation
+  if minor_children and (showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]')):
     additional_children_information
     if abuse_or_neglect or other_custody_proceeding or other_litigation or others_with_physical_custody:
       children_explanation
@@ -389,7 +392,7 @@ code: |
 ---
 code: |    
   nav.set_section('income')
-  if showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
+  if any(key in doc_list_selected.true_values() for key in ["fee_waiver_attachment",  "petition_attachment", "income_statement_attachment","form_14_attachment", "judgment_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party"):
     users[0].jobs.gather() # income_statement.yml, fee_waiver, form_17
     if users[0].jobs.there_are_any or users[0].has_self_employment_income: # form_17
       users[0].employer.name.text
@@ -404,7 +407,6 @@ code: |
     if len(users[0].other_incomes) > 0:
       users[0].other_incomes.review_items
     users[0].maintenance_other_received
-    users[0].other_children
     users[0].other_child_support_received
     users[0].monthly_gross_income # property_statement
     if showifdef('doc_list_selected["petition_attachment"]'):
@@ -425,7 +427,6 @@ code: |
     if len(other_parties[0].other_incomes) > 0:
       other_parties[0].other_incomes.review_items
     other_parties[0].maintenance_other_received
-    other_parties[0].other_children
     other_parties[0].other_child_support_received
     other_parties[0].monthly_gross_income # property_statement
     if showifdef('doc_list_selected["petition_attachment"]'):
@@ -439,7 +440,9 @@ code: |
     users[0].expenses.gather()
     if len(users[0].expenses) > 0:
       users[0].expenses.review_items
-  if showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
+
+  if any(key in doc_list_selected.true_values() for key in ["fee_waiver_attachment",  "income_statement_attachment","form_14_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party"):
+  
     users[0].maintenance_other_paid
     users[0].other_child_support_paid
     users[0].health_insurance_costs
@@ -450,9 +453,13 @@ code: |
     other_parties[0].expenses.gather()
     if len(other_parties[0].expenses) > 0:
       other_parties[0].expenses.review_items
-  if showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
+  if any(key in doc_list_selected.true_values() for key in [  "income_statement_attachment","form_14_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party"):  
     other_parties[0].maintenance_other_paid
     other_parties[0].other_child_support_paid
+    other_parties[0].health_insurance_costs
+    other_parties[0].work_childcare_expenses
+    other_parties[0].extraordinary_medical_costs.gather()
+    other_parties[0].extraordinary_childrearing_costs.gather()
   section_expenses = True
 ---
 id: assets interview code
@@ -505,18 +512,23 @@ code: |
     secured_debts.gathered
     if len(debts) > 0:
       debts.review_items
-    joint_debts.review_items
+    petitioner.debts_owned.gathered
+    petitioner.debts_award.gathered
+    respondent.debts_owned.gathered
+    respondent.debts_award.gathered
+    if showifdef('doc_list_selected["fee_waiver_attachment"]'):
+      vehicles_owned.gathered
+      additional_possessions.gathered
+      other_debts.gathered
   section_debts = True
 ---
 code: |
-  if showifdef('doc_list_selected["property_statement_attachment"]'):
-    nav.set_sections('property_statement_review')
+  if showifdef('doc_list_selected["property_statement_attachment"]') or showifdef('doc_list_selected["fee_waiver_attachment"]'):
+    nav.set_section('review')
     # Refresh the derived lists once, on the way into this section, instead of
     # with `reconsider:` on each review screen - that rebuilt both lists on
     # every render of every screen, including redraws after a validation error.
-    reconsider('joint_assets', 'joint_debts',  'petitioner.assets', 'respondent.assets')
-    debt_checkbox_review
-    debt_review
+    reconsider('joint_assets.gathered', 'petitioner.assets_award.gathered', 'petitioner.assets_owned.gathered', 'respondent.assets_award.gathered', 'respondent.assets_owned.gathered', 'secured_debts.gathered', 'joint_debts.gathered',  'petitioner.debts_award.gathered',   'petitioner.debts_owned.gathered','respondent.debts_award.gathered', 'respondent.debts_owned.gathered','additional_possessions.gathered', 'vehicles_owned.gathered','other_debts.gathered')
     # No document preview here any more; see the note on the "property statement
     # review" block in shared.yml. Assembling the Statement of Property took
     # 30-60 seconds even in the background, which is not a useful preview.
@@ -527,15 +539,22 @@ code: |
 id: service interview code
 code: |     
   nav.set_section('service')
-  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["notice_of_hearing_attachment"]') or showifdef('doc_list_selected["property_statement_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]'):
+  if any(key in doc_list_selected.true_values() for key in ["answer_attachment", "petition_attachment", "notice_of_hearing_attachment", "property_statement_attachment", "income_statement_attachment"]):
     people_served.gathered
     people_served[0].service_address_pdf
   if other_parties[0].service_type == "publication":
     location_attempts
   elif other_parties[0].service_type == "mail":
     mail_information
-  filing_pleadings_video
+  elif other_parties[0].service_type == "work":
+    other_parties[0].hours_of_employment
   section_service = True
+---
+question: Test Service1
+continue button field: test_service1
+---
+question: Test Service2
+continue button field: test_service2
 ---
 ###################### Main order ######################
 comment: |
@@ -549,29 +568,54 @@ code: |
   interview_order_mo_divorce_forms
   if 'petition_attachment' in doc_list_selected.true_values():
     preview_additional_allegations  
-  if 'property_statement_attachment' in doc_list_selected.true_values():
+  if 'property_statement_attachment' in doc_list_selected.true_values() or 'fee_waiver_attachment' in doc_list_selected.true_values():
     property_statement_review
-  if 'parenting_plan_attachment' in doc_list_selected.true_values():
+  if any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party":
     is_additional_provisions_parenting_plan
   if task_not_yet_performed('show review'):
     mark_task_as_performed('show review')
     force_ask('review_form')
   al_court_bundle
   signature_date
-  # Store anonymous data for analytics / statistics
-  store_variables_snapshot(
-      persistent=True,
-      data={
-          "zip": showifdef("users[0].address.zip"),
-          "reached_interview_end": True,
-      },
-  )
   # al_court_bundle, not al_user_bundle: the download screen renders
   # al_court_bundle, and download_list_html() only reuses the background
   # results of the bundle it is called on.
-  if not al_court_bundle.generate_downloads_task.ready():
+  if not all_downloads_task.ready():
+    if date_difference(starting=all_downloads_started,ending=current_datetime()).minutes >= 10:
+      log("mo_create_all_downloads still not ready after 10 minutes")
+      mo_download_failed_screen
     al_download_waiting_screen
+  if all_downloads_task.failed():
+    download_task_error = all_downloads_task.result()
+    log("mo_create_all_downloads failed: " + str(download_task_error.error_type) + ": " + str(download_task_error.error_message))
+    log(str(download_task_error.error_trace))
+    mo_download_failed_screen
   mo_divorce_forms_download
+---
+code: |
+  all_downloads_started = current_datetime()
+  all_downloads_task = background_action('mo_create_all_downloads')
+---
+id: download failed
+event: mo_download_failed_screen
+question: |
+  Something went wrong making your documents
+subquestion: |
+  ${ action_button_html(url_action('mo_divorce_forms_edit_answers'), label='Go back and review your answers', color='primary') }
+---
+event: mo_create_all_downloads
+code: |
+  # One pass: documents shared by both bundles are assembled once and
+  # served from ALDocument.cache the second time.
+  court_files = al_court_bundle.get_cacheable_documents(key="final", pdf=True, include_full_pdf=True)
+  user_files = al_user_bundle.get_cacheable_documents(key="final", pdf=True, include_full_pdf=True)
+  background_response_action('mo_save_all_downloads', court_files=court_files, user_files=user_files)
+---
+event: mo_save_all_downloads
+code: |
+  al_court_bundle._downloadable_files = action_argument('court_files')
+  al_user_bundle._downloadable_files = action_argument('user_files')
+  background_response()
 ---
 include:
   - property_statement.yml
@@ -642,7 +686,7 @@ data:
 
 id: basic questions intro screen
 question: |
-  MO Divorce Help
+  MO divorce help
 subquestion: |
   % if form_approved_for_email_filing:
   MO Divorce Help can help you complete and file court forms in 3 steps:
@@ -687,7 +731,7 @@ validation code: |
     validation_error("You must accept the terms of use to continue.", field="acknowledged_information_use")
 ---
 id: Welcome
-question: Missouri Divorce Forms
+question: Missouri divorce forms
 fields:
   - What issue are you looking for help with?:  case_type
     datatype: radio
@@ -714,7 +758,7 @@ fields:
 ---
 id: child custody kickout
 event: custody_exit
-question: Child Custody
+question: Child custody
 subquestion: |
   Unfortunately, this system is unable to address custody issues at this time.  Click the link below to find legal help better suited to your situation.
 
@@ -722,7 +766,7 @@ subquestion: |
 ---
 id: legal separation kickout
 event: legal_separation_exit
-question: Legal Separation
+question: Legal separation
 subquestion: |
   Unfortunately, this tool only helps with divorce. If you believe it is possible that you and your spouse may reconcile and want to legally separate, you should seek advice on legal separation from a Missouri licensed attorney. 
   
@@ -778,7 +822,7 @@ subquestion: |
   Missouri law requires that at least one party in the divorce live in Missouri for at least 90 days before filing divorce.  Since neither you nor your spouse has lived in Missouri for 90 days and you do not agree to the divorce in Missouri, you should find a lawyer to help you.
 ---
 id: third party custody warning
-question: Third Party Custody
+question: Third party custody
 subquestion: |
   Third-party custody is a unique situation. We won't be able to help you fill out the court-required parenting plan, but we can help with everything else! At the end, we will provide you with all the necessary documents and a blank parenting plan for you to complete prior to filing with the court.
 continue button field: third_party_custody_warning
@@ -851,7 +895,7 @@ fields:
        Sometimes when a child is born to two people before they get married, the court will require a separate case to establish paternity (even if everybody agrees).  However, most courts will move forward with just the divorce, assuming that paternity is acknowledged through the marriage.  For now, we'll move forward with the understanding that the paternity has been acknowledged.  However, a judge may direct you to file something else or speak to an attorney.
     js show if:   |
       val("minor_children_before_marriage") === true
-  - Have you or your spouse physically given birth to a child with another partner during your marriage?: child_outside_marriage
+  - Have you or your spouse given birth to a child with another partner during your marriage?: child_outside_marriage
     datatype: yesnoradio
     js show if:   |
       val("has_children") === false || val("minor_children_before_marriage") === true || val("minor_children_before_marriage") === false
@@ -875,7 +919,7 @@ validation code: |
 ---
 id: separation date
 question: |
-  Residence of Marriage
+  Residence of marriage
 fields:
   - "Did you and your spouse live together in Missouri?": marriage.live_together_in_mo
     datatype: yesnoradio
@@ -1061,49 +1105,34 @@ continue button field: active_duty_warning
 ---
 event: child_outside_marriage_exit
 id: Child Born Outside of Marriage
-question: Children Born Outside of Marriage
+question: Children born outside of marriage
 subquestion: |
   Missouri law automatically assumes that the husband is the father of the child unless a separate case is filed establishing paternity of the biological father and non-paternity of the husband, even if the biological father is the one on the birth certificate.  It would be in your best interest to find an attorney.  
   
   [Missouri Supreme Court Website](https://www.courts.mo.gov/page.jsp?id=611)
 ---
 id: Children Born Before Marriage
-question: Children Born Before Marriage
+question: Children born before marriage
 subquestion: |
   Sometimes when a child is born to two people before they get married, the court will require a separate case to establish paternity (even if everybody agrees).  However, most courts will move forward with just the divorce, assuming that paternity is acknowledged through the marriage.  For now, we'll move forward with the understanding that the paternity has been acknowledged.  However, a judge may direct you to file something else or speak to an attorney.
 continue button field: 
   minor_children_before_marriage_information
 ---
 id: Presumption of Custody
-question: Presumption of 50/50 Custody
+question: Presumption of 50/50 custody
 subquestion: |
   RSMo 452.375 & 454.1005 Video
     [YOUTUBE V82Yvl2aENg]
 continue button field: presumption_video
 ---
-id: interview order with children
-code: |
-  users[0].name.first
-  other_parties[0].name.first
-  marriage_info
-  children.gather()
-  family_information = True
----
-id: interview order without children
-code: |
-  users[0].name.first
-  other_parties[0].name.first
-  marriage_info
-  party_information = True 
----
 id: Other Allegations
-question: Other Allegations
+question: Other allegations
 fields:
   - If there are any other statements you wish to include in your Petition, you should enter them here: other_allegations
     datatype: area
 ---
 id: Assets warning screen
-question: Assets Warning
+question: Assets warning
 subquestion: |
   It looks like you some pretty significant assets! It is important to know your rights and the best way to divide some of these bigger assets.  You may consider speaking with an attorney if these assets need to be divided.
 continue button field: assets_warning
@@ -1123,7 +1152,7 @@ continue button field: served_information
 
 ---
 id: Publication Service Information Screen
-question: Service by Publication
+question: Service by publication
 subquestion: |
   If attempts to serve your spouse in person have failed, you can file a request to serve them by publication.
   
@@ -1135,7 +1164,7 @@ subquestion: |
 continue button field: service_by_publication_information
 ---
 id: Personal Service Information Screen
-question:  In Person Service
+question:  In person service
 subquestion: |
 
   
@@ -1185,7 +1214,7 @@ subquestion: |
 continue button field: filing_pleadings_video
 ---
 id: Final Page
-question: Final Page
+question: Final page
 subquestion: |
 
 ---
@@ -1247,9 +1276,9 @@ confirm: True
 id: answer enabled block for main interview
 code: |
   if "answer_attachment" in doc_list_selected.true_values():
-    answer_attachment.enabled = True
+    answer_attachment[i].enabled = True
   else:
-    answer_attachment.enabled = False
+    answer_attachment[i].enabled = False
 ---
 id: notice_of_hearing enabled block for main interview
 code: |
@@ -1268,16 +1297,16 @@ code: |
 id: fee_waiver enabled block for main interview
 code: |
   if "fee_waiver_attachment" in doc_list_selected.true_values():
-    fee_waiver_attachment.enabled = True
+    fee_waiver_attachment[i].enabled = True
   else:
-    fee_waiver_attachment.enabled = False
+    fee_waiver_attachment[i].enabled = False
 ---
 id: judgment enabled block for main interview
 code: |
   if "judgment_attachment" in doc_list_selected.true_values():
-    judgment_attachment.enabled = True
+    judgment_attachment[i].enabled = True
   else:
-    judgment_attachment.enabled = False
+    judgment_attachment[i].enabled = False
 ---
 id: petition enabled block for main interview
 code: |
@@ -1309,17 +1338,14 @@ code: |
 ---
 id: redaction_certification enabled block for main interview
 code: |
-  if "redaction_certification_attachment" in doc_list_selected.true_values():
-    redaction_certification_attachment.enabled = True
-  else:
-    redaction_certification_attachment.enabled = False
+  redaction_certification_attachment.enabled = True
 ---
 id: parenting_plan_attachment enabled block for main interview
 code: |
   if "parenting_plan_attachment" in doc_list_selected.true_values():
-    parenting_plan_attachment.enabled = True
+    parenting_plan_attachment[i].enabled = True
   else:
-    parenting_plan_attachment.enabled = False
+    parenting_plan_attachment[i].enabled = False
 ---
 id: service_by_mail_notice enabled block for main interview
 code: |
@@ -1351,45 +1377,30 @@ code: |
 ---
 id: form 14 2 enabled block for main interview
 code: |
-  if "form_14_attachment" in doc_list_selected.true_values() or "parenting_plan_attachment" in doc_list_selected.true_values() and number_of_children > 1:
-    form_14_attachment_2.enabled = True
-  else:
-    form_14_attachment_2.enabled = False
+  form_14_attachment_2.enabled = ("form_14_attachment" in doc_list_selected.true_values() or "parenting_plan_attachment" in doc_list_selected.true_values()) and number_of_children > 1
 ---
 id: form 14 3 enabled block for main interview
 code: |
-  if "form_14_attachment" in doc_list_selected.true_values() or "parenting_plan_attachment" in doc_list_selected.true_values() and number_of_children > 2:
-    form_14_attachment_3.enabled = True
-  else:
-    form_14_attachment_3.enabled = False
+  form_14_attachment_3.enabled = ("form_14_attachment" in doc_list_selected.true_values() or "parenting_plan_attachment" in doc_list_selected.true_values()) and number_of_children > 2
 ---
 id: form 14 4 enabled block for main interview
 code: |
-  if "form_14_attachment" in doc_list_selected.true_values() or "parenting_plan_attachment" in doc_list_selected.true_values() and number_of_children > 3:
-    form_14_attachment_4.enabled = True
-  else:
-    form_14_attachment_4.enabled = False
+  form_14_attachment_4.enabled = ("form_14_attachment" in doc_list_selected.true_values() or "parenting_plan_attachment" in doc_list_selected.true_values()) and number_of_children > 3
 ---
 id: form 14 5 enabled block for main interview
 code: |
-  if "form_14_attachment" in doc_list_selected.true_values() or "parenting_plan_attachment" in doc_list_selected.true_values() and number_of_children > 4:
-    form_14_attachment_5.enabled = True
-  else:
-    form_14_attachment_5.enabled = False
+  form_14_attachment_5.enabled = ("form_14_attachment" in doc_list_selected.true_values() or "parenting_plan_attachment" in doc_list_selected.true_values()) and number_of_children > 4
 ---
 id: form 14 6 enabled block for main interview
 code: |
-  if "form_14_attachment" in doc_list_selected.true_values() or "parenting_plan_attachment" in doc_list_selected.true_values() and number_of_children > 5:
-    form_14_attachment_6.enabled = True
-  else:
-    form_14_attachment_6.enabled = False
+  form_14_attachment_6.enabled = ("form_14_attachment" in doc_list_selected.true_values() or "parenting_plan_attachment" in doc_list_selected.true_values()) and number_of_children > 5
 ---
 code: |
   document_list = doc_list_selected.true_values()
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment['unredacted'], redaction_certification_attachment, confidential_information_sheet_attachment['unredacted'], income_statement_attachment, petition_attachment['unredacted'], judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment, notice_of_hearing_attachment, certificate_of_dissolution_attachment, property_statement_attachment['unredacted'], property_statement_attachment['redacted'], redaction_certification_attachment, confidential_information_sheet_attachment['unredacted'], income_statement_attachment, petition_attachment['unredacted'], judgment_attachment, fee_waiver_attachment, service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment, form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[mo_divorce_forms_Post_interview_instructions, answer_attachment['unredacted'], certificate_of_dissolution_attachment, property_statement_attachment['unredacted'], redaction_certification_attachment, confidential_information_sheet_attachment['unredacted'], income_statement_attachment, petition_attachment['unredacted'], fee_waiver_attachment['unredacted'], service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment['unredacted'], form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6, notice_of_hearing_attachment, judgment_attachment['unredacted']], filename="mo_divorce_forms", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[answer_attachment['redacted'], certificate_of_dissolution_attachment, property_statement_attachment['redacted'], redaction_certification_attachment, confidential_information_sheet_attachment['redacted'], income_statement_attachment, petition_attachment['redacted'], fee_waiver_attachment['redacted'], service_by_mail_notice_attachment, service_by_mail_affidavit_attachment, service_by_publication_attachment, parenting_plan_attachment['redacted'], form_14_attachment, form_14_attachment_2, form_14_attachment_3, form_14_attachment_4, form_14_attachment_5, form_14_attachment_6, notice_of_hearing_attachment, judgment_attachment['redacted']],  filename="mo_divorce_forms", title="All forms to deliver to court", enabled=True)
   - property_statement_bundle: ALDocumentBundle.using(elements=[property_statement_attachment['unredacted']],  filename="property_statement_preview", title="Property Statement Preview", enabled=True)
 ---

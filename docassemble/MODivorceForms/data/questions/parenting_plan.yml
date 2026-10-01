@@ -36,7 +36,7 @@ objects:
   - communications_other: ALIndividual
 ---
 id: dispute resolution question
-question: Dispute Resolution Procedure
+question: Dispute resolution procedure
 subquestion: |
   After your case has gone through the complete court process and you have your judgment, there may still be some things that you and your coparent disagree on later. When that happens, parents are usually encouraged to go to mediation to resolve their disagreements regarding the children. Mediated agreements are non-binding, meaning you do not have to follow them if you or your coparent choose not to. 
 
@@ -55,8 +55,8 @@ fields:
   - Check all that apply: parenting_plan_A_author
     datatype: checkboxes
     choices:
-      - ${ petitioner }: petitioner
-      - ${ respondent }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
       - The court
       - The guardian ad litem
       - Other
@@ -95,8 +95,8 @@ fields:
   - Check all that apply: parenting_plan_B_author
     datatype: checkboxes
     choices:
-      - ${ petitioner }: petitioner
-      - ${ respondent }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
       - The court
       - The guardian ad litem
       - Other
@@ -130,7 +130,7 @@ fields:
       parenting_plan_B_author_other.name_fields()
 ---
 id: Vacation
-question: Vacation Schedule
+question: Vacation schedule
 subquestion: |
   You can set aside a number of weeks each year during which one parent will have exclusive physical custody of the children and the regular schedules do not apply. However, during this period, the Holiday Schedule still applies. Petitioner shall have first choice of weeks in odd-numbered years. Respondent will have first choice of weeks in even-numbered years. The parent with the first choice of weeks must designate the vacation weeks by March 31 of each year. The parent with the second choice of weeks must designate the weeks by April 15 of each year
 fields:
@@ -141,7 +141,7 @@ fields:
     min: 0
     max: 52
     show if: vacation
-  - Do you want to add any extra information about vacations?: vacation_invo
+  - Do you want to add any extra information about vacations?: vacation_info
     datatype: area
     required: False
     show if: vacation
@@ -152,8 +152,8 @@ fields:
   - Where should an exchange occur if a specific location for an exchange is not stated on the schedule?: location_of_exchange
     choices:
       - "All exchanges shall occur at the children’s school or child care provider when school or child care is in session.": school
-      - ${ petitioner.possessive('residence')  }: petitioner_residence
-      - ${ respondent.possessive('residence')  }: respondent_residence
+      - ${ petitioner.possessive('residence')  }: ${ petitioner.name.full() }
+      - ${ respondent.possessive('residence')  }: ${ respondent.name.full() }
       - "The parent receiving custody of the children shall pick up the children at the other parent’s residence.": pick_up
       - Other location: other
   - When should the exchange occur?: time_of_exchange
@@ -198,21 +198,21 @@ validation code: |
        default_exchange_time2 = time_of_exchange2
      else:
        default_exchange_time2 = None
-   if location_of_exchange == "petitioner_residence":
-     default_exchange_method = "petitioner_residence"
+   if location_of_exchange == petitioner.name.full():
+     default_exchange_method = petitioner.name.full()
      default_exchange_time = time_of_exchange
      default_exchange_location = "house"
      default_add_pick_up_from_school = False
      default_exchange_time2 = None
-   if location_of_exchange == "respondent_residence":
-     default_exchange_method = "respondent_residence"
+   if location_of_exchange == respondent.name.full():
+     default_exchange_method = respondent.name.full()
      default_exchange_time = time_of_exchange
      default_exchange_location = "house"
      default_add_pick_up_from_school = False
      default_exchange_time2 = None
 ---
 id: telephone contact
-question: Telephone Contact with Children
+question: Telephone contact with children
 fields:
   - Are there restrictions on the time to contact children?:  phone_contact
     datatype: yesnoradio
@@ -237,14 +237,14 @@ fields:
     show if: phone_contact
 ---
 id: Domestic Violence
-question: Domestic Violence
+question: Domestic violence
 fields:
   - Has there been a pattern of domestic violence between the parents?: domestic_violence
     datatype: yesnoradio
   - Who has committed the domestic violence?: domestic_violence_committed_by
     choices:
-      - ${ petitioner }: petitioner
-      - ${ respondent }: respondent
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
       - Both: both
     show if: domestic_violence
   - note: |
@@ -256,7 +256,7 @@ fields:
     
 ---
 id: Health Expenses Not Covered by Insurance
-question: Health Expenses Not Covered by Insurance
+question: Health expenses not covered by insurance
 fields:
   - Who should pay health expenses not covered by insurance?: health_expenses_not_covered
     choices:
@@ -275,16 +275,17 @@ fields:
       val('health_expenses_not_covered_reimburse') === true
       
 ---
-reconsider: actual_child_support
+reconsider: 
+  - actual_child_support
 id: use presumed child support
-question:  Presumed Child Support amount
+question:  Presumed child support amount
 subquestion: |
   Based on the information you provided, it looks like  ${ support_payer.name_full() } should pay the following in child support.  
 
   This is calculated using a monthly gross income of $${ thousands(support_payer.monthly_gross_income) }.
 
-  % if showifdef('support_payer.assumed_monthly_gross_income'):
-  Because you didn't know if ${ support_payer.name_full() } has a job or any other income, we assumed that ${ support_payer.name.full() } had a monthly income of minimum wage, working 40 hours per week. 
+  % if showifdef('support_payer.use_assumed_monthly_income'):
+  Because you don't know if ${ support_payer.name_full() } has a job, you are assuming that ${ support_payer.name.full() } has a monthly job income of ${ support_payer.assumed_monthly_income } because ${ support_payer.assumed_monthly_income_explanation }
 
   % endif
 
@@ -352,7 +353,7 @@ fields:
       is: specific_date
 ---
 id: child support method of payment
-question: Method of payment of Child Support
+question: Method of payment of child support
 fields:
   - How should child support be paid?: child_support_method_of_payment
     datatype: radio
@@ -369,7 +370,7 @@ fields:
       val('child_support_method_of_payment') == "no_agreement" || val('child_support_method_of_payment') == "no_not_in_best_interest"
 ---
 id: tax deduction info for child
-question:  Tax Deductions for ${ children[i].name_full() }
+question:  Tax deductions for ${ children[i].name_full() }
 fields:
   - Who should be allowed to claim ${ children[i].name_full() } as a tax deduction in even years?: children[i].tax_dependency_even
     datatype: radio
@@ -471,8 +472,8 @@ code: |
     else: 
       support_recipient.childcare_tax_credit_6a2 = support_recipient.work_childcare_expenses*(.35-credit_subtract)
   support_recipient.total_adjusted_child_care_costs_6a = support_recipient.work_childcare_expenses - support_recipient.childcare_tax_credit_6a2
-  support_recipient.total_childrearing_costs_7 =  support_recipient.total_adjusted_child_care_costs_6a + support_recipient.health_insurance_costs + float(support_recipient.extraordinary_medical_costs.total(times_per_year=12)) + float(sum([cost.total(times_per_year=12) for cost in support_recipient.extraordinary_childrearing_costs if cost.included_in_form_14]))
-  support_payer.total_childrearing_costs_7  = support_payer.work_childcare_expenses + support_payer.health_insurance_costs + float(support_payer.extraordinary_medical_costs.total(times_per_year=12)) + float(sum([cost.total(times_per_year=12) for cost in support_payer.extraordinary_childrearing_costs if cost.included_in_form_14]))
+  support_recipient.total_childrearing_costs_7 =  support_recipient.total_adjusted_child_care_costs_6a + support_recipient.health_insurance_costs + int(support_recipient.extraordinary_medical_costs.total(times_per_year=12)) + int(support_recipient.extraordinary_childrearing_costs_in_14.total(times_per_year=12))
+  support_payer.total_childrearing_costs_7  = support_payer.work_childcare_expenses + support_payer.health_insurance_costs + int(support_payer.extraordinary_medical_costs.total(times_per_year=12)) + int(support_payer.extraordinary_childrearing_costs_in_14.total(times_per_year=12))
   total_childrearing_costs_7 = support_recipient.total_childrearing_costs_7 + support_payer.total_childrearing_costs_7
   if number_of_children > 5:
     combined_child_support_costs_8_6 = basic_child_support_amount_5_6 + total_childrearing_costs_7
@@ -581,18 +582,910 @@ code: |
   else:
     support_payer.presumed_child_support_amount_1_children = None
   form_14_calculations = True
+---
+
+id: holidays intro
+question: Holidays
+subquestion: |
+  A different schedule can apply on holidays. The times each parent will have with the children during the holidays are set forth on the Holiday Exchange Schedule.
+
+  Check the holidays where you want a different schedule to apply.
   
+  
+fields:
+ - "Do you want to use a default alternating schedule that you can change?": holidays_default
+   datatype: yesnoradio
+ - "Martin Luther King Day": holidays['mlk']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "President’s Day": holidays['president']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Memorial Day": holidays['memorial']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Independence Day": holidays['independence']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Labor Day": holidays['labor']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Thanksgiving": holidays['thanksgiving']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Halloween": holidays['halloween']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Christmas Eve": holidays['xmas_eve']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Christmas Day": holidays['xmas_day']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Mother’s Day": holidays['mother']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Father’s Day": holidays['father']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Petitioner’s Birthday": holidays['petitioner_birthday']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Respondent’s Birthday": holidays['respondent_birthday']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+ - "Child(ren)'s Birthday": holidays['children_birthday']['different']
+   datatype: yesno
+   show if: 
+     variable: holidays_default
+     is: False
+---
+variable name: holidays
+use objects: True
+data:
+  mlk:
+    description: "Martin Luther King Day"
+    even_default: ${ petitioner.name.full() }
+    odd_default: ${ respondent.name.full() }
+  president:
+    description: "President’s Day"
+    even_default: ${ respondent.name.full() }
+    odd_default: ${ petitioner.name.full() }
+  memorial:
+    description: "Memorial Day"
+    even_default: ${ petitioner.name.full() }
+    odd_default: ${ respondent.name.full() }
+  independence:
+    description: "Independence Day"
+    even_default: ${ respondent.name.full() }
+    odd_default: ${ petitioner.name.full() }
+  labor:
+    description: "Labor Day"
+    even_default: ${ petitioner.name.full() }
+    odd_default: ${ respondent.name.full() }
+  thanksgiving:
+    description: "Thanksgiving"
+    even_default: ${ respondent.name.full() }
+    odd_default: ${ petitioner.name.full() }
+  halloween:
+    description: "Halloween"
+    even_default: ${ petitioner.name.full() }
+    odd_default: ${ respondent.name.full() }
+  xmas_eve:
+    description: "Christmas Eve"
+    even_default: ${ respondent.name.full() }
+    odd_default: ${ petitioner.name.full() }
+  xmas_day:
+    description: "Christmas Day"
+    even_default: ${ petitioner.name.full() }
+    odd_default: ${ respondent.name.full() }
+  mother:
+    description: "Mother’s Day"
+    even_default: ${ respondent.name.full() }
+    odd_default: ${ petitioner.name.full() }
+  father:
+    description: "Father’s Day"
+    even_default: ${ petitioner.name.full() }
+    odd_default: ${ respondent.name.full() }
+  petitioner_birthday:
+    description: "Petitioner’s Birthday"
+    even_default: ${ petitioner.name.full() }
+    odd_default: ${ petitioner.name.full() }
+  respondent_birthday:
+    description: "Respondent’s Birthday"
+    even_default: ${ respondent.name.full() }
+    odd_default: ${ respondent.name.full() }
+  children_birthday:
+    description: "Child(ren)'s Birthday"
+    even_default: ${ respondent.name.full() }
+    odd_default: ${ petitioner.name.full() }
+---
+id: describe other holidays
+question: ${ holidays[i]["description"] }
+fields:
+  - Even Numbered Years: holidays[i]['even_years']
+    datatype: radio
+    choices:
+     - ${ petitioner.name.first }
+     - ${ respondent.name.first }
+  - Odd Numbered Years: holidays[i]['odd_years']
+    datatype: radio
+    choices:
+     - ${ petitioner.name.first }
+     - ${ respondent.name.first }
+  - Physical custody from time: holidays[i]["custody_from_time"]
+    datatype: time
+  - Physical custody to time: holidays[i]['custody_to_time']
+    datatype: time
+---
+objects: 
+  - other_holidays: DAList.using(object_type=DAObject, complete_attribute='complete')
+---
+id: other holidays there are any
+question: Do you want to add any other holidays, including special holidays and occassions?
+fields:
+  - Other holidays: other_holidays.there_are_any
+    datatype: yesnoradio
+---
+id: other holidays there is another
+question: Do you want to add any more holidays?
+fields:
+  - Other holidays: other_holidays.there_is_another
+    datatype: yesnoradio
+---
+id: Other holidays information
+question: Other holidays information
+subquestion: |
+  % if len(other_holidays.complete_elements()) > 0:
+  You have already mentioned:
+  % for other_holiday in other_holidays.complete_elements():
+  
+   - ${ other_holiday.description }
+  % endfor
+  % endif
+fields:
+ - Description: other_holidays[i].description
+ - Even Numbered Years: other_holidays[i].even_years
+   datatype: radio
+   choices:
+     - ${ petitioner.name.full() }
+     - ${ respondent.name.full() }
+ - Odd Numbered Years: other_holidays[i].odd_years
+   datatype: radio
+   choices:
+     - ${ petitioner.name.full() }
+     - ${ respondent.name.full() }
+ - Physical custody from: other_holidays[i].custody_from_time
+   datatype: time
+ - Physical custody to: other_holidays[i].custody_to_time
+   datatype: time
+---
+code: |
+  other_holidays[i].description
+  other_holidays[i].complete = True
+---
+id: other holidays revisit
+continue button field: other_holidays.revisit
+question: |
+  Other holidays
+subquestion: |
+  
+  ${ other_holidays.table }
+
+  ${ other_holidays.add_action() }
+---
+table: other_holidays.table
+id: other holidays table
+rows: other_holidays
+columns:
+  - Description: |
+      row_item.description
+  - Even Numbered Years: row_item.even_years
+  - Odd Numbered Years: row_item.odd_years
+  - Physical custody from: row_item.custody_from_time
+  - Physical custody to: row_item.custody_to_time
+edit:
+  - description
+---
+only sets: holidays_review
+id: holiday review if not holidays_default
+if: not holidays_default
+question: Holiday exchange schedule
+continue button field: holidays_review
+fields:
+  - note: |
+      Holiday |Eveb Years|Odd Years|From|To
+      --------|-------------------|------------------|----|--
+      ${ holidays["mlk"]["description"] } | [FIELD holidays["mlk"]["even_years"]] | [FIELD holidays["mlk"]["odd_years"]] | [FIELD holidays["mlk"]["custody_from_time"]] | [FIELD holidays["mlk"]["custody_to_time"]]
+      ${ holidays["president"]["description"] } | [FIELD holidays["president"]["even_years"]] | [FIELD holidays["president"]["odd_years"]] | [FIELD holidays["president"]["custody_from_time"]] | [FIELD holidays["president"]["custody_to_time"]]
+      ${ holidays["memorial"]["description"] } | [FIELD holidays["memorial"]["even_years"]] | [FIELD holidays["memorial"]["odd_years"]] | [FIELD holidays["memorial"]["custody_from_time"]] | [FIELD holidays["memorial"]["custody_to_time"]]
+      ${ holidays["independence"]["description"] } | [FIELD holidays["independence"]["even_years"]] | [FIELD holidays["independence"]["odd_years"]] | [FIELD holidays["independence"]["custody_from_time"]] | [FIELD holidays["independence"]["custody_to_time"]]
+      ${ holidays["labor"]["description"] } | [FIELD holidays["labor"]["even_years"]] | [FIELD holidays["labor"]["odd_years"]] | [FIELD holidays["labor"]["custody_from_time"]] | [FIELD holidays["labor"]["custody_to_time"]]
+      ${ holidays["halloween"]["description"] } | [FIELD holidays["halloween"]["even_years"]] | [FIELD holidays["halloween"]["odd_years"]] | [FIELD holidays["halloween"]["custody_from_time"]] | [FIELD holidays["halloween"]["custody_to_time"]]
+      ${ holidays["thanksgiving"]["description"] } | [FIELD holidays["thanksgiving"]["even_years"]] | [FIELD holidays["thanksgiving"]["odd_years"]] | [FIELD holidays["thanksgiving"]["custody_from_time"]] | [FIELD holidays["thanksgiving"]["custody_to_time"]]
+      ${ holidays["xmas_eve"]["description"] } | [FIELD holidays["xmas_eve"]["even_years"]] | [FIELD holidays["xmas_eve"]["odd_years"]] | [FIELD holidays["xmas_eve"]["custody_from_time"]] | [FIELD holidays["xmas_eve"]["custody_to_time"]]
+      ${ holidays["xmas_day"]["description"] } | [FIELD holidays["xmas_day"]["even_years"]] | [FIELD holidays["xmas_day"]["odd_years"]] | [FIELD holidays["xmas_day"]["custody_from_time"]] | [FIELD holidays["xmas_day"]["custody_to_time"]]
+      ${ holidays["mother"]["description"] } | [FIELD holidays["mother"]["even_years"]] | [FIELD holidays["mother"]["odd_years"]] | [FIELD holidays["mother"]["custody_from_time"]] | [FIELD holidays["mother"]["custody_to_time"]]
+      ${ holidays["father"]["description"] } | [FIELD holidays["father"]["even_years"]] | [FIELD holidays["father"]["odd_years"]] | [FIELD holidays["father"]["custody_from_time"]] | [FIELD holidays["father"]["custody_to_time"]]
+      ${ holidays["petitioner_birthday"]["description"] } | [FIELD holidays["petitioner_birthday"]["even_years"]] | [FIELD holidays["petitioner_birthday"]["odd_years"]] | [FIELD holidays["petitioner_birthday"]["custody_from_time"]] | [FIELD holidays["petitioner_birthday"]["custody_to_time"]]
+      ${ holidays["respondent_birthday"]["description"] } | [FIELD holidays["respondent_birthday"]["even_years"]] | [FIELD holidays["respondent_birthday"]["odd_years"]] | [FIELD holidays["respondent_birthday"]["custody_from_time"]] | [FIELD holidays["respondent_birthday"]["custody_to_time"]]
+      ${ holidays["children_birthday"]["description"] } | [FIELD holidays["children_birthday"]["even_years"]] | [FIELD holidays["children_birthday"]["odd_years"]] | [FIELD holidays["children_birthday"]["custody_from_time"]] | [FIELD holidays["children_birthday"]["custody_to_time"]]
+  - no label: holidays["mlk"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["mlk"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["mlk"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["mlk"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["president"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["president"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["president"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["president"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["memorial"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["memorial"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["memorial"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["memorial"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["independence"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["independence"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["independence"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["independence"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["labor"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["labor"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["labor"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["labor"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["thanksgiving"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["thanksgiving"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["thanksgiving"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["thanksgiving"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["halloween"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["halloween"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["halloween"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["halloween"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["xmas_eve"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["xmas_eve"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["xmas_eve"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["xmas_eve"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["xmas_day"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["xmas_day"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["xmas_day"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["xmas_day"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["mother"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["mother"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["mother"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["mother"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["father"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["father"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["father"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["father"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["petitioner_birthday"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["petitioner_birthday"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["petitioner_birthday"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["petitioner_birthday"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["respondent_birthday"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["respondent_birthday"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["respondent_birthday"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["respondent_birthday"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["children_birthday"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["children_birthday"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    required: False
+  - no label: holidays["children_birthday"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+  - no label: holidays["children_birthday"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    required: False
+---
+code: |
+  role_dictionary_full_name = dict()
+  role_dictionary_full_name["petitioner"]= petitioner.name.full()
+  role_dictionary_full_name["respondent"]= respondent.name.full()
+---
+only sets: holidays_review
+id: holidays_review if holidays_default
+if: holidays_default
+question: Holiday exchange schedule
+continue button field: holidays_review
+fields:
+  - note: |
+      Holiday |Even Years|Odd Years|From|To
+      --------|-------------------|------------------|----|--
+      ${ holidays["mlk"]["description"] } | [FIELD holidays["mlk"]["even_years"]] | [FIELD holidays["mlk"]["odd_years"]] | [FIELD holidays["mlk"]["custody_from_time"]] | [FIELD holidays["mlk"]["custody_to_time"]]
+      ${ holidays["president"]["description"] } | [FIELD holidays["president"]["even_years"]] | [FIELD holidays["president"]["odd_years"]] | [FIELD holidays["president"]["custody_from_time"]] | [FIELD holidays["president"]["custody_to_time"]]
+      ${ holidays["memorial"]["description"] } | [FIELD holidays["memorial"]["even_years"]] | [FIELD holidays["memorial"]["odd_years"]] | [FIELD holidays["memorial"]["custody_from_time"]] | [FIELD holidays["memorial"]["custody_to_time"]]
+      ${ holidays["independence"]["description"] } | [FIELD holidays["independence"]["even_years"]] | [FIELD holidays["independence"]["odd_years"]] | [FIELD holidays["independence"]["custody_from_time"]] | [FIELD holidays["independence"]["custody_to_time"]]
+      ${ holidays["labor"]["description"] } | [FIELD holidays["labor"]["even_years"]] | [FIELD holidays["labor"]["odd_years"]] | [FIELD holidays["labor"]["custody_from_time"]] | [FIELD holidays["labor"]["custody_to_time"]]
+      ${ holidays["halloween"]["description"] } | [FIELD holidays["halloween"]["even_years"]] | [FIELD holidays["halloween"]["odd_years"]] | [FIELD holidays["halloween"]["custody_from_time"]] | [FIELD holidays["halloween"]["custody_to_time"]]
+      ${ holidays["thanksgiving"]["description"] } | [FIELD holidays["thanksgiving"]["even_years"]] | [FIELD holidays["thanksgiving"]["odd_years"]] | [FIELD holidays["thanksgiving"]["custody_from_time"]] | [FIELD holidays["thanksgiving"]["custody_to_time"]]
+      ${ holidays["xmas_eve"]["description"] } | [FIELD holidays["xmas_eve"]["even_years"]] | [FIELD holidays["xmas_eve"]["odd_years"]] | [FIELD holidays["xmas_eve"]["custody_from_time"]] | [FIELD holidays["xmas_eve"]["custody_to_time"]]
+      ${ holidays["xmas_day"]["description"] } | [FIELD holidays["xmas_day"]["even_years"]] | [FIELD holidays["xmas_day"]["odd_years"]] | [FIELD holidays["xmas_day"]["custody_from_time"]] | [FIELD holidays["xmas_day"]["custody_to_time"]]
+      ${ holidays["mother"]["description"] } | [FIELD holidays["mother"]["even_years"]] | [FIELD holidays["mother"]["odd_years"]] | [FIELD holidays["mother"]["custody_from_time"]] | [FIELD holidays["mother"]["custody_to_time"]]
+      ${ holidays["father"]["description"] } | [FIELD holidays["father"]["even_years"]] | [FIELD holidays["father"]["odd_years"]] | [FIELD holidays["father"]["custody_from_time"]] | [FIELD holidays["father"]["custody_to_time"]]
+      ${ holidays["petitioner_birthday"]["description"] } | [FIELD holidays["petitioner_birthday"]["even_years"]] | [FIELD holidays["petitioner_birthday"]["odd_years"]] | [FIELD holidays["petitioner_birthday"]["custody_from_time"]] | [FIELD holidays["petitioner_birthday"]["custody_to_time"]]
+      ${ holidays["respondent_birthday"]["description"] } | [FIELD holidays["respondent_birthday"]["even_years"]] | [FIELD holidays["respondent_birthday"]["odd_years"]] | [FIELD holidays["respondent_birthday"]["custody_from_time"]] | [FIELD holidays["respondent_birthday"]["custody_to_time"]]
+      ${ holidays["children_birthday"]["description"] } | [FIELD holidays["children_birthday"]["even_years"]] | [FIELD holidays["children_birthday"]["odd_years"]] | [FIELD holidays["children_birthday"]["custody_from_time"]] | [FIELD holidays["children_birthday"]["custody_to_time"]]
+  - no label: holidays["mlk"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["mlk"]["even_default"] } 
+  - no label: holidays["mlk"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["mlk"]["odd_default"] }
+  - no label: holidays["mlk"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["mlk"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["president"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["president"]["even_default"] }
+  - no label: holidays["president"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["president"]["odd_default"] }
+  - no label: holidays["president"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["president"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["memorial"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["memorial"]["even_default"] }
+  - no label: holidays["memorial"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["memorial"]["odd_default"] }
+  - no label: holidays["memorial"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["memorial"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["independence"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["independence"]["even_default"] }
+  - no label: holidays["independence"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["independence"]["odd_default"] }
+  - no label: holidays["independence"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["independence"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["labor"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["labor"]["even_default"] }
+  - no label: holidays["labor"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["labor"]["odd_default"] }
+  - no label: holidays["labor"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["labor"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["thanksgiving"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["thanksgiving"]["even_default"] }
+  - no label: holidays["thanksgiving"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["thanksgiving"]["odd_default"] }
+  - no label: holidays["thanksgiving"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["thanksgiving"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["halloween"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["halloween"]["even_default"] }
+  - no label: holidays["halloween"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["halloween"]["odd_default"] }
+  - no label: holidays["halloween"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["halloween"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["xmas_eve"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["xmas_eve"]["even_default"] }
+  - no label: holidays["xmas_eve"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["xmas_eve"]["odd_default"] }
+  - no label: holidays["xmas_eve"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["xmas_eve"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["xmas_day"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["xmas_day"]["even_default"] }
+  - no label: holidays["xmas_day"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["xmas_day"]["odd_default"] }
+  - no label: holidays["xmas_day"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["xmas_day"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["mother"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["mother"]["even_default"] }
+  - no label: holidays["mother"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["mother"]["odd_default"] }
+  - no label: holidays["mother"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["mother"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["father"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["father"]["even_default"] }
+  - no label: holidays["father"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["father"]["odd_default"] }
+  - no label: holidays["father"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["father"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["petitioner_birthday"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["petitioner_birthday"]["even_default"] }
+  - no label: holidays["petitioner_birthday"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["petitioner_birthday"]["odd_default"] }
+  - no label: holidays["petitioner_birthday"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["petitioner_birthday"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["respondent_birthday"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["respondent_birthday"]["even_default"] }
+  - no label: holidays["respondent_birthday"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["respondent_birthday"]["odd_default"] }
+  - no label: holidays["respondent_birthday"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["respondent_birthday"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+  - no label: holidays["children_birthday"]["even_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["children_birthday"]["even_default"] }
+  - no label: holidays["children_birthday"]["odd_years"]
+    choices:
+      - ${ petitioner.name.full() }
+      - ${ respondent.name.full() }
+    inline width: 3em
+    default: ${ holidays["children_birthday"]["odd_default"] }
+  - no label: holidays["children_birthday"]["custody_from_time"]
+    datatype: time
+    inline width: 3em
+    default: "9 am"
+  - no label: holidays["children_birthday"]["custody_to_time"]
+    datatype: time
+    inline width: 3em
+    default: "7 pm"
+---        
+        
 ---
 id: Parenting Plan object
 objects:
-  - parenting_plan_attachment: ALDocument.using(title="Parenting Plan", filename="Parenting_Plan", has_addendum=False, )
+  - parenting_plan_attachment: DADict.using(object_type=ALDocument.using(has_addendum=True, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE), auto_gather=False, gathered=True)
+---
+id: parenting_plan per-key document settings
+code: |
+  parenting_plan_attachment[i].title = "Parenting Plan"
+  parenting_plan_attachment[i].filename = "parenting_plan" if i == "redacted" else "parenting_plan_unredacted"
+---
+id: parenting_plan overflow fields
+code: |
+  parenting_plan_attachment[i].overflow_fields["legal_custody_sole_explanation"].overflow_trigger = 240
+  parenting_plan_attachment[i].overflow_fields["legal_custody_sole_explanation"].label = "6. Explanation for Sole Legal Custody"
+  parenting_plan_attachment[i].overflow_fields["dispute_resolution"].overflow_trigger = 420
+  parenting_plan_attachment[i].overflow_fields["dispute_resolution"].label = "9. Dispute Resolution Procedure"
+  parenting_plan_attachment[i].overflow_fields["visitation_reason"].overflow_trigger = 80
+  parenting_plan_attachment[i].overflow_fields["visitation_reason"].label = "10. Supervised Visitation"
+  parenting_plan_attachment[i].overflow_fields["other_holidays"].overflow_trigger = 7
+  parenting_plan_attachment[i].overflow_fields["other_holidays"].label = "12. Other Holidays"
+  parenting_plan_attachment[i].overflow_fields["vacation_info"].overflow_trigger = 400
+  parenting_plan_attachment[i].overflow_fields["vacation_info"].label = "13. Vacation Schedule"
+  parenting_plan_attachment[i].overflow_fields["location_of_exchange_school_not_in_session"].overflow_trigger = 240
+  parenting_plan_attachment[i].overflow_fields["location_of_exchange_school_not_in_session"].label = "14. Location of Exchange When School Not in Session"
+  parenting_plan_attachment[i].overflow_fields["location_of_exchange_specific_location"].overflow_trigger = 320
+  parenting_plan_attachment[i].overflow_fields["location_of_exchange_specific_location"].label = "14. Location of Exchange"
+  parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_medical_costs"].overflow_trigger = 3
+  parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_medical_costs"].label = "8. Extraordinary medical costs for " + (support_payer.name.full() if defined('support_payer.name.first') else "Payer")
+  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_medical_costs"].overflow_trigger = 3
+  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_medical_costs"].label = "8. Extraordinary medical costs for " + (support_recipient.name.full() if defined('support_recipient.name.first') else "Recipient") + " Included in Form 14"
+  parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_childrearing_costs_in_14"].overflow_trigger = 3
+  parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_childrearing_costs_in_14"].label = "13a. Extraordinary Childcare Costs for " + (support_payer.name.full() if defined('support_payer.name.first') else "Payer") + " Included in Form 14"
+  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_in_14"].overflow_trigger = 3
+  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_in_14"].label = "8. Extraordinary medical costs for " + (support_recipient.name.full() if defined('support_recipient.name.first') else "Recipient")
+  parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_childrearing_costs_not_in_14"].overflow_trigger = 3
+  parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_childrearing_costs_not_in_14"].label = "13a. Extraordinary Childcare Costs for " + (support_payer.name.full() if defined('support_payer.name.first') else "Payer") + " Included in Form 14"
+  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_not_in_14"].overflow_trigger = 3
+  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_not_in_14"].label = "8. Extraordinary medical costs for " + (support_recipient.name.full() if defined('support_recipient.name.first') else "Recipient")
+  parenting_plan_attachment[i].overflow_fields["use_presumed_child_support_explanation"].overflow_trigger = 320
+  parenting_plan_attachment[i].overflow_fields["use_presumed_child_support_explanation"].label = "15. Presumed Child Support Explanation"
+  parenting_plan_attachment[i].overflow_fields["additional_provisions_parenting_plan"].overflow_trigger = 480
+  parenting_plan_attachment[i].overflow_fields["additional_provisions_parenting_plan"].label = "20. Additional Provisions"
+  parenting_plan_attachment[i].overflow_fields["children_of_marriage_minor"].overflow_trigger = 6
+  parenting_plan_attachment[i].overflow_fields["children_of_marriage_minor"].label = "Additional Children"
+  parenting_plan_attachment[i].overflow_fields.gathered = True
+---
+attachment:
+  variable name: parenting_plan_attachment[i].addendum
+  docx template file: parenting_plan_attachment_addendum.docx
+  redact: i == "redacted"
+  skip undefined: True
 ---
 id: Parenting Plan attachment
 attachment:
-  name: Parenting Plan
-  filename: Parenting_Plan
-  variable name: parenting_plan_attachment[i]
+  name: Parenting Plan ${ "Redacted" if i == "redacted" else "Unredacted" }
+  filename: parenting_plan${ "" if i == "redacted" else "_unredacted" }
+  variable name: parenting_plan_attachment[i][j]
   skip undefined: True
+  redact: i == "redacted"
   pdf template file: parenting_plan.pdf
   editable: False
   fields:
@@ -607,9 +1500,9 @@ attachment:
       - "respondentsLastName": ${ respondent.name.last } 
       - "respondentsFirstName": ${ respondent.name.first } 
       - "pDivisionNumber": ${ case.division_number } 
-      - "pAuthorsBothParentsA": ${ parenting_plan_A_author["petitioner"] and parenting_plan_A_author["respondent"]  } 
-      - "pAuthorsPetitionerA": ${ parenting_plan_A_author["petitioner"] and not parenting_plan_A_author["respondent"] } 
-      - "pAuthorsRespondentA": ${ parenting_plan_A_author["respondent"] and not parenting_plan_A_author["petitioner"] } 
+      - "pAuthorsBothParentsA": ${ parenting_plan_A_author[petitioner.name.full()] and parenting_plan_A_author[respondent.name.full()] } 
+      - "pAuthorsPetitionerA": ${ parenting_plan_A_author[petitioner.name.full()] and not parenting_plan_A_author[respondent.name.full()] } 
+      - "pAuthorsRespondentA": ${ parenting_plan_A_author[respondent.name.full()] and not parenting_plan_A_author[petitioner.name.full()] } 
       - "pAuthorsCourtA": ${ parenting_plan_A_author["The court"] } 
       - "pAuthorsGuardianAdLitemA": ${ parenting_plan_A_author["The guardian ad litem"] } 
       - "PAuthorsOtherA": ${ parenting_plan_A_author["Other"] } 
@@ -617,156 +1510,156 @@ attachment:
       - "pAuthorsOtherSuffixA": ${ parenting_plan_A_author_other.name.suffix } 
       - "pAuthorsOtherLastNameA": ${ parenting_plan_A_author_other.name.last } 
       - "pAuthorsOtherFirstNameA": ${ parenting_plan_A_author_other.name.first } 
-      - "pChildrenNumber": ${ len(children) } 
+      - "pChildrenNumber": ${ number_of_children } 
       - "pFirstChildsAge": |
-          % if len(children) > 0:
-          % if date_difference(starting=children[0].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children[0].birthdate,ending=today()).years) }
+          % if len(children_of_marriage_minor) > 0:
+          % if date_difference(starting=children_of_marriage_minor[0].birthdate,ending=today()).years > 1:
+          ${ int(date_difference(starting=children_of_marriage_minor[0].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children[0].birthdate,ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage_minor[0].birthdate,ending=today()).describe(specificity='month') }
           % endif
           % endif
       - "pFirstChildFirstName": |
-          % if len(children) > 0:
-          ${ children[0].name.first }
+          % if len(children_of_marriage_minor) > 0:
+          ${ redact(children_of_marriage_minor[0].name.first) }
           % endif
       - "pFirstChildMiddleName": |
-          % if len(children) > 0:
-          ${ children[0].name.middle }
+          % if len(children_of_marriage_minor) > 0:
+          ${ redact(children_of_marriage_minor[0].name.middle) }
           % endif
       - "pFirstChildLastName": |
-          % if len(children) > 0:
-          ${ children[0].name.last }
+          % if len(children_of_marriage_minor) > 0:
+          ${ redact(children_of_marriage_minor[0].name.last) }
           % endif
       - "pFirstChildSuffix": |
-          % if len(children) > 0:
-          ${ children[0].name.suffix }
+          % if len(children_of_marriage_minor) > 0:
+          ${ redact(children_of_marriage_minor[0].name.suffix) }
           % endif
       - "pSecondChildsAge": |
-          % if len(children) > 1:
-          % if date_difference(starting=children[1].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children[1].birthdate,ending=today()).years) }
+          % if len(children_of_marriage_minor) > 1:
+          % if date_difference(starting=children_of_marriage_minor[1].birthdate,ending=today()).years > 1:
+          ${ int(date_difference(starting=children_of_marriage_minor[1].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children[1].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage_minor[1].birthdate, ending=today()).describe(specificity='month') }
           % endif
           % endif
       - "pSecondChildFirstName": |
-          % if len(children) > 1:
-          ${ children[1].name.first }
+          % if len(children_of_marriage_minor) > 1:
+          ${ redact(children_of_marriage_minor[1].name.first) }
           % endif
       - "pSecondChildMiddleName": |
-          % if len(children) > 1:
-          ${ children[1].name.middle }
+          % if len(children_of_marriage_minor) > 1:
+          ${ redact(children_of_marriage_minor[1].name.middle) }
           % endif
       - "pSecondChildLastName": |
-          % if len(children) > 1:
-          ${ children[1].name.last }
+          % if len(children_of_marriage_minor) > 1:
+          ${ redact(children_of_marriage_minor[1].name.last) }
           % endif
       - "pSecondChildSuffix": |
-          % if len(children) > 1:
-          ${ children[1].name.suffix }
+          % if len(children_of_marriage_minor) > 1:
+          ${ redact(children_of_marriage_minor[1].name.suffix) }
           % endif
       - "pThirdChildFirstName": |
-          % if len(children) > 2:
-          ${ children[2].name.first }
+          % if len(children_of_marriage_minor) > 2:
+          ${ redact(children_of_marriage_minor[2].name.first) }
           % endif
       - "pThirdChildMiddleName": |
-          % if len(children) > 2:
-          ${ children[2].name.middle }
+          % if len(children_of_marriage_minor) > 2:
+          ${ redact(children_of_marriage_minor[2].name.middle) }
           % endif
       - "pThirdChildLastName": |
-          % if len(children) > 2:
-          ${ children[2].name.last }
+          % if len(children_of_marriage_minor) > 2:
+          ${ redact(children_of_marriage_minor[2].name.last) }
           % endif
       - "pThirdChildSuffix": |
-          % if len(children) > 2:
-          ${ children[2].name.suffix }
+          % if len(children_of_marriage_minor) > 2:
+          ${ redact(children_of_marriage_minor[2].name.suffix) }
           % endif
       - "pThirdChildsAge": |
-          % if len(children) > 2:
-          % if date_difference(starting=children[2].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children[2].birthdate,ending=today()).years) }
+          % if len(children_of_marriage_minor) > 2:
+          % if date_difference(starting=children_of_marriage_minor[2].birthdate,ending=today()).years > 1:
+          ${ int(date_difference(starting=children_of_marriage_minor[2].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children[2].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage_minor[2].birthdate, ending=today()).describe(specificity='month') }
           % endif
           % endif
       - "pFourthChildSuffix": |
-          % if len(children) > 3:
-          ${ children[3].name.suffix }
+          % if len(children_of_marriage_minor) > 3:
+          ${ redact(children_of_marriage_minor[3].name.suffix) }
           % endif
       - "pFourthChildsAge": |
-          % if len(children) > 3:
-          % if date_difference(starting=children[3].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children[3].birthdate,ending=today()).years) }
+          % if len(children_of_marriage_minor) > 3:
+          % if date_difference(starting=children_of_marriage_minor[3].birthdate,ending=today()).years > 1:
+          ${ int(date_difference(starting=children_of_marriage_minor[3].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children[3].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage_minor[3].birthdate, ending=today()).describe(specificity='month') }
           % endif
           % endif
       - "pFourthChildFirstName": |
-          % if len(children) > 3:
-          ${ children[3].name.first }
+          % if len(children_of_marriage_minor) > 3:
+          ${ redact(children_of_marriage_minor[3].name.first) }
           % endif
       - "pFourthChildMiddleName": |
-          % if len(children) > 3:
-          ${ children[3].name.middle }
+          % if len(children_of_marriage_minor) > 3:
+          ${ redact(children_of_marriage_minor[3].name.middle) }
           % endif
       - "pFourthChildLastName": |
-          % if len(children) > 3:
-          ${ children[3].name.last }
+          % if len(children_of_marriage_minor) > 3:
+          ${ redact(children_of_marriage_minor[3].name.last) }
           % endif
       - "pFifthChildsAge": |
-          % if len(children) > 4:
-          % if date_difference(starting=children[4].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children[4].birthdate,ending=today()).years) }
+          % if len(children_of_marriage_minor) > 4:
+          % if date_difference(starting=children_of_marriage_minor[4].birthdate,ending=today()).years > 1:
+          ${ int(date_difference(starting=children_of_marriage_minor[4].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children[4].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage_minor[4].birthdate, ending=today()).describe(specificity='month') }
           % endif
           % endif
       - "pFifthChildFirstName": |
-          % if len(children) > 4:
-          ${ children[4].name.first }
+          % if len(children_of_marriage_minor) > 4:
+          ${ redact(children_of_marriage_minor[4].name.first) }
           % endif
       - "pFifthChildMiddleName": |
-          % if len(children) > 4:
-          ${ children[4].name.middle }
+          % if len(children_of_marriage_minor) > 4:
+          ${ redact(children_of_marriage_minor[4].name.middle) }
           % endif
       - "pFifthChildLastName": |
-          % if len(children) > 4:
-          ${ children[4].name.last }
+          % if len(children_of_marriage_minor) > 4:
+          ${ redact(children_of_marriage_minor[4].name.last) }
           % endif
       - "pFifthChildSuffix": |
-          % if len(children) > 4:
-          ${ children[4].name.suffix }
+          % if len(children_of_marriage_minor) > 4:
+          ${ redact(children_of_marriage_minor[4].name.suffix) }
           % endif
       - "pSixthChildSuffix": |
-          % if len(children) > 5:
-          ${ children[5].name.suffix }
+          % if len(children_of_marriage_minor) > 5:
+          ${ redact(children_of_marriage_minor[5].name.suffix) }
           % endif
       - "pSixthChildsAge": |
-          % if len(children) > 5:
-          % if date_difference(starting=children[5].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children[5].birthdate,ending=today()).years) }
+          % if len(children_of_marriage_minor) > 5:
+          % if date_difference(starting=children_of_marriage_minor[5].birthdate,ending=today()).years > 1:
+          ${ int(date_difference(starting=children_of_marriage_minor[5].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children[5].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage_minor[5].birthdate, ending=today()).describe(specificity='month') }
           % endif
           % endif
       - "pSixthChildFirstName": |
-          % if len(children) > 5:
-          ${ children[5].name.first }
+          % if len(children_of_marriage_minor) > 5:
+          ${ redact(children_of_marriage_minor[5].name.first) }
           % endif
       - "pSixthChildMiddleName": |
-          % if len(children) > 5:
-          ${ children[5].name.middle }
+          % if len(children_of_marriage_minor) > 5:
+          ${ redact(children_of_marriage_minor[5].name.middle) }
           % endif
       - "pSixthChildLastName": |
-          % if len(children) > 5:
-          ${ children[5].name.last }
+          % if len(children_of_marriage_minor) > 5:
+          ${ redact(children_of_marriage_minor[5].name.last) }
           % endif
       - "paLegalCustodyJoint": ${ legal_custody in ["Joint"] } 
-      - "paLegalCustodySole": ${ legal_custody in ["petitioner","respondent"] } 
-      - "paSoleLegalCustPetitioner": ${ legal_custody == "petitioner" } 
-      - "paSoleLegalCustRespondent": ${ legal_custody == "respondent" } 
-      - "paSoleCustodyReason1": ${ legal_custody_sole_explanation } 
+      - "paLegalCustodySole": ${ legal_custody in [petitioner.name.full(),respondent.name.full()] } 
+      - "paSoleLegalCustPetitioner": ${ legal_custody == petitioner.name.full() } 
+      - "paSoleLegalCustRespondent": ${ legal_custody == respondent.name.full() } 
+      - "paSoleCustodyReason1": ${ parenting_plan_attachment[i].safe_value('legal_custody_sole_explanation') } 
       - "paLegalCustodyThirdParty": ${ legal_custody == "third_party" } 
       - "paLegalCustThirdPartyFirstName": ${ legal_custody_other.name.first } 
       - "paLegalCustThirdPartyMiddleName": ${ legal_custody_other.name.middle } 
@@ -783,19 +1676,19 @@ attachment:
       - "paCommunicationThirdPersonMiddleName": ${ communications_other.name.middle } 
       - "paCommunicationThirdPersonLastName": ${ communications_other.name.last } 
       - "paCommunicationThirdPersonSuffix": ${ communications_other.name.suffix } 
-      - "paDisputeResolution1": ${ dispute_resolution } 
+      - "paDisputeResolution1": ${ parenting_plan_attachment[i].safe_value('dispute_resolution') } 
       - "paPhysicalCustodyJoint": ${ physical_custody == "Joint" } 
-      - "paJointPhysCustAddressPetitioner": ${ physical_custody_address == "petitioner" } 
-      - "paJointPhysCustAddressRespondent": ${ physical_custody_address == "respondent" } 
-      - "paPhysicalCustodySoleWithVisit": ${ physical_custody in ["petitioner","respondent"] and visitation == False } 
-      - "paSolePhysCustWithVisitPetitioner": ${ physical_custody in ["petitioner"] and visitation == False } 
-      - "paSolePhysCustWithVisitRespondent": ${ physical_custody in ["respondent"] and visitation == False } 
-      - "paPhysicalCustodySoleSupVisit": ${ physical_custody in ["petitioner","respondent"] and visitation == True } 
-      - "paSolePhysCustSupVisitPetitioner": ${ physical_custody == "petitioner" and visitation == True } 
-      - "paSolePhysCustSupVisitRespondent": ${ physical_custody == "respondent" and visitation == True } 
-      - "paNoUnsupVisitPetitioner": ${ physical_custody in ["respondent"] and visitation == True } 
-      - "paNoUnsupVisitRespondent": ${ physical_custody in ["petitioner"] and visitation == True } 
-      - "paNoUnsupervisedVisitReason": ${ visitation_reason } 
+      - "paJointPhysCustAddressPetitioner": ${ physical_custody_address == petitioner.name.full() } 
+      - "paJointPhysCustAddressRespondent": ${ physical_custody_address == respondent.name.full() } 
+      - "paPhysicalCustodySoleWithVisit": ${ physical_custody in [petitioner.name.full(), respondent.name.full()] and visitation == False } 
+      - "paSolePhysCustWithVisitPetitioner": ${ physical_custody in [petitioner.name.full()] and visitation == False } 
+      - "paSolePhysCustWithVisitRespondent": ${ physical_custody in [respondent.name.full()] and visitation == False } 
+      - "paPhysicalCustodySoleSupVisit": ${ physical_custody in [petitioner.name.full(),respondent.name.full()] and visitation == True } 
+      - "paSolePhysCustSupVisitPetitioner": ${ physical_custody == petitioner.name.full() and visitation == True } 
+      - "paSolePhysCustSupVisitRespondent": ${ physical_custody == respondent.name.full() and visitation == True } 
+      - "paNoUnsupVisitPetitioner": ${ physical_custody in [respondent.name.full()] and visitation == True } 
+      - "paNoUnsupVisitRespondent": ${ physical_custody in [petitioner.name.full()] and visitation == True } 
+      - "paNoUnsupervisedVisitReason": ${ parenting_plan_attachment[i].safe_value('visitation_reason') } 
       - "paSupVisitationFirstName": ${ visitation_supervisor.name.first } 
       - "paSupVisitationMiddleName": ${ visitation_supervisor.name.middle } 
       - "paSupVisitationLastName": ${ visitation_supervisor.name.last } 
@@ -819,60 +1712,60 @@ attachment:
       - "paScheduleWeekTwoThursday": ${ biweekly_schedule[11] } 
       - "paScheduleWeekTwoFriday": ${ biweekly_schedule[12] } 
       - "paScheduleWeekTwoSaturday": ${ biweekly_schedule[13] } 
-      - "paMLKdayEven": ${ role_dictionary_full_name[holidays["mlk"]["even_years"]] } 
-      - "paMLKdayOdd": ${ role_dictionary_full_name[holidays["mlk"]["odd_years"]] } 
+      - "paMLKdayEven": ${ holidays["mlk"]["even_years"] } 
+      - "paMLKdayOdd": ${ holidays["mlk"]["odd_years"] } 
       - "paMLKdayStartTime": ${ format_time(holidays["mlk"]["custody_from_time"]) } 
       - "paMLKdayEndTime": ${ format_time(holidays["mlk"]["custody_to_time"]) } 
-      - "paPresidentsDayEven": ${ role_dictionary_full_name[holidays["president"]["even_years"]] } 
-      - "paPresidentsDayOdd": ${ role_dictionary_full_name[holidays["president"]["odd_years"]] } 
+      - "paPresidentsDayEven": ${ holidays["president"]["even_years"] } 
+      - "paPresidentsDayOdd": ${ holidays["president"]["odd_years"] } 
       - "paPresidentsDayStartTime": ${ format_time(holidays["president"]["custody_from_time"]) } 
       - "paPresidentsDayEndTime": ${ format_time(holidays["president"]["custody_to_time"]) } 
-      - "paMemorialDayEven": ${ role_dictionary_full_name[holidays["memorial"]["even_years"]] } 
-      - "paMemorialDayOdd": ${ role_dictionary_full_name[holidays["memorial"]["odd_years"]] } 
+      - "paMemorialDayEven": ${ holidays["memorial"]["even_years"] } 
+      - "paMemorialDayOdd": ${ holidays["memorial"]["odd_years"] } 
       - "paMemorialDayStartTime": ${ format_time(holidays["memorial"]["custody_from_time"]) } 
       - "paMemorialDayEndTime": ${ format_time(holidays["memorial"]["custody_to_time"]) } 
-      - "paIndependenceDayEven": ${ role_dictionary_full_name[holidays["independence"]["even_years"]] } 
-      - "paIndependenceDayOdd": ${ role_dictionary_full_name[holidays["independence"]["odd_years"]] } 
+      - "paIndependenceDayEven": ${ holidays["independence"]["even_years"] } 
+      - "paIndependenceDayOdd": ${ holidays["independence"]["odd_years"] } 
       - "paIndependenceDayStartTime": ${ format_time(holidays["independence"]["custody_from_time"]) } 
       - "paIndependenceDayEndTime": ${ format_time(holidays["independence"]["custody_to_time"]) } 
-      - "paLaborDayEven": ${ role_dictionary_full_name[holidays["labor"]["even_years"]] } 
-      - "paLaborDayOdd": ${ role_dictionary_full_name[holidays["labor"]["odd_years"]] } 
+      - "paLaborDayEven": ${ holidays["labor"]["even_years"] } 
+      - "paLaborDayOdd": ${ holidays["labor"]["odd_years"] } 
       - "paLaborDayStartTime": ${ format_time(holidays["labor"]["custody_from_time"]) } 
       - "paLaborDayEndTime": ${ format_time(holidays["labor"]["custody_to_time"]) } 
-      - "paThanksgivingEven": ${ role_dictionary_full_name[holidays["thanksgiving"]["even_years"]] } 
-      - "paThanksgivingOdd": ${ role_dictionary_full_name[holidays["thanksgiving"]["odd_years"]] } 
+      - "paThanksgivingEven": ${ holidays["thanksgiving"]["even_years"] } 
+      - "paThanksgivingOdd": ${ holidays["thanksgiving"]["odd_years"] } 
       - "paThanksgivingStartTime": ${ format_time(holidays["thanksgiving"]["custody_from_time"]) } 
       - "paThanksgivingEndTime": ${ format_time(holidays["thanksgiving"]["custody_to_time"]) } 
-      - "paHalloweenEven": ${ role_dictionary_full_name[holidays["halloween"]["even_years"]] } 
-      - "paHalloweenOdd": ${ role_dictionary_full_name[holidays["halloween"]["odd_years"]] } 
+      - "paHalloweenEven": ${ holidays["halloween"]["even_years"] } 
+      - "paHalloweenOdd": ${ holidays["halloween"]["odd_years"] } 
       - "paHalloweenStartTime": ${ format_time(holidays["halloween"]["custody_from_time"]) } 
       - "paHalloweenEndTime": ${ format_time(holidays["halloween"]["custody_to_time"]) } 
-      - "paChristmasEveEven": ${ role_dictionary_full_name[holidays["xmas_eve"]["even_years"]] } 
-      - "paChristmasEveOdd": ${ role_dictionary_full_name[holidays["xmas_eve"]["odd_years"]] } 
+      - "paChristmasEveEven": ${ holidays["xmas_eve"]["even_years"] } 
+      - "paChristmasEveOdd": ${ holidays["xmas_eve"]["odd_years"] } 
       - "paChristmasEveEndTime": ${ format_time(holidays["xmas_eve"]["custody_from_time"]) } 
       - "paChristmasEveStartTime": ${ format_time(holidays["xmas_eve"]["custody_to_time"]) } 
-      - "paChristmasDayEven": ${ role_dictionary_full_name[holidays["xmas_day"]["even_years"]] } 
-      - "paChristmasDayOdd": ${ role_dictionary_full_name[holidays["xmas_day"]["odd_years"]] } 
+      - "paChristmasDayEven": ${ holidays["xmas_day"]["even_years"] } 
+      - "paChristmasDayOdd": ${ holidays["xmas_day"]["odd_years"] } 
       - "paChristmasDayStartTime": ${ format_time(holidays["xmas_day"]["custody_from_time"]) } 
       - "paChristmasDayEndTime": ${ format_time(holidays["xmas_day"]["custody_to_time"]) } 
-      - "paMothersDayEven": ${ role_dictionary_full_name[holidays["mother"]["even_years"]] } 
-      - "paMothersDayOdd": ${ role_dictionary_full_name[holidays["mother"]["odd_years"]] } 
+      - "paMothersDayEven": ${ holidays["mother"]["even_years"] } 
+      - "paMothersDayOdd": ${ holidays["mother"]["odd_years"] } 
       - "paMothersDayStartTime": ${ format_time(holidays["mother"]["custody_from_time"]) } 
       - "paMothersDayEndTime": ${ format_time(holidays["mother"]["custody_to_time"]) } 
-      - "paFathersDayEven": ${ role_dictionary_full_name[holidays["father"]["even_years"]] } 
-      - "paFathersDayOdd": ${ role_dictionary_full_name[holidays["father"]["odd_years"]] } 
+      - "paFathersDayEven": ${ holidays["father"]["even_years"] } 
+      - "paFathersDayOdd": ${ holidays["father"]["odd_years"] } 
       - "paFathersDayStartTime": ${ format_time(holidays["father"]["custody_from_time"]) } 
       - "paFathersDayEndTime": ${ format_time(holidays["father"]["custody_to_time"]) } 
-      - "paPetitionersBirthdayEven": ${ role_dictionary_full_name[holidays["petitioner_birthday"]["even_years"]] } 
-      - "paPetitionersBirthdayOdd": ${ role_dictionary_full_name[holidays["petitioner_birthday"]["odd_years"]] } 
+      - "paPetitionersBirthdayEven": ${ holidays["petitioner_birthday"]["even_years"] } 
+      - "paPetitionersBirthdayOdd": ${ holidays["petitioner_birthday"]["odd_years"] } 
       - "paPetitionersBirthdayStartTime": ${ format_time(holidays["petitioner_birthday"]["custody_from_time"]) } 
       - "paPetitionersBirthdayEndTime": ${ format_time(holidays["petitioner_birthday"]["custody_to_time"]) } 
-      - "paRespondentsBirthdayEven": ${ role_dictionary_full_name[holidays["respondent_birthday"]["even_years"]] } 
-      - "paRespondentsBirthdayOdd": ${ role_dictionary_full_name[holidays["respondent_birthday"]["odd_years"]] } 
+      - "paRespondentsBirthdayEven": ${ holidays["respondent_birthday"]["even_years"] } 
+      - "paRespondentsBirthdayOdd": ${ holidays["respondent_birthday"]["odd_years"] } 
       - "paRespondentsBirthdayStartTime": ${ format_time(holidays["respondent_birthday"]["custody_from_time"]) } 
       - "paRespondentsBirthdayEndTime": ${ format_time(holidays["respondent_birthday"]["custody_to_time"]) } 
-      - "paChildrensBirthdaysEven": ${ role_dictionary_full_name[holidays["children_birthday"]["even_years"]]  } 
-      - "paChildrensBirthdaysOdd": ${ role_dictionary_full_name[holidays["children_birthday"]["odd_years"]] } 
+      - "paChildrensBirthdaysEven": ${ holidays["children_birthday"]["even_years"]  } 
+      - "paChildrensBirthdaysOdd": ${ holidays["children_birthday"]["odd_years"] } 
       - "paChildrensBirthdaysStartTime": ${ format_time(holidays["children_birthday"]["custody_from_time"]) } 
       - "paChildrensBirthdayEndTime": ${ format_time(holidays["children_birthday"]["custody_to_time"]) } 
       - "paOtherHolidays1": |
@@ -1018,31 +1911,31 @@ attachment:
       - "paVacationNone": ${ not vacation } 
       - "paVacationDesignated": ${ vacation } 
       - "paVacationWeeks": ${ vacation_weeks } 
-      - "paVacationInfo1": ${ vacation_invo } 
+      - "paVacationInfo1": ${ parenting_plan_attachment[i].safe_value('vacation_info') } 
       - "paLocationExchangesSchool": ${ location_of_exchange == "school" } 
-      - "paLocationExchangesSchoolNotInSession1": ${ location_of_exchange_school_not_in_session } 
-      - "paLocationExchangesResidence": ${ location_of_exchange in ["respondent_residence", "petitioner_residence"] } 
-      - "paLocationExchangesResidencePetitioner": ${ location_of_exchange == "petitioner_residence" } 
-      - "paLocationExchangesResidenceRespondent": ${ location_of_exchange == "respondent_residence" } 
+      - "paLocationExchangesSchoolNotInSession1": ${ parenting_plan_attachment[i].safe_value('location_of_exchange_school_not_in_session') } 
+      - "paLocationExchangesResidence": ${ location_of_exchange in [respondent.name.full(), petitioner.name.full()] } 
+      - "paLocationExchangesResidencePetitioner": ${ location_of_exchange == petitioner.name.full() } 
+      - "paLocationExchangesResidenceRespondent": ${ location_of_exchange == respondent.name.full() } 
       - "paLocationExchangesPickUp": ${ location_of_exchange == "pick_up" } 
       - "paLocationExchangesSpecific": ${ location_of_exchange == "other" } 
-      - "paLocationExchangesOther1": ${ location_of_exchange_specific_location } 
+      - "paLocationExchangesOther1": ${ parenting_plan_attachment[i].safe_value('location_of_exchange_specific_location') } 
       - "paPhoneContactAm": ${ phone_contact_am } 
       - "paPhoneContactRestrictions": ${ phone_contact } 
       - "paPhoneContactPm": ${ phone_contact_pm } 
       - "paPhoneContactNoRestrictions": ${ not phone_contact } 
       - "paPatternDomesticViolenceNone": ${ domestic_violence == False } 
-      - "paPatternDomViolencePetitioner": ${ domestic_violence_committed_by == "petitioner" } 
-      - "paPatternDomViolenceRespondent": ${ domestic_violence_committed_by == "respondent" } 
-      - "paPatternDomesticViolenceOne": ${ domestic_violence_committed_by in ['petitioner','respondent'] } 
+      - "paPatternDomViolencePetitioner": ${ domestic_violence_committed_by == petitioner.name.full() } 
+      - "paPatternDomViolenceRespondent": ${ domestic_violence_committed_by == respondent.name.full() } 
+      - "paPatternDomesticViolenceOne": ${ domestic_violence_committed_by in [petitioner.name.full(), respondent.name.full()] } 
       - "paPatternDomesticViolenceBoth": ${ domestic_violence_committed_by == "both" } 
       - "paDomesticViolenceNone": ${ domestic_violence == False } 
       - "paDomesticViolenceNoRecords": ${ educational_records_include_victim_address == False and domestic_violence } 
-      - "paDomViolencePetitionerNoRecords": ${ educational_records_include_victim_address == False and domestic_violence_committed_by in ['petitioner'] } 
-      - "paDomViolenceRespondentNoRecords": ${ educational_records_include_victim_address == False and domestic_violence_committed_by in ['respondent'] } 
+      - "paDomViolencePetitionerNoRecords": ${ educational_records_include_victim_address == False and domestic_violence_committed_by in [petitioner.name.full()] } 
+      - "paDomViolenceRespondentNoRecords": ${ educational_records_include_victim_address == False and domestic_violence_committed_by in [respondent.name.full()] } 
       - "paDomesticViolenceRecords": ${ educational_records_include_victim_address == True and domestic_violence } 
-      - "paDomViolencePetitionerRecords": ${ educational_records_include_victim_address == True and domestic_violence_committed_by in ['petitioner'] } 
-      - "paDomViolenceRespondentRecords": ${ educational_records_include_victim_address == True and domestic_violence_committed_by in ['respondent'] } 
+      - "paDomViolencePetitionerRecords": ${ educational_records_include_victim_address == True and domestic_violence_committed_by in [petitioner.name.full()] } 
+      - "paDomViolenceRespondentRecords": ${ educational_records_include_victim_address == True and domestic_violence_committed_by in [respondent.name.full()] } 
       - "countyList2": ${ case.county } 
       - "petitionersFirstName2": ${ petitioner.name.first } 
       - "petitionersMiddleName2": ${ petitioner.name.middle } 
@@ -1054,9 +1947,9 @@ attachment:
       - "respondentsLastName2": ${ respondent.name.last } 
       - "respondentsFirstName2": ${ respondent.name.first } 
       - "pDivisionNumber2": ${ case.division_number } 
-      - "pAuthorsBothParentsB": ${ parenting_plan_B_author["petitioner"] and parenting_plan_B_author["respondent"]  } 
-      - "pAuthorsPetitionerB": ${ parenting_plan_B_author["petitioner"] and not parenting_plan_B_author["respondent"] } 
-      - "pAuthorsRespondentB": ${ parenting_plan_B_author["respondent"] and not parenting_plan_B_author["petitioner"] } 
+      - "pAuthorsBothParentsB": ${ parenting_plan_B_author[petitioner.name.full()] and parenting_plan_B_author[respondent.name.full()]  } 
+      - "pAuthorsPetitionerB": ${ parenting_plan_B_author[petitioner.name.full()] and not parenting_plan_B_author[respondent.name.full()] } 
+      - "pAuthorsRespondentB": ${ parenting_plan_B_author[respondent.name.full()] and not parenting_plan_B_author[petitioner.name.full()] } 
       - "pAuthorsCourtB": ${ parenting_plan_B_author["The court"] } 
       - "pAuthorsGuardianAdLitemB": ${ parenting_plan_B_author["The guardian ad litem"] } 
       - "PAuthorsOtherB": ${ parenting_plan_B_author["Other"] } 
@@ -1064,155 +1957,155 @@ attachment:
       - "pAuthorsOtherSuffixB": ${ parenting_plan_B_author_other.name.suffix } 
       - "pAuthorsOtherLastNameB": ${ parenting_plan_B_author_other.name.last } 
       - "pAuthorsOtherFirstNameB": ${ parenting_plan_B_author_other.name.first } 
-      - "pChildrenNumber2": ${ len(children) } 
+      - "pChildrenNumber2": ${ len(children_of_marriage_minor) } 
       - "pFirstChildsAge2": |
-          % if len(children) > 0:
-          % if date_difference(starting=children[0].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children[0].birthdate,ending=today()).years) }
+          % if len(children_of_marriage_minor) > 0:
+          % if date_difference(starting=children_of_marriage_minor[0].birthdate,ending=today()).years > 1:
+          ${ int(date_difference(starting=children_of_marriage_minor[0].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children[0].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage_minor[0].birthdate, ending=today()).describe(specificity='month') }
           % endif
           % endif
       - "pFirstChildFirstName2": |
-          % if len(children) > 0:
-          ${ children[0].name.first }
+          % if len(children_of_marriage_minor) > 0:
+          ${ redact(children_of_marriage_minor[0].name.first) }
           % endif
       - "pFirstChildMiddleName2": |
-          % if len(children) > 0:
-          ${ children[0].name.middle }
+          % if len(children_of_marriage_minor) > 0:
+          ${ redact(children_of_marriage_minor[0].name.middle) }
           % endif
       - "pFirstChildLastName2": |
-          % if len(children) > 0:
-          ${ children[0].name.last }
+          % if len(children_of_marriage_minor) > 0:
+          ${ redact(children_of_marriage_minor[0].name.last) }
           % endif
       - "pFirstChildSuffix2": |
-          % if len(children) > 0:
-          ${ children[0].name.suffix }
+          % if len(children_of_marriage_minor) > 0:
+          ${ redact(children_of_marriage_minor[0].name.suffix) }
           % endif
       - "pSecondChildsAge2": |
-          % if len(children) > 1:
-          % if date_difference(starting=children[1].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children[1].birthdate,ending=today()).years) }
+          % if len(children_of_marriage_minor) > 1:
+          % if date_difference(starting=children_of_marriage_minor[1].birthdate,ending=today()).years > 1:
+          ${ int(date_difference(starting=children_of_marriage_minor[1].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children[1].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage_minor[1].birthdate, ending=today()).describe(specificity='month') }
           % endif
           % endif
       - "pSecondChildFirstName2": |
-          % if len(children) > 1:
-          ${ children[1].name.first }
+          % if len(children_of_marriage_minor) > 1:
+          ${ redact(children_of_marriage_minor[1].name.first) }
           % endif
       - "pSecondChildMiddleName2": |
-          % if len(children) > 1:
-          ${ children[1].name.middle }
+          % if len(children_of_marriage_minor) > 1:
+          ${ redact(children_of_marriage_minor[1].name.middle) }
           % endif
       - "pSecondChildLastName2": |
-          % if len(children) > 1:
-          ${ children[1].name.last }
+          % if len(children_of_marriage_minor) > 1:
+          ${ redact(children_of_marriage_minor[1].name.last) }
           % endif
       - "pSecondChildSuffix2": |
-          % if len(children) > 1:
-          ${ children[1].name.suffix }
+          % if len(children_of_marriage_minor) > 1:
+          ${ redact(children_of_marriage_minor[1].name.suffix) }
           % endif
       - "pThirdChildsAge2": |
-          % if len(children) > 2:
-          % if date_difference(starting=children[2].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children[2].birthdate,ending=today()).years) }
+          % if len(children_of_marriage_minor) > 2:
+          % if date_difference(starting=children_of_marriage_minor[2].birthdate,ending=today()).years > 1:
+          ${ int(date_difference(starting=children_of_marriage_minor[2].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children[2].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage_minor[2].birthdate, ending=today()).describe(specificity='month') }
           % endif
           % endif
       - "pThirdChildFirstName2": |
-          % if len(children) > 2:
-          ${ children[2].name.first }
+          % if len(children_of_marriage_minor) > 2:
+          ${ redact(children_of_marriage_minor[2].name.first) }
           % endif
       - "pThirdChildMiddleName2": |
-          % if len(children) > 2:
-          ${ children[2].name.middle }
+          % if len(children_of_marriage_minor) > 2:
+          ${ redact(children_of_marriage_minor[2].name.middle) }
           % endif
       - "pThirdChildLastName2": |
-          % if len(children) > 2:
-          ${ children[2].name.last }
+          % if len(children_of_marriage_minor) > 2:
+          ${ redact(children_of_marriage_minor[2].name.last) }
           % endif
       - "pThirdChildSuffix2": |
-          % if len(children) > 2:
-          ${ children[2].name.suffix }
+          % if len(children_of_marriage_minor) > 2:
+          ${ redact(children_of_marriage_minor[2].name.suffix) }
           % endif
       - "pFourthChildsAge2": |
-          % if len(children) > 3:
-          % if date_difference(starting=children[3].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children[3].birthdate,ending=today()).years) }
+          % if len(children_of_marriage_minor) > 3:
+          % if date_difference(starting=children_of_marriage_minor[3].birthdate,ending=today()).years > 1:
+          ${ int(date_difference(starting=children_of_marriage_minor[3].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children[3].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage_minor[3].birthdate, ending=today()).describe(specificity='month') }
           % endif
           % endif
       - "pFourthChildFirstName2": |
-          % if len(children) > 3:
-          ${ children[3].name.first }
+          % if len(children_of_marriage_minor) > 3:
+          ${ redact(children_of_marriage_minor[3].name.first) }
           % endif
       - "pFourthChildMiddleName2": |
-          % if len(children) > 3:
-          ${ children[3].name.middle }
+          % if len(children_of_marriage_minor) > 3:
+          ${ redact(children_of_marriage_minor[3].name.middle) }
           % endif
       - "pFourthChildLastName2": |
-          % if len(children) > 3:
-          ${ children[3].name.last }
+          % if len(children_of_marriage_minor) > 3:
+          ${ redact(children_of_marriage_minor[3].name.last) }
           % endif
       - "pFourthChildSuffix2": |
-          % if len(children) > 3:
-          ${ children[3].name.suffix }
+          % if len(children_of_marriage_minor) > 3:
+          ${ redact(children_of_marriage_minor[3].name.suffix) }
           % endif
       - "pFifthChildsAge2": |
-          % if len(children) > 4:
-          % if date_difference(starting=children[4].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children[4].birthdate,ending=today()).years) }
+          % if len(children_of_marriage_minor) > 4:
+          % if date_difference(starting=children_of_marriage_minor[4].birthdate,ending=today()).years > 1:
+          ${ int(date_difference(starting=children_of_marriage_minor[4].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children[4].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage_minor[4].birthdate, ending=today()).describe(specificity='month') }
           % endif
           % endif
       - "pFifthChildFirstName2": |
-          % if len(children) > 4:
-          ${ children[4].name.first }
+          % if len(children_of_marriage_minor) > 4:
+          ${ redact(children_of_marriage_minor[4].name.first) }
           % endif
       - "pFifthChildMiddleName2": |
-          % if len(children) > 4:
-          ${ children[4].name.middle }
+          % if len(children_of_marriage_minor) > 4:
+          ${ redact(children_of_marriage_minor[4].name.middle) }
           % endif
       - "pFifthChildLastName2": |
-          % if len(children) > 4:
-          ${ children[4].name.last }
+          % if len(children_of_marriage_minor) > 4:
+          ${ redact(children_of_marriage_minor[4].name.last) }
           % endif
       - "pFifthChildSuffix2": |
-          % if len(children) > 4:
-          ${ children[4].name.suffix }
+          % if len(children_of_marriage_minor) > 4:
+          ${ redact(children_of_marriage_minor[4].name.suffix) }
           % endif
       - "pSixthChildsAge2": |
-          % if len(children) > 5:
-          % if date_difference(starting=children[5].birthdate,ending=today()).years > 1:
-          ${ "{:.0f}".format(date_difference(starting=children[5].birthdate,ending=today()).years) }
+          % if len(children_of_marriage_minor) > 5:
+          % if date_difference(starting=children_of_marriage_minor[5].birthdate,ending=today()).years > 1:
+          ${ int(date_difference(starting=children_of_marriage_minor[5].birthdate,ending=today()).years) }
           % else:
-          ${ date_difference(starting=children[5].birthdate, ending=today()).describe(specificity='month') }
+          ${ date_difference(starting=children_of_marriage_minor[5].birthdate, ending=today()).describe(specificity='month') }
           % endif
           % endif
       - "pSixthChildFirstName2": |
-          % if len(children) > 5:
-          ${ children[5].name.first }
+          % if len(children_of_marriage_minor) > 5:
+          ${ redact(children_of_marriage_minor[5].name.first) }
           % endif
       - "pSixthChildMiddleName2": |
-          % if len(children) > 5:
-          ${ children[5].name.middle }
+          % if len(children_of_marriage_minor) > 5:
+          ${ redact(children_of_marriage_minor[5].name.middle) }
           % endif
       - "pSixthChildLastName2": |
-          % if len(children) > 5:
-          ${ children[5].name.last }
+          % if len(children_of_marriage_minor) > 5:
+          ${ redact(children_of_marriage_minor[5].name.last) }
           % endif
       - "pSixthChildSuffix2": |
-          % if len(children) > 5:
-          ${ children[5].name.suffix }
+          % if len(children_of_marriage_minor) > 5:
+          ${ redact(children_of_marriage_minor[5].name.suffix) }
           % endif
-      - "pbParentPayRespondent": ${ child_support == "respondent" } 
-      - "pbParentPaidPetitioner": ${ child_support == "respondent" } 
-      - "pbParentPaidRespondent": ${ child_support == "petitioner" } 
-      - "pbParentPayPetitioner": ${ child_support == "petitioner" } 
+      - "pbParentPayRespondent": ${ child_support == respondent.name.full() } 
+      - "pbParentPaidPetitioner": ${ child_support == respondent.name.full() } 
+      - "pbParentPaidRespondent": ${ child_support == petitioner.name.full() } 
+      - "pbParentPayPetitioner": ${ child_support == petitioner.name.full() } 
       - "pbParentPayNone": ${ child_support == "none" } 
       - "pbParentPayingForm14Only": ${ child_support == "none" } 
       - "pbParentPayingForm14Only": ${ } 
@@ -1290,107 +2183,107 @@ attachment:
       - "pbWrkRelatedCarePayPercentage": ${ pay_work_childcare_expenses == "pay_percentage" } 
       - "pbWrkRelatedCarePercent": ${ pay_work_childcare_expenses_percentage } 
       - "pbExtraChildCostsParentPayingSupportAmt1": |
-          % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 0:
-          ${ thousands([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14][0].total(times_per_year = 12), show_decimals=True) }
+          % if len(support_payer.extraordinary_childrearing_costs_in_14) > 0:
+          ${ thousands(support_payer.extraordinary_childrearing_costs_in_14[0].total(times_per_year = 12), show_decimals=True) }
           % endif 
       - "pbExtraChildCostsParentPayingSupportForm141": |
-          % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 0:
-          ${ [included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14][0].description }
+          % if len(support_payer.extraordinary_childrearing_costs_in_14) > 0:
+          ${ support_payer.extraordinary_childrearing_costs_in_14[0].description }
           % endif 
       - "pbExtraChildCostsParentPayingSupportAmt2": |
-          % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 1:
-          ${ thousands([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14][1].total(times_per_year = 12), show_decimals=True) }
+          % if len(support_payer.extraordinary_childrearing_costs_in_14) > 1:
+          ${ thousands(support_payer.extraordinary_childrearing_costs_in_14[1].total(times_per_year = 12), show_decimals=True) }
           % endif 
       - "pbExtraChildCostsParentPayingSupportForm142": |
-          % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 1:
-          ${ [included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14][1].description }
+          % if len(support_payer.extraordinary_childrearing_costs_in_14) > 1:
+          ${ support_payer.extraordinary_childrearing_costs_in_14[1].description }
           % endif 
       - "pbExtraChildCostsParentPayingSupportAmt3": |
-          % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 2:
-          ${ thousands([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14][2].total(times_per_year = 12), show_decimals=True) }
+          % if len(support_payer.extraordinary_childrearing_costs_in_14) > 2:
+          ${ thousands(support_payer.extraordinary_childrearing_costs_in_14[2].total(times_per_year = 12), show_decimals=True) }
           % endif 
       - "pbExtraChildCostsParentPayingSupportForm143": |
-          % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 2:
-          ${ [included_cost for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14][2].description }
+          % if len(support_payer.extraordinary_childrearing_costs_in_14) > 2:
+          ${ support_payer.extraordinary_childrearing_costs_in_14[2].description }
           % endif 
       - "pbExtraChildCostsParentPayingSupportTotalForm14": |
-          ${ thousands(sum([included_cost.total(times_per_year=12) for included_cost in support_payer.extraordinary_childrearing_costs if included_cost.included_in_form_14]), show_decimals=True) }
+          ${ thousands(support_payer.extraordinary_childrearing_costs_in_14.total(times_per_year=12), show_decimals=True) }
       - "pbExtraChildCostsParentReceivingSupportAmt1": |
-          % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 0:
-          ${ thousands([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14][0].total(times_per_year = 12), show_decimals=True) }
+          % if len(support_recipient.extraordinary_childrearing_costs_in_14) > 0:
+          ${ thousands(support_recipient.extraordinary_childrearing_costs_in_14[0].total(times_per_year = 12), show_decimals=True) }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportForm141": |
-          % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 0:
-          ${ [included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14][0].description }
+          % if len(support_recipient.extraordinary_childrearing_costs_in_14) > 0:
+          ${ support_recipient.extraordinary_childrearing_costs_in_14[0].description }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportAmt2": |
-          % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 1:
-          ${ thousands([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14][1].total(times_per_year = 12), show_decimals=True) }
+          % if len(support_recipient.extraordinary_childrearing_costs_in_14) > 1:
+          ${ thousands(support_recipient.extraordinary_childrearing_costs_in_14[1].total(times_per_year = 12), show_decimals=True) }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportForm142": |
-          % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 1:
-          ${ [included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14][1].description }
+          % if len(support_recipient.extraordinary_childrearing_costs_in_14) > 1:
+          ${ support_recipient.extraordinary_childrearing_costs_in_14[1].description }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportAmt3": |
-          % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 2:
-          ${ thousands([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14][2].total(times_per_year = 12), show_decimals=True) }
+          % if len(support_recipient.extraordinary_childrearing_costs_in_14) > 2:
+          ${ thousands(support_recipient.extraordinary_childrearing_costs_in_14[2].total(times_per_year = 12), show_decimals=True) }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportForm143": |
-          % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]) > 2:
-          ${ [included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14][2].description }
+          % if len(support_recipient.extraordinary_childrearing_costs_in_14) > 2:
+          ${ support_recipient.extraordinary_childrearing_costs_in_14[2].description }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportTotalForm14": |
-          ${ thousands(sum([included_cost.total(times_per_year=12) for included_cost in support_recipient.extraordinary_childrearing_costs if included_cost.included_in_form_14]), show_decimals=True) }          
+          ${ thousands(support_recipient.extraordinary_childrearing_costs_in_14.total(times_per_year=12), show_decimals=True) }     
       - "pbExtraChildCostsParentReceivingSupportPaysPercent1": |
-          % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if not included_cost.included_in_form_14]) > 0:
-          ${ "{:.0f}".format([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if not included_cost.included_in_form_14][0].percentage) }
+          % if len(support_payer.extraordinary_childrearing_costs_not_in_14) > 0:
+          ${ "{:.0f}".format(support_payer.extraordinary_childrearing_costs_not_in_14[0].percentage) }
           % endif 
       - "pbExtraChildCostsParentPayingSupportNotForm1": |
-          % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if not included_cost.included_in_form_14]) > 0:
-          ${ [included_cost for included_cost in support_payer.extraordinary_childrearing_costs if not included_cost.included_in_form_14][0].description }
+          % if len(support_payer.extraordinary_childrearing_costs_not_in_14) > 0:
+          ${ support_payer.extraordinary_childrearing_costs_not_in_14[0].description }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportPaysPercent2": |
-          % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if not included_cost.included_in_form_14]) > 1:
-          ${ "{:.0f}".format([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if not included_cost.included_in_form_14][1].percentage) }
+          % if len(support_payer.extraordinary_childrearing_costs_not_in_14) > 1:
+          ${ "{:.0f}".format(support_payer.extraordinary_childrearing_costs_not_in_14[1].percentage) }
           % endif 
       - "pbExtraChildCostsParentPayingSupportNotForm2": |
-          % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if not included_cost.included_in_form_14]) > 1:
-          ${ [included_cost for included_cost in support_payer.extraordinary_childrearing_costs if not included_cost.included_in_form_14][1].description }
+          % if len(support_payer.extraordinary_childrearing_costs_not_in_14) > 1:
+          ${ support_payer.extraordinary_childrearing_costs_not_in_14[1].description }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportPaysPercent3": |
-          % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if not included_cost.included_in_form_14]) > 2:
-          ${ "{:.0f}".format([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if not included_cost.included_in_form_14][2].percentage) }
+          % if len(support_payer.extraordinary_childrearing_costs_not_in_14) > 2:
+          ${ "{:.0f}".format(support_payer.extraordinary_childrearing_costs_not_in_14[2].percentage) }
           % endif 
       - "pbExtraChildCostsParentPayingSupportNotForm3": |
-          % if len([included_cost for included_cost in support_payer.extraordinary_childrearing_costs if not included_cost.included_in_form_14]) > 2:
-          ${ [included_cost for included_cost in support_payer.extraordinary_childrearing_costs if not included_cost.included_in_form_14][2].description }
+          % if len(support_payer.extraordinary_childrearing_costs_not_in_14) > 2:
+          ${ support_payer.extraordinary_childrearing_costs_not_in_14[2].description }
           % endif 
       - "pbExtraChildCostsParentPayingSupportPaysPercent1": |
-          % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if not included_cost.included_in_form_14]) > 0:
-          ${ "{:.0f}".format([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if not included_cost.included_in_form_14][0].percentage) }
+          % if len(support_recipient.extraordinary_childrearing_costs_not_in_14) > 0:
+          ${ "{:.0f}".format(support_recipient.extraordinary_childrearing_costs_not_in_14[0].percentage) }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportNotForm1": |
-          % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if not included_cost.included_in_form_14]) > 0:
-          ${ [included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if not included_cost.included_in_form_14][0].description }
+          % if len(support_recipient.extraordinary_childrearing_costs_not_in_14) > 0:
+          ${ support_recipient.extraordinary_childrearing_costs_not_in_14[0].description }
           % endif 
       - "pbExtraChildCostsParentPayingSupportPaysPercent2": |
-          % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if not included_cost.included_in_form_14]) > 1:
-          ${ "{:.0f}".format([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if not included_cost.included_in_form_14][1].percentage) }
+          % if len(support_recipient.extraordinary_childrearing_costs_not_in_14) > 1:
+          ${ "{:.0f}".format(support_recipient.extraordinary_childrearing_costs_not_in_14[1].percentage) }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportNotForm2": |
-          % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if not included_cost.included_in_form_14]) > 1:
-          ${ [included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if not included_cost.included_in_form_14][1].description }
+          % if len(support_recipient.extraordinary_childrearing_costs_not_in_14) > 1:
+          ${ support_recipient.extraordinary_childrearing_costs_not_in_14[1].description }
           % endif 
       - "pbExtraChildCostsParentPayingSupportPaysPercent3": |
-          % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if not included_cost.included_in_form_14]) > 2:
-          ${ "{:.0f}".format([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if not included_cost.included_in_form_14][2].percentage) }
+          % if len(support_recipient.extraordinary_childrearing_costs_not_in_14) > 2:
+          ${ "{:.0f}".format(support_recipient.extraordinary_childrearing_costs_not_in_14[2].percentage) }
           % endif 
       - "pbExtraChildCostsParentReceivingSupportNotForm3": |
-          % if len([included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if not included_cost.included_in_form_14]) > 2:
-          ${ [included_cost for included_cost in support_recipient.extraordinary_childrearing_costs if not included_cost.included_in_form_14][2].description }
+          % if len(support_recipient.extraordinary_childrearing_costs_not_in_14) > 2:
+          ${ support_recipient.extraordinary_childrearing_costs_not_in_14[2].description }
           % endif 
-      - "pbParentPayingSupportForm14Respondent": ${ child_support in ["petitioner", "none","third_party"] } 
-      - "pbParentPayingSupportForm14Petitioner": ${ child_support in ["respondent"] } 
+      - "pbParentPayingSupportForm14Respondent": ${ child_support in [petitioner.name.full(), "none","third_party"] } 
+      - "pbParentPayingSupportForm14Petitioner": ${ child_support in [respondent.name.full()] } 
       - "pbChildrenNumber": ${ "1" } 
       - "lineOneColOne": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) } 
       - "lineOneColTwo": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) } 
@@ -1452,7 +2345,7 @@ attachment:
       - "pbPresumedSupportOneKid": ${ thousands(support_payer.presumed_child_support_amount_12, show_decimals=True) } 
       - "pbCourtOrderSupportYes": ${ use_presumed_child_support == "yes" } 
       - "pbCourtOrderSupportNo": ${ use_presumed_child_support == "no" } 
-      - "pbPresumedUnjustDueTo": ${ use_presumed_child_support_explanation } 
+      - "pbPresumedUnjustDueTo": ${ parenting_plan_attachment[i].safe_value('use_presumed_child_support_explanation') } 
       - "pbCourtOrderSupportSix": ${ number_of_children > 5 } 
       - "pbCourtOrderSupportSixAmt": ${ thousands(support_payer.presumed_child_support_amount_12_6, show_decimals=True) if use_presumed_child_support == "yes" else thousands(actual_child_support_6, show_decimals=True) } 
       - "pbCourtOrderSupportFiveAmt": ${ thousands(support_payer.presumed_child_support_amount_12_5, show_decimals=True) if use_presumed_child_support == "yes" else thousands(actual_child_support_5, show_decimals=True) }
@@ -1467,83 +2360,83 @@ attachment:
       - "pbCourtOrderSupportOne": ${ number_of_children > 0 } 
       - "pbSupportStartDateJudgment": ${ child_support_start_date == "judgment_date" } 
       - "pbSupportStartDateSpecific": ${ child_support_start_date == "specific_date" } 
-      - "pbSupportStartDateSpecified": ${ child_support_start_date_other_date } 
+      - "pbSupportStartDateSpecified": ${ format_date(child_support_start_date_other_date, format='MM/dd/yyyy') } 
       - "pbTaxDependentsChildOneName": |
-          % if len(children) > 0:
-          ${ children[0].name_full() }
+          % if len(children_of_marriage_minor) > 0:
+          ${ redact(children_of_marriage_minor[0].name_full()) }
           % endif
       - "pbTaxDependentsChildOneOddYears": |
-          % if len(children) > 0:
-          ${ children[0].tax_dependency_odd }
+          % if len(children_of_marriage_minor) > 0:
+          ${ children_of_marriage_minor[0].tax_dependency_odd }
           % endif
       - "pbTaxDependentsChildOneEvenYears": |
-          % if len(children) > 0:
-          ${ children[0].tax_dependency_even }
+          % if len(children_of_marriage_minor) > 0:
+          ${ children_of_marriage_minor[0].tax_dependency_even }
           % endif
       - "pbTaxDependentsChildTwoName": |
-          % if len(children) > 1:
-          ${ children[1].name_full() }
+          % if len(children_of_marriage_minor) > 1:
+          ${ redact(children_of_marriage_minor[1].name_full()) }
           % endif
       - "pbTaxDependentsChildTwoOddYears": |
-          % if len(children) > 1:
-          ${ children[1].tax_dependency_odd }
+          % if len(children_of_marriage_minor) > 1:
+          ${ children_of_marriage_minor[1].tax_dependency_odd }
           % endif
       - "pbTaxDependentsChildTwoEvenYears": |
-          % if len(children) > 1:
-          ${ children[1].tax_dependency_even }
+          % if len(children_of_marriage_minor) > 1:
+          ${ children_of_marriage_minor[1].tax_dependency_even }
           % endif
       - "pbTaxDependentsChildThreeName": |
-          % if len(children) > 2:
-          ${ children[2].name_full() }
+          % if len(children_of_marriage_minor) > 2:
+          ${ redact(children_of_marriage_minor[2].name_full()) }
           % endif
       - "pbTaxDependentsChildThreeEvenYears": |
-          % if len(children) > 2:
-          ${ children[2].tax_dependency_even }
+          % if len(children_of_marriage_minor) > 2:
+          ${ children_of_marriage_minor[2].tax_dependency_even }
           % endif
       - "pbTaxDependentsChildThreeOddYears": |
-          % if len(children) > 2:
-          ${ children[2].tax_dependency_odd }
+          % if len(children_of_marriage_minor) > 2:
+          ${ children_of_marriage_minor[2].tax_dependency_odd }
           % endif
       - "pbTaxDependentsChildFourName": |
-          % if len(children) > 3:
-          ${ children[3].name_full() }
+          % if len(children_of_marriage_minor) > 3:
+          ${ redact(children_of_marriage_minor[3].name_full()) }
           % endif
       - "pbTaxDependentsChildFourOddYears": |
-          % if len(children) > 3:
-          ${ children[3].tax_dependency_odd }
+          % if len(children_of_marriage_minor) > 3:
+          ${ children_of_marriage_minor[3].tax_dependency_odd }
           % endif
       - "pbTaxDependentsChildFourEvenYears": |
-          % if len(children) > 3:
-          ${ children[3].tax_dependency_even }
+          % if len(children_of_marriage_minor) > 3:
+          ${ children_of_marriage_minor[3].tax_dependency_even }
           % endif
       - "pbTaxDependentsChildFiveName": |
-          % if len(children) > 4:
-          ${ children[4].name_full() }
+          % if len(children_of_marriage_minor) > 4:
+          ${ redact(children_of_marriage_minor[4].name_full()) }
           % endif
       - "pbTaxDependentsChildFiveOddYears": |
-          % if len(children) > 4:
-          ${ children[4].tax_dependency_odd }
+          % if len(children_of_marriage_minor) > 4:
+          ${ children_of_marriage_minor[4].tax_dependency_odd }
           % endif
       - "pbTaxDependentsChildFiveEvenYears": |
-          % if len(children) > 4:
-          ${ children[4].tax_dependency_even }
+          % if len(children_of_marriage_minor) > 4:
+          ${ children_of_marriage_minor[4].tax_dependency_even }
           % endif
       - "pbTaxDependentsChildSixName": |
-          % if len(children) > 5:
-          ${ children[5].name_full() }
+          % if len(children_of_marriage_minor) > 5:
+          ${ redact(children_of_marriage_minor[5].name_full()) }
           % endif
       - "pbTaxDependentsChildSixOddYears": |
-          % if len(children) > 5:
-          ${ children[5].tax_dependency_odd }
+          % if len(children_of_marriage_minor) > 5:
+          ${ children_of_marriage_minor[5].tax_dependency_odd }
           % endif
       - "pbTaxDependentsChildSixEvenYears": |
-          % if len(children) > 5:
-          ${ children[5].tax_dependency_even }
+          % if len(children_of_marriage_minor) > 5:
+          ${ children_of_marriage_minor[5].tax_dependency_even }
           % endif
       - "pbMethodChildSupportIncomeWithholding": ${ child_support_method_of_payment == "income_withholding" } 
       - "pbMethodChildSupportAgreementFPSC": ${ child_support_method_of_payment == "no_agreement" and child_support_location_of_payment == "fpsc" } 
       - "pbMethodChildSupportNotInBestInterestFPSC": ${ child_support_method_of_payment == "no_not_in_best_interest" and child_support_location_of_payment == "fpsc" } 
       - "pbMethodChildSupportAgreementDirectPayment": ${ child_support_method_of_payment == "no_agreement" and child_support_location_of_payment == "direct_payment" } 
       - "pbMethodChildSupportNotInBestInterestDirectPayment": ${ child_support_method_of_payment == "no_not_in_best_interest" and child_support_location_of_payment == "direct_payment" } 
-      - "pbAdditionalProvisionsSupport1": ${ additional_provisions } 
+      - "pbAdditionalProvisionsSupport1": ${ parenting_plan_attachment[i].safe_value('additional_provisions_parenting_plan') } 
 ---
