@@ -1454,17 +1454,17 @@ code: |
   parenting_plan_attachment[i].overflow_fields["location_of_exchange_specific_location"].overflow_trigger = 320
   parenting_plan_attachment[i].overflow_fields["location_of_exchange_specific_location"].label = "14. Location of Exchange"
   parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_medical_costs"].overflow_trigger = 3
-  parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_medical_costs"].label = "8. Extraordinary medical costs for " + support_payer.name.full()
+  parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_medical_costs"].label = "8. Extraordinary medical costs for " + (support_payer.name.full() if defined('support_payer.name.first') else "Payer")
   parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_medical_costs"].overflow_trigger = 3
-  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_medical_costs"].label = "8. Extraordinary medical costs for " + support_recipient.name.full() + " Included in Form 14"
+  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_medical_costs"].label = "8. Extraordinary medical costs for " + (support_recipient.name.full() if defined('support_recipient.name.first') else "Recipient") + " Included in Form 14"
   parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_childrearing_costs_in_14"].overflow_trigger = 3
-  parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_childrearing_costs_in_14"].label = "13a. Extraordinary Childcare Costs for " + support_payer.name.full() + " Included in Form 14"
+  parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_childrearing_costs_in_14"].label = "13a. Extraordinary Childcare Costs for " + (support_payer.name.full() if defined('support_payer.name.first') else "Payer") + " Included in Form 14"
   parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_in_14"].overflow_trigger = 3
-  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_in_14"].label = "8. Extraordinary medical costs for " + support_recipient.name.full()
+  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_in_14"].label = "8. Extraordinary medical costs for " + (support_recipient.name.full() if defined('support_recipient.name.first') else "Recipient")
   parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_childrearing_costs_not_in_14"].overflow_trigger = 3
-  parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_childrearing_costs_not_in_14"].label = "13a. Extraordinary Childcare Costs for " + support_payer.name.full() + " Included in Form 14"
+  parenting_plan_attachment[i].overflow_fields["support_payer.extraordinary_childrearing_costs_not_in_14"].label = "13a. Extraordinary Childcare Costs for " + (support_payer.name.full() if defined('support_payer.name.first') else "Payer") + " Included in Form 14"
   parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_not_in_14"].overflow_trigger = 3
-  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_not_in_14"].label = "8. Extraordinary medical costs for " + support_recipient.name.full()
+  parenting_plan_attachment[i].overflow_fields["support_recipient.extraordinary_childrearing_costs_not_in_14"].label = "8. Extraordinary medical costs for " + (support_recipient.name.full() if defined('support_recipient.name.first') else "Recipient")
   parenting_plan_attachment[i].overflow_fields["use_presumed_child_support_explanation"].overflow_trigger = 320
   parenting_plan_attachment[i].overflow_fields["use_presumed_child_support_explanation"].label = "15. Presumed Child Support Explanation"
   parenting_plan_attachment[i].overflow_fields["additional_provisions_parenting_plan"].overflow_trigger = 480
@@ -1477,6 +1477,7 @@ attachment:
   variable name: parenting_plan_attachment[i].addendum
   docx template file: parenting_plan_attachment_addendum.docx
   redact: i == "redacted"
+  skip undefined: True
 ---
 id: Parenting Plan attachment
 attachment:
