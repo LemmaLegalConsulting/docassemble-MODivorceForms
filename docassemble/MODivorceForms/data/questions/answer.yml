@@ -1,13 +1,13 @@
 
 ---
 id: Agree with Parenting Plan
-question: Agree with Parenting Plan
+question: Agree with parenting plan
 fields:
   - Do you agree with the Parenting Plan filed by ${ petitioner }?: agree_with_parenting_plan
     datatype: yesnoradio
 ---
 id: Active Duty and Servicemember Civil Relief Act
-question: Active Duty
+question: Active duty
 subquestion: |
 
   ${ collapse_template(servicemember_template) }

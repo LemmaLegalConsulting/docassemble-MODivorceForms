@@ -1073,7 +1073,7 @@ fields:
     datatype: yesnoradio
 ---
 id: income withholding question
-question: Income Withholding
+question: Income withholding
 fields:
   - Should income withholding be prepared by the person receiving maintenance?: maintenance_income_withholding
     datatype: yesnoradio

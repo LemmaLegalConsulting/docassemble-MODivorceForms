@@ -8,7 +8,7 @@ fields:
     datatype: yesnoradio
 ---
 id: property statement additional provisions
-question: Additional provisions for the Property Statement
+question: Additional provisions for the property statement
 fields:
   - Do you want to include additional provisions in the Statement of Property and Debt and Proposed Separation Agreement?: is_additional_provisions
     datatype: yesnoradio

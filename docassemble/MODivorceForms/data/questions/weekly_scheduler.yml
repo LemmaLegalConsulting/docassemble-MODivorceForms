@@ -35,7 +35,7 @@ code: |
 ---
 reconsider: remaining_days
 id: exchange intro
-question: Schedule for Exchange
+question: Schedule for exchange
 subquestion: |
 fields:
   - "Who should have the child at the start of the schedule?": starting_parent
@@ -201,7 +201,7 @@ validation code: |
 
 reconsider: remaining_days
 id: exchange information other than intro
-question: Schedule for Exchange
+question: Schedule for exchange
 subquestion: |
   ${ exchanges[i].starting_parent }
 fields:
@@ -787,7 +787,7 @@ code: |
 
 ---
 id: biweekly_schedule_review
-question: Weekday and Weekend Exchange Schedule
+question: Weekday and weekend exchange schedule
 subquestion: |
   Enter the parent who is receiving custody and the specified time for each exchange.
 

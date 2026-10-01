@@ -90,7 +90,7 @@ objects:
   - case: Thing
 ---
 id: Your Court Case
-question: Court Case
+question: Court case
 fields: 
   - Has your case already been filed?: case.filed
     datatype: radio
@@ -145,7 +145,7 @@ fields:
 ---
 if: case.filed in ["user0_filed"]
 id: number of previous petitions
-question: Petitions Filed
+question: Petitions filed
 fields:
   - How many petitions have you filed in this case?: previous_petitions
     datatype: integer
@@ -175,7 +175,7 @@ fields:
     datatype: time
 ---
 id: case.name question
-question: Case information - Case Name
+question: Case information - case name
 subquestion: |
 
   ${ collapse_template(case.name_casenet_template) }
@@ -189,7 +189,7 @@ fields:
 continue button field: case.name_asked
 ---
 id: case.division_number
-question: Case information - Division Number
+question: Case information - division number
 subquestion: |
 
    collapse_template(case.division_casenet_template) 
@@ -212,7 +212,7 @@ content: |
   ${ warn_casenet_picture_is_example_template }
 ---
 id: case.description question
-question: Case information - Case Description
+question: Case information - case description
 subquestion: |
 
   ${ collapse_template(case.matter_type_casenet_template) }
@@ -248,7 +248,7 @@ content: |
   ${ warn_casenet_picture_is_example_template }
 ---
 id: case.filing_date question
-question: Case information - Filing date
+question: Case information - filing date
 subquestion: |
 
   ${ collapse_template(case.filing_date_casenet_template) }
@@ -277,7 +277,7 @@ content: |
   ${ warn_casenet_picture_is_example_template }
 ---
 id: case.judge question
-question: Case information - Judge
+question: Case information - judge
 subquestion: |
 
   ${ collapse_template(case.judge_casenet_template) }
@@ -302,7 +302,7 @@ content: |
   ${ warn_casenet_picture_is_example_template }
 ---
 id: case.docket_number question
-question: Case information - Case number
+question: Case information - case number
 subquestion: |
 
   ${ collapse_template(case.docket_number_casenet_template) }
@@ -822,7 +822,7 @@ sets:
   - x.attorney.name.first
 id: attorney information
 generic object: ALIndividual
-question: Attorney Information for ${ x }
+question: Attorney information for ${ x }
 subquestion: |
 
   ${ collapse_template(attorney_casenet_template) }
@@ -949,7 +949,7 @@ code: |
   children_list_create = True
 ---
 id: are there children
-question: Children of the Marriage
+question: Children of the marriage
 subquestion: |
   Are there living children who were 
   
@@ -1479,7 +1479,7 @@ reconsider: people_choices
 sets:
  - legal_custody_other.name.first
 if: legal_custody == "Third Party"
-question: Sole Legal Custody to Third Party
+question: Sole legal custody to third party
 fields:
   - Existing person: legal_custody_other
     datatype: object
@@ -1493,7 +1493,7 @@ objects:
   - legal_custody_other: ALIndividual
 ---
 id: legal_custody question
-question: Legal Custody
+question: Legal custody
 subquestion: |
   Legal custody refers to decision-making authority related to health, education, and general welfare of the children.
 fields:
@@ -1522,7 +1522,7 @@ fields:
     datatype: area
 ---
 id: physical_custody question
-question: Physical Custody
+question: Physical custody
 subquestion: |
   Physical custody refers to the time spent with each parent.
 fields:
@@ -1582,7 +1582,7 @@ if: physical_custody == "Third Party"
 reconsider: people_choices
 sets:
   - physical_custody_other.name.first
-question: Sole physical Custody to Third Party
+question: Sole physical custody to third party
 fields:
   - Existing person: physical_custody_other
     datatype: object
@@ -1858,7 +1858,7 @@ objects:
 id: Child Support Award
 reconsider: child_support_choices
 question: |
-  Child Support Award
+  Child support award
 fields:
   - Who are you asking the court to award child support to?: child_support
     datatype: radio
@@ -1910,7 +1910,7 @@ objects:
 ---
 id: are there any extraordinary medical costs
 generic object: ALIndividual
-question: Extraordinary Medical Costs to be paid by ${ x.name_full() }
+question: Extraordinary medical costs to be paid by ${ x.name_full() }
 subquestion: |
   Extraordinary medical costs are predictable and recurring expenses for things like: ongoing dental treatment, orthodontic treatment, asthma treatment, and physical therapy.
 
@@ -1952,7 +1952,7 @@ fields:
 ---
 id: extraordinary medical costs
 generic object: ALIndividual
-question: Extraordinary Medical Costs to be paid by ${ x.name_full() }
+question: Extraordinary medical costs to be paid by ${ x.name_full() }
 subquestion: |
   % if x.spouse.extraordinary_medical_costs.has_been_gathered() and len(x.spouse.extraordinary_medical_costs) > 0:
   You have already told us about ${ x.spouse } paying the following extraordinary medical costs: ${ comma_and_list([cost.description for cost in x.spouse.extraordinary_medical_costs.complete_elements()]) }
@@ -1998,7 +1998,7 @@ objects:
 ---
 id: extraordinary child-rearing costs there are any
 generic object: ALIndividual
-question: Extraordinary child-rearing Costs to be paid by ${ x.name_full() }
+question: Extraordinary child-rearing costs to be paid by ${ x.name_full() }
 subquestion: |
   Extraordinary child-rearing costs can include things like school tuition, lessons, or extracurricular activities.
 
@@ -2052,7 +2052,7 @@ reconsider:
   - x.extraordinary_childrearing_costs_in_14.gathered
 id: extraordinary child-rearing costs is there another
 generic object: ALIndividual
-question: Extraordinary Child-rearing Costs to be paid by ${ x.name_full() }
+question: Extraordinary child-rearing costs to be paid by ${ x.name_full() }
 subquestion: |
   Extraordinary child-rearing costs can include things like school tuition, lessons, or extracurricular activities.
   
@@ -2144,7 +2144,7 @@ fields:
 ---
 id: Child Care Expenses Responsibility
 question: |
-  Child Care Expenses
+  Child care expenses
 fields:
   - "How should work-related childcare expenses be handled?": pay_work_childcare_expenses
     datatype: radio
@@ -2173,7 +2173,7 @@ data:
 ---
 id: Work related childcare costs
 generic object: ALIndividual
-question: Work-Related Child Care Costs for ${ x.name_full() }
+question: Work-related child care costs for ${ x.name_full() }
 subquestion: |
   % if x.spouse and defined('x.spouse.work_childcare_expenses'):
   You have already told us ${ x.spouse } pays $${ thousands(x.spouse.work_childcare_expenses)} for work-related child care expenses.
@@ -2202,7 +2202,7 @@ code: |
   x.work_childcare_expenses = 0
 ---
 id: medical insurance responsibility
-question: Parent Responsible for Medical Insurance
+question: Parent responsible for medical insurance
 fields:
   - Who should maintain and pay the cost of medical insurance for the benefit of the children?: medical_insurance
     datatype: radio
@@ -2213,7 +2213,7 @@ fields:
                       
 ---
 id: dental insurance responsibility
-question: Parent Responsible for Dental Insurance
+question: Parent responsible for dental insurance
 fields:
   - Who should maintain and pay the cost of dental insurance for the benefit of the children?: dental_insurance
     datatype: radio
@@ -2225,7 +2225,7 @@ fields:
 ---
 id: health insurance costs
 generic object: ALIndividual
-question: Children Health Insurance Costs for ${ x.name_full() }
+question: Children health insurance costs for ${ x.name_full() }
 subquestion: |
   Health insurance for the children is determined by dividing the amount paid for insurance each month by the number of people covered.  Multiply that amount by the number of children covered.
 
@@ -2249,7 +2249,7 @@ code:
 ## MARRIAGE ##
 id: Marriage questions
 question: |
-  Information about Your Marriage
+  Information about your marriage
 fields:
   - "Where did you get your marriage license?": marriage.address.city
     maxlength: 36
@@ -2293,7 +2293,7 @@ fields:
 ## ASSETS ##
 
 id: cash
-question: Cash on Hand
+question: Cash on hand
 fields:
   - How much cash do you have on hand?: users[0].cash
     datatype: currency
@@ -3075,7 +3075,7 @@ code: |
 ---
 id: personal_goods selected values for there are any
 question: |
-  Personal Possessions
+  Personal possessions
 subquestion: |   
   Do you or your spouse own any personal possessions?
 
@@ -4327,7 +4327,7 @@ code: |
 ---
 id: debts there are any
 question: |
-  Other Debts
+  Other debts
 subquestion: |   
   You have already entered information about these debts. 
   
@@ -4497,7 +4497,7 @@ code: |
 ---
 reconsider: joint_debts.gathered
 id: joint_debts review 
-question: All Debts
+question: All debts
 subquestion: |
 
   Tap Next if you don't have more to add.
@@ -4513,7 +4513,7 @@ continue button field:  joint_debts.review_items
 ---
 only sets: users[0].has_self_employment_income
 id: user self employment income
-question: Self Employment Income 
+question: Self-employment income 
 fields: 
   - Do you have any self employment income?: users[0].has_self_employment_income
     datatype: yesnoradio
@@ -4527,7 +4527,7 @@ validation code: |
 ---
 only sets: other_parties[0].has_self_employment_income
 id: other party self employment income
-question: Self Employment Income 
+question: Self-employment income 
 fields: 
   - Does ${ other_parties[0].name_full() } have any self employment income?: other_parties[0].has_self_employment_income
     datatype: yesnomaybe
@@ -5772,7 +5772,7 @@ code: |
 ## MAINTENANCE ##
 ---
 id: Income Withholding
-question: Income Withholding
+question: Income withholding
 subquestion: |
   ${ prog_disclose(maintenance_template) }
   
@@ -6188,7 +6188,7 @@ review:
   button: |
     **Communication between parents**
 
-    Communication methods: ${ showifdef('communications') }
+    Communication methods: ${ checkbox_labels('communications', communications) if defined('communications') else '' }
 - Edit: communications_other
   button: |
     **Third Person for Party Communication**
@@ -6468,11 +6468,11 @@ review:
   button: |
     **Parent Responsible for Medical Insurance**
 
-    Who should maintain and pay the cost of medical insurance for the benefit of the children?: ${ showifdef('medical_insurance') }
+    Who should maintain and pay the cost of medical insurance for the benefit of the children?: ${ choice_label('medical_insurance', showifdef('medical_insurance')) }
 
     **Parent Responsible for Dental Insurance**
 
-    Who should maintain and pay the cost of dental insurance for the benefit of the children?: ${ showifdef('dental_insurance') }
+    Who should maintain and pay the cost of dental insurance for the benefit of the children?: ${ choice_label('dental_insurance', showifdef('dental_insurance')) }
 
     Health insurance costs for ${ users[0] }: **${ users[0].health_insurance_costs }**
     
@@ -6481,7 +6481,7 @@ review:
   button: |
     **Health Expenses Not Covered by Insurance**
 
-    Who should pay health expenses not covered by insurance?: ${ showifdef('health_expenses_not_covered') }
+    Who should pay health expenses not covered by insurance?: ${ choice_label('health_expenses_not_covered', showifdef('health_expenses_not_covered')) }
 
     Should that other parent reimburse for a percentage of thse expenses?: ${ word(yesno(health_expenses_not_covered_reimburse)) }
 
@@ -6514,7 +6514,7 @@ review:
     
     Work-related childcare expenses for ${ other_parties[0] }: **$${ thousands(other_parties[0].work_childcare_expenses) }**
 
-    How should work-related childcare expenses be handled?: ${ showifdef('pay_work_childcare_expenses') }
+    How should work-related childcare expenses be handled?: ${ choice_label('pay_work_childcare_expenses', showifdef('pay_work_childcare_expenses')) }
 
     % if showifdef('pay_work_childcare_expenses') == "pay_percentage":
     What percentage of ${ possessify(support_recipient.name_full(), 'childcare costs') }should ${ support_payer.name_full() } reimburse?: ${ showifdef('pay_work_childcare_expenses_percentage') }
@@ -6714,7 +6714,7 @@ review:
     % endif
      - One child - ${ currency(support_payer.presumed_child_support_amount_12 if support_payer.presumed_child_support_amount_12 > 0 else 0 ) }
     
-    Should the court order this amount in monthly child support?: **${ showifdef('use_presumed_child_support') }**
+    Should the court order this amount in monthly child support?: **${ choice_label('use_presumed_child_support', showifdef('use_presumed_child_support')) }**
 
     % if showifdef('use_presumed_child_support') == "no":
     Why is the presumed child support amount unjust and inappropriate?: ${ showifdef('use_presumed_child_support_explanation') }
@@ -6743,7 +6743,7 @@ review:
   button: |
     **Child support starting date**
 
-    When should the child support start?: ${ showifdef('child_support_start_date') }
+    When should the child support start?: ${ choice_label('child_support_start_date', showifdef('child_support_start_date')) }
 
     % if showifdef('child_support_start_date') == "specific_date":
     Date: ${ showifdef('child_support_start_date_other_date') }
@@ -6752,9 +6752,9 @@ review:
   button: |
     **Method of payment of Child Support**
 
-    How should child support be paid?: ${ showifdef('child_support_method_of_payment') }
+    How should child support be paid?: ${ choice_label('child_support_method_of_payment', showifdef('child_support_method_of_payment')) }
 
-    Should child support be paid at the Family Support Payment Center or directly to ${ support_recipient.name_full() }: ${ showifdef('child_support_location_of_payment') }
+    Should child support be paid at the Family Support Payment Center or directly to ${ support_recipient.name_full() }: ${ choice_label('child_support_location_of_payment', showifdef('child_support_location_of_payment')) }
 - note: |
     **Income Tax Dependents**
 
@@ -7731,7 +7731,7 @@ review:
     ${ end_accordion() }
 ---
 id: parenting plan review
-question: Review the Parenting Plan
+question: Review the parenting plan
     
 review:
   - raw html: |
@@ -7767,7 +7767,7 @@ review:
     button: |
       **Communication between parents**
 
-      Communication methods: ${ showifdef('communications') }
+      Communication methods: ${ checkbox_labels('communications', communications) if defined('communications') else '' }
   - Edit: communications_other
     button: |
       **Communication**
@@ -7929,17 +7929,17 @@ review:
     button: |
       **Parent Responsible for Medical Insurance**
 
-      Who should maintain and pay the cost of medical insurance for the benefit of the children?: ${ showifdef('medical_insurance') }
+      Who should maintain and pay the cost of medical insurance for the benefit of the children?: ${ choice_label('medical_insurance', showifdef('medical_insurance')) }
   - Edit: dental_insurance
     button: |
       **Parent Responsible for Dental Insurance**
 
-      Who should maintain and pay the cost of dental insurance for the benefit of the children?: ${ showifdef('dental_insurance') }
+      Who should maintain and pay the cost of dental insurance for the benefit of the children?: ${ choice_label('dental_insurance', showifdef('dental_insurance')) }
   - Edit: health_expenses_not_covered
     button: |
       **Health Expenses Not Covered by Insurance**
 
-      Who should pay health expenses not covered by insurance?: ${ showifdef('health_expenses_not_covered') }
+      Who should pay health expenses not covered by insurance?: ${ choice_label('health_expenses_not_covered', showifdef('health_expenses_not_covered')) }
 
       Should that other parent reimburse for a percentage of thse expenses?: ${ word(yesno(health_expenses_not_covered_reimburse)) }
 
@@ -7950,7 +7950,7 @@ review:
     button: |
       **Child Care Expenses**
 
-      How should work-related childcare expenses be handled?: ${ showifdef('pay_work_childcare_expenses') }
+      How should work-related childcare expenses be handled?: ${ choice_label('pay_work_childcare_expenses', showifdef('pay_work_childcare_expenses')) }
 
       % if showifdef('pay_work_childcare_expenses') == "pay_percentage":
       What percentage of ${ possessify(support_recipient.name_full(), 'childcare costs') }should ${ support_payer.name_full() } reimburse?: ${ showifdef('pay_work_childcare_expenses_percentage') }
@@ -7965,7 +7965,7 @@ review:
     button: |
       **Presumed Child Support amount**
 
-      Should the court order this amount in monthly child support?: ${ showifdef('use_presumed_child_support') }
+      Should the court order this amount in monthly child support?: ${ choice_label('use_presumed_child_support', showifdef('use_presumed_child_support')) }
 
       % if showifdef('use_presumed_child_support') == "no":
       Why is the presumed child support amount unjust and inappropriate?: ${ showifdef('use_presumed_child_support_explanation') }
@@ -7974,7 +7974,7 @@ review:
     button: |
       **Child support starting date**
 
-      When should the child support start?: ${ showifdef('child_support_start_date') }
+      When should the child support start?: ${ choice_label('child_support_start_date', showifdef('child_support_start_date')) }
 
       % if showifdef('child_support_start_date') == "specific_date":
       Date: ${ showifdef('child_support_start_date_other_date') }
@@ -7983,9 +7983,9 @@ review:
     button: |
       **Method of payment of Child Support**
 
-      How should child support be paid?: ${ showifdef('child_support_method_of_payment') }
+      How should child support be paid?: ${ choice_label('child_support_method_of_payment', showifdef('child_support_method_of_payment')) }
 
-      Should child support be paid at the Family Support Payment Center or directly to ${ support_recipient.name_full() }: ${ showifdef('child_support_location_of_payment') }
+      Should child support be paid at the Family Support Payment Center or directly to ${ support_recipient.name_full() }: ${ choice_label('child_support_location_of_payment', showifdef('child_support_location_of_payment')) }
   - Edit: tax_deductions
     button: |
       **Tax Deductions for ${ children[i].name_full() }**
@@ -8131,7 +8131,7 @@ content: |
     % endif
 ---
 id: parenting plan additional provisions review
-question: Review the Parenting Plan Statement
+question: Review the parenting plan statement
 subquestion: |
   % if 'parenting_plan_attachment' in doc_list_selected.true_values():
 
@@ -8315,47 +8315,47 @@ content: |
 template: pp_support_review_template
 content: |
   % if defined('medical_insurance'):
-  Medical insurance paid by: ${ medical_insurance }
+  Medical insurance paid by: ${ choice_label('medical_insurance', medical_insurance) }
 
   % endif
   % if defined('dental_insurance'):
-  Dental insurance paid by: ${ dental_insurance }
+  Dental insurance paid by: ${ choice_label('dental_insurance', dental_insurance) }
 
   % endif
   % if defined('health_expenses_not_covered'):
-  Health expenses not covered by insurance paid by: ${ health_expenses_not_covered }
+  Health expenses not covered by insurance paid by: ${ choice_label('health_expenses_not_covered', health_expenses_not_covered) }
   % if defined('health_expenses_not_covered_reimburse') and health_expenses_not_covered_reimburse and defined('health_expenses_not_covered_reimburse_percentage'):
   (other parent reimburses ${ health_expenses_not_covered_reimburse_percentage }%)
   % endif
 
   % endif
   % if defined('pay_work_childcare_expenses'):
-  Work-related child care expenses: ${ pay_work_childcare_expenses }
+  Work-related child care expenses: ${ choice_label('pay_work_childcare_expenses', pay_work_childcare_expenses) }
   % if pay_work_childcare_expenses == "pay_percentage" and defined('pay_work_childcare_expenses_percentage'):
   (percentage reimbursed: ${ pay_work_childcare_expenses_percentage }%)
   % endif
 
   % endif
   % if defined('use_presumed_child_support'):
-  Court orders the presumed child support amount: ${ use_presumed_child_support }
+  Court orders the presumed child support amount: ${ choice_label('use_presumed_child_support', use_presumed_child_support) }
   % if use_presumed_child_support == "no" and defined('use_presumed_child_support_explanation'):
   Why it is unjust or inappropriate: ${ use_presumed_child_support_explanation }
   % endif
 
   % endif
   % if defined('child_support_start_date'):
-  Child support starts: ${ child_support_start_date }
+  Child support starts: ${ choice_label('child_support_start_date', child_support_start_date) }
   % if child_support_start_date == "specific_date" and defined('child_support_start_date_other_date'):
   (${ child_support_start_date_other_date })
   % endif
 
   % endif
   % if defined('child_support_method_of_payment'):
-  Method of payment: ${ child_support_method_of_payment }
+  Method of payment: ${ choice_label('child_support_method_of_payment', child_support_method_of_payment) }
 
   % endif
   % if defined('child_support_location_of_payment'):
-  Payment location: ${ child_support_location_of_payment }
+  Payment location: ${ choice_label('child_support_location_of_payment', child_support_location_of_payment) }
 
   % endif
 ---
@@ -8370,7 +8370,7 @@ comment: |
     ${ property_statement_bundle._preview_file }
   and restore the generate_preview_task wait in main.yml.
 id: property statement review 
-question: Review the Property Statement
+question: Review the property statement
 subquestion: |
   % if 'property_statement_attachment' in doc_list_selected.true_values():
   

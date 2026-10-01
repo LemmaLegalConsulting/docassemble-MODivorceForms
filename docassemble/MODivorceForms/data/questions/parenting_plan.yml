@@ -36,7 +36,7 @@ objects:
   - communications_other: ALIndividual
 ---
 id: dispute resolution question
-question: Dispute Resolution Procedure
+question: Dispute resolution procedure
 subquestion: |
   After your case has gone through the complete court process and you have your judgment, there may still be some things that you and your coparent disagree on later. When that happens, parents are usually encouraged to go to mediation to resolve their disagreements regarding the children. Mediated agreements are non-binding, meaning you do not have to follow them if you or your coparent choose not to. 
 
@@ -130,7 +130,7 @@ fields:
       parenting_plan_B_author_other.name_fields()
 ---
 id: Vacation
-question: Vacation Schedule
+question: Vacation schedule
 subquestion: |
   You can set aside a number of weeks each year during which one parent will have exclusive physical custody of the children and the regular schedules do not apply. However, during this period, the Holiday Schedule still applies. Petitioner shall have first choice of weeks in odd-numbered years. Respondent will have first choice of weeks in even-numbered years. The parent with the first choice of weeks must designate the vacation weeks by March 31 of each year. The parent with the second choice of weeks must designate the weeks by April 15 of each year
 fields:
@@ -212,7 +212,7 @@ validation code: |
      default_exchange_time2 = None
 ---
 id: telephone contact
-question: Telephone Contact with Children
+question: Telephone contact with children
 fields:
   - Are there restrictions on the time to contact children?:  phone_contact
     datatype: yesnoradio
@@ -237,7 +237,7 @@ fields:
     show if: phone_contact
 ---
 id: Domestic Violence
-question: Domestic Violence
+question: Domestic violence
 fields:
   - Has there been a pattern of domestic violence between the parents?: domestic_violence
     datatype: yesnoradio
@@ -256,7 +256,7 @@ fields:
     
 ---
 id: Health Expenses Not Covered by Insurance
-question: Health Expenses Not Covered by Insurance
+question: Health expenses not covered by insurance
 fields:
   - Who should pay health expenses not covered by insurance?: health_expenses_not_covered
     choices:
@@ -278,7 +278,7 @@ fields:
 reconsider: 
   - actual_child_support
 id: use presumed child support
-question:  Presumed Child Support amount
+question:  Presumed child support amount
 subquestion: |
   Based on the information you provided, it looks like  ${ support_payer.name_full() } should pay the following in child support.  
 
@@ -353,7 +353,7 @@ fields:
       is: specific_date
 ---
 id: child support method of payment
-question: Method of payment of Child Support
+question: Method of payment of child support
 fields:
   - How should child support be paid?: child_support_method_of_payment
     datatype: radio
@@ -370,7 +370,7 @@ fields:
       val('child_support_method_of_payment') == "no_agreement" || val('child_support_method_of_payment') == "no_not_in_best_interest"
 ---
 id: tax deduction info for child
-question:  Tax Deductions for ${ children[i].name_full() }
+question:  Tax deductions for ${ children[i].name_full() }
 fields:
   - Who should be allowed to claim ${ children[i].name_full() } as a tax deduction in even years?: children[i].tax_dependency_even
     datatype: radio
@@ -816,7 +816,7 @@ edit:
 only sets: holidays_review
 id: holiday review if not holidays_default
 if: not holidays_default
-question: Holiday Exchange Schedule
+question: Holiday exchange schedule
 continue button field: holidays_review
 fields:
   - note: |
@@ -1125,7 +1125,7 @@ code: |
 only sets: holidays_review
 id: holidays_review if holidays_default
 if: holidays_default
-question: Holiday Exchange Schedule
+question: Holiday exchange schedule
 continue button field: holidays_review
 fields:
   - note: |

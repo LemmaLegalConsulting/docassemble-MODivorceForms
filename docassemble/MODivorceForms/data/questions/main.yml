@@ -686,7 +686,7 @@ data:
 
 id: basic questions intro screen
 question: |
-  MO Divorce Help
+  MO divorce help
 subquestion: |
   % if form_approved_for_email_filing:
   MO Divorce Help can help you complete and file court forms in 3 steps:
@@ -731,7 +731,7 @@ validation code: |
     validation_error("You must accept the terms of use to continue.", field="acknowledged_information_use")
 ---
 id: Welcome
-question: Missouri Divorce Forms
+question: Missouri divorce forms
 fields:
   - What issue are you looking for help with?:  case_type
     datatype: radio
@@ -758,7 +758,7 @@ fields:
 ---
 id: child custody kickout
 event: custody_exit
-question: Child Custody
+question: Child custody
 subquestion: |
   Unfortunately, this system is unable to address custody issues at this time.  Click the link below to find legal help better suited to your situation.
 
@@ -766,7 +766,7 @@ subquestion: |
 ---
 id: legal separation kickout
 event: legal_separation_exit
-question: Legal Separation
+question: Legal separation
 subquestion: |
   Unfortunately, this tool only helps with divorce. If you believe it is possible that you and your spouse may reconcile and want to legally separate, you should seek advice on legal separation from a Missouri licensed attorney. 
   
@@ -822,7 +822,7 @@ subquestion: |
   Missouri law requires that at least one party in the divorce live in Missouri for at least 90 days before filing divorce.  Since neither you nor your spouse has lived in Missouri for 90 days and you do not agree to the divorce in Missouri, you should find a lawyer to help you.
 ---
 id: third party custody warning
-question: Third Party Custody
+question: Third party custody
 subquestion: |
   Third-party custody is a unique situation. We won't be able to help you fill out the court-required parenting plan, but we can help with everything else! At the end, we will provide you with all the necessary documents and a blank parenting plan for you to complete prior to filing with the court.
 continue button field: third_party_custody_warning
@@ -919,7 +919,7 @@ validation code: |
 ---
 id: separation date
 question: |
-  Residence of Marriage
+  Residence of marriage
 fields:
   - "Did you and your spouse live together in Missouri?": marriage.live_together_in_mo
     datatype: yesnoradio
@@ -1105,34 +1105,34 @@ continue button field: active_duty_warning
 ---
 event: child_outside_marriage_exit
 id: Child Born Outside of Marriage
-question: Children Born Outside of Marriage
+question: Children born outside of marriage
 subquestion: |
   Missouri law automatically assumes that the husband is the father of the child unless a separate case is filed establishing paternity of the biological father and non-paternity of the husband, even if the biological father is the one on the birth certificate.  It would be in your best interest to find an attorney.  
   
   [Missouri Supreme Court Website](https://www.courts.mo.gov/page.jsp?id=611)
 ---
 id: Children Born Before Marriage
-question: Children Born Before Marriage
+question: Children born before marriage
 subquestion: |
   Sometimes when a child is born to two people before they get married, the court will require a separate case to establish paternity (even if everybody agrees).  However, most courts will move forward with just the divorce, assuming that paternity is acknowledged through the marriage.  For now, we'll move forward with the understanding that the paternity has been acknowledged.  However, a judge may direct you to file something else or speak to an attorney.
 continue button field: 
   minor_children_before_marriage_information
 ---
 id: Presumption of Custody
-question: Presumption of 50/50 Custody
+question: Presumption of 50/50 custody
 subquestion: |
   RSMo 452.375 & 454.1005 Video
     [YOUTUBE V82Yvl2aENg]
 continue button field: presumption_video
 ---
 id: Other Allegations
-question: Other Allegations
+question: Other allegations
 fields:
   - If there are any other statements you wish to include in your Petition, you should enter them here: other_allegations
     datatype: area
 ---
 id: Assets warning screen
-question: Assets Warning
+question: Assets warning
 subquestion: |
   It looks like you some pretty significant assets! It is important to know your rights and the best way to divide some of these bigger assets.  You may consider speaking with an attorney if these assets need to be divided.
 continue button field: assets_warning
@@ -1152,7 +1152,7 @@ continue button field: served_information
 
 ---
 id: Publication Service Information Screen
-question: Service by Publication
+question: Service by publication
 subquestion: |
   If attempts to serve your spouse in person have failed, you can file a request to serve them by publication.
   
@@ -1164,7 +1164,7 @@ subquestion: |
 continue button field: service_by_publication_information
 ---
 id: Personal Service Information Screen
-question:  In Person Service
+question:  In person service
 subquestion: |
 
   
@@ -1214,7 +1214,7 @@ subquestion: |
 continue button field: filing_pleadings_video
 ---
 id: Final Page
-question: Final Page
+question: Final page
 subquestion: |
 
 ---

@@ -1,6 +1,6 @@
 ---
 id: Court Appearance
-question: Court Appearance
+question: Court appearance
 generic object: ALIndividual
 fields:
   - ${ x } will make an appearance: x.appears
@@ -22,7 +22,7 @@ objects:
   - third_party: ALIndividual
 ---
 id: third party court appearance
-question: Third Party
+question: Third party
 fields:
   - Another person will make an appearance: third_party_appears
     datatype: yesnoradio
@@ -41,7 +41,7 @@ fields:
     show if: third_party_appears
 ---
 id: personal_jurisdiction
-question: Personal Juridisdiction
+question: Personal jurisdiction
 subquestion: |
   % if personal_jurisdiction_over_respondent_default:
   It appears that there is personal jurisdiction over ${ respondent } because ${ respondent } has been a resident of Missouri for at least 90 days.
@@ -81,7 +81,7 @@ fields:
     show if: child_support_jurisdiction
 ---
 id: attorney fees
-question: Attorney's Fees
+question: Attorney's fees
 fields:
   - Who should be awarded attorney's fees from the other party?: attorney_fees
     datatype: radio
@@ -101,7 +101,7 @@ fields:
       is: petitioner
 ---
 id: court costs
-question: Court Costs
+question: Court costs
 fields:
   - Should court costs be waived?: court_costs
     datatype: yesnoradio
@@ -146,7 +146,7 @@ fields:
     datatype: yesnoradio
 ---
 id: separation_agreement
-question: Separation Agreement
+question: Separation agreement
 fields:
   - Have the parties entered into a separation agreement for marital and non-marital property and debt: separation_agreement
     datatype: yesnoradio
