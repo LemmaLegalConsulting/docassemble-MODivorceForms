@@ -95,9 +95,9 @@ code: |
   section_expenses
   section_assets
   section_debts
-  if showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
+  if (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party") or showifdef('doc_list_selected["form_14_attachment"]'):
     form_14_calculations
-  if showifdef('doc_list_selected["parenting_plan_attachment"]'):
+  if any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party":
     use_presumed_child_support
   section_service
   al_court_bundle
@@ -298,7 +298,7 @@ code: |
 
     if legal_custody != "Third Party" and physical_custody in [petitioner.name.full(), respondent.name.full()] and visitation:
       visitation_supervisor.name.first
-    elif legal_custody != "Third Party":
+    if physical_custody == "Third Party":
       third_party_custody_warning
       physical_custody_other.name.first
 
@@ -306,30 +306,29 @@ code: |
     relief['child_support']
   
   
-  if minor_children and (showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]')):
+  if minor_children and (any(key in doc_list_selected.true_values() for key in ["answer_attachment", "certificate_of_dissolution_attachment",  "confidential_information_sheet_attachment", "petition_attachment", "income_statement_attachment","form_14_attachment", "judgment_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party")):
     if child_support != "none": # certificate_of_dissolution
       child_support_method_of_payment
       child_support_start_date
     nav.set_section("children")
 
-  if showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]'): 
+  if any(key in doc_list_selected.true_values() for key in ["answer_attachment", "certificate_of_dissolution_attachment",  "confidential_information_sheet_attachment", "petition_attachment", "income_statement_attachment", "judgment_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party"):
     children.gather()
   children_list_create
   number_of_children
-  if showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
+  if any(key in doc_list_selected.true_values() for key in ["fee_waiver_attachment",  "petition_attachment", "income_statement_attachment", "form_14_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party"):
     users[0].other_children
     other_parties[0].other_children
 
-  if minor_children and (showifdef('doc_list_selected["answer_attachment"]') or showifdef('doc_list_selected["certificate_of_dissolution_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["judgment_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]')):
-    if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]'):
-      persons_lived_with_preload # petition
-      persons_lived_with.gather()
+  if minor_children and any(key in doc_list_selected.true_values() for key in ["answer_attachment", "petition_attachment"]):
+    persons_lived_with_preload # petition
+    persons_lived_with.gather()
     
 
   if minor_children and "answer_attachment" in doc_list_selected.true_values():
     agree_with_parenting_plan
   
-  if minor_children and (showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]')) and legal_custody != "Third Party" and physical_custody != "Third Party":
+  if minor_children and showifdef('doc_list_selected["parenting_plan_attachment"]') and legal_custody != "Third Party" and physical_custody != "Third Party":
     if parenting_plan_A_author["Other"]:
       parenting_plan_A_author_other.name.first
     if communications["third_party"]:
@@ -370,7 +369,7 @@ code: |
     dental_insurance
     health_expenses_not_covered
   
-  if minor_children and (showifdef('doc_list_selected["form_14_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]')):
+  if minor_children and (any(key in doc_list_selected.true_values() for key in ["form_14_attachment", "income_statement_attachment"]) or (any(key in doc_list_selected.true_values() for key in [ "parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party")):
     users[0].health_insurance_costs
     users[0].work_childcare_expenses
     users[0].extraordinary_medical_costs.gather()
@@ -385,8 +384,6 @@ code: |
     denials_exist
 
   if minor_children and (showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]')):
-  #    # if others_with_physical_custody or other_custody_proceeding or other_litigation or abuse_or_neglect: # form_17
-  #      related_case_explanation
     additional_children_information
     if abuse_or_neglect or other_custody_proceeding or other_litigation or others_with_physical_custody:
       children_explanation
@@ -395,7 +392,7 @@ code: |
 ---
 code: |    
   nav.set_section('income')
-  if showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
+  if any(key in doc_list_selected.true_values() for key in ["fee_waiver_attachment",  "petition_attachment", "income_statement_attachment","form_14_attachment", "judgment_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party"):
     users[0].jobs.gather() # income_statement.yml, fee_waiver, form_17
     if users[0].jobs.there_are_any or users[0].has_self_employment_income: # form_17
       users[0].employer.name.text
@@ -443,7 +440,9 @@ code: |
     users[0].expenses.gather()
     if len(users[0].expenses) > 0:
       users[0].expenses.review_items
-  if showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
+
+  if any(key in doc_list_selected.true_values() for key in ["fee_waiver_attachment",  "income_statement_attachment","form_14_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party"):
+  
     users[0].maintenance_other_paid
     users[0].other_child_support_paid
     users[0].health_insurance_costs
@@ -454,7 +453,7 @@ code: |
     other_parties[0].expenses.gather()
     if len(other_parties[0].expenses) > 0:
       other_parties[0].expenses.review_items
-  if showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
+  if any(key in doc_list_selected.true_values() for key in [  "income_statement_attachment","form_14_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party"):  
     other_parties[0].maintenance_other_paid
     other_parties[0].other_child_support_paid
     other_parties[0].health_insurance_costs
@@ -571,7 +570,7 @@ code: |
     preview_additional_allegations  
   if 'property_statement_attachment' in doc_list_selected.true_values() or 'fee_waiver_attachment' in doc_list_selected.true_values():
     property_statement_review
-  if 'parenting_plan_attachment' in doc_list_selected.true_values():
+  if any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party":
     is_additional_provisions_parenting_plan
   if task_not_yet_performed('show review'):
     mark_task_as_performed('show review')
