@@ -112,8 +112,10 @@ Scenario: Petitioner with one minor child gets all documents (default holiday sc
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | False |  |
+    | legal_custody_sole_explanation | Sample text legal_custody_sole_explanation |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
+    | visitation | False |  |
     | child_support | Firstname S. Lastname Jr |  |
     | child_support_method_of_payment | income_withholding |  |
     | child_support_start_date | judgment_date |  |
