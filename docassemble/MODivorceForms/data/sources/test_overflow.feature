@@ -111,8 +111,10 @@ Scenario: 5 children: the Petition addendum lists the 5th child
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | False |  |
+    | legal_custody_sole_explanation | Sample text legal_custody_sole_explanation |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
+    | visitation | False |  |
     | child_support | Firstname S. Lastname Jr |  |
     | child_support_method_of_payment | income_withholding |  |
     | child_support_start_date | judgment_date |  |
@@ -331,60 +333,60 @@ Scenario: 5 children: the Petition addendum lists the 5th child
     | holidays['children_birthday']['different'] | False |  |
     | holidays["mlk"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mlk"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mlk"]["custody_from_time"] | 09:00 |  |
-    | holidays["mlk"]["custody_to_time"] | 09:00 |  |
+    | holidays["mlk"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mlk"]["custody_to_time"] | 9:00 AM |  |
     | holidays["president"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["president"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["president"]["custody_from_time"] | 09:00 |  |
-    | holidays["president"]["custody_to_time"] | 09:00 |  |
+    | holidays["president"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["president"]["custody_to_time"] | 9:00 AM |  |
     | holidays["memorial"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["memorial"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["memorial"]["custody_from_time"] | 09:00 |  |
-    | holidays["memorial"]["custody_to_time"] | 09:00 |  |
+    | holidays["memorial"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["memorial"]["custody_to_time"] | 9:00 AM |  |
     | holidays["independence"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["independence"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["independence"]["custody_from_time"] | 09:00 |  |
-    | holidays["independence"]["custody_to_time"] | 09:00 |  |
+    | holidays["independence"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["independence"]["custody_to_time"] | 9:00 AM |  |
     | holidays["labor"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["labor"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["labor"]["custody_from_time"] | 09:00 |  |
-    | holidays["labor"]["custody_to_time"] | 09:00 |  |
+    | holidays["labor"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["labor"]["custody_to_time"] | 9:00 AM |  |
     | holidays["halloween"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["halloween"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["halloween"]["custody_from_time"] | 09:00 |  |
-    | holidays["halloween"]["custody_to_time"] | 09:00 |  |
+    | holidays["halloween"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["halloween"]["custody_to_time"] | 9:00 AM |  |
     | holidays["thanksgiving"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["thanksgiving"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["thanksgiving"]["custody_from_time"] | 09:00 |  |
-    | holidays["thanksgiving"]["custody_to_time"] | 09:00 |  |
+    | holidays["thanksgiving"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["thanksgiving"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_eve"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_eve"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_eve"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_eve"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_eve"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_eve"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_day"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_day"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_day"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_day"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_day"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_day"]["custody_to_time"] | 9:00 AM |  |
     | holidays["mother"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mother"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mother"]["custody_from_time"] | 09:00 |  |
-    | holidays["mother"]["custody_to_time"] | 09:00 |  |
+    | holidays["mother"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mother"]["custody_to_time"] | 9:00 AM |  |
     | holidays["father"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["father"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["father"]["custody_from_time"] | 09:00 |  |
-    | holidays["father"]["custody_to_time"] | 09:00 |  |
+    | holidays["father"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["father"]["custody_to_time"] | 9:00 AM |  |
     | holidays["petitioner_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["petitioner_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["petitioner_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["petitioner_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["petitioner_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["petitioner_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["respondent_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["respondent_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["respondent_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["respondent_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["respondent_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["respondent_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["children_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["children_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["children_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["children_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["children_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["children_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays_review | True |  |
     | dispute_resolution | Sample text Is there another way you would like to r |  |
     | ask_about_dispute_resolution | True |  |
@@ -409,16 +411,15 @@ Scenario: 5 children: the Petition addendum lists the 5th child
     | family_support_order | False |  |
     | additional_children_information | True |  |
     | users[0].has_self_employment_income | False |  |
-    | x.benefits.selected_types['food_stamps'] | False | users[0].benefits.selected_types |
+    | x.benefits.selected_types['food_stamps'] | True | users[0].benefits.selected_types |
     | x.benefits.selected_types['medicaid'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['ssi'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['tanf'] | False | users[0].benefits.selected_types |
-    | users[0].benefits.benefits.selected_types['food_stamps'] | True |  |
-    | x.benefits[0].source | food_stamps | users[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | users[0].benefits[0].value |
-    | x.benefits[0].value | 100 | users[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | users[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | users[0].benefits[0].value |
+    | x.benefits[i].value | 100 | users[0].benefits[0].value |
     | x.benefits.review_items | True |  |
-    | x.other_incomes.selected_types['social security'] | False | users[0].other_incomes.selected_types |
+    | x.other_incomes.selected_types['social security'] | True | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['retirement'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['pension'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['interest'] | False | users[0].other_incomes.selected_types |
@@ -430,11 +431,10 @@ Scenario: 5 children: the Petition addendum lists the 5th child
     | x.other_incomes.selected_types['veteran'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['military'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['other'] | False | users[0].other_incomes.selected_types |
-    | users[0].other_incomes.other_incomes.selected_types['social security'] | True |  |
-    | x.other_incomes[0].source | social security | users[0].other_incomes[0].value |
-    | x.other_incomes[0].source_other | Sample Specify Type | users[0].other_incomes[0].value |
-    | x.other_incomes[0].times_per_year | 12 | users[0].other_incomes[0].value |
-    | x.other_incomes[0].value | 100 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source | social security | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source_other | Sample Specify Type | users[0].other_incomes[0].value |
+    | x.other_incomes[i].times_per_year | 12 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].value | 100 | users[0].other_incomes[0].value |
     | x.review_items | True |  |
     | x.other_child_support_received | 100 | users[0].other_child_support_received |
     | users[0].self_supporting | False |  |
@@ -444,9 +444,9 @@ Scenario: 5 children: the Petition addendum lists the 5th child
     | other_parties[0].benefits.selected_types['ssi'] | False |  |
     | other_parties[0].benefits.selected_types['tanf'] | False |  |
     | other_parties[0].benefits_unknown | False |  |
-    | x.benefits[0].source | food_stamps | other_parties[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | other_parties[0].benefits[0].value |
-    | x.benefits[0].value | 100 | other_parties[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | other_parties[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | other_parties[0].benefits[0].value |
+    | x.benefits[i].value | 100 | other_parties[0].benefits[0].value |
     | other_parties[0].other_incomes.selected_types['social security'] | True |  |
     | other_parties[0].other_incomes.selected_types['retirement'] | False |  |
     | other_parties[0].other_incomes.selected_types['pension'] | False |  |
@@ -466,16 +466,15 @@ Scenario: 5 children: the Petition addendum lists the 5th child
     | other_parties[0].other_incomes[0].value | 100 |  |
     | x.other_child_support_received | 100 | other_parties[0].other_child_support_received |
     | other_parties[0].self_supporting | False |  |
-    | x.expenses.selected_types['rent'] | False | users[0].expenses.selected_types |
+    | x.expenses.selected_types['rent'] | True | users[0].expenses.selected_types |
     | x.expenses.selected_types['utilities'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['food'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['medical'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['laundry'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['repairs'] | False | users[0].expenses.selected_types |
-    | users[0].expenses.expenses.selected_types['rent'] | True |  |
-    | x.expenses[0].source | rent | users[0].expenses[0].value |
-    | x.expenses[0].value | 100 | users[0].expenses[0].value |
-    | x.expenses[0].times_per_year | 12 | users[0].expenses[0].value |
+    | x.expenses[i].source | rent | users[0].expenses[0].value |
+    | x.expenses[i].value | 100 | users[0].expenses[0].value |
+    | x.expenses[i].times_per_year | 12 | users[0].expenses[0].value |
     | x.other_child_support_paid | 100 | users[0].other_child_support_paid |
     | other_parties[0].expenses.selected_types['rent'] | True |  |
     | other_parties[0].expenses.selected_types['utilities'] | False |  |
@@ -488,11 +487,10 @@ Scenario: 5 children: the Petition addendum lists the 5th child
     | other_parties[0].expenses[0].value | 100 |  |
     | other_parties[0].expenses[0].times_per_year | 12 |  |
     | x.other_child_support_paid | 100 | other_parties[0].other_child_support_paid |
-    | x.selected_types['house'] | False | real_estate.selected_types |
+    | x.selected_types['house'] | True | real_estate.selected_types |
     | x.selected_types['condominium'] | False | real_estate.selected_types |
     | x.selected_types['leasehold'] | False | real_estate.selected_types |
     | x.selected_types['other'] | False | real_estate.selected_types |
-    | real_estate.selected_types['house'] | True |  |
     | real_estate[0].source | house |  |
     | real_estate[0].address | 123 Main St |  |
     | real_estate[0].legal_description_attach | False |  |
@@ -504,7 +502,7 @@ Scenario: 5 children: the Petition addendum lists the 5th child
     | real_estate[0].recommended_award | Firstname S. Lastname Jr |  |
     | real_estate[0].legal_description | Sample Legal description |  |
     | assets_warning | True |  |
-    | x.selected_types['car'] | False | vehicles.selected_types |
+    | x.selected_types['car'] | True | vehicles.selected_types |
     | x.selected_types['truck'] | False | vehicles.selected_types |
     | x.selected_types['motorcycle'] | False | vehicles.selected_types |
     | x.selected_types['mobile_home'] | False | vehicles.selected_types |
@@ -512,7 +510,6 @@ Scenario: 5 children: the Petition addendum lists the 5th child
     | x.selected_types['boat'] | False | vehicles.selected_types |
     | x.selected_types['airplane'] | False | vehicles.selected_types |
     | x.selected_types['other'] | False | vehicles.selected_types |
-    | vehicles.selected_types['car'] | True |  |
     | vehicles[0].source | car |  |
     | vehicles[0].year | Sample Year |  |
     | vehicles[0].make | Sample Make |  |
@@ -543,13 +540,12 @@ Scenario: 5 children: the Petition addendum lists the 5th child
     | personal_goods[0].marital_property | Marital |  |
     | personal_goods[0].has_possession | Firstname S. Lastname Jr |  |
     | personal_goods[0].recommended_award | Firstname S. Lastname Jr |  |
-    | x.selected_types['checking account'] | False | bank_assets.selected_types |
+    | x.selected_types['checking account'] | True | bank_assets.selected_types |
     | x.selected_types['savings account'] | False | bank_assets.selected_types |
     | x.selected_types['time deposit'] | False | bank_assets.selected_types |
     | x.selected_types['money market'] | False | bank_assets.selected_types |
     | x.selected_types['certificates'] | False | bank_assets.selected_types |
     | x.selected_types['other'] | False | bank_assets.selected_types |
-    | bank_assets.selected_types['checking account'] | True |  |
     | bank_assets[0].source | checking account |  |
     | bank_assets[0].institution | Sample Bank or Institution |  |
     | bank_assets[0].account_number | Sample Account number |  |
@@ -710,8 +706,10 @@ Scenario: 7 children: Petition, Judgment and Parenting Plan get addenda
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | False |  |
+    | legal_custody_sole_explanation | Sample text legal_custody_sole_explanation |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
+    | visitation | False |  |
     | child_support | Firstname S. Lastname Jr |  |
     | child_support_method_of_payment | income_withholding |  |
     | child_support_start_date | judgment_date |  |
@@ -994,60 +992,60 @@ Scenario: 7 children: Petition, Judgment and Parenting Plan get addenda
     | holidays['children_birthday']['different'] | False |  |
     | holidays["mlk"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mlk"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mlk"]["custody_from_time"] | 09:00 |  |
-    | holidays["mlk"]["custody_to_time"] | 09:00 |  |
+    | holidays["mlk"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mlk"]["custody_to_time"] | 9:00 AM |  |
     | holidays["president"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["president"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["president"]["custody_from_time"] | 09:00 |  |
-    | holidays["president"]["custody_to_time"] | 09:00 |  |
+    | holidays["president"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["president"]["custody_to_time"] | 9:00 AM |  |
     | holidays["memorial"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["memorial"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["memorial"]["custody_from_time"] | 09:00 |  |
-    | holidays["memorial"]["custody_to_time"] | 09:00 |  |
+    | holidays["memorial"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["memorial"]["custody_to_time"] | 9:00 AM |  |
     | holidays["independence"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["independence"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["independence"]["custody_from_time"] | 09:00 |  |
-    | holidays["independence"]["custody_to_time"] | 09:00 |  |
+    | holidays["independence"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["independence"]["custody_to_time"] | 9:00 AM |  |
     | holidays["labor"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["labor"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["labor"]["custody_from_time"] | 09:00 |  |
-    | holidays["labor"]["custody_to_time"] | 09:00 |  |
+    | holidays["labor"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["labor"]["custody_to_time"] | 9:00 AM |  |
     | holidays["halloween"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["halloween"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["halloween"]["custody_from_time"] | 09:00 |  |
-    | holidays["halloween"]["custody_to_time"] | 09:00 |  |
+    | holidays["halloween"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["halloween"]["custody_to_time"] | 9:00 AM |  |
     | holidays["thanksgiving"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["thanksgiving"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["thanksgiving"]["custody_from_time"] | 09:00 |  |
-    | holidays["thanksgiving"]["custody_to_time"] | 09:00 |  |
+    | holidays["thanksgiving"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["thanksgiving"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_eve"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_eve"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_eve"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_eve"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_eve"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_eve"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_day"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_day"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_day"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_day"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_day"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_day"]["custody_to_time"] | 9:00 AM |  |
     | holidays["mother"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mother"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mother"]["custody_from_time"] | 09:00 |  |
-    | holidays["mother"]["custody_to_time"] | 09:00 |  |
+    | holidays["mother"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mother"]["custody_to_time"] | 9:00 AM |  |
     | holidays["father"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["father"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["father"]["custody_from_time"] | 09:00 |  |
-    | holidays["father"]["custody_to_time"] | 09:00 |  |
+    | holidays["father"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["father"]["custody_to_time"] | 9:00 AM |  |
     | holidays["petitioner_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["petitioner_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["petitioner_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["petitioner_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["petitioner_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["petitioner_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["respondent_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["respondent_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["respondent_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["respondent_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["respondent_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["respondent_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["children_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["children_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["children_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["children_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["children_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["children_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays_review | True |  |
     | dispute_resolution | Sample text Is there another way you would like to r |  |
     | ask_about_dispute_resolution | True |  |
@@ -1072,16 +1070,15 @@ Scenario: 7 children: Petition, Judgment and Parenting Plan get addenda
     | family_support_order | False |  |
     | additional_children_information | True |  |
     | users[0].has_self_employment_income | False |  |
-    | x.benefits.selected_types['food_stamps'] | False | users[0].benefits.selected_types |
+    | x.benefits.selected_types['food_stamps'] | True | users[0].benefits.selected_types |
     | x.benefits.selected_types['medicaid'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['ssi'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['tanf'] | False | users[0].benefits.selected_types |
-    | users[0].benefits.benefits.selected_types['food_stamps'] | True |  |
-    | x.benefits[0].source | food_stamps | users[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | users[0].benefits[0].value |
-    | x.benefits[0].value | 100 | users[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | users[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | users[0].benefits[0].value |
+    | x.benefits[i].value | 100 | users[0].benefits[0].value |
     | x.benefits.review_items | True |  |
-    | x.other_incomes.selected_types['social security'] | False | users[0].other_incomes.selected_types |
+    | x.other_incomes.selected_types['social security'] | True | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['retirement'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['pension'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['interest'] | False | users[0].other_incomes.selected_types |
@@ -1093,11 +1090,10 @@ Scenario: 7 children: Petition, Judgment and Parenting Plan get addenda
     | x.other_incomes.selected_types['veteran'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['military'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['other'] | False | users[0].other_incomes.selected_types |
-    | users[0].other_incomes.other_incomes.selected_types['social security'] | True |  |
-    | x.other_incomes[0].source | social security | users[0].other_incomes[0].value |
-    | x.other_incomes[0].source_other | Sample Specify Type | users[0].other_incomes[0].value |
-    | x.other_incomes[0].times_per_year | 12 | users[0].other_incomes[0].value |
-    | x.other_incomes[0].value | 100 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source | social security | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source_other | Sample Specify Type | users[0].other_incomes[0].value |
+    | x.other_incomes[i].times_per_year | 12 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].value | 100 | users[0].other_incomes[0].value |
     | x.review_items | True |  |
     | x.other_child_support_received | 100 | users[0].other_child_support_received |
     | users[0].self_supporting | False |  |
@@ -1107,9 +1103,9 @@ Scenario: 7 children: Petition, Judgment and Parenting Plan get addenda
     | other_parties[0].benefits.selected_types['ssi'] | False |  |
     | other_parties[0].benefits.selected_types['tanf'] | False |  |
     | other_parties[0].benefits_unknown | False |  |
-    | x.benefits[0].source | food_stamps | other_parties[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | other_parties[0].benefits[0].value |
-    | x.benefits[0].value | 100 | other_parties[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | other_parties[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | other_parties[0].benefits[0].value |
+    | x.benefits[i].value | 100 | other_parties[0].benefits[0].value |
     | other_parties[0].other_incomes.selected_types['social security'] | True |  |
     | other_parties[0].other_incomes.selected_types['retirement'] | False |  |
     | other_parties[0].other_incomes.selected_types['pension'] | False |  |
@@ -1129,16 +1125,15 @@ Scenario: 7 children: Petition, Judgment and Parenting Plan get addenda
     | other_parties[0].other_incomes[0].value | 100 |  |
     | x.other_child_support_received | 100 | other_parties[0].other_child_support_received |
     | other_parties[0].self_supporting | False |  |
-    | x.expenses.selected_types['rent'] | False | users[0].expenses.selected_types |
+    | x.expenses.selected_types['rent'] | True | users[0].expenses.selected_types |
     | x.expenses.selected_types['utilities'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['food'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['medical'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['laundry'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['repairs'] | False | users[0].expenses.selected_types |
-    | users[0].expenses.expenses.selected_types['rent'] | True |  |
-    | x.expenses[0].source | rent | users[0].expenses[0].value |
-    | x.expenses[0].value | 100 | users[0].expenses[0].value |
-    | x.expenses[0].times_per_year | 12 | users[0].expenses[0].value |
+    | x.expenses[i].source | rent | users[0].expenses[0].value |
+    | x.expenses[i].value | 100 | users[0].expenses[0].value |
+    | x.expenses[i].times_per_year | 12 | users[0].expenses[0].value |
     | x.other_child_support_paid | 100 | users[0].other_child_support_paid |
     | other_parties[0].expenses.selected_types['rent'] | True |  |
     | other_parties[0].expenses.selected_types['utilities'] | False |  |
@@ -1151,11 +1146,10 @@ Scenario: 7 children: Petition, Judgment and Parenting Plan get addenda
     | other_parties[0].expenses[0].value | 100 |  |
     | other_parties[0].expenses[0].times_per_year | 12 |  |
     | x.other_child_support_paid | 100 | other_parties[0].other_child_support_paid |
-    | x.selected_types['house'] | False | real_estate.selected_types |
+    | x.selected_types['house'] | True | real_estate.selected_types |
     | x.selected_types['condominium'] | False | real_estate.selected_types |
     | x.selected_types['leasehold'] | False | real_estate.selected_types |
     | x.selected_types['other'] | False | real_estate.selected_types |
-    | real_estate.selected_types['house'] | True |  |
     | real_estate[0].source | house |  |
     | real_estate[0].address | 123 Main St |  |
     | real_estate[0].legal_description_attach | False |  |
@@ -1167,7 +1161,7 @@ Scenario: 7 children: Petition, Judgment and Parenting Plan get addenda
     | real_estate[0].recommended_award | Firstname S. Lastname Jr |  |
     | real_estate[0].legal_description | Sample Legal description |  |
     | assets_warning | True |  |
-    | x.selected_types['car'] | False | vehicles.selected_types |
+    | x.selected_types['car'] | True | vehicles.selected_types |
     | x.selected_types['truck'] | False | vehicles.selected_types |
     | x.selected_types['motorcycle'] | False | vehicles.selected_types |
     | x.selected_types['mobile_home'] | False | vehicles.selected_types |
@@ -1175,7 +1169,6 @@ Scenario: 7 children: Petition, Judgment and Parenting Plan get addenda
     | x.selected_types['boat'] | False | vehicles.selected_types |
     | x.selected_types['airplane'] | False | vehicles.selected_types |
     | x.selected_types['other'] | False | vehicles.selected_types |
-    | vehicles.selected_types['car'] | True |  |
     | vehicles[0].source | car |  |
     | vehicles[0].year | Sample Year |  |
     | vehicles[0].make | Sample Make |  |
@@ -1206,13 +1199,12 @@ Scenario: 7 children: Petition, Judgment and Parenting Plan get addenda
     | personal_goods[0].marital_property | Marital |  |
     | personal_goods[0].has_possession | Firstname S. Lastname Jr |  |
     | personal_goods[0].recommended_award | Firstname S. Lastname Jr |  |
-    | x.selected_types['checking account'] | False | bank_assets.selected_types |
+    | x.selected_types['checking account'] | True | bank_assets.selected_types |
     | x.selected_types['savings account'] | False | bank_assets.selected_types |
     | x.selected_types['time deposit'] | False | bank_assets.selected_types |
     | x.selected_types['money market'] | False | bank_assets.selected_types |
     | x.selected_types['certificates'] | False | bank_assets.selected_types |
     | x.selected_types['other'] | False | bank_assets.selected_types |
-    | bank_assets.selected_types['checking account'] | True |  |
     | bank_assets[0].source | checking account |  |
     | bank_assets[0].institution | Sample Bank or Institution |  |
     | bank_assets[0].account_number | Sample Account number |  |
@@ -1376,8 +1368,10 @@ Scenario: 11 children: Confidential Information Sheet addendum must not break do
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | False |  |
+    | legal_custody_sole_explanation | Sample text legal_custody_sole_explanation |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
+    | visitation | False |  |
     | child_support | Firstname S. Lastname Jr |  |
     | child_support_method_of_payment | income_withholding |  |
     | child_support_start_date | judgment_date |  |
@@ -1788,60 +1782,60 @@ Scenario: 11 children: Confidential Information Sheet addendum must not break do
     | holidays['children_birthday']['different'] | False |  |
     | holidays["mlk"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mlk"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mlk"]["custody_from_time"] | 09:00 |  |
-    | holidays["mlk"]["custody_to_time"] | 09:00 |  |
+    | holidays["mlk"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mlk"]["custody_to_time"] | 9:00 AM |  |
     | holidays["president"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["president"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["president"]["custody_from_time"] | 09:00 |  |
-    | holidays["president"]["custody_to_time"] | 09:00 |  |
+    | holidays["president"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["president"]["custody_to_time"] | 9:00 AM |  |
     | holidays["memorial"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["memorial"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["memorial"]["custody_from_time"] | 09:00 |  |
-    | holidays["memorial"]["custody_to_time"] | 09:00 |  |
+    | holidays["memorial"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["memorial"]["custody_to_time"] | 9:00 AM |  |
     | holidays["independence"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["independence"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["independence"]["custody_from_time"] | 09:00 |  |
-    | holidays["independence"]["custody_to_time"] | 09:00 |  |
+    | holidays["independence"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["independence"]["custody_to_time"] | 9:00 AM |  |
     | holidays["labor"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["labor"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["labor"]["custody_from_time"] | 09:00 |  |
-    | holidays["labor"]["custody_to_time"] | 09:00 |  |
+    | holidays["labor"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["labor"]["custody_to_time"] | 9:00 AM |  |
     | holidays["halloween"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["halloween"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["halloween"]["custody_from_time"] | 09:00 |  |
-    | holidays["halloween"]["custody_to_time"] | 09:00 |  |
+    | holidays["halloween"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["halloween"]["custody_to_time"] | 9:00 AM |  |
     | holidays["thanksgiving"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["thanksgiving"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["thanksgiving"]["custody_from_time"] | 09:00 |  |
-    | holidays["thanksgiving"]["custody_to_time"] | 09:00 |  |
+    | holidays["thanksgiving"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["thanksgiving"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_eve"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_eve"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_eve"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_eve"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_eve"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_eve"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_day"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_day"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_day"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_day"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_day"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_day"]["custody_to_time"] | 9:00 AM |  |
     | holidays["mother"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mother"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mother"]["custody_from_time"] | 09:00 |  |
-    | holidays["mother"]["custody_to_time"] | 09:00 |  |
+    | holidays["mother"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mother"]["custody_to_time"] | 9:00 AM |  |
     | holidays["father"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["father"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["father"]["custody_from_time"] | 09:00 |  |
-    | holidays["father"]["custody_to_time"] | 09:00 |  |
+    | holidays["father"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["father"]["custody_to_time"] | 9:00 AM |  |
     | holidays["petitioner_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["petitioner_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["petitioner_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["petitioner_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["petitioner_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["petitioner_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["respondent_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["respondent_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["respondent_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["respondent_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["respondent_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["respondent_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["children_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["children_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["children_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["children_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["children_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["children_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays_review | True |  |
     | dispute_resolution | Sample text Is there another way you would like to r |  |
     | ask_about_dispute_resolution | True |  |
@@ -1866,16 +1860,15 @@ Scenario: 11 children: Confidential Information Sheet addendum must not break do
     | family_support_order | False |  |
     | additional_children_information | True |  |
     | users[0].has_self_employment_income | False |  |
-    | x.benefits.selected_types['food_stamps'] | False | users[0].benefits.selected_types |
+    | x.benefits.selected_types['food_stamps'] | True | users[0].benefits.selected_types |
     | x.benefits.selected_types['medicaid'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['ssi'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['tanf'] | False | users[0].benefits.selected_types |
-    | users[0].benefits.benefits.selected_types['food_stamps'] | True |  |
-    | x.benefits[0].source | food_stamps | users[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | users[0].benefits[0].value |
-    | x.benefits[0].value | 100 | users[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | users[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | users[0].benefits[0].value |
+    | x.benefits[i].value | 100 | users[0].benefits[0].value |
     | x.benefits.review_items | True |  |
-    | x.other_incomes.selected_types['social security'] | False | users[0].other_incomes.selected_types |
+    | x.other_incomes.selected_types['social security'] | True | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['retirement'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['pension'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['interest'] | False | users[0].other_incomes.selected_types |
@@ -1887,11 +1880,10 @@ Scenario: 11 children: Confidential Information Sheet addendum must not break do
     | x.other_incomes.selected_types['veteran'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['military'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['other'] | False | users[0].other_incomes.selected_types |
-    | users[0].other_incomes.other_incomes.selected_types['social security'] | True |  |
-    | x.other_incomes[0].source | social security | users[0].other_incomes[0].value |
-    | x.other_incomes[0].source_other | Sample Specify Type | users[0].other_incomes[0].value |
-    | x.other_incomes[0].times_per_year | 12 | users[0].other_incomes[0].value |
-    | x.other_incomes[0].value | 100 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source | social security | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source_other | Sample Specify Type | users[0].other_incomes[0].value |
+    | x.other_incomes[i].times_per_year | 12 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].value | 100 | users[0].other_incomes[0].value |
     | x.review_items | True |  |
     | x.other_child_support_received | 100 | users[0].other_child_support_received |
     | users[0].self_supporting | False |  |
@@ -1901,9 +1893,9 @@ Scenario: 11 children: Confidential Information Sheet addendum must not break do
     | other_parties[0].benefits.selected_types['ssi'] | False |  |
     | other_parties[0].benefits.selected_types['tanf'] | False |  |
     | other_parties[0].benefits_unknown | False |  |
-    | x.benefits[0].source | food_stamps | other_parties[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | other_parties[0].benefits[0].value |
-    | x.benefits[0].value | 100 | other_parties[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | other_parties[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | other_parties[0].benefits[0].value |
+    | x.benefits[i].value | 100 | other_parties[0].benefits[0].value |
     | other_parties[0].other_incomes.selected_types['social security'] | True |  |
     | other_parties[0].other_incomes.selected_types['retirement'] | False |  |
     | other_parties[0].other_incomes.selected_types['pension'] | False |  |
@@ -1923,16 +1915,15 @@ Scenario: 11 children: Confidential Information Sheet addendum must not break do
     | other_parties[0].other_incomes[0].value | 100 |  |
     | x.other_child_support_received | 100 | other_parties[0].other_child_support_received |
     | other_parties[0].self_supporting | False |  |
-    | x.expenses.selected_types['rent'] | False | users[0].expenses.selected_types |
+    | x.expenses.selected_types['rent'] | True | users[0].expenses.selected_types |
     | x.expenses.selected_types['utilities'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['food'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['medical'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['laundry'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['repairs'] | False | users[0].expenses.selected_types |
-    | users[0].expenses.expenses.selected_types['rent'] | True |  |
-    | x.expenses[0].source | rent | users[0].expenses[0].value |
-    | x.expenses[0].value | 100 | users[0].expenses[0].value |
-    | x.expenses[0].times_per_year | 12 | users[0].expenses[0].value |
+    | x.expenses[i].source | rent | users[0].expenses[0].value |
+    | x.expenses[i].value | 100 | users[0].expenses[0].value |
+    | x.expenses[i].times_per_year | 12 | users[0].expenses[0].value |
     | x.other_child_support_paid | 100 | users[0].other_child_support_paid |
     | other_parties[0].expenses.selected_types['rent'] | True |  |
     | other_parties[0].expenses.selected_types['utilities'] | False |  |
@@ -1945,11 +1936,10 @@ Scenario: 11 children: Confidential Information Sheet addendum must not break do
     | other_parties[0].expenses[0].value | 100 |  |
     | other_parties[0].expenses[0].times_per_year | 12 |  |
     | x.other_child_support_paid | 100 | other_parties[0].other_child_support_paid |
-    | x.selected_types['house'] | False | real_estate.selected_types |
+    | x.selected_types['house'] | True | real_estate.selected_types |
     | x.selected_types['condominium'] | False | real_estate.selected_types |
     | x.selected_types['leasehold'] | False | real_estate.selected_types |
     | x.selected_types['other'] | False | real_estate.selected_types |
-    | real_estate.selected_types['house'] | True |  |
     | real_estate[0].source | house |  |
     | real_estate[0].address | 123 Main St |  |
     | real_estate[0].legal_description_attach | False |  |
@@ -1961,7 +1951,7 @@ Scenario: 11 children: Confidential Information Sheet addendum must not break do
     | real_estate[0].recommended_award | Firstname S. Lastname Jr |  |
     | real_estate[0].legal_description | Sample Legal description |  |
     | assets_warning | True |  |
-    | x.selected_types['car'] | False | vehicles.selected_types |
+    | x.selected_types['car'] | True | vehicles.selected_types |
     | x.selected_types['truck'] | False | vehicles.selected_types |
     | x.selected_types['motorcycle'] | False | vehicles.selected_types |
     | x.selected_types['mobile_home'] | False | vehicles.selected_types |
@@ -1969,7 +1959,6 @@ Scenario: 11 children: Confidential Information Sheet addendum must not break do
     | x.selected_types['boat'] | False | vehicles.selected_types |
     | x.selected_types['airplane'] | False | vehicles.selected_types |
     | x.selected_types['other'] | False | vehicles.selected_types |
-    | vehicles.selected_types['car'] | True |  |
     | vehicles[0].source | car |  |
     | vehicles[0].year | Sample Year |  |
     | vehicles[0].make | Sample Make |  |
@@ -2000,13 +1989,12 @@ Scenario: 11 children: Confidential Information Sheet addendum must not break do
     | personal_goods[0].marital_property | Marital |  |
     | personal_goods[0].has_possession | Firstname S. Lastname Jr |  |
     | personal_goods[0].recommended_award | Firstname S. Lastname Jr |  |
-    | x.selected_types['checking account'] | False | bank_assets.selected_types |
+    | x.selected_types['checking account'] | True | bank_assets.selected_types |
     | x.selected_types['savings account'] | False | bank_assets.selected_types |
     | x.selected_types['time deposit'] | False | bank_assets.selected_types |
     | x.selected_types['money market'] | False | bank_assets.selected_types |
     | x.selected_types['certificates'] | False | bank_assets.selected_types |
     | x.selected_types['other'] | False | bank_assets.selected_types |
-    | bank_assets.selected_types['checking account'] | True |  |
     | bank_assets[0].source | checking account |  |
     | bank_assets[0].institution | Sample Bank or Institution |  |
     | bank_assets[0].account_number | Sample Account number |  |
@@ -2167,8 +2155,10 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | True |  |
+    | legal_custody_sole_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
+    | visitation | False |  |
     | child_support | Firstname S. Lastname Jr |  |
     | child_support_method_of_payment | income_withholding |  |
     | child_support_start_date | judgment_date |  |
@@ -2260,60 +2250,60 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | holidays['children_birthday']['different'] | False |  |
     | holidays["mlk"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mlk"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mlk"]["custody_from_time"] | 09:00 |  |
-    | holidays["mlk"]["custody_to_time"] | 09:00 |  |
+    | holidays["mlk"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mlk"]["custody_to_time"] | 9:00 AM |  |
     | holidays["president"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["president"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["president"]["custody_from_time"] | 09:00 |  |
-    | holidays["president"]["custody_to_time"] | 09:00 |  |
+    | holidays["president"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["president"]["custody_to_time"] | 9:00 AM |  |
     | holidays["memorial"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["memorial"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["memorial"]["custody_from_time"] | 09:00 |  |
-    | holidays["memorial"]["custody_to_time"] | 09:00 |  |
+    | holidays["memorial"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["memorial"]["custody_to_time"] | 9:00 AM |  |
     | holidays["independence"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["independence"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["independence"]["custody_from_time"] | 09:00 |  |
-    | holidays["independence"]["custody_to_time"] | 09:00 |  |
+    | holidays["independence"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["independence"]["custody_to_time"] | 9:00 AM |  |
     | holidays["labor"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["labor"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["labor"]["custody_from_time"] | 09:00 |  |
-    | holidays["labor"]["custody_to_time"] | 09:00 |  |
+    | holidays["labor"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["labor"]["custody_to_time"] | 9:00 AM |  |
     | holidays["halloween"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["halloween"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["halloween"]["custody_from_time"] | 09:00 |  |
-    | holidays["halloween"]["custody_to_time"] | 09:00 |  |
+    | holidays["halloween"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["halloween"]["custody_to_time"] | 9:00 AM |  |
     | holidays["thanksgiving"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["thanksgiving"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["thanksgiving"]["custody_from_time"] | 09:00 |  |
-    | holidays["thanksgiving"]["custody_to_time"] | 09:00 |  |
+    | holidays["thanksgiving"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["thanksgiving"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_eve"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_eve"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_eve"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_eve"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_eve"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_eve"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_day"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_day"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_day"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_day"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_day"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_day"]["custody_to_time"] | 9:00 AM |  |
     | holidays["mother"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mother"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mother"]["custody_from_time"] | 09:00 |  |
-    | holidays["mother"]["custody_to_time"] | 09:00 |  |
+    | holidays["mother"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mother"]["custody_to_time"] | 9:00 AM |  |
     | holidays["father"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["father"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["father"]["custody_from_time"] | 09:00 |  |
-    | holidays["father"]["custody_to_time"] | 09:00 |  |
+    | holidays["father"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["father"]["custody_to_time"] | 9:00 AM |  |
     | holidays["petitioner_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["petitioner_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["petitioner_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["petitioner_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["petitioner_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["petitioner_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["respondent_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["respondent_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["respondent_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["respondent_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["respondent_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["respondent_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["children_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["children_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["children_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["children_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["children_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["children_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays_review | True |  |
     | dispute_resolution | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | ask_about_dispute_resolution | True |  |
@@ -2339,16 +2329,15 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | additional_children_information | True |  |
     | children_explanation | word word word word word word word word word w |  |
     | users[0].has_self_employment_income | False |  |
-    | x.benefits.selected_types['food_stamps'] | False | users[0].benefits.selected_types |
+    | x.benefits.selected_types['food_stamps'] | True | users[0].benefits.selected_types |
     | x.benefits.selected_types['medicaid'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['ssi'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['tanf'] | False | users[0].benefits.selected_types |
-    | users[0].benefits.benefits.selected_types['food_stamps'] | True |  |
-    | x.benefits[0].source | food_stamps | users[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | users[0].benefits[0].value |
-    | x.benefits[0].value | 100 | users[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | users[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | users[0].benefits[0].value |
+    | x.benefits[i].value | 100 | users[0].benefits[0].value |
     | x.benefits.review_items | True |  |
-    | x.other_incomes.selected_types['social security'] | False | users[0].other_incomes.selected_types |
+    | x.other_incomes.selected_types['social security'] | True | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['retirement'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['pension'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['interest'] | False | users[0].other_incomes.selected_types |
@@ -2360,11 +2349,10 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | x.other_incomes.selected_types['veteran'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['military'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['other'] | False | users[0].other_incomes.selected_types |
-    | users[0].other_incomes.other_incomes.selected_types['social security'] | True |  |
-    | x.other_incomes[0].source | social security | users[0].other_incomes[0].value |
-    | x.other_incomes[0].source_other | Sample Specify Type | users[0].other_incomes[0].value |
-    | x.other_incomes[0].times_per_year | 12 | users[0].other_incomes[0].value |
-    | x.other_incomes[0].value | 100 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source | social security | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source_other | Sample Specify Type | users[0].other_incomes[0].value |
+    | x.other_incomes[i].times_per_year | 12 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].value | 100 | users[0].other_incomes[0].value |
     | x.review_items | True |  |
     | x.other_child_support_received | 100 | users[0].other_child_support_received |
     | users[0].self_supporting | False |  |
@@ -2374,9 +2362,9 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | other_parties[0].benefits.selected_types['ssi'] | False |  |
     | other_parties[0].benefits.selected_types['tanf'] | False |  |
     | other_parties[0].benefits_unknown | False |  |
-    | x.benefits[0].source | food_stamps | other_parties[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | other_parties[0].benefits[0].value |
-    | x.benefits[0].value | 100 | other_parties[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | other_parties[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | other_parties[0].benefits[0].value |
+    | x.benefits[i].value | 100 | other_parties[0].benefits[0].value |
     | other_parties[0].other_incomes.selected_types['social security'] | True |  |
     | other_parties[0].other_incomes.selected_types['retirement'] | False |  |
     | other_parties[0].other_incomes.selected_types['pension'] | False |  |
@@ -2396,16 +2384,15 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | other_parties[0].other_incomes[0].value | 100 |  |
     | x.other_child_support_received | 100 | other_parties[0].other_child_support_received |
     | other_parties[0].self_supporting | False |  |
-    | x.expenses.selected_types['rent'] | False | users[0].expenses.selected_types |
+    | x.expenses.selected_types['rent'] | True | users[0].expenses.selected_types |
     | x.expenses.selected_types['utilities'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['food'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['medical'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['laundry'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['repairs'] | False | users[0].expenses.selected_types |
-    | users[0].expenses.expenses.selected_types['rent'] | True |  |
-    | x.expenses[0].source | rent | users[0].expenses[0].value |
-    | x.expenses[0].value | 100 | users[0].expenses[0].value |
-    | x.expenses[0].times_per_year | 12 | users[0].expenses[0].value |
+    | x.expenses[i].source | rent | users[0].expenses[0].value |
+    | x.expenses[i].value | 100 | users[0].expenses[0].value |
+    | x.expenses[i].times_per_year | 12 | users[0].expenses[0].value |
     | x.other_child_support_paid | 100 | users[0].other_child_support_paid |
     | other_parties[0].expenses.selected_types['rent'] | True |  |
     | other_parties[0].expenses.selected_types['utilities'] | False |  |
@@ -2418,11 +2405,10 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | other_parties[0].expenses[0].value | 100 |  |
     | other_parties[0].expenses[0].times_per_year | 12 |  |
     | x.other_child_support_paid | 100 | other_parties[0].other_child_support_paid |
-    | x.selected_types['house'] | False | real_estate.selected_types |
+    | x.selected_types['house'] | True | real_estate.selected_types |
     | x.selected_types['condominium'] | False | real_estate.selected_types |
     | x.selected_types['leasehold'] | False | real_estate.selected_types |
     | x.selected_types['other'] | False | real_estate.selected_types |
-    | real_estate.selected_types['house'] | True |  |
     | real_estate[0].source | house |  |
     | real_estate[0].address | 123 Main St |  |
     | real_estate[0].legal_description_attach | False |  |
@@ -2434,7 +2420,7 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | real_estate[0].recommended_award | Firstname S. Lastname Jr |  |
     | real_estate[0].legal_description | Sample Legal description |  |
     | assets_warning | True |  |
-    | x.selected_types['car'] | False | vehicles.selected_types |
+    | x.selected_types['car'] | True | vehicles.selected_types |
     | x.selected_types['truck'] | False | vehicles.selected_types |
     | x.selected_types['motorcycle'] | False | vehicles.selected_types |
     | x.selected_types['mobile_home'] | False | vehicles.selected_types |
@@ -2442,7 +2428,6 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | x.selected_types['boat'] | False | vehicles.selected_types |
     | x.selected_types['airplane'] | False | vehicles.selected_types |
     | x.selected_types['other'] | False | vehicles.selected_types |
-    | vehicles.selected_types['car'] | True |  |
     | vehicles[0].source | car |  |
     | vehicles[0].year | Sample Year |  |
     | vehicles[0].make | Sample Make |  |
@@ -2473,13 +2458,12 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | personal_goods[0].marital_property | Marital |  |
     | personal_goods[0].has_possession | Firstname S. Lastname Jr |  |
     | personal_goods[0].recommended_award | Firstname S. Lastname Jr |  |
-    | x.selected_types['checking account'] | False | bank_assets.selected_types |
+    | x.selected_types['checking account'] | True | bank_assets.selected_types |
     | x.selected_types['savings account'] | False | bank_assets.selected_types |
     | x.selected_types['time deposit'] | False | bank_assets.selected_types |
     | x.selected_types['money market'] | False | bank_assets.selected_types |
     | x.selected_types['certificates'] | False | bank_assets.selected_types |
     | x.selected_types['other'] | False | bank_assets.selected_types |
-    | bank_assets.selected_types['checking account'] | True |  |
     | bank_assets[0].source | checking account |  |
     | bank_assets[0].institution | Sample Bank or Institution |  |
     | bank_assets[0].account_number | Sample Account number |  |
@@ -2644,8 +2628,10 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | True |  |
+    | legal_custody_sole_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
+    | visitation | False |  |
     | child_support | Firstname S. Lastname Jr |  |
     | child_support_method_of_payment | income_withholding |  |
     | child_support_start_date | judgment_date |  |
@@ -2737,60 +2723,60 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | holidays['children_birthday']['different'] | False |  |
     | holidays["mlk"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mlk"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mlk"]["custody_from_time"] | 09:00 |  |
-    | holidays["mlk"]["custody_to_time"] | 09:00 |  |
+    | holidays["mlk"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mlk"]["custody_to_time"] | 9:00 AM |  |
     | holidays["president"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["president"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["president"]["custody_from_time"] | 09:00 |  |
-    | holidays["president"]["custody_to_time"] | 09:00 |  |
+    | holidays["president"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["president"]["custody_to_time"] | 9:00 AM |  |
     | holidays["memorial"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["memorial"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["memorial"]["custody_from_time"] | 09:00 |  |
-    | holidays["memorial"]["custody_to_time"] | 09:00 |  |
+    | holidays["memorial"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["memorial"]["custody_to_time"] | 9:00 AM |  |
     | holidays["independence"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["independence"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["independence"]["custody_from_time"] | 09:00 |  |
-    | holidays["independence"]["custody_to_time"] | 09:00 |  |
+    | holidays["independence"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["independence"]["custody_to_time"] | 9:00 AM |  |
     | holidays["labor"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["labor"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["labor"]["custody_from_time"] | 09:00 |  |
-    | holidays["labor"]["custody_to_time"] | 09:00 |  |
+    | holidays["labor"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["labor"]["custody_to_time"] | 9:00 AM |  |
     | holidays["halloween"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["halloween"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["halloween"]["custody_from_time"] | 09:00 |  |
-    | holidays["halloween"]["custody_to_time"] | 09:00 |  |
+    | holidays["halloween"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["halloween"]["custody_to_time"] | 9:00 AM |  |
     | holidays["thanksgiving"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["thanksgiving"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["thanksgiving"]["custody_from_time"] | 09:00 |  |
-    | holidays["thanksgiving"]["custody_to_time"] | 09:00 |  |
+    | holidays["thanksgiving"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["thanksgiving"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_eve"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_eve"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_eve"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_eve"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_eve"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_eve"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_day"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_day"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_day"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_day"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_day"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_day"]["custody_to_time"] | 9:00 AM |  |
     | holidays["mother"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mother"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mother"]["custody_from_time"] | 09:00 |  |
-    | holidays["mother"]["custody_to_time"] | 09:00 |  |
+    | holidays["mother"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mother"]["custody_to_time"] | 9:00 AM |  |
     | holidays["father"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["father"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["father"]["custody_from_time"] | 09:00 |  |
-    | holidays["father"]["custody_to_time"] | 09:00 |  |
+    | holidays["father"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["father"]["custody_to_time"] | 9:00 AM |  |
     | holidays["petitioner_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["petitioner_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["petitioner_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["petitioner_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["petitioner_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["petitioner_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["respondent_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["respondent_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["respondent_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["respondent_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["respondent_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["respondent_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["children_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["children_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["children_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["children_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["children_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["children_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays_review | True |  |
     | dispute_resolution | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | ask_about_dispute_resolution | True |  |
@@ -2816,16 +2802,15 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | additional_children_information | True |  |
     | children_explanation | word word word word word word word word word w |  |
     | users[0].has_self_employment_income | False |  |
-    | x.benefits.selected_types['food_stamps'] | False | users[0].benefits.selected_types |
+    | x.benefits.selected_types['food_stamps'] | True | users[0].benefits.selected_types |
     | x.benefits.selected_types['medicaid'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['ssi'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['tanf'] | False | users[0].benefits.selected_types |
-    | users[0].benefits.benefits.selected_types['food_stamps'] | True |  |
-    | x.benefits[0].source | food_stamps | users[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | users[0].benefits[0].value |
-    | x.benefits[0].value | 100 | users[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | users[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | users[0].benefits[0].value |
+    | x.benefits[i].value | 100 | users[0].benefits[0].value |
     | x.benefits.review_items | True |  |
-    | x.other_incomes.selected_types['social security'] | False | users[0].other_incomes.selected_types |
+    | x.other_incomes.selected_types['social security'] | True | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['retirement'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['pension'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['interest'] | False | users[0].other_incomes.selected_types |
@@ -2837,11 +2822,10 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | x.other_incomes.selected_types['veteran'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['military'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['other'] | False | users[0].other_incomes.selected_types |
-    | users[0].other_incomes.other_incomes.selected_types['social security'] | True |  |
-    | x.other_incomes[0].source | social security | users[0].other_incomes[0].value |
-    | x.other_incomes[0].source_other | Sample Specify Type | users[0].other_incomes[0].value |
-    | x.other_incomes[0].times_per_year | 12 | users[0].other_incomes[0].value |
-    | x.other_incomes[0].value | 100 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source | social security | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source_other | Sample Specify Type | users[0].other_incomes[0].value |
+    | x.other_incomes[i].times_per_year | 12 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].value | 100 | users[0].other_incomes[0].value |
     | x.review_items | True |  |
     | x.other_child_support_received | 100 | users[0].other_child_support_received |
     | users[0].self_supporting | False |  |
@@ -2851,9 +2835,9 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | other_parties[0].benefits.selected_types['ssi'] | False |  |
     | other_parties[0].benefits.selected_types['tanf'] | False |  |
     | other_parties[0].benefits_unknown | False |  |
-    | x.benefits[0].source | food_stamps | other_parties[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | other_parties[0].benefits[0].value |
-    | x.benefits[0].value | 100 | other_parties[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | other_parties[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | other_parties[0].benefits[0].value |
+    | x.benefits[i].value | 100 | other_parties[0].benefits[0].value |
     | other_parties[0].other_incomes.selected_types['social security'] | True |  |
     | other_parties[0].other_incomes.selected_types['retirement'] | False |  |
     | other_parties[0].other_incomes.selected_types['pension'] | False |  |
@@ -2873,16 +2857,15 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | other_parties[0].other_incomes[0].value | 100 |  |
     | x.other_child_support_received | 100 | other_parties[0].other_child_support_received |
     | other_parties[0].self_supporting | False |  |
-    | x.expenses.selected_types['rent'] | False | users[0].expenses.selected_types |
+    | x.expenses.selected_types['rent'] | True | users[0].expenses.selected_types |
     | x.expenses.selected_types['utilities'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['food'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['medical'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['laundry'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['repairs'] | False | users[0].expenses.selected_types |
-    | users[0].expenses.expenses.selected_types['rent'] | True |  |
-    | x.expenses[0].source | rent | users[0].expenses[0].value |
-    | x.expenses[0].value | 100 | users[0].expenses[0].value |
-    | x.expenses[0].times_per_year | 12 | users[0].expenses[0].value |
+    | x.expenses[i].source | rent | users[0].expenses[0].value |
+    | x.expenses[i].value | 100 | users[0].expenses[0].value |
+    | x.expenses[i].times_per_year | 12 | users[0].expenses[0].value |
     | x.other_child_support_paid | 100 | users[0].other_child_support_paid |
     | other_parties[0].expenses.selected_types['rent'] | True |  |
     | other_parties[0].expenses.selected_types['utilities'] | False |  |
@@ -2895,11 +2878,10 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | other_parties[0].expenses[0].value | 100 |  |
     | other_parties[0].expenses[0].times_per_year | 12 |  |
     | x.other_child_support_paid | 100 | other_parties[0].other_child_support_paid |
-    | x.selected_types['house'] | False | real_estate.selected_types |
+    | x.selected_types['house'] | True | real_estate.selected_types |
     | x.selected_types['condominium'] | False | real_estate.selected_types |
     | x.selected_types['leasehold'] | False | real_estate.selected_types |
     | x.selected_types['other'] | False | real_estate.selected_types |
-    | real_estate.selected_types['house'] | True |  |
     | real_estate[0].source | house |  |
     | real_estate[0].address | 123 Main St |  |
     | real_estate[0].legal_description_attach | False |  |
@@ -2911,7 +2893,7 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | real_estate[0].recommended_award | Firstname S. Lastname Jr |  |
     | real_estate[0].legal_description | Sample Legal description |  |
     | assets_warning | True |  |
-    | x.selected_types['car'] | False | vehicles.selected_types |
+    | x.selected_types['car'] | True | vehicles.selected_types |
     | x.selected_types['truck'] | False | vehicles.selected_types |
     | x.selected_types['motorcycle'] | False | vehicles.selected_types |
     | x.selected_types['mobile_home'] | False | vehicles.selected_types |
@@ -2919,7 +2901,6 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | x.selected_types['boat'] | False | vehicles.selected_types |
     | x.selected_types['airplane'] | False | vehicles.selected_types |
     | x.selected_types['other'] | False | vehicles.selected_types |
-    | vehicles.selected_types['car'] | True |  |
     | vehicles[0].source | car |  |
     | vehicles[0].year | Sample Year |  |
     | vehicles[0].make | Sample Make |  |
@@ -2950,13 +2931,12 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | personal_goods[0].marital_property | Marital |  |
     | personal_goods[0].has_possession | Firstname S. Lastname Jr |  |
     | personal_goods[0].recommended_award | Firstname S. Lastname Jr |  |
-    | x.selected_types['checking account'] | False | bank_assets.selected_types |
+    | x.selected_types['checking account'] | True | bank_assets.selected_types |
     | x.selected_types['savings account'] | False | bank_assets.selected_types |
     | x.selected_types['time deposit'] | False | bank_assets.selected_types |
     | x.selected_types['money market'] | False | bank_assets.selected_types |
     | x.selected_types['certificates'] | False | bank_assets.selected_types |
     | x.selected_types['other'] | False | bank_assets.selected_types |
-    | bank_assets.selected_types['checking account'] | True |  |
     | bank_assets[0].source | checking account |  |
     | bank_assets[0].institution | Sample Bank or Institution |  |
     | bank_assets[0].account_number | Sample Account number |  |
@@ -3121,8 +3101,10 @@ Scenario: Text exactly at each limit does NOT create an addendum
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | True |  |
+    | legal_custody_sole_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word wordx |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
+    | visitation | False |  |
     | child_support | Firstname S. Lastname Jr |  |
     | child_support_method_of_payment | income_withholding |  |
     | child_support_start_date | judgment_date |  |
@@ -3214,60 +3196,60 @@ Scenario: Text exactly at each limit does NOT create an addendum
     | holidays['children_birthday']['different'] | False |  |
     | holidays["mlk"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mlk"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mlk"]["custody_from_time"] | 09:00 |  |
-    | holidays["mlk"]["custody_to_time"] | 09:00 |  |
+    | holidays["mlk"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mlk"]["custody_to_time"] | 9:00 AM |  |
     | holidays["president"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["president"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["president"]["custody_from_time"] | 09:00 |  |
-    | holidays["president"]["custody_to_time"] | 09:00 |  |
+    | holidays["president"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["president"]["custody_to_time"] | 9:00 AM |  |
     | holidays["memorial"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["memorial"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["memorial"]["custody_from_time"] | 09:00 |  |
-    | holidays["memorial"]["custody_to_time"] | 09:00 |  |
+    | holidays["memorial"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["memorial"]["custody_to_time"] | 9:00 AM |  |
     | holidays["independence"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["independence"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["independence"]["custody_from_time"] | 09:00 |  |
-    | holidays["independence"]["custody_to_time"] | 09:00 |  |
+    | holidays["independence"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["independence"]["custody_to_time"] | 9:00 AM |  |
     | holidays["labor"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["labor"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["labor"]["custody_from_time"] | 09:00 |  |
-    | holidays["labor"]["custody_to_time"] | 09:00 |  |
+    | holidays["labor"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["labor"]["custody_to_time"] | 9:00 AM |  |
     | holidays["halloween"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["halloween"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["halloween"]["custody_from_time"] | 09:00 |  |
-    | holidays["halloween"]["custody_to_time"] | 09:00 |  |
+    | holidays["halloween"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["halloween"]["custody_to_time"] | 9:00 AM |  |
     | holidays["thanksgiving"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["thanksgiving"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["thanksgiving"]["custody_from_time"] | 09:00 |  |
-    | holidays["thanksgiving"]["custody_to_time"] | 09:00 |  |
+    | holidays["thanksgiving"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["thanksgiving"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_eve"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_eve"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_eve"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_eve"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_eve"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_eve"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_day"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_day"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_day"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_day"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_day"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_day"]["custody_to_time"] | 9:00 AM |  |
     | holidays["mother"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mother"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mother"]["custody_from_time"] | 09:00 |  |
-    | holidays["mother"]["custody_to_time"] | 09:00 |  |
+    | holidays["mother"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mother"]["custody_to_time"] | 9:00 AM |  |
     | holidays["father"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["father"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["father"]["custody_from_time"] | 09:00 |  |
-    | holidays["father"]["custody_to_time"] | 09:00 |  |
+    | holidays["father"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["father"]["custody_to_time"] | 9:00 AM |  |
     | holidays["petitioner_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["petitioner_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["petitioner_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["petitioner_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["petitioner_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["petitioner_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["respondent_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["respondent_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["respondent_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["respondent_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["respondent_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["respondent_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["children_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["children_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["children_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["children_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["children_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["children_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays_review | True |  |
     | dispute_resolution | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word wordx |  |
     | ask_about_dispute_resolution | True |  |
@@ -3293,16 +3275,15 @@ Scenario: Text exactly at each limit does NOT create an addendum
     | additional_children_information | True |  |
     | children_explanation | word word word word word word word word wordx |  |
     | users[0].has_self_employment_income | False |  |
-    | x.benefits.selected_types['food_stamps'] | False | users[0].benefits.selected_types |
+    | x.benefits.selected_types['food_stamps'] | True | users[0].benefits.selected_types |
     | x.benefits.selected_types['medicaid'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['ssi'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['tanf'] | False | users[0].benefits.selected_types |
-    | users[0].benefits.benefits.selected_types['food_stamps'] | True |  |
-    | x.benefits[0].source | food_stamps | users[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | users[0].benefits[0].value |
-    | x.benefits[0].value | 100 | users[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | users[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | users[0].benefits[0].value |
+    | x.benefits[i].value | 100 | users[0].benefits[0].value |
     | x.benefits.review_items | True |  |
-    | x.other_incomes.selected_types['social security'] | False | users[0].other_incomes.selected_types |
+    | x.other_incomes.selected_types['social security'] | True | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['retirement'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['pension'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['interest'] | False | users[0].other_incomes.selected_types |
@@ -3314,11 +3295,10 @@ Scenario: Text exactly at each limit does NOT create an addendum
     | x.other_incomes.selected_types['veteran'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['military'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['other'] | False | users[0].other_incomes.selected_types |
-    | users[0].other_incomes.other_incomes.selected_types['social security'] | True |  |
-    | x.other_incomes[0].source | social security | users[0].other_incomes[0].value |
-    | x.other_incomes[0].source_other | Sample Specify Type | users[0].other_incomes[0].value |
-    | x.other_incomes[0].times_per_year | 12 | users[0].other_incomes[0].value |
-    | x.other_incomes[0].value | 100 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source | social security | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source_other | Sample Specify Type | users[0].other_incomes[0].value |
+    | x.other_incomes[i].times_per_year | 12 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].value | 100 | users[0].other_incomes[0].value |
     | x.review_items | True |  |
     | x.other_child_support_received | 100 | users[0].other_child_support_received |
     | users[0].self_supporting | False |  |
@@ -3328,9 +3308,9 @@ Scenario: Text exactly at each limit does NOT create an addendum
     | other_parties[0].benefits.selected_types['ssi'] | False |  |
     | other_parties[0].benefits.selected_types['tanf'] | False |  |
     | other_parties[0].benefits_unknown | False |  |
-    | x.benefits[0].source | food_stamps | other_parties[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | other_parties[0].benefits[0].value |
-    | x.benefits[0].value | 100 | other_parties[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | other_parties[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | other_parties[0].benefits[0].value |
+    | x.benefits[i].value | 100 | other_parties[0].benefits[0].value |
     | other_parties[0].other_incomes.selected_types['social security'] | True |  |
     | other_parties[0].other_incomes.selected_types['retirement'] | False |  |
     | other_parties[0].other_incomes.selected_types['pension'] | False |  |
@@ -3350,16 +3330,15 @@ Scenario: Text exactly at each limit does NOT create an addendum
     | other_parties[0].other_incomes[0].value | 100 |  |
     | x.other_child_support_received | 100 | other_parties[0].other_child_support_received |
     | other_parties[0].self_supporting | False |  |
-    | x.expenses.selected_types['rent'] | False | users[0].expenses.selected_types |
+    | x.expenses.selected_types['rent'] | True | users[0].expenses.selected_types |
     | x.expenses.selected_types['utilities'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['food'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['medical'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['laundry'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['repairs'] | False | users[0].expenses.selected_types |
-    | users[0].expenses.expenses.selected_types['rent'] | True |  |
-    | x.expenses[0].source | rent | users[0].expenses[0].value |
-    | x.expenses[0].value | 100 | users[0].expenses[0].value |
-    | x.expenses[0].times_per_year | 12 | users[0].expenses[0].value |
+    | x.expenses[i].source | rent | users[0].expenses[0].value |
+    | x.expenses[i].value | 100 | users[0].expenses[0].value |
+    | x.expenses[i].times_per_year | 12 | users[0].expenses[0].value |
     | x.other_child_support_paid | 100 | users[0].other_child_support_paid |
     | other_parties[0].expenses.selected_types['rent'] | True |  |
     | other_parties[0].expenses.selected_types['utilities'] | False |  |
@@ -3372,11 +3351,10 @@ Scenario: Text exactly at each limit does NOT create an addendum
     | other_parties[0].expenses[0].value | 100 |  |
     | other_parties[0].expenses[0].times_per_year | 12 |  |
     | x.other_child_support_paid | 100 | other_parties[0].other_child_support_paid |
-    | x.selected_types['house'] | False | real_estate.selected_types |
+    | x.selected_types['house'] | True | real_estate.selected_types |
     | x.selected_types['condominium'] | False | real_estate.selected_types |
     | x.selected_types['leasehold'] | False | real_estate.selected_types |
     | x.selected_types['other'] | False | real_estate.selected_types |
-    | real_estate.selected_types['house'] | True |  |
     | real_estate[0].source | house |  |
     | real_estate[0].address | 123 Main St |  |
     | real_estate[0].legal_description_attach | False |  |
@@ -3388,7 +3366,7 @@ Scenario: Text exactly at each limit does NOT create an addendum
     | real_estate[0].recommended_award | Firstname S. Lastname Jr |  |
     | real_estate[0].legal_description | Sample Legal description |  |
     | assets_warning | True |  |
-    | x.selected_types['car'] | False | vehicles.selected_types |
+    | x.selected_types['car'] | True | vehicles.selected_types |
     | x.selected_types['truck'] | False | vehicles.selected_types |
     | x.selected_types['motorcycle'] | False | vehicles.selected_types |
     | x.selected_types['mobile_home'] | False | vehicles.selected_types |
@@ -3396,7 +3374,6 @@ Scenario: Text exactly at each limit does NOT create an addendum
     | x.selected_types['boat'] | False | vehicles.selected_types |
     | x.selected_types['airplane'] | False | vehicles.selected_types |
     | x.selected_types['other'] | False | vehicles.selected_types |
-    | vehicles.selected_types['car'] | True |  |
     | vehicles[0].source | car |  |
     | vehicles[0].year | Sample Year |  |
     | vehicles[0].make | Sample Make |  |
@@ -3427,13 +3404,12 @@ Scenario: Text exactly at each limit does NOT create an addendum
     | personal_goods[0].marital_property | Marital |  |
     | personal_goods[0].has_possession | Firstname S. Lastname Jr |  |
     | personal_goods[0].recommended_award | Firstname S. Lastname Jr |  |
-    | x.selected_types['checking account'] | False | bank_assets.selected_types |
+    | x.selected_types['checking account'] | True | bank_assets.selected_types |
     | x.selected_types['savings account'] | False | bank_assets.selected_types |
     | x.selected_types['time deposit'] | False | bank_assets.selected_types |
     | x.selected_types['money market'] | False | bank_assets.selected_types |
     | x.selected_types['certificates'] | False | bank_assets.selected_types |
     | x.selected_types['other'] | False | bank_assets.selected_types |
-    | bank_assets.selected_types['checking account'] | True |  |
     | bank_assets[0].source | checking account |  |
     | bank_assets[0].institution | Sample Bank or Institution |  |
     | bank_assets[0].account_number | Sample Account number |  |
@@ -3588,8 +3564,10 @@ Scenario: Respondent Answer: long denials and other-relief text overflow
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | False |  |
+    | legal_custody_sole_explanation | Sample text legal_custody_sole_explanation |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
+    | visitation | False |  |
     | child_support | Firstname S. Lastname Jr |  |
     | child_support_method_of_payment | income_withholding |  |
     | child_support_start_date | judgment_date |  |
@@ -3674,60 +3652,60 @@ Scenario: Respondent Answer: long denials and other-relief text overflow
     | holidays['children_birthday']['different'] | False |  |
     | holidays["mlk"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mlk"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mlk"]["custody_from_time"] | 09:00 |  |
-    | holidays["mlk"]["custody_to_time"] | 09:00 |  |
+    | holidays["mlk"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mlk"]["custody_to_time"] | 9:00 AM |  |
     | holidays["president"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["president"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["president"]["custody_from_time"] | 09:00 |  |
-    | holidays["president"]["custody_to_time"] | 09:00 |  |
+    | holidays["president"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["president"]["custody_to_time"] | 9:00 AM |  |
     | holidays["memorial"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["memorial"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["memorial"]["custody_from_time"] | 09:00 |  |
-    | holidays["memorial"]["custody_to_time"] | 09:00 |  |
+    | holidays["memorial"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["memorial"]["custody_to_time"] | 9:00 AM |  |
     | holidays["independence"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["independence"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["independence"]["custody_from_time"] | 09:00 |  |
-    | holidays["independence"]["custody_to_time"] | 09:00 |  |
+    | holidays["independence"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["independence"]["custody_to_time"] | 9:00 AM |  |
     | holidays["labor"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["labor"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["labor"]["custody_from_time"] | 09:00 |  |
-    | holidays["labor"]["custody_to_time"] | 09:00 |  |
+    | holidays["labor"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["labor"]["custody_to_time"] | 9:00 AM |  |
     | holidays["halloween"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["halloween"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["halloween"]["custody_from_time"] | 09:00 |  |
-    | holidays["halloween"]["custody_to_time"] | 09:00 |  |
+    | holidays["halloween"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["halloween"]["custody_to_time"] | 9:00 AM |  |
     | holidays["thanksgiving"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["thanksgiving"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["thanksgiving"]["custody_from_time"] | 09:00 |  |
-    | holidays["thanksgiving"]["custody_to_time"] | 09:00 |  |
+    | holidays["thanksgiving"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["thanksgiving"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_eve"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_eve"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_eve"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_eve"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_eve"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_eve"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_day"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_day"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_day"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_day"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_day"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_day"]["custody_to_time"] | 9:00 AM |  |
     | holidays["mother"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mother"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mother"]["custody_from_time"] | 09:00 |  |
-    | holidays["mother"]["custody_to_time"] | 09:00 |  |
+    | holidays["mother"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mother"]["custody_to_time"] | 9:00 AM |  |
     | holidays["father"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["father"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["father"]["custody_from_time"] | 09:00 |  |
-    | holidays["father"]["custody_to_time"] | 09:00 |  |
+    | holidays["father"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["father"]["custody_to_time"] | 9:00 AM |  |
     | holidays["petitioner_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["petitioner_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["petitioner_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["petitioner_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["petitioner_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["petitioner_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["respondent_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["respondent_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["respondent_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["respondent_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["respondent_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["respondent_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["children_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["children_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["children_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["children_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["children_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["children_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays_review | True |  |
     | dispute_resolution | Sample text Is there another way you would like to r |  |
     | ask_about_dispute_resolution | True |  |
@@ -3754,16 +3732,15 @@ Scenario: Respondent Answer: long denials and other-relief text overflow
     | family_support_order | False |  |
     | additional_children_information | True |  |
     | users[0].has_self_employment_income | False |  |
-    | x.benefits.selected_types['food_stamps'] | False | users[0].benefits.selected_types |
+    | x.benefits.selected_types['food_stamps'] | True | users[0].benefits.selected_types |
     | x.benefits.selected_types['medicaid'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['ssi'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['tanf'] | False | users[0].benefits.selected_types |
-    | users[0].benefits.benefits.selected_types['food_stamps'] | True |  |
-    | x.benefits[0].source | food_stamps | users[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | users[0].benefits[0].value |
-    | x.benefits[0].value | 100 | users[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | users[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | users[0].benefits[0].value |
+    | x.benefits[i].value | 100 | users[0].benefits[0].value |
     | x.benefits.review_items | True |  |
-    | x.other_incomes.selected_types['social security'] | False | users[0].other_incomes.selected_types |
+    | x.other_incomes.selected_types['social security'] | True | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['retirement'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['pension'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['interest'] | False | users[0].other_incomes.selected_types |
@@ -3775,11 +3752,10 @@ Scenario: Respondent Answer: long denials and other-relief text overflow
     | x.other_incomes.selected_types['veteran'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['military'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['other'] | False | users[0].other_incomes.selected_types |
-    | users[0].other_incomes.other_incomes.selected_types['social security'] | True |  |
-    | x.other_incomes[0].source | social security | users[0].other_incomes[0].value |
-    | x.other_incomes[0].source_other | Sample Specify Type | users[0].other_incomes[0].value |
-    | x.other_incomes[0].times_per_year | 12 | users[0].other_incomes[0].value |
-    | x.other_incomes[0].value | 100 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source | social security | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source_other | Sample Specify Type | users[0].other_incomes[0].value |
+    | x.other_incomes[i].times_per_year | 12 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].value | 100 | users[0].other_incomes[0].value |
     | x.review_items | True |  |
     | x.maintenance_other_received | 100 | users[0].maintenance_other_received |
     | x.other_child_support_received | 100 | users[0].other_child_support_received |
@@ -3789,9 +3765,9 @@ Scenario: Respondent Answer: long denials and other-relief text overflow
     | other_parties[0].benefits.selected_types['ssi'] | False |  |
     | other_parties[0].benefits.selected_types['tanf'] | False |  |
     | other_parties[0].benefits_unknown | False |  |
-    | x.benefits[0].source | food_stamps | other_parties[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | other_parties[0].benefits[0].value |
-    | x.benefits[0].value | 100 | other_parties[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | other_parties[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | other_parties[0].benefits[0].value |
+    | x.benefits[i].value | 100 | other_parties[0].benefits[0].value |
     | other_parties[0].other_incomes.selected_types['social security'] | True |  |
     | other_parties[0].other_incomes.selected_types['retirement'] | False |  |
     | other_parties[0].other_incomes.selected_types['pension'] | False |  |
@@ -3811,16 +3787,15 @@ Scenario: Respondent Answer: long denials and other-relief text overflow
     | other_parties[0].other_incomes[0].value | 100 |  |
     | x.maintenance_other_received | 100 | other_parties[0].maintenance_other_received |
     | x.other_child_support_received | 100 | other_parties[0].other_child_support_received |
-    | x.expenses.selected_types['rent'] | False | users[0].expenses.selected_types |
+    | x.expenses.selected_types['rent'] | True | users[0].expenses.selected_types |
     | x.expenses.selected_types['utilities'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['food'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['medical'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['laundry'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['repairs'] | False | users[0].expenses.selected_types |
-    | users[0].expenses.expenses.selected_types['rent'] | True |  |
-    | x.expenses[0].source | rent | users[0].expenses[0].value |
-    | x.expenses[0].value | 100 | users[0].expenses[0].value |
-    | x.expenses[0].times_per_year | 12 | users[0].expenses[0].value |
+    | x.expenses[i].source | rent | users[0].expenses[0].value |
+    | x.expenses[i].value | 100 | users[0].expenses[0].value |
+    | x.expenses[i].times_per_year | 12 | users[0].expenses[0].value |
     | x.maintenance_other_paid | 100 | users[0].maintenance_other_paid |
     | x.other_child_support_paid | 100 | users[0].other_child_support_paid |
     | other_parties[0].expenses.selected_types['rent'] | True |  |
@@ -3835,11 +3810,10 @@ Scenario: Respondent Answer: long denials and other-relief text overflow
     | other_parties[0].expenses[0].times_per_year | 12 |  |
     | x.maintenance_other_paid | 100 | other_parties[0].maintenance_other_paid |
     | x.other_child_support_paid | 100 | other_parties[0].other_child_support_paid |
-    | x.selected_types['house'] | False | real_estate.selected_types |
+    | x.selected_types['house'] | True | real_estate.selected_types |
     | x.selected_types['condominium'] | False | real_estate.selected_types |
     | x.selected_types['leasehold'] | False | real_estate.selected_types |
     | x.selected_types['other'] | False | real_estate.selected_types |
-    | real_estate.selected_types['house'] | True |  |
     | real_estate[0].source | house |  |
     | real_estate[0].address | 123 Main St |  |
     | real_estate[0].legal_description_attach | False |  |
@@ -3851,7 +3825,7 @@ Scenario: Respondent Answer: long denials and other-relief text overflow
     | real_estate[0].recommended_award | Firstname S. Lastname Jr |  |
     | real_estate[0].legal_description | Sample Legal description |  |
     | assets_warning | True |  |
-    | x.selected_types['car'] | False | vehicles.selected_types |
+    | x.selected_types['car'] | True | vehicles.selected_types |
     | x.selected_types['truck'] | False | vehicles.selected_types |
     | x.selected_types['motorcycle'] | False | vehicles.selected_types |
     | x.selected_types['mobile_home'] | False | vehicles.selected_types |
@@ -3859,7 +3833,6 @@ Scenario: Respondent Answer: long denials and other-relief text overflow
     | x.selected_types['boat'] | False | vehicles.selected_types |
     | x.selected_types['airplane'] | False | vehicles.selected_types |
     | x.selected_types['other'] | False | vehicles.selected_types |
-    | vehicles.selected_types['car'] | True |  |
     | vehicles[0].source | car |  |
     | vehicles[0].year | Sample Year |  |
     | vehicles[0].make | Sample Make |  |
@@ -3890,13 +3863,12 @@ Scenario: Respondent Answer: long denials and other-relief text overflow
     | personal_goods[0].marital_property | Marital |  |
     | personal_goods[0].has_possession | Firstname S. Lastname Jr |  |
     | personal_goods[0].recommended_award | Firstname S. Lastname Jr |  |
-    | x.selected_types['checking account'] | False | bank_assets.selected_types |
+    | x.selected_types['checking account'] | True | bank_assets.selected_types |
     | x.selected_types['savings account'] | False | bank_assets.selected_types |
     | x.selected_types['time deposit'] | False | bank_assets.selected_types |
     | x.selected_types['money market'] | False | bank_assets.selected_types |
     | x.selected_types['certificates'] | False | bank_assets.selected_types |
     | x.selected_types['other'] | False | bank_assets.selected_types |
-    | bank_assets.selected_types['checking account'] | True |  |
     | bank_assets[0].source | checking account |  |
     | bank_assets[0].institution | Sample Bank or Institution |  |
     | bank_assets[0].account_number | Sample Account number |  |
@@ -4044,8 +4016,10 @@ Scenario: Respondent Answer: 4 people the children lived with (limit 3) must not
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | False |  |
+    | legal_custody_sole_explanation | Sample text legal_custody_sole_explanation |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
+    | visitation | False |  |
     | child_support | Firstname S. Lastname Jr |  |
     | child_support_method_of_payment | income_withholding |  |
     | child_support_start_date | judgment_date |  |
@@ -4158,60 +4132,60 @@ Scenario: Respondent Answer: 4 people the children lived with (limit 3) must not
     | holidays['children_birthday']['different'] | False |  |
     | holidays["mlk"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mlk"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mlk"]["custody_from_time"] | 09:00 |  |
-    | holidays["mlk"]["custody_to_time"] | 09:00 |  |
+    | holidays["mlk"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mlk"]["custody_to_time"] | 9:00 AM |  |
     | holidays["president"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["president"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["president"]["custody_from_time"] | 09:00 |  |
-    | holidays["president"]["custody_to_time"] | 09:00 |  |
+    | holidays["president"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["president"]["custody_to_time"] | 9:00 AM |  |
     | holidays["memorial"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["memorial"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["memorial"]["custody_from_time"] | 09:00 |  |
-    | holidays["memorial"]["custody_to_time"] | 09:00 |  |
+    | holidays["memorial"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["memorial"]["custody_to_time"] | 9:00 AM |  |
     | holidays["independence"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["independence"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["independence"]["custody_from_time"] | 09:00 |  |
-    | holidays["independence"]["custody_to_time"] | 09:00 |  |
+    | holidays["independence"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["independence"]["custody_to_time"] | 9:00 AM |  |
     | holidays["labor"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["labor"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["labor"]["custody_from_time"] | 09:00 |  |
-    | holidays["labor"]["custody_to_time"] | 09:00 |  |
+    | holidays["labor"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["labor"]["custody_to_time"] | 9:00 AM |  |
     | holidays["halloween"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["halloween"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["halloween"]["custody_from_time"] | 09:00 |  |
-    | holidays["halloween"]["custody_to_time"] | 09:00 |  |
+    | holidays["halloween"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["halloween"]["custody_to_time"] | 9:00 AM |  |
     | holidays["thanksgiving"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["thanksgiving"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["thanksgiving"]["custody_from_time"] | 09:00 |  |
-    | holidays["thanksgiving"]["custody_to_time"] | 09:00 |  |
+    | holidays["thanksgiving"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["thanksgiving"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_eve"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_eve"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_eve"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_eve"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_eve"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_eve"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_day"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_day"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_day"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_day"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_day"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_day"]["custody_to_time"] | 9:00 AM |  |
     | holidays["mother"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mother"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mother"]["custody_from_time"] | 09:00 |  |
-    | holidays["mother"]["custody_to_time"] | 09:00 |  |
+    | holidays["mother"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mother"]["custody_to_time"] | 9:00 AM |  |
     | holidays["father"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["father"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["father"]["custody_from_time"] | 09:00 |  |
-    | holidays["father"]["custody_to_time"] | 09:00 |  |
+    | holidays["father"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["father"]["custody_to_time"] | 9:00 AM |  |
     | holidays["petitioner_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["petitioner_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["petitioner_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["petitioner_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["petitioner_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["petitioner_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["respondent_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["respondent_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["respondent_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["respondent_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["respondent_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["respondent_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["children_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["children_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["children_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["children_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["children_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["children_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays_review | True |  |
     | dispute_resolution | Sample text Is there another way you would like to r |  |
     | ask_about_dispute_resolution | True |  |
@@ -4237,16 +4211,15 @@ Scenario: Respondent Answer: 4 people the children lived with (limit 3) must not
     | family_support_order | False |  |
     | additional_children_information | True |  |
     | users[0].has_self_employment_income | False |  |
-    | x.benefits.selected_types['food_stamps'] | False | users[0].benefits.selected_types |
+    | x.benefits.selected_types['food_stamps'] | True | users[0].benefits.selected_types |
     | x.benefits.selected_types['medicaid'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['ssi'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['tanf'] | False | users[0].benefits.selected_types |
-    | users[0].benefits.benefits.selected_types['food_stamps'] | True |  |
-    | x.benefits[0].source | food_stamps | users[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | users[0].benefits[0].value |
-    | x.benefits[0].value | 100 | users[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | users[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | users[0].benefits[0].value |
+    | x.benefits[i].value | 100 | users[0].benefits[0].value |
     | x.benefits.review_items | True |  |
-    | x.other_incomes.selected_types['social security'] | False | users[0].other_incomes.selected_types |
+    | x.other_incomes.selected_types['social security'] | True | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['retirement'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['pension'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['interest'] | False | users[0].other_incomes.selected_types |
@@ -4258,11 +4231,10 @@ Scenario: Respondent Answer: 4 people the children lived with (limit 3) must not
     | x.other_incomes.selected_types['veteran'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['military'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['other'] | False | users[0].other_incomes.selected_types |
-    | users[0].other_incomes.other_incomes.selected_types['social security'] | True |  |
-    | x.other_incomes[0].source | social security | users[0].other_incomes[0].value |
-    | x.other_incomes[0].source_other | Sample Specify Type | users[0].other_incomes[0].value |
-    | x.other_incomes[0].times_per_year | 12 | users[0].other_incomes[0].value |
-    | x.other_incomes[0].value | 100 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source | social security | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source_other | Sample Specify Type | users[0].other_incomes[0].value |
+    | x.other_incomes[i].times_per_year | 12 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].value | 100 | users[0].other_incomes[0].value |
     | x.review_items | True |  |
     | x.maintenance_other_received | 100 | users[0].maintenance_other_received |
     | x.other_child_support_received | 100 | users[0].other_child_support_received |
@@ -4272,9 +4244,9 @@ Scenario: Respondent Answer: 4 people the children lived with (limit 3) must not
     | other_parties[0].benefits.selected_types['ssi'] | False |  |
     | other_parties[0].benefits.selected_types['tanf'] | False |  |
     | other_parties[0].benefits_unknown | False |  |
-    | x.benefits[0].source | food_stamps | other_parties[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | other_parties[0].benefits[0].value |
-    | x.benefits[0].value | 100 | other_parties[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | other_parties[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | other_parties[0].benefits[0].value |
+    | x.benefits[i].value | 100 | other_parties[0].benefits[0].value |
     | other_parties[0].other_incomes.selected_types['social security'] | True |  |
     | other_parties[0].other_incomes.selected_types['retirement'] | False |  |
     | other_parties[0].other_incomes.selected_types['pension'] | False |  |
@@ -4294,16 +4266,15 @@ Scenario: Respondent Answer: 4 people the children lived with (limit 3) must not
     | other_parties[0].other_incomes[0].value | 100 |  |
     | x.maintenance_other_received | 100 | other_parties[0].maintenance_other_received |
     | x.other_child_support_received | 100 | other_parties[0].other_child_support_received |
-    | x.expenses.selected_types['rent'] | False | users[0].expenses.selected_types |
+    | x.expenses.selected_types['rent'] | True | users[0].expenses.selected_types |
     | x.expenses.selected_types['utilities'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['food'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['medical'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['laundry'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['repairs'] | False | users[0].expenses.selected_types |
-    | users[0].expenses.expenses.selected_types['rent'] | True |  |
-    | x.expenses[0].source | rent | users[0].expenses[0].value |
-    | x.expenses[0].value | 100 | users[0].expenses[0].value |
-    | x.expenses[0].times_per_year | 12 | users[0].expenses[0].value |
+    | x.expenses[i].source | rent | users[0].expenses[0].value |
+    | x.expenses[i].value | 100 | users[0].expenses[0].value |
+    | x.expenses[i].times_per_year | 12 | users[0].expenses[0].value |
     | x.maintenance_other_paid | 100 | users[0].maintenance_other_paid |
     | x.other_child_support_paid | 100 | users[0].other_child_support_paid |
     | other_parties[0].expenses.selected_types['rent'] | True |  |
@@ -4318,11 +4289,10 @@ Scenario: Respondent Answer: 4 people the children lived with (limit 3) must not
     | other_parties[0].expenses[0].times_per_year | 12 |  |
     | x.maintenance_other_paid | 100 | other_parties[0].maintenance_other_paid |
     | x.other_child_support_paid | 100 | other_parties[0].other_child_support_paid |
-    | x.selected_types['house'] | False | real_estate.selected_types |
+    | x.selected_types['house'] | True | real_estate.selected_types |
     | x.selected_types['condominium'] | False | real_estate.selected_types |
     | x.selected_types['leasehold'] | False | real_estate.selected_types |
     | x.selected_types['other'] | False | real_estate.selected_types |
-    | real_estate.selected_types['house'] | True |  |
     | real_estate[0].source | house |  |
     | real_estate[0].address | 123 Main St |  |
     | real_estate[0].legal_description_attach | False |  |
@@ -4334,7 +4304,7 @@ Scenario: Respondent Answer: 4 people the children lived with (limit 3) must not
     | real_estate[0].recommended_award | Firstname S. Lastname Jr |  |
     | real_estate[0].legal_description | Sample Legal description |  |
     | assets_warning | True |  |
-    | x.selected_types['car'] | False | vehicles.selected_types |
+    | x.selected_types['car'] | True | vehicles.selected_types |
     | x.selected_types['truck'] | False | vehicles.selected_types |
     | x.selected_types['motorcycle'] | False | vehicles.selected_types |
     | x.selected_types['mobile_home'] | False | vehicles.selected_types |
@@ -4342,7 +4312,6 @@ Scenario: Respondent Answer: 4 people the children lived with (limit 3) must not
     | x.selected_types['boat'] | False | vehicles.selected_types |
     | x.selected_types['airplane'] | False | vehicles.selected_types |
     | x.selected_types['other'] | False | vehicles.selected_types |
-    | vehicles.selected_types['car'] | True |  |
     | vehicles[0].source | car |  |
     | vehicles[0].year | Sample Year |  |
     | vehicles[0].make | Sample Make |  |
@@ -4373,13 +4342,12 @@ Scenario: Respondent Answer: 4 people the children lived with (limit 3) must not
     | personal_goods[0].marital_property | Marital |  |
     | personal_goods[0].has_possession | Firstname S. Lastname Jr |  |
     | personal_goods[0].recommended_award | Firstname S. Lastname Jr |  |
-    | x.selected_types['checking account'] | False | bank_assets.selected_types |
+    | x.selected_types['checking account'] | True | bank_assets.selected_types |
     | x.selected_types['savings account'] | False | bank_assets.selected_types |
     | x.selected_types['time deposit'] | False | bank_assets.selected_types |
     | x.selected_types['money market'] | False | bank_assets.selected_types |
     | x.selected_types['certificates'] | False | bank_assets.selected_types |
     | x.selected_types['other'] | False | bank_assets.selected_types |
-    | bank_assets.selected_types['checking account'] | True |  |
     | bank_assets[0].source | checking account |  |
     | bank_assets[0].institution | Sample Bank or Institution |  |
     | bank_assets[0].account_number | Sample Account number |  |
@@ -4527,8 +4495,10 @@ Scenario: Respondent Answer: 7 children (limit 6) must not break generation
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | False |  |
+    | legal_custody_sole_explanation | Sample text legal_custody_sole_explanation |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
+    | visitation | False |  |
     | child_support | Firstname S. Lastname Jr |  |
     | child_support_method_of_payment | income_withholding |  |
     | child_support_start_date | judgment_date |  |
@@ -4703,60 +4673,60 @@ Scenario: Respondent Answer: 7 children (limit 6) must not break generation
     | holidays['children_birthday']['different'] | False |  |
     | holidays["mlk"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mlk"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mlk"]["custody_from_time"] | 09:00 |  |
-    | holidays["mlk"]["custody_to_time"] | 09:00 |  |
+    | holidays["mlk"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mlk"]["custody_to_time"] | 9:00 AM |  |
     | holidays["president"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["president"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["president"]["custody_from_time"] | 09:00 |  |
-    | holidays["president"]["custody_to_time"] | 09:00 |  |
+    | holidays["president"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["president"]["custody_to_time"] | 9:00 AM |  |
     | holidays["memorial"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["memorial"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["memorial"]["custody_from_time"] | 09:00 |  |
-    | holidays["memorial"]["custody_to_time"] | 09:00 |  |
+    | holidays["memorial"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["memorial"]["custody_to_time"] | 9:00 AM |  |
     | holidays["independence"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["independence"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["independence"]["custody_from_time"] | 09:00 |  |
-    | holidays["independence"]["custody_to_time"] | 09:00 |  |
+    | holidays["independence"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["independence"]["custody_to_time"] | 9:00 AM |  |
     | holidays["labor"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["labor"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["labor"]["custody_from_time"] | 09:00 |  |
-    | holidays["labor"]["custody_to_time"] | 09:00 |  |
+    | holidays["labor"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["labor"]["custody_to_time"] | 9:00 AM |  |
     | holidays["halloween"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["halloween"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["halloween"]["custody_from_time"] | 09:00 |  |
-    | holidays["halloween"]["custody_to_time"] | 09:00 |  |
+    | holidays["halloween"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["halloween"]["custody_to_time"] | 9:00 AM |  |
     | holidays["thanksgiving"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["thanksgiving"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["thanksgiving"]["custody_from_time"] | 09:00 |  |
-    | holidays["thanksgiving"]["custody_to_time"] | 09:00 |  |
+    | holidays["thanksgiving"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["thanksgiving"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_eve"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_eve"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_eve"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_eve"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_eve"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_eve"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_day"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_day"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_day"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_day"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_day"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_day"]["custody_to_time"] | 9:00 AM |  |
     | holidays["mother"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mother"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mother"]["custody_from_time"] | 09:00 |  |
-    | holidays["mother"]["custody_to_time"] | 09:00 |  |
+    | holidays["mother"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mother"]["custody_to_time"] | 9:00 AM |  |
     | holidays["father"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["father"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["father"]["custody_from_time"] | 09:00 |  |
-    | holidays["father"]["custody_to_time"] | 09:00 |  |
+    | holidays["father"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["father"]["custody_to_time"] | 9:00 AM |  |
     | holidays["petitioner_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["petitioner_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["petitioner_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["petitioner_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["petitioner_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["petitioner_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["respondent_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["respondent_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["respondent_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["respondent_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["respondent_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["respondent_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["children_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["children_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["children_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["children_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["children_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["children_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays_review | True |  |
     | dispute_resolution | Sample text Is there another way you would like to r |  |
     | ask_about_dispute_resolution | True |  |
@@ -4782,16 +4752,15 @@ Scenario: Respondent Answer: 7 children (limit 6) must not break generation
     | family_support_order | False |  |
     | additional_children_information | True |  |
     | users[0].has_self_employment_income | False |  |
-    | x.benefits.selected_types['food_stamps'] | False | users[0].benefits.selected_types |
+    | x.benefits.selected_types['food_stamps'] | True | users[0].benefits.selected_types |
     | x.benefits.selected_types['medicaid'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['ssi'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['tanf'] | False | users[0].benefits.selected_types |
-    | users[0].benefits.benefits.selected_types['food_stamps'] | True |  |
-    | x.benefits[0].source | food_stamps | users[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | users[0].benefits[0].value |
-    | x.benefits[0].value | 100 | users[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | users[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | users[0].benefits[0].value |
+    | x.benefits[i].value | 100 | users[0].benefits[0].value |
     | x.benefits.review_items | True |  |
-    | x.other_incomes.selected_types['social security'] | False | users[0].other_incomes.selected_types |
+    | x.other_incomes.selected_types['social security'] | True | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['retirement'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['pension'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['interest'] | False | users[0].other_incomes.selected_types |
@@ -4803,11 +4772,10 @@ Scenario: Respondent Answer: 7 children (limit 6) must not break generation
     | x.other_incomes.selected_types['veteran'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['military'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['other'] | False | users[0].other_incomes.selected_types |
-    | users[0].other_incomes.other_incomes.selected_types['social security'] | True |  |
-    | x.other_incomes[0].source | social security | users[0].other_incomes[0].value |
-    | x.other_incomes[0].source_other | Sample Specify Type | users[0].other_incomes[0].value |
-    | x.other_incomes[0].times_per_year | 12 | users[0].other_incomes[0].value |
-    | x.other_incomes[0].value | 100 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source | social security | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source_other | Sample Specify Type | users[0].other_incomes[0].value |
+    | x.other_incomes[i].times_per_year | 12 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].value | 100 | users[0].other_incomes[0].value |
     | x.review_items | True |  |
     | x.maintenance_other_received | 100 | users[0].maintenance_other_received |
     | x.other_child_support_received | 100 | users[0].other_child_support_received |
@@ -4817,9 +4785,9 @@ Scenario: Respondent Answer: 7 children (limit 6) must not break generation
     | other_parties[0].benefits.selected_types['ssi'] | False |  |
     | other_parties[0].benefits.selected_types['tanf'] | False |  |
     | other_parties[0].benefits_unknown | False |  |
-    | x.benefits[0].source | food_stamps | other_parties[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | other_parties[0].benefits[0].value |
-    | x.benefits[0].value | 100 | other_parties[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | other_parties[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | other_parties[0].benefits[0].value |
+    | x.benefits[i].value | 100 | other_parties[0].benefits[0].value |
     | other_parties[0].other_incomes.selected_types['social security'] | True |  |
     | other_parties[0].other_incomes.selected_types['retirement'] | False |  |
     | other_parties[0].other_incomes.selected_types['pension'] | False |  |
@@ -4839,16 +4807,15 @@ Scenario: Respondent Answer: 7 children (limit 6) must not break generation
     | other_parties[0].other_incomes[0].value | 100 |  |
     | x.maintenance_other_received | 100 | other_parties[0].maintenance_other_received |
     | x.other_child_support_received | 100 | other_parties[0].other_child_support_received |
-    | x.expenses.selected_types['rent'] | False | users[0].expenses.selected_types |
+    | x.expenses.selected_types['rent'] | True | users[0].expenses.selected_types |
     | x.expenses.selected_types['utilities'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['food'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['medical'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['laundry'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['repairs'] | False | users[0].expenses.selected_types |
-    | users[0].expenses.expenses.selected_types['rent'] | True |  |
-    | x.expenses[0].source | rent | users[0].expenses[0].value |
-    | x.expenses[0].value | 100 | users[0].expenses[0].value |
-    | x.expenses[0].times_per_year | 12 | users[0].expenses[0].value |
+    | x.expenses[i].source | rent | users[0].expenses[0].value |
+    | x.expenses[i].value | 100 | users[0].expenses[0].value |
+    | x.expenses[i].times_per_year | 12 | users[0].expenses[0].value |
     | x.maintenance_other_paid | 100 | users[0].maintenance_other_paid |
     | x.other_child_support_paid | 100 | users[0].other_child_support_paid |
     | other_parties[0].expenses.selected_types['rent'] | True |  |
@@ -4863,11 +4830,10 @@ Scenario: Respondent Answer: 7 children (limit 6) must not break generation
     | other_parties[0].expenses[0].times_per_year | 12 |  |
     | x.maintenance_other_paid | 100 | other_parties[0].maintenance_other_paid |
     | x.other_child_support_paid | 100 | other_parties[0].other_child_support_paid |
-    | x.selected_types['house'] | False | real_estate.selected_types |
+    | x.selected_types['house'] | True | real_estate.selected_types |
     | x.selected_types['condominium'] | False | real_estate.selected_types |
     | x.selected_types['leasehold'] | False | real_estate.selected_types |
     | x.selected_types['other'] | False | real_estate.selected_types |
-    | real_estate.selected_types['house'] | True |  |
     | real_estate[0].source | house |  |
     | real_estate[0].address | 123 Main St |  |
     | real_estate[0].legal_description_attach | False |  |
@@ -4879,7 +4845,7 @@ Scenario: Respondent Answer: 7 children (limit 6) must not break generation
     | real_estate[0].recommended_award | Firstname S. Lastname Jr |  |
     | real_estate[0].legal_description | Sample Legal description |  |
     | assets_warning | True |  |
-    | x.selected_types['car'] | False | vehicles.selected_types |
+    | x.selected_types['car'] | True | vehicles.selected_types |
     | x.selected_types['truck'] | False | vehicles.selected_types |
     | x.selected_types['motorcycle'] | False | vehicles.selected_types |
     | x.selected_types['mobile_home'] | False | vehicles.selected_types |
@@ -4887,7 +4853,6 @@ Scenario: Respondent Answer: 7 children (limit 6) must not break generation
     | x.selected_types['boat'] | False | vehicles.selected_types |
     | x.selected_types['airplane'] | False | vehicles.selected_types |
     | x.selected_types['other'] | False | vehicles.selected_types |
-    | vehicles.selected_types['car'] | True |  |
     | vehicles[0].source | car |  |
     | vehicles[0].year | Sample Year |  |
     | vehicles[0].make | Sample Make |  |
@@ -4918,13 +4883,12 @@ Scenario: Respondent Answer: 7 children (limit 6) must not break generation
     | personal_goods[0].marital_property | Marital |  |
     | personal_goods[0].has_possession | Firstname S. Lastname Jr |  |
     | personal_goods[0].recommended_award | Firstname S. Lastname Jr |  |
-    | x.selected_types['checking account'] | False | bank_assets.selected_types |
+    | x.selected_types['checking account'] | True | bank_assets.selected_types |
     | x.selected_types['savings account'] | False | bank_assets.selected_types |
     | x.selected_types['time deposit'] | False | bank_assets.selected_types |
     | x.selected_types['money market'] | False | bank_assets.selected_types |
     | x.selected_types['certificates'] | False | bank_assets.selected_types |
     | x.selected_types['other'] | False | bank_assets.selected_types |
-    | bank_assets.selected_types['checking account'] | True |  |
     | bank_assets[0].source | checking account |  |
     | bank_assets[0].institution | Sample Bank or Institution |  |
     | bank_assets[0].account_number | Sample Account number |  |
@@ -5083,8 +5047,10 @@ Scenario: Fee waiver: 3 vehicles (limit 2) must not break generation
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | False |  |
+    | legal_custody_sole_explanation | Sample text legal_custody_sole_explanation |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
+    | visitation | False |  |
     | child_support | Firstname S. Lastname Jr |  |
     | child_support_method_of_payment | income_withholding |  |
     | child_support_start_date | judgment_date |  |
@@ -5175,60 +5141,60 @@ Scenario: Fee waiver: 3 vehicles (limit 2) must not break generation
     | holidays['children_birthday']['different'] | False |  |
     | holidays["mlk"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mlk"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mlk"]["custody_from_time"] | 09:00 |  |
-    | holidays["mlk"]["custody_to_time"] | 09:00 |  |
+    | holidays["mlk"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mlk"]["custody_to_time"] | 9:00 AM |  |
     | holidays["president"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["president"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["president"]["custody_from_time"] | 09:00 |  |
-    | holidays["president"]["custody_to_time"] | 09:00 |  |
+    | holidays["president"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["president"]["custody_to_time"] | 9:00 AM |  |
     | holidays["memorial"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["memorial"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["memorial"]["custody_from_time"] | 09:00 |  |
-    | holidays["memorial"]["custody_to_time"] | 09:00 |  |
+    | holidays["memorial"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["memorial"]["custody_to_time"] | 9:00 AM |  |
     | holidays["independence"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["independence"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["independence"]["custody_from_time"] | 09:00 |  |
-    | holidays["independence"]["custody_to_time"] | 09:00 |  |
+    | holidays["independence"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["independence"]["custody_to_time"] | 9:00 AM |  |
     | holidays["labor"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["labor"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["labor"]["custody_from_time"] | 09:00 |  |
-    | holidays["labor"]["custody_to_time"] | 09:00 |  |
+    | holidays["labor"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["labor"]["custody_to_time"] | 9:00 AM |  |
     | holidays["halloween"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["halloween"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["halloween"]["custody_from_time"] | 09:00 |  |
-    | holidays["halloween"]["custody_to_time"] | 09:00 |  |
+    | holidays["halloween"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["halloween"]["custody_to_time"] | 9:00 AM |  |
     | holidays["thanksgiving"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["thanksgiving"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["thanksgiving"]["custody_from_time"] | 09:00 |  |
-    | holidays["thanksgiving"]["custody_to_time"] | 09:00 |  |
+    | holidays["thanksgiving"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["thanksgiving"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_eve"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_eve"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_eve"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_eve"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_eve"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_eve"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_day"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_day"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_day"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_day"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_day"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_day"]["custody_to_time"] | 9:00 AM |  |
     | holidays["mother"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mother"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mother"]["custody_from_time"] | 09:00 |  |
-    | holidays["mother"]["custody_to_time"] | 09:00 |  |
+    | holidays["mother"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mother"]["custody_to_time"] | 9:00 AM |  |
     | holidays["father"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["father"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["father"]["custody_from_time"] | 09:00 |  |
-    | holidays["father"]["custody_to_time"] | 09:00 |  |
+    | holidays["father"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["father"]["custody_to_time"] | 9:00 AM |  |
     | holidays["petitioner_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["petitioner_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["petitioner_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["petitioner_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["petitioner_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["petitioner_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["respondent_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["respondent_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["respondent_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["respondent_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["respondent_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["respondent_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["children_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["children_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["children_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["children_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["children_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["children_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays_review | True |  |
     | dispute_resolution | Sample text Is there another way you would like to r |  |
     | ask_about_dispute_resolution | True |  |
@@ -5253,16 +5219,15 @@ Scenario: Fee waiver: 3 vehicles (limit 2) must not break generation
     | family_support_order | False |  |
     | additional_children_information | True |  |
     | users[0].has_self_employment_income | False |  |
-    | x.benefits.selected_types['food_stamps'] | False | users[0].benefits.selected_types |
+    | x.benefits.selected_types['food_stamps'] | True | users[0].benefits.selected_types |
     | x.benefits.selected_types['medicaid'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['ssi'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['tanf'] | False | users[0].benefits.selected_types |
-    | users[0].benefits.benefits.selected_types['food_stamps'] | True |  |
-    | x.benefits[0].source | food_stamps | users[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | users[0].benefits[0].value |
-    | x.benefits[0].value | 100 | users[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | users[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | users[0].benefits[0].value |
+    | x.benefits[i].value | 100 | users[0].benefits[0].value |
     | x.benefits.review_items | True |  |
-    | x.other_incomes.selected_types['social security'] | False | users[0].other_incomes.selected_types |
+    | x.other_incomes.selected_types['social security'] | True | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['retirement'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['pension'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['interest'] | False | users[0].other_incomes.selected_types |
@@ -5274,11 +5239,10 @@ Scenario: Fee waiver: 3 vehicles (limit 2) must not break generation
     | x.other_incomes.selected_types['veteran'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['military'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['other'] | False | users[0].other_incomes.selected_types |
-    | users[0].other_incomes.other_incomes.selected_types['social security'] | True |  |
-    | x.other_incomes[0].source | social security | users[0].other_incomes[0].value |
-    | x.other_incomes[0].source_other | Sample Specify Type | users[0].other_incomes[0].value |
-    | x.other_incomes[0].times_per_year | 12 | users[0].other_incomes[0].value |
-    | x.other_incomes[0].value | 100 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source | social security | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source_other | Sample Specify Type | users[0].other_incomes[0].value |
+    | x.other_incomes[i].times_per_year | 12 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].value | 100 | users[0].other_incomes[0].value |
     | x.review_items | True |  |
     | x.other_child_support_received | 100 | users[0].other_child_support_received |
     | users[0].self_supporting | False |  |
@@ -5288,9 +5252,9 @@ Scenario: Fee waiver: 3 vehicles (limit 2) must not break generation
     | other_parties[0].benefits.selected_types['ssi'] | False |  |
     | other_parties[0].benefits.selected_types['tanf'] | False |  |
     | other_parties[0].benefits_unknown | False |  |
-    | x.benefits[0].source | food_stamps | other_parties[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | other_parties[0].benefits[0].value |
-    | x.benefits[0].value | 100 | other_parties[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | other_parties[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | other_parties[0].benefits[0].value |
+    | x.benefits[i].value | 100 | other_parties[0].benefits[0].value |
     | other_parties[0].other_incomes.selected_types['social security'] | True |  |
     | other_parties[0].other_incomes.selected_types['retirement'] | False |  |
     | other_parties[0].other_incomes.selected_types['pension'] | False |  |
@@ -5310,16 +5274,15 @@ Scenario: Fee waiver: 3 vehicles (limit 2) must not break generation
     | other_parties[0].other_incomes[0].value | 100 |  |
     | x.other_child_support_received | 100 | other_parties[0].other_child_support_received |
     | other_parties[0].self_supporting | False |  |
-    | x.expenses.selected_types['rent'] | False | users[0].expenses.selected_types |
+    | x.expenses.selected_types['rent'] | True | users[0].expenses.selected_types |
     | x.expenses.selected_types['utilities'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['food'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['medical'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['laundry'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['repairs'] | False | users[0].expenses.selected_types |
-    | users[0].expenses.expenses.selected_types['rent'] | True |  |
-    | x.expenses[0].source | rent | users[0].expenses[0].value |
-    | x.expenses[0].value | 100 | users[0].expenses[0].value |
-    | x.expenses[0].times_per_year | 12 | users[0].expenses[0].value |
+    | x.expenses[i].source | rent | users[0].expenses[0].value |
+    | x.expenses[i].value | 100 | users[0].expenses[0].value |
+    | x.expenses[i].times_per_year | 12 | users[0].expenses[0].value |
     | x.other_child_support_paid | 100 | users[0].other_child_support_paid |
     | other_parties[0].expenses.selected_types['rent'] | True |  |
     | other_parties[0].expenses.selected_types['utilities'] | False |  |
@@ -5333,11 +5296,10 @@ Scenario: Fee waiver: 3 vehicles (limit 2) must not break generation
     | other_parties[0].expenses[0].times_per_year | 12 |  |
     | x.other_child_support_paid | 100 | other_parties[0].other_child_support_paid |
     | users[0].cash | 100 |  |
-    | x.selected_types['house'] | False | real_estate.selected_types |
+    | x.selected_types['house'] | True | real_estate.selected_types |
     | x.selected_types['condominium'] | False | real_estate.selected_types |
     | x.selected_types['leasehold'] | False | real_estate.selected_types |
     | x.selected_types['other'] | False | real_estate.selected_types |
-    | real_estate.selected_types['house'] | True |  |
     | real_estate[0].source | house |  |
     | real_estate[0].address | 123 Main St |  |
     | real_estate[0].legal_description_attach | False |  |
@@ -5425,13 +5387,12 @@ Scenario: Fee waiver: 3 vehicles (limit 2) must not break generation
     | personal_goods[3].marital_property | Marital |  |
     | personal_goods[3].has_possession | Firstname S. Lastname Jr |  |
     | personal_goods[3].recommended_award | Firstname S. Lastname Jr |  |
-    | x.selected_types['checking account'] | False | bank_assets.selected_types |
+    | x.selected_types['checking account'] | True | bank_assets.selected_types |
     | x.selected_types['savings account'] | False | bank_assets.selected_types |
     | x.selected_types['time deposit'] | False | bank_assets.selected_types |
     | x.selected_types['money market'] | False | bank_assets.selected_types |
     | x.selected_types['certificates'] | False | bank_assets.selected_types |
     | x.selected_types['other'] | False | bank_assets.selected_types |
-    | bank_assets.selected_types['checking account'] | True |  |
     | bank_assets[0].source | checking account |  |
     | bank_assets[0].institution | Sample Bank or Institution |  |
     | bank_assets[0].account_number | Sample Account number |  |
@@ -5477,9 +5438,6 @@ Scenario: Fee waiver: 3 vehicles (limit 2) must not break generation
     | other_parties[0].service_type | home |  |
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
-    | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
-    | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
     | debts_owed_to_you.target_number | 0 |  |
@@ -5491,7 +5449,7 @@ Scenario: Fee waiver: 3 vehicles (limit 2) must not break generation
     | other_assets.target_number | 0 |  |
     | other_holidays.target_number | 0 |  |
     | other_parties[0].jobs.target_number | 0 |  |
-    | persons_lived_with.target_number | 1 |  |
+    | persons_lived_with.target_number | 0 |  |
     | users[0].jobs.target_number | 0 |  |
     | x.extraordinary_childrearing_costs.target_number | 0 | other_parties[0].extraordinary_childrearing_costs.target_number |
     | x.extraordinary_childrearing_costs.target_number | 0 | users[0].extraordinary_childrearing_costs.target_number |
@@ -5610,8 +5568,10 @@ Scenario: Parenting plan: more than 3 extraordinary costs per parent overflow
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | False |  |
+    | legal_custody_sole_explanation | Sample text legal_custody_sole_explanation |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
+    | visitation | False |  |
     | child_support | Firstname S. Lastname Jr |  |
     | child_support_method_of_payment | income_withholding |  |
     | child_support_start_date | judgment_date |  |
@@ -5702,60 +5662,60 @@ Scenario: Parenting plan: more than 3 extraordinary costs per parent overflow
     | holidays['children_birthday']['different'] | False |  |
     | holidays["mlk"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mlk"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mlk"]["custody_from_time"] | 09:00 |  |
-    | holidays["mlk"]["custody_to_time"] | 09:00 |  |
+    | holidays["mlk"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mlk"]["custody_to_time"] | 9:00 AM |  |
     | holidays["president"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["president"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["president"]["custody_from_time"] | 09:00 |  |
-    | holidays["president"]["custody_to_time"] | 09:00 |  |
+    | holidays["president"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["president"]["custody_to_time"] | 9:00 AM |  |
     | holidays["memorial"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["memorial"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["memorial"]["custody_from_time"] | 09:00 |  |
-    | holidays["memorial"]["custody_to_time"] | 09:00 |  |
+    | holidays["memorial"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["memorial"]["custody_to_time"] | 9:00 AM |  |
     | holidays["independence"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["independence"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["independence"]["custody_from_time"] | 09:00 |  |
-    | holidays["independence"]["custody_to_time"] | 09:00 |  |
+    | holidays["independence"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["independence"]["custody_to_time"] | 9:00 AM |  |
     | holidays["labor"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["labor"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["labor"]["custody_from_time"] | 09:00 |  |
-    | holidays["labor"]["custody_to_time"] | 09:00 |  |
+    | holidays["labor"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["labor"]["custody_to_time"] | 9:00 AM |  |
     | holidays["halloween"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["halloween"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["halloween"]["custody_from_time"] | 09:00 |  |
-    | holidays["halloween"]["custody_to_time"] | 09:00 |  |
+    | holidays["halloween"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["halloween"]["custody_to_time"] | 9:00 AM |  |
     | holidays["thanksgiving"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["thanksgiving"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["thanksgiving"]["custody_from_time"] | 09:00 |  |
-    | holidays["thanksgiving"]["custody_to_time"] | 09:00 |  |
+    | holidays["thanksgiving"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["thanksgiving"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_eve"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_eve"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_eve"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_eve"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_eve"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_eve"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_day"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_day"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_day"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_day"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_day"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_day"]["custody_to_time"] | 9:00 AM |  |
     | holidays["mother"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mother"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mother"]["custody_from_time"] | 09:00 |  |
-    | holidays["mother"]["custody_to_time"] | 09:00 |  |
+    | holidays["mother"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mother"]["custody_to_time"] | 9:00 AM |  |
     | holidays["father"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["father"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["father"]["custody_from_time"] | 09:00 |  |
-    | holidays["father"]["custody_to_time"] | 09:00 |  |
+    | holidays["father"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["father"]["custody_to_time"] | 9:00 AM |  |
     | holidays["petitioner_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["petitioner_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["petitioner_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["petitioner_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["petitioner_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["petitioner_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["respondent_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["respondent_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["respondent_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["respondent_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["respondent_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["respondent_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["children_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["children_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["children_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["children_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["children_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["children_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays_review | True |  |
     | dispute_resolution | Sample text Is there another way you would like to r |  |
     | ask_about_dispute_resolution | True |  |
@@ -5771,56 +5731,56 @@ Scenario: Parenting plan: more than 3 extraordinary costs per parent overflow
     | x.health_insurance_costs | 100 | users[0].health_insurance_costs |
     | pay_work_childcare_expenses | included_in_form14 |  |
     | x.work_childcare_expenses | 100 | users[0].work_childcare_expenses |
-    | x.extraordinary_medical_costs[0].description | Sample Description | users[0].extraordinary_medical_costs[0].value |
-    | x.extraordinary_medical_costs[0].value | 100 | users[0].extraordinary_medical_costs[0].value |
-    | x.extraordinary_medical_costs[0].times_per_year | 12 | users[0].extraordinary_medical_costs[0].value |
-    | x.extraordinary_medical_costs[0].description | Sample Description | users[0].extraordinary_medical_costs[1].value |
-    | x.extraordinary_medical_costs[0].value | 100 | users[0].extraordinary_medical_costs[1].value |
-    | x.extraordinary_medical_costs[0].times_per_year | 12 | users[0].extraordinary_medical_costs[1].value |
-    | x.extraordinary_medical_costs[0].description | Sample Description | users[0].extraordinary_medical_costs[2].value |
-    | x.extraordinary_medical_costs[0].value | 100 | users[0].extraordinary_medical_costs[2].value |
-    | x.extraordinary_medical_costs[0].times_per_year | 12 | users[0].extraordinary_medical_costs[2].value |
-    | x.extraordinary_medical_costs[0].description | Sample Description | users[0].extraordinary_medical_costs[3].value |
-    | x.extraordinary_medical_costs[0].value | 100 | users[0].extraordinary_medical_costs[3].value |
-    | x.extraordinary_medical_costs[0].times_per_year | 12 | users[0].extraordinary_medical_costs[3].value |
-    | x.extraordinary_childrearing_costs[0].description | Sample Description | users[0].extraordinary_childrearing_costs[0].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].included_in_form_14 | False | users[0].extraordinary_childrearing_costs[0].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].percentage | 1 | users[0].extraordinary_childrearing_costs[0].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].description | Sample Description | users[0].extraordinary_childrearing_costs[1].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].included_in_form_14 | False | users[0].extraordinary_childrearing_costs[1].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].percentage | 1 | users[0].extraordinary_childrearing_costs[1].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].description | Sample Description | users[0].extraordinary_childrearing_costs[2].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].included_in_form_14 | False | users[0].extraordinary_childrearing_costs[2].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].percentage | 1 | users[0].extraordinary_childrearing_costs[2].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].description | Sample Description | users[0].extraordinary_childrearing_costs[3].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].included_in_form_14 | False | users[0].extraordinary_childrearing_costs[3].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].percentage | 1 | users[0].extraordinary_childrearing_costs[3].included_in_form_14 |
+    | x.extraordinary_medical_costs[i].description | Sample Description | users[0].extraordinary_medical_costs[0].value |
+    | x.extraordinary_medical_costs[i].value | 100 | users[0].extraordinary_medical_costs[0].value |
+    | x.extraordinary_medical_costs[i].times_per_year | 12 | users[0].extraordinary_medical_costs[0].value |
+    | x.extraordinary_medical_costs[i].description | Sample Description | users[0].extraordinary_medical_costs[1].value |
+    | x.extraordinary_medical_costs[i].value | 100 | users[0].extraordinary_medical_costs[1].value |
+    | x.extraordinary_medical_costs[i].times_per_year | 12 | users[0].extraordinary_medical_costs[1].value |
+    | x.extraordinary_medical_costs[i].description | Sample Description | users[0].extraordinary_medical_costs[2].value |
+    | x.extraordinary_medical_costs[i].value | 100 | users[0].extraordinary_medical_costs[2].value |
+    | x.extraordinary_medical_costs[i].times_per_year | 12 | users[0].extraordinary_medical_costs[2].value |
+    | x.extraordinary_medical_costs[i].description | Sample Description | users[0].extraordinary_medical_costs[3].value |
+    | x.extraordinary_medical_costs[i].value | 100 | users[0].extraordinary_medical_costs[3].value |
+    | x.extraordinary_medical_costs[i].times_per_year | 12 | users[0].extraordinary_medical_costs[3].value |
+    | x.extraordinary_childrearing_costs[i].description | Sample Description | users[0].extraordinary_childrearing_costs[0].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].included_in_form_14 | False | users[0].extraordinary_childrearing_costs[0].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].percentage | 1 | users[0].extraordinary_childrearing_costs[0].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].description | Sample Description | users[0].extraordinary_childrearing_costs[1].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].included_in_form_14 | False | users[0].extraordinary_childrearing_costs[1].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].percentage | 1 | users[0].extraordinary_childrearing_costs[1].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].description | Sample Description | users[0].extraordinary_childrearing_costs[2].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].included_in_form_14 | False | users[0].extraordinary_childrearing_costs[2].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].percentage | 1 | users[0].extraordinary_childrearing_costs[2].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].description | Sample Description | users[0].extraordinary_childrearing_costs[3].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].included_in_form_14 | False | users[0].extraordinary_childrearing_costs[3].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].percentage | 1 | users[0].extraordinary_childrearing_costs[3].included_in_form_14 |
     | x.health_insurance_costs | 100 | other_parties[0].health_insurance_costs |
     | x.work_childcare_expenses | 100 | other_parties[0].work_childcare_expenses |
-    | x.extraordinary_medical_costs[0].description | Sample Description | other_parties[0].extraordinary_medical_costs[0].value |
-    | x.extraordinary_medical_costs[0].value | 100 | other_parties[0].extraordinary_medical_costs[0].value |
-    | x.extraordinary_medical_costs[0].times_per_year | 12 | other_parties[0].extraordinary_medical_costs[0].value |
-    | x.extraordinary_medical_costs[0].description | Sample Description | other_parties[0].extraordinary_medical_costs[1].value |
-    | x.extraordinary_medical_costs[0].value | 100 | other_parties[0].extraordinary_medical_costs[1].value |
-    | x.extraordinary_medical_costs[0].times_per_year | 12 | other_parties[0].extraordinary_medical_costs[1].value |
-    | x.extraordinary_medical_costs[0].description | Sample Description | other_parties[0].extraordinary_medical_costs[2].value |
-    | x.extraordinary_medical_costs[0].value | 100 | other_parties[0].extraordinary_medical_costs[2].value |
-    | x.extraordinary_medical_costs[0].times_per_year | 12 | other_parties[0].extraordinary_medical_costs[2].value |
-    | x.extraordinary_medical_costs[0].description | Sample Description | other_parties[0].extraordinary_medical_costs[3].value |
-    | x.extraordinary_medical_costs[0].value | 100 | other_parties[0].extraordinary_medical_costs[3].value |
-    | x.extraordinary_medical_costs[0].times_per_year | 12 | other_parties[0].extraordinary_medical_costs[3].value |
-    | x.extraordinary_childrearing_costs[0].description | Sample Description | other_parties[0].extraordinary_childrearing_costs[0].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].included_in_form_14 | False | other_parties[0].extraordinary_childrearing_costs[0].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].percentage | 1 | other_parties[0].extraordinary_childrearing_costs[0].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].description | Sample Description | other_parties[0].extraordinary_childrearing_costs[1].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].included_in_form_14 | False | other_parties[0].extraordinary_childrearing_costs[1].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].percentage | 1 | other_parties[0].extraordinary_childrearing_costs[1].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].description | Sample Description | other_parties[0].extraordinary_childrearing_costs[2].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].included_in_form_14 | False | other_parties[0].extraordinary_childrearing_costs[2].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].percentage | 1 | other_parties[0].extraordinary_childrearing_costs[2].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].description | Sample Description | other_parties[0].extraordinary_childrearing_costs[3].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].included_in_form_14 | False | other_parties[0].extraordinary_childrearing_costs[3].included_in_form_14 |
-    | x.extraordinary_childrearing_costs[0].percentage | 1 | other_parties[0].extraordinary_childrearing_costs[3].included_in_form_14 |
+    | x.extraordinary_medical_costs[i].description | Sample Description | other_parties[0].extraordinary_medical_costs[0].value |
+    | x.extraordinary_medical_costs[i].value | 100 | other_parties[0].extraordinary_medical_costs[0].value |
+    | x.extraordinary_medical_costs[i].times_per_year | 12 | other_parties[0].extraordinary_medical_costs[0].value |
+    | x.extraordinary_medical_costs[i].description | Sample Description | other_parties[0].extraordinary_medical_costs[1].value |
+    | x.extraordinary_medical_costs[i].value | 100 | other_parties[0].extraordinary_medical_costs[1].value |
+    | x.extraordinary_medical_costs[i].times_per_year | 12 | other_parties[0].extraordinary_medical_costs[1].value |
+    | x.extraordinary_medical_costs[i].description | Sample Description | other_parties[0].extraordinary_medical_costs[2].value |
+    | x.extraordinary_medical_costs[i].value | 100 | other_parties[0].extraordinary_medical_costs[2].value |
+    | x.extraordinary_medical_costs[i].times_per_year | 12 | other_parties[0].extraordinary_medical_costs[2].value |
+    | x.extraordinary_medical_costs[i].description | Sample Description | other_parties[0].extraordinary_medical_costs[3].value |
+    | x.extraordinary_medical_costs[i].value | 100 | other_parties[0].extraordinary_medical_costs[3].value |
+    | x.extraordinary_medical_costs[i].times_per_year | 12 | other_parties[0].extraordinary_medical_costs[3].value |
+    | x.extraordinary_childrearing_costs[i].description | Sample Description | other_parties[0].extraordinary_childrearing_costs[0].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].included_in_form_14 | False | other_parties[0].extraordinary_childrearing_costs[0].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].percentage | 1 | other_parties[0].extraordinary_childrearing_costs[0].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].description | Sample Description | other_parties[0].extraordinary_childrearing_costs[1].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].included_in_form_14 | False | other_parties[0].extraordinary_childrearing_costs[1].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].percentage | 1 | other_parties[0].extraordinary_childrearing_costs[1].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].description | Sample Description | other_parties[0].extraordinary_childrearing_costs[2].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].included_in_form_14 | False | other_parties[0].extraordinary_childrearing_costs[2].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].percentage | 1 | other_parties[0].extraordinary_childrearing_costs[2].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].description | Sample Description | other_parties[0].extraordinary_childrearing_costs[3].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].included_in_form_14 | False | other_parties[0].extraordinary_childrearing_costs[3].included_in_form_14 |
+    | x.extraordinary_childrearing_costs[i].percentage | 1 | other_parties[0].extraordinary_childrearing_costs[3].included_in_form_14 |
     | others_with_physical_custody | False |  |
     | other_custody_proceeding | False |  |
     | other_litigation | False |  |
@@ -5828,16 +5788,15 @@ Scenario: Parenting plan: more than 3 extraordinary costs per parent overflow
     | family_support_order | False |  |
     | additional_children_information | True |  |
     | users[0].has_self_employment_income | False |  |
-    | x.benefits.selected_types['food_stamps'] | False | users[0].benefits.selected_types |
+    | x.benefits.selected_types['food_stamps'] | True | users[0].benefits.selected_types |
     | x.benefits.selected_types['medicaid'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['ssi'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['tanf'] | False | users[0].benefits.selected_types |
-    | users[0].benefits.benefits.selected_types['food_stamps'] | True |  |
-    | x.benefits[0].source | food_stamps | users[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | users[0].benefits[0].value |
-    | x.benefits[0].value | 100 | users[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | users[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | users[0].benefits[0].value |
+    | x.benefits[i].value | 100 | users[0].benefits[0].value |
     | x.benefits.review_items | True |  |
-    | x.other_incomes.selected_types['social security'] | False | users[0].other_incomes.selected_types |
+    | x.other_incomes.selected_types['social security'] | True | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['retirement'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['pension'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['interest'] | False | users[0].other_incomes.selected_types |
@@ -5849,11 +5808,10 @@ Scenario: Parenting plan: more than 3 extraordinary costs per parent overflow
     | x.other_incomes.selected_types['veteran'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['military'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['other'] | False | users[0].other_incomes.selected_types |
-    | users[0].other_incomes.other_incomes.selected_types['social security'] | True |  |
-    | x.other_incomes[0].source | social security | users[0].other_incomes[0].value |
-    | x.other_incomes[0].source_other | Sample Specify Type | users[0].other_incomes[0].value |
-    | x.other_incomes[0].times_per_year | 12 | users[0].other_incomes[0].value |
-    | x.other_incomes[0].value | 100 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source | social security | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source_other | Sample Specify Type | users[0].other_incomes[0].value |
+    | x.other_incomes[i].times_per_year | 12 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].value | 100 | users[0].other_incomes[0].value |
     | x.review_items | True |  |
     | x.other_child_support_received | 100 | users[0].other_child_support_received |
     | users[0].self_supporting | False |  |
@@ -5863,9 +5821,9 @@ Scenario: Parenting plan: more than 3 extraordinary costs per parent overflow
     | other_parties[0].benefits.selected_types['ssi'] | False |  |
     | other_parties[0].benefits.selected_types['tanf'] | False |  |
     | other_parties[0].benefits_unknown | False |  |
-    | x.benefits[0].source | food_stamps | other_parties[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | other_parties[0].benefits[0].value |
-    | x.benefits[0].value | 100 | other_parties[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | other_parties[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | other_parties[0].benefits[0].value |
+    | x.benefits[i].value | 100 | other_parties[0].benefits[0].value |
     | other_parties[0].other_incomes.selected_types['social security'] | True |  |
     | other_parties[0].other_incomes.selected_types['retirement'] | False |  |
     | other_parties[0].other_incomes.selected_types['pension'] | False |  |
@@ -5885,16 +5843,15 @@ Scenario: Parenting plan: more than 3 extraordinary costs per parent overflow
     | other_parties[0].other_incomes[0].value | 100 |  |
     | x.other_child_support_received | 100 | other_parties[0].other_child_support_received |
     | other_parties[0].self_supporting | False |  |
-    | x.expenses.selected_types['rent'] | False | users[0].expenses.selected_types |
+    | x.expenses.selected_types['rent'] | True | users[0].expenses.selected_types |
     | x.expenses.selected_types['utilities'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['food'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['medical'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['laundry'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['repairs'] | False | users[0].expenses.selected_types |
-    | users[0].expenses.expenses.selected_types['rent'] | True |  |
-    | x.expenses[0].source | rent | users[0].expenses[0].value |
-    | x.expenses[0].value | 100 | users[0].expenses[0].value |
-    | x.expenses[0].times_per_year | 12 | users[0].expenses[0].value |
+    | x.expenses[i].source | rent | users[0].expenses[0].value |
+    | x.expenses[i].value | 100 | users[0].expenses[0].value |
+    | x.expenses[i].times_per_year | 12 | users[0].expenses[0].value |
     | x.other_child_support_paid | 100 | users[0].other_child_support_paid |
     | other_parties[0].expenses.selected_types['rent'] | True |  |
     | other_parties[0].expenses.selected_types['utilities'] | False |  |
@@ -5907,11 +5864,10 @@ Scenario: Parenting plan: more than 3 extraordinary costs per parent overflow
     | other_parties[0].expenses[0].value | 100 |  |
     | other_parties[0].expenses[0].times_per_year | 12 |  |
     | x.other_child_support_paid | 100 | other_parties[0].other_child_support_paid |
-    | x.selected_types['house'] | False | real_estate.selected_types |
+    | x.selected_types['house'] | True | real_estate.selected_types |
     | x.selected_types['condominium'] | False | real_estate.selected_types |
     | x.selected_types['leasehold'] | False | real_estate.selected_types |
     | x.selected_types['other'] | False | real_estate.selected_types |
-    | real_estate.selected_types['house'] | True |  |
     | real_estate[0].source | house |  |
     | real_estate[0].address | 123 Main St |  |
     | real_estate[0].legal_description_attach | False |  |
@@ -5923,7 +5879,7 @@ Scenario: Parenting plan: more than 3 extraordinary costs per parent overflow
     | real_estate[0].recommended_award | Firstname S. Lastname Jr |  |
     | real_estate[0].legal_description | Sample Legal description |  |
     | assets_warning | True |  |
-    | x.selected_types['car'] | False | vehicles.selected_types |
+    | x.selected_types['car'] | True | vehicles.selected_types |
     | x.selected_types['truck'] | False | vehicles.selected_types |
     | x.selected_types['motorcycle'] | False | vehicles.selected_types |
     | x.selected_types['mobile_home'] | False | vehicles.selected_types |
@@ -5931,7 +5887,6 @@ Scenario: Parenting plan: more than 3 extraordinary costs per parent overflow
     | x.selected_types['boat'] | False | vehicles.selected_types |
     | x.selected_types['airplane'] | False | vehicles.selected_types |
     | x.selected_types['other'] | False | vehicles.selected_types |
-    | vehicles.selected_types['car'] | True |  |
     | vehicles[0].source | car |  |
     | vehicles[0].year | Sample Year |  |
     | vehicles[0].make | Sample Make |  |
@@ -5962,13 +5917,12 @@ Scenario: Parenting plan: more than 3 extraordinary costs per parent overflow
     | personal_goods[0].marital_property | Marital |  |
     | personal_goods[0].has_possession | Firstname S. Lastname Jr |  |
     | personal_goods[0].recommended_award | Firstname S. Lastname Jr |  |
-    | x.selected_types['checking account'] | False | bank_assets.selected_types |
+    | x.selected_types['checking account'] | True | bank_assets.selected_types |
     | x.selected_types['savings account'] | False | bank_assets.selected_types |
     | x.selected_types['time deposit'] | False | bank_assets.selected_types |
     | x.selected_types['money market'] | False | bank_assets.selected_types |
     | x.selected_types['certificates'] | False | bank_assets.selected_types |
     | x.selected_types['other'] | False | bank_assets.selected_types |
-    | bank_assets.selected_types['checking account'] | True |  |
     | bank_assets[0].source | checking account |  |
     | bank_assets[0].institution | Sample Bank or Institution |  |
     | bank_assets[0].account_number | Sample Account number |  |
@@ -6130,8 +6084,10 @@ Scenario: Parenting plan: 9 other holidays (limit 7) must not error
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | False |  |
+    | legal_custody_sole_explanation | Sample text legal_custody_sole_explanation |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
+    | visitation | False |  |
     | child_support | Firstname S. Lastname Jr |  |
     | child_support_method_of_payment | income_withholding |  |
     | child_support_start_date | judgment_date |  |
@@ -6222,106 +6178,106 @@ Scenario: Parenting plan: 9 other holidays (limit 7) must not error
     | holidays['children_birthday']['different'] | False |  |
     | holidays["mlk"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mlk"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mlk"]["custody_from_time"] | 09:00 |  |
-    | holidays["mlk"]["custody_to_time"] | 09:00 |  |
+    | holidays["mlk"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mlk"]["custody_to_time"] | 9:00 AM |  |
     | holidays["president"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["president"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["president"]["custody_from_time"] | 09:00 |  |
-    | holidays["president"]["custody_to_time"] | 09:00 |  |
+    | holidays["president"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["president"]["custody_to_time"] | 9:00 AM |  |
     | holidays["memorial"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["memorial"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["memorial"]["custody_from_time"] | 09:00 |  |
-    | holidays["memorial"]["custody_to_time"] | 09:00 |  |
+    | holidays["memorial"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["memorial"]["custody_to_time"] | 9:00 AM |  |
     | holidays["independence"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["independence"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["independence"]["custody_from_time"] | 09:00 |  |
-    | holidays["independence"]["custody_to_time"] | 09:00 |  |
+    | holidays["independence"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["independence"]["custody_to_time"] | 9:00 AM |  |
     | holidays["labor"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["labor"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["labor"]["custody_from_time"] | 09:00 |  |
-    | holidays["labor"]["custody_to_time"] | 09:00 |  |
+    | holidays["labor"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["labor"]["custody_to_time"] | 9:00 AM |  |
     | holidays["halloween"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["halloween"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["halloween"]["custody_from_time"] | 09:00 |  |
-    | holidays["halloween"]["custody_to_time"] | 09:00 |  |
+    | holidays["halloween"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["halloween"]["custody_to_time"] | 9:00 AM |  |
     | holidays["thanksgiving"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["thanksgiving"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["thanksgiving"]["custody_from_time"] | 09:00 |  |
-    | holidays["thanksgiving"]["custody_to_time"] | 09:00 |  |
+    | holidays["thanksgiving"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["thanksgiving"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_eve"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_eve"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_eve"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_eve"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_eve"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_eve"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_day"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_day"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_day"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_day"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_day"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_day"]["custody_to_time"] | 9:00 AM |  |
     | holidays["mother"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mother"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mother"]["custody_from_time"] | 09:00 |  |
-    | holidays["mother"]["custody_to_time"] | 09:00 |  |
+    | holidays["mother"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mother"]["custody_to_time"] | 9:00 AM |  |
     | holidays["father"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["father"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["father"]["custody_from_time"] | 09:00 |  |
-    | holidays["father"]["custody_to_time"] | 09:00 |  |
+    | holidays["father"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["father"]["custody_to_time"] | 9:00 AM |  |
     | holidays["petitioner_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["petitioner_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["petitioner_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["petitioner_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["petitioner_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["petitioner_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["respondent_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["respondent_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["respondent_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["respondent_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["respondent_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["respondent_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["children_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["children_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["children_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["children_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["children_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["children_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays_review | True |  |
     | other_holidays[0].description | Sample Description |  |
     | other_holidays[0].even_years | Firstname S. Lastname Jr |  |
     | other_holidays[0].odd_years | Firstname S. Lastname Jr |  |
-    | other_holidays[0].custody_from_time | 09:00 |  |
-    | other_holidays[0].custody_to_time | 09:00 |  |
+    | other_holidays[0].custody_from_time | 9:00 AM |  |
+    | other_holidays[0].custody_to_time | 9:00 AM |  |
     | other_holidays[1].description | Sample Description |  |
     | other_holidays[1].even_years | Firstname S. Lastname Jr |  |
     | other_holidays[1].odd_years | Firstname S. Lastname Jr |  |
-    | other_holidays[1].custody_from_time | 09:00 |  |
-    | other_holidays[1].custody_to_time | 09:00 |  |
+    | other_holidays[1].custody_from_time | 9:00 AM |  |
+    | other_holidays[1].custody_to_time | 9:00 AM |  |
     | other_holidays[2].description | Sample Description |  |
     | other_holidays[2].even_years | Firstname S. Lastname Jr |  |
     | other_holidays[2].odd_years | Firstname S. Lastname Jr |  |
-    | other_holidays[2].custody_from_time | 09:00 |  |
-    | other_holidays[2].custody_to_time | 09:00 |  |
+    | other_holidays[2].custody_from_time | 9:00 AM |  |
+    | other_holidays[2].custody_to_time | 9:00 AM |  |
     | other_holidays[3].description | Sample Description |  |
     | other_holidays[3].even_years | Firstname S. Lastname Jr |  |
     | other_holidays[3].odd_years | Firstname S. Lastname Jr |  |
-    | other_holidays[3].custody_from_time | 09:00 |  |
-    | other_holidays[3].custody_to_time | 09:00 |  |
+    | other_holidays[3].custody_from_time | 9:00 AM |  |
+    | other_holidays[3].custody_to_time | 9:00 AM |  |
     | other_holidays[4].description | Sample Description |  |
     | other_holidays[4].even_years | Firstname S. Lastname Jr |  |
     | other_holidays[4].odd_years | Firstname S. Lastname Jr |  |
-    | other_holidays[4].custody_from_time | 09:00 |  |
-    | other_holidays[4].custody_to_time | 09:00 |  |
+    | other_holidays[4].custody_from_time | 9:00 AM |  |
+    | other_holidays[4].custody_to_time | 9:00 AM |  |
     | other_holidays[5].description | Sample Description |  |
     | other_holidays[5].even_years | Firstname S. Lastname Jr |  |
     | other_holidays[5].odd_years | Firstname S. Lastname Jr |  |
-    | other_holidays[5].custody_from_time | 09:00 |  |
-    | other_holidays[5].custody_to_time | 09:00 |  |
+    | other_holidays[5].custody_from_time | 9:00 AM |  |
+    | other_holidays[5].custody_to_time | 9:00 AM |  |
     | other_holidays[6].description | Sample Description |  |
     | other_holidays[6].even_years | Firstname S. Lastname Jr |  |
     | other_holidays[6].odd_years | Firstname S. Lastname Jr |  |
-    | other_holidays[6].custody_from_time | 09:00 |  |
-    | other_holidays[6].custody_to_time | 09:00 |  |
+    | other_holidays[6].custody_from_time | 9:00 AM |  |
+    | other_holidays[6].custody_to_time | 9:00 AM |  |
     | other_holidays[7].description | Sample Description |  |
     | other_holidays[7].even_years | Firstname S. Lastname Jr |  |
     | other_holidays[7].odd_years | Firstname S. Lastname Jr |  |
-    | other_holidays[7].custody_from_time | 09:00 |  |
-    | other_holidays[7].custody_to_time | 09:00 |  |
+    | other_holidays[7].custody_from_time | 9:00 AM |  |
+    | other_holidays[7].custody_to_time | 9:00 AM |  |
     | other_holidays[8].description | Sample Description |  |
     | other_holidays[8].even_years | Firstname S. Lastname Jr |  |
     | other_holidays[8].odd_years | Firstname S. Lastname Jr |  |
-    | other_holidays[8].custody_from_time | 09:00 |  |
-    | other_holidays[8].custody_to_time | 09:00 |  |
+    | other_holidays[8].custody_from_time | 9:00 AM |  |
+    | other_holidays[8].custody_to_time | 9:00 AM |  |
     | dispute_resolution | Sample text Is there another way you would like to r |  |
     | ask_about_dispute_resolution | True |  |
     | domestic_violence | False |  |
@@ -6345,16 +6301,15 @@ Scenario: Parenting plan: 9 other holidays (limit 7) must not error
     | family_support_order | False |  |
     | additional_children_information | True |  |
     | users[0].has_self_employment_income | False |  |
-    | x.benefits.selected_types['food_stamps'] | False | users[0].benefits.selected_types |
+    | x.benefits.selected_types['food_stamps'] | True | users[0].benefits.selected_types |
     | x.benefits.selected_types['medicaid'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['ssi'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['tanf'] | False | users[0].benefits.selected_types |
-    | users[0].benefits.benefits.selected_types['food_stamps'] | True |  |
-    | x.benefits[0].source | food_stamps | users[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | users[0].benefits[0].value |
-    | x.benefits[0].value | 100 | users[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | users[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | users[0].benefits[0].value |
+    | x.benefits[i].value | 100 | users[0].benefits[0].value |
     | x.benefits.review_items | True |  |
-    | x.other_incomes.selected_types['social security'] | False | users[0].other_incomes.selected_types |
+    | x.other_incomes.selected_types['social security'] | True | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['retirement'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['pension'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['interest'] | False | users[0].other_incomes.selected_types |
@@ -6366,11 +6321,10 @@ Scenario: Parenting plan: 9 other holidays (limit 7) must not error
     | x.other_incomes.selected_types['veteran'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['military'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['other'] | False | users[0].other_incomes.selected_types |
-    | users[0].other_incomes.other_incomes.selected_types['social security'] | True |  |
-    | x.other_incomes[0].source | social security | users[0].other_incomes[0].value |
-    | x.other_incomes[0].source_other | Sample Specify Type | users[0].other_incomes[0].value |
-    | x.other_incomes[0].times_per_year | 12 | users[0].other_incomes[0].value |
-    | x.other_incomes[0].value | 100 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source | social security | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source_other | Sample Specify Type | users[0].other_incomes[0].value |
+    | x.other_incomes[i].times_per_year | 12 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].value | 100 | users[0].other_incomes[0].value |
     | x.review_items | True |  |
     | x.other_child_support_received | 100 | users[0].other_child_support_received |
     | users[0].self_supporting | False |  |
@@ -6380,9 +6334,9 @@ Scenario: Parenting plan: 9 other holidays (limit 7) must not error
     | other_parties[0].benefits.selected_types['ssi'] | False |  |
     | other_parties[0].benefits.selected_types['tanf'] | False |  |
     | other_parties[0].benefits_unknown | False |  |
-    | x.benefits[0].source | food_stamps | other_parties[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | other_parties[0].benefits[0].value |
-    | x.benefits[0].value | 100 | other_parties[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | other_parties[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | other_parties[0].benefits[0].value |
+    | x.benefits[i].value | 100 | other_parties[0].benefits[0].value |
     | other_parties[0].other_incomes.selected_types['social security'] | True |  |
     | other_parties[0].other_incomes.selected_types['retirement'] | False |  |
     | other_parties[0].other_incomes.selected_types['pension'] | False |  |
@@ -6402,16 +6356,15 @@ Scenario: Parenting plan: 9 other holidays (limit 7) must not error
     | other_parties[0].other_incomes[0].value | 100 |  |
     | x.other_child_support_received | 100 | other_parties[0].other_child_support_received |
     | other_parties[0].self_supporting | False |  |
-    | x.expenses.selected_types['rent'] | False | users[0].expenses.selected_types |
+    | x.expenses.selected_types['rent'] | True | users[0].expenses.selected_types |
     | x.expenses.selected_types['utilities'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['food'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['medical'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['laundry'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['repairs'] | False | users[0].expenses.selected_types |
-    | users[0].expenses.expenses.selected_types['rent'] | True |  |
-    | x.expenses[0].source | rent | users[0].expenses[0].value |
-    | x.expenses[0].value | 100 | users[0].expenses[0].value |
-    | x.expenses[0].times_per_year | 12 | users[0].expenses[0].value |
+    | x.expenses[i].source | rent | users[0].expenses[0].value |
+    | x.expenses[i].value | 100 | users[0].expenses[0].value |
+    | x.expenses[i].times_per_year | 12 | users[0].expenses[0].value |
     | x.other_child_support_paid | 100 | users[0].other_child_support_paid |
     | other_parties[0].expenses.selected_types['rent'] | True |  |
     | other_parties[0].expenses.selected_types['utilities'] | False |  |
@@ -6424,11 +6377,10 @@ Scenario: Parenting plan: 9 other holidays (limit 7) must not error
     | other_parties[0].expenses[0].value | 100 |  |
     | other_parties[0].expenses[0].times_per_year | 12 |  |
     | x.other_child_support_paid | 100 | other_parties[0].other_child_support_paid |
-    | x.selected_types['house'] | False | real_estate.selected_types |
+    | x.selected_types['house'] | True | real_estate.selected_types |
     | x.selected_types['condominium'] | False | real_estate.selected_types |
     | x.selected_types['leasehold'] | False | real_estate.selected_types |
     | x.selected_types['other'] | False | real_estate.selected_types |
-    | real_estate.selected_types['house'] | True |  |
     | real_estate[0].source | house |  |
     | real_estate[0].address | 123 Main St |  |
     | real_estate[0].legal_description_attach | False |  |
@@ -6440,7 +6392,7 @@ Scenario: Parenting plan: 9 other holidays (limit 7) must not error
     | real_estate[0].recommended_award | Firstname S. Lastname Jr |  |
     | real_estate[0].legal_description | Sample Legal description |  |
     | assets_warning | True |  |
-    | x.selected_types['car'] | False | vehicles.selected_types |
+    | x.selected_types['car'] | True | vehicles.selected_types |
     | x.selected_types['truck'] | False | vehicles.selected_types |
     | x.selected_types['motorcycle'] | False | vehicles.selected_types |
     | x.selected_types['mobile_home'] | False | vehicles.selected_types |
@@ -6448,7 +6400,6 @@ Scenario: Parenting plan: 9 other holidays (limit 7) must not error
     | x.selected_types['boat'] | False | vehicles.selected_types |
     | x.selected_types['airplane'] | False | vehicles.selected_types |
     | x.selected_types['other'] | False | vehicles.selected_types |
-    | vehicles.selected_types['car'] | True |  |
     | vehicles[0].source | car |  |
     | vehicles[0].year | Sample Year |  |
     | vehicles[0].make | Sample Make |  |
@@ -6479,13 +6430,12 @@ Scenario: Parenting plan: 9 other holidays (limit 7) must not error
     | personal_goods[0].marital_property | Marital |  |
     | personal_goods[0].has_possession | Firstname S. Lastname Jr |  |
     | personal_goods[0].recommended_award | Firstname S. Lastname Jr |  |
-    | x.selected_types['checking account'] | False | bank_assets.selected_types |
+    | x.selected_types['checking account'] | True | bank_assets.selected_types |
     | x.selected_types['savings account'] | False | bank_assets.selected_types |
     | x.selected_types['time deposit'] | False | bank_assets.selected_types |
     | x.selected_types['money market'] | False | bank_assets.selected_types |
     | x.selected_types['certificates'] | False | bank_assets.selected_types |
     | x.selected_types['other'] | False | bank_assets.selected_types |
-    | bank_assets.selected_types['checking account'] | True |  |
     | bank_assets[0].source | checking account |  |
     | bank_assets[0].institution | Sample Bank or Institution |  |
     | bank_assets[0].account_number | Sample Account number |  |
@@ -6515,6 +6465,7 @@ Scenario: Parenting plan: 9 other holidays (limit 7) must not error
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
     | property_statement_review | True |  |
+    | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
     | debts_owed_to_you.target_number | 0 |  |
@@ -6526,7 +6477,7 @@ Scenario: Parenting plan: 9 other holidays (limit 7) must not error
     | other_assets.target_number | 0 |  |
     | other_holidays.target_number | 9 |  |
     | other_parties[0].jobs.target_number | 0 |  |
-    | persons_lived_with.target_number | 0 |  |
+    | persons_lived_with.target_number | 1 |  |
     | users[0].jobs.target_number | 0 |  |
     | x.extraordinary_childrearing_costs.target_number | 0 | other_parties[0].extraordinary_childrearing_costs.target_number |
     | x.extraordinary_childrearing_costs.target_number | 0 | users[0].extraordinary_childrearing_costs.target_number |
@@ -6645,8 +6596,10 @@ Scenario: Property statement: more than 16 awarded assets overflow
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | False |  |
+    | legal_custody_sole_explanation | Sample text legal_custody_sole_explanation |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
+    | visitation | False |  |
     | child_support | Firstname S. Lastname Jr |  |
     | child_support_method_of_payment | income_withholding |  |
     | child_support_start_date | judgment_date |  |
@@ -6737,60 +6690,60 @@ Scenario: Property statement: more than 16 awarded assets overflow
     | holidays['children_birthday']['different'] | False |  |
     | holidays["mlk"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mlk"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mlk"]["custody_from_time"] | 09:00 |  |
-    | holidays["mlk"]["custody_to_time"] | 09:00 |  |
+    | holidays["mlk"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mlk"]["custody_to_time"] | 9:00 AM |  |
     | holidays["president"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["president"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["president"]["custody_from_time"] | 09:00 |  |
-    | holidays["president"]["custody_to_time"] | 09:00 |  |
+    | holidays["president"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["president"]["custody_to_time"] | 9:00 AM |  |
     | holidays["memorial"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["memorial"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["memorial"]["custody_from_time"] | 09:00 |  |
-    | holidays["memorial"]["custody_to_time"] | 09:00 |  |
+    | holidays["memorial"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["memorial"]["custody_to_time"] | 9:00 AM |  |
     | holidays["independence"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["independence"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["independence"]["custody_from_time"] | 09:00 |  |
-    | holidays["independence"]["custody_to_time"] | 09:00 |  |
+    | holidays["independence"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["independence"]["custody_to_time"] | 9:00 AM |  |
     | holidays["labor"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["labor"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["labor"]["custody_from_time"] | 09:00 |  |
-    | holidays["labor"]["custody_to_time"] | 09:00 |  |
+    | holidays["labor"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["labor"]["custody_to_time"] | 9:00 AM |  |
     | holidays["halloween"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["halloween"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["halloween"]["custody_from_time"] | 09:00 |  |
-    | holidays["halloween"]["custody_to_time"] | 09:00 |  |
+    | holidays["halloween"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["halloween"]["custody_to_time"] | 9:00 AM |  |
     | holidays["thanksgiving"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["thanksgiving"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["thanksgiving"]["custody_from_time"] | 09:00 |  |
-    | holidays["thanksgiving"]["custody_to_time"] | 09:00 |  |
+    | holidays["thanksgiving"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["thanksgiving"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_eve"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_eve"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_eve"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_eve"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_eve"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_eve"]["custody_to_time"] | 9:00 AM |  |
     | holidays["xmas_day"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["xmas_day"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["xmas_day"]["custody_from_time"] | 09:00 |  |
-    | holidays["xmas_day"]["custody_to_time"] | 09:00 |  |
+    | holidays["xmas_day"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["xmas_day"]["custody_to_time"] | 9:00 AM |  |
     | holidays["mother"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["mother"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["mother"]["custody_from_time"] | 09:00 |  |
-    | holidays["mother"]["custody_to_time"] | 09:00 |  |
+    | holidays["mother"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["mother"]["custody_to_time"] | 9:00 AM |  |
     | holidays["father"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["father"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["father"]["custody_from_time"] | 09:00 |  |
-    | holidays["father"]["custody_to_time"] | 09:00 |  |
+    | holidays["father"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["father"]["custody_to_time"] | 9:00 AM |  |
     | holidays["petitioner_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["petitioner_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["petitioner_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["petitioner_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["petitioner_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["petitioner_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["respondent_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["respondent_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["respondent_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["respondent_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["respondent_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["respondent_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays["children_birthday"]["even_years"] | Firstname S. Lastname Jr |  |
     | holidays["children_birthday"]["odd_years"] | Firstname S. Lastname Jr |  |
-    | holidays["children_birthday"]["custody_from_time"] | 09:00 |  |
-    | holidays["children_birthday"]["custody_to_time"] | 09:00 |  |
+    | holidays["children_birthday"]["custody_from_time"] | 9:00 AM |  |
+    | holidays["children_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays_review | True |  |
     | dispute_resolution | Sample text Is there another way you would like to r |  |
     | ask_about_dispute_resolution | True |  |
@@ -6815,16 +6768,15 @@ Scenario: Property statement: more than 16 awarded assets overflow
     | family_support_order | False |  |
     | additional_children_information | True |  |
     | users[0].has_self_employment_income | False |  |
-    | x.benefits.selected_types['food_stamps'] | False | users[0].benefits.selected_types |
+    | x.benefits.selected_types['food_stamps'] | True | users[0].benefits.selected_types |
     | x.benefits.selected_types['medicaid'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['ssi'] | False | users[0].benefits.selected_types |
     | x.benefits.selected_types['tanf'] | False | users[0].benefits.selected_types |
-    | users[0].benefits.benefits.selected_types['food_stamps'] | True |  |
-    | x.benefits[0].source | food_stamps | users[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | users[0].benefits[0].value |
-    | x.benefits[0].value | 100 | users[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | users[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | users[0].benefits[0].value |
+    | x.benefits[i].value | 100 | users[0].benefits[0].value |
     | x.benefits.review_items | True |  |
-    | x.other_incomes.selected_types['social security'] | False | users[0].other_incomes.selected_types |
+    | x.other_incomes.selected_types['social security'] | True | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['retirement'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['pension'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['interest'] | False | users[0].other_incomes.selected_types |
@@ -6836,11 +6788,10 @@ Scenario: Property statement: more than 16 awarded assets overflow
     | x.other_incomes.selected_types['veteran'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['military'] | False | users[0].other_incomes.selected_types |
     | x.other_incomes.selected_types['other'] | False | users[0].other_incomes.selected_types |
-    | users[0].other_incomes.other_incomes.selected_types['social security'] | True |  |
-    | x.other_incomes[0].source | social security | users[0].other_incomes[0].value |
-    | x.other_incomes[0].source_other | Sample Specify Type | users[0].other_incomes[0].value |
-    | x.other_incomes[0].times_per_year | 12 | users[0].other_incomes[0].value |
-    | x.other_incomes[0].value | 100 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source | social security | users[0].other_incomes[0].value |
+    | x.other_incomes[i].source_other | Sample Specify Type | users[0].other_incomes[0].value |
+    | x.other_incomes[i].times_per_year | 12 | users[0].other_incomes[0].value |
+    | x.other_incomes[i].value | 100 | users[0].other_incomes[0].value |
     | x.review_items | True |  |
     | x.other_child_support_received | 100 | users[0].other_child_support_received |
     | users[0].self_supporting | False |  |
@@ -6850,9 +6801,9 @@ Scenario: Property statement: more than 16 awarded assets overflow
     | other_parties[0].benefits.selected_types['ssi'] | False |  |
     | other_parties[0].benefits.selected_types['tanf'] | False |  |
     | other_parties[0].benefits_unknown | False |  |
-    | x.benefits[0].source | food_stamps | other_parties[0].benefits[0].value |
-    | x.benefits[0].times_per_year | 12 | other_parties[0].benefits[0].value |
-    | x.benefits[0].value | 100 | other_parties[0].benefits[0].value |
+    | x.benefits[i].source | food_stamps | other_parties[0].benefits[0].value |
+    | x.benefits[i].times_per_year | 12 | other_parties[0].benefits[0].value |
+    | x.benefits[i].value | 100 | other_parties[0].benefits[0].value |
     | other_parties[0].other_incomes.selected_types['social security'] | True |  |
     | other_parties[0].other_incomes.selected_types['retirement'] | False |  |
     | other_parties[0].other_incomes.selected_types['pension'] | False |  |
@@ -6872,16 +6823,15 @@ Scenario: Property statement: more than 16 awarded assets overflow
     | other_parties[0].other_incomes[0].value | 100 |  |
     | x.other_child_support_received | 100 | other_parties[0].other_child_support_received |
     | other_parties[0].self_supporting | False |  |
-    | x.expenses.selected_types['rent'] | False | users[0].expenses.selected_types |
+    | x.expenses.selected_types['rent'] | True | users[0].expenses.selected_types |
     | x.expenses.selected_types['utilities'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['food'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['medical'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['laundry'] | False | users[0].expenses.selected_types |
     | x.expenses.selected_types['repairs'] | False | users[0].expenses.selected_types |
-    | users[0].expenses.expenses.selected_types['rent'] | True |  |
-    | x.expenses[0].source | rent | users[0].expenses[0].value |
-    | x.expenses[0].value | 100 | users[0].expenses[0].value |
-    | x.expenses[0].times_per_year | 12 | users[0].expenses[0].value |
+    | x.expenses[i].source | rent | users[0].expenses[0].value |
+    | x.expenses[i].value | 100 | users[0].expenses[0].value |
+    | x.expenses[i].times_per_year | 12 | users[0].expenses[0].value |
     | x.other_child_support_paid | 100 | users[0].other_child_support_paid |
     | other_parties[0].expenses.selected_types['rent'] | True |  |
     | other_parties[0].expenses.selected_types['utilities'] | False |  |
