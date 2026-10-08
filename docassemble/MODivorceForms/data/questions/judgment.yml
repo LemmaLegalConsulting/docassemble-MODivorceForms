@@ -266,7 +266,7 @@ attachment:
           % endif
       - "children0_ssn": |
           % if len(children_of_marriage_minor) > 0:
-          ${ redact("{:.0f}".format(children_of_marriage_minor[0].ssn)) }
+          ${ redact(children_of_marriage_minor[0].ssn) }
           % endif
       - "children0_name_middle": |
           % if len(children_of_marriage_minor) > 0:
@@ -290,7 +290,7 @@ attachment:
           % endif
       - "children1_name_ssn": |
           % if len(children_of_marriage_minor) > 1:
-          ${ redact("{:.0f}".format(children_of_marriage_minor[1].ssn)) }
+          ${ redact(children_of_marriage_minor[1].ssn) }
           % endif
       - "children1_name_name_last": |
           % if len(children_of_marriage_minor) > 1:
@@ -330,7 +330,7 @@ attachment:
           % endif
       - "children2_ssn": |
           % if len(children_of_marriage_minor) > 2:
-          ${ redact("{:.0f}".format(children_of_marriage_minor[2].ssn)) }
+          ${ redact(children_of_marriage_minor[2].ssn) }
           % endif
       - "children3_name_middle": |
           % if len(children_of_marriage_minor) > 3:
@@ -358,7 +358,7 @@ attachment:
           % endif
       - "children3_ssn": |
           % if len(children_of_marriage_minor) > 3:
-          ${ redact("{:.0f}".format(children_of_marriage_minor[3].ssn)) }
+          ${ redact(children_of_marriage_minor[3].ssn) }
           % endif
       - "children4_name_first": |
           % if len(children_of_marriage_minor) > 4:
@@ -366,7 +366,7 @@ attachment:
           % endif
       - "children4_age": |
           % if len(children_of_marriage_minor) > 4:
-          ${ redact("{:.0f}".format(children_of_marriage_minor[4].ssn)) }
+          ${ redact(children_of_marriage_minor[4].ssn) }
           % endif
       - "children4_name_suffix": |
           % if len(children_of_marriage_minor) > 4:
@@ -410,7 +410,7 @@ attachment:
           % endif
       - "children5_ssn": |
           % if len(children_of_marriage_minor) > 5:
-          ${ redact("{:.0f}".format(children_of_marriage_minor[5].ssn)) }
+          ${ redact(children_of_marriage_minor[5].ssn) }
           % endif
       - "children5_name_suffix": |
           % if len(children_of_marriage_minor) > 5:
