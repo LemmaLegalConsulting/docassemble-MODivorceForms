@@ -66,7 +66,7 @@ attachment:
       - "P_Male": ${ petitioner.gender == "male" } 
       - "P_Female": ${ petitioner.gender == "female" } 
       - "P DOB": ${ redact(format_date(petitioner.birthdate, format='M/d/yyyy')) } 
-      - "P_SSN": ${ redact("{:.0f}".format(petitioner.ssn)) } 
+      - "P_SSN": ${ redact(petitioner.ssn) } 
       - "P Race American Indian or Alaska Native": ${ petitioner.race == "American Indian or Alaska Native" } 
       - "P Race Asian": ${ petitioner.race == "Asian" } 
       - "P Race Black or African American": ${ petitioner.race == "Black or African American" } 
@@ -108,7 +108,7 @@ attachment:
       - "respondent_birthdate": ${ redact(format_date(respondent.birthdate, format='M/d/yyyy')) } 
       - "respondent_gender_female": ${ respondent.gender == "female" } 
       - "respondent_gender_male": ${ respondent.gender == "male" } 
-      - "respondent_ssn": ${ redact("{:.0f}".format(respondent.ssn)) } 
+      - "respondent_ssn": ${ redact(respondent.ssn) } 
       - "R Race American Indian or Alaska Native": ${ respondent.race == "American Indian or Alaska Native" } 
       - "R Race Asian": ${ respondent.race == "Asian" } 
       - "R Race White": ${ respondent.race == "White" } 
@@ -237,7 +237,7 @@ attachment:
           % endif
       - "children0_ssn": |
           % if len(children_of_marriage_minor) > 0:
-          ${ redact("{:.0f}".format(children_of_marriage_minor[0].ssn)) }
+          ${ redact(children_of_marriage_minor[0].ssn) }
           % endif
       - "children0_birthdate": |
           % if len(children_of_marriage_minor) > 0:
@@ -257,7 +257,7 @@ attachment:
           % endif
       - "children1_ssn": |
           % if len(children_of_marriage_minor) > 1:
-          ${ redact("{:.0f}".format(children_of_marriage_minor[1].ssn)) }
+          ${ redact(children_of_marriage_minor[1].ssn) }
           % endif
       - "children1_birthdate": |
           % if len(children_of_marriage_minor) > 1:
@@ -277,7 +277,7 @@ attachment:
           % endif
       - "children2_ssn": |
           % if len(children_of_marriage_minor) > 2:
-          ${ redact("{:.0f}".format(children_of_marriage_minor[2].ssn)) }
+          ${ redact(children_of_marriage_minor[2].ssn) }
           % endif
       - "children2_birthdate": |
           % if len(children_of_marriage_minor) > 2:
@@ -301,7 +301,7 @@ attachment:
           % endif
       - "children3_ssn": |
           % if len(children_of_marriage_minor) > 3:
-          ${ redact("{:.0f}".format(children_of_marriage_minor[3].ssn)) }
+          ${ redact(children_of_marriage_minor[3].ssn) }
           % endif
       - "children4": |
           % if len(children_of_marriage_minor) > 4:
@@ -317,7 +317,7 @@ attachment:
           % endif
       - "children4_ssn": |
           % if len(children_of_marriage_minor) > 4:
-          ${ redact("{:.0f}".format(children_of_marriage_minor[4].ssn)) }
+          ${ redact(children_of_marriage_minor[4].ssn) }
           % endif
       - "children4_birthdate": |
           % if len(children_of_marriage_minor) > 4:
@@ -341,7 +341,7 @@ attachment:
           % endif
       - "children5_ssn": |
           % if len(children_of_marriage_minor) > 5:
-          ${ redact("{:.0f}".format(children_of_marriage_minor[5].ssn)) }
+          ${ redact(children_of_marriage_minor[5].ssn) }
           % endif
       - "children6": |
           % if len(children_of_marriage_minor) > 6:
@@ -357,7 +357,7 @@ attachment:
           % endif
       - "children6_ssn": |
           % if len(children_of_marriage_minor) > 6:
-          ${ redact("{:.0f}".format(children_of_marriage_minor[6].ssn)) }
+          ${ redact(children_of_marriage_minor[6].ssn) }
           % endif
       - "children6_birthdate": |
           % if len(children_of_marriage_minor) > 6:
@@ -381,7 +381,7 @@ attachment:
           % endif
       - "children7_ssn": |
           % if len(children_of_marriage_minor) > 7:
-          ${ redact("{:.0f}".format(children_of_marriage_minor[7].ssn)) }
+          ${ redact(children_of_marriage_minor[7].ssn) }
           % endif
       - "children8": |
           % if len(children_of_marriage_minor) > 8:
@@ -389,7 +389,7 @@ attachment:
           % endif
       - "children8_ssn": |
           % if len(children_of_marriage_minor) > 8:
-          ${ redact("{:.0f}".format(children_of_marriage_minor[8].ssn)) }
+          ${ redact(children_of_marriage_minor[8].ssn) }
           % endif
       - "children8_gender_female": |
           % if len(children_of_marriage_minor) > 8:
@@ -421,7 +421,7 @@ attachment:
           % endif
       - "children9_ssn": |
           % if len(children_of_marriage_minor) > 9:
-          ${ redact("{:.0f}".format(children_of_marriage_minor[9].ssn)) }
+          ${ redact(children_of_marriage_minor[9].ssn) }
           % endif
       - "children_more_than_10": ${ len(children_of_marriage_minor) > 10 } 
       - "submitted_by": ${ users[0].attorney.name_full() if users[0].attorney_involved else  users[0].name_full() } 

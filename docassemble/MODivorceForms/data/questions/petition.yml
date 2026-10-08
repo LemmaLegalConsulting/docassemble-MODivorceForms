@@ -239,7 +239,7 @@ attachment:
           % endif
       - "childOneSsnLastFour": |
           % if len(children_of_marriage) > 0:
-          ${ redact("{:.0f}".format(children_of_marriage[0].ssn)) }
+          ${ redact(children_of_marriage[0].ssn) }
           % endif
       - "childOneStreet": |
           % if len(children_of_marriage) > 0:
@@ -439,7 +439,7 @@ attachment:
           % endif
       - "childTwoSsnLastFour": |
           % if len(children_of_marriage) > 1:
-          ${ redact("{:.0f}".format(children_of_marriage[1].ssn)) }
+          ${ redact(children_of_marriage[1].ssn) }
           % endif
       - "childTwoStreet": |
           % if len(children_of_marriage) > 1:
@@ -639,7 +639,7 @@ attachment:
           % endif
       - "childThreeSsnLastFour": |
           % if len(children_of_marriage) > 2:
-          ${ redact("{:.0f}".format(children_of_marriage[2].ssn)) }
+          ${ redact(children_of_marriage[2].ssn) }
           % endif
       - "childThreeStreet": |
           % if len(children_of_marriage) > 2:
@@ -839,7 +839,7 @@ attachment:
           % endif
       - "childFourSsnLastFour": |
           % if len(children_of_marriage) > 3:
-          ${ redact("{:.0f}".format(children_of_marriage[3].ssn)) }
+          ${ redact(children_of_marriage[3].ssn) }
           % endif
       - "childFourStreet": |
           % if len(children_of_marriage) > 3:

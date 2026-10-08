@@ -32,7 +32,7 @@ attachment:
       - "users1_name_middle": ${ users[0].name.middle } 
       - "users1_name_last": ${ users[0].name.last } 
       - "users1_prior_name": ${ users[0].prior_name } 
-      - "users1_ssn": ${ redact("{:.0f}".format(users[0].ssn)) } 
+      - "users1_ssn": ${ redact(users[0].ssn) } 
       - "users1_address_city": ${ users[0].address.city } 
       - "users1_address_state": ${ users[0].address.state } 
       - "users1_address_zip": ${ users[0].address.zip } 
@@ -43,7 +43,7 @@ attachment:
       - "users2_name_middle": ${ other_parties[0].name.middle } 
       - "users2_name_last": ${ other_parties[0].name.last } 
       - "users2_prior_name": ${ other_parties[0].prior_name } 
-      - "users2_ssn": ${ redact("{:.0f}".format(other_parties[0].ssn)) }
+      - "users2_ssn": ${ redact(other_parties[0].ssn) }
       - "users2_address_city": ${ other_parties[0].address.city } 
       - "users2_address_state": ${ other_parties[0].address.state } 
       - "users2_address_zip": ${ other_parties[0].address.zip } 

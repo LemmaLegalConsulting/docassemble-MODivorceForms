@@ -86,22 +86,22 @@ attachment:
       - "check_child1_reside_R": ${ children[0].lived_with == respondent.name.full() } 
       - "child1_name_full": ${ children[0].name_full() } 
       - "child1_birthdate": ${ format_date(children[0].birthdate, format='M/d/yyyy') } 
-      - "child1_ssn": ${ "{:.0f}".format(children[0].ssn) } 
+      - "child1_ssn": ${ children[0].ssn } 
       - "check_child2_reside_P": ${ children[1].lived_with == petitioner.name.full() } 
       - "check_child2_reside_R": ${ children[1].lived_with == respondent.name.full() } 
       - "child2_name_full": ${ children[1].name_full() } 
       - "child3_birthdate1": ${ format_date(children[1].birthdate, format='M/d/yyyy') } 
-      - "child2_ssn": ${ "{:.0f}".format(children[1].ssn) } 
+      - "child2_ssn": ${ children[1].ssn } 
       - "check_child3_reside_P": ${ children[2].lived_with == petitioner.name.full() } 
       - "check_child3_reside_R": ${ children[2].lived_with == respondent.name.full() } 
       - "child3_name_full": ${ children[2].name_full() } 
       - "child3_birthdate2": ${ format_date(children[2].birthdate, format='M/d/yyyy') } 
-      - "child3_ssn": ${ "{:.0f}".format(children[2].ssn) } 
+      - "child3_ssn": ${ children[2].ssn } 
       - "check_child4_reside_P": ${ children[3].lived_with == petitioner.name.full() } 
       - "check_child4_reside_R": ${ children[3].lived_with == respondent.name.full() } 
       - "child4_name_full": ${ children[3].name_full() } 
       - "child4_birthdate": ${ format_date(children[3].birthdate, format='M/d/yyyy') } 
-      - "child4_ssn": ${ "{:.0f}".format(children[3].ssn) } 
+      - "child4_ssn": ${ children[3].ssn } 
       - "check_child_support": ${ relief['child_support'] } 
       - "check_children_welfare_medicaid_yes": ${ received_welfare } 
       - "check_children_welfare_medicaid_no": ${ not received_welfare } 
