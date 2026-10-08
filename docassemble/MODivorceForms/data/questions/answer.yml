@@ -120,7 +120,7 @@ attachment:
           % endif
       - "raLastFourSsnFirstChild": |
           % if len(children_of_marriage) > 0:
-          ${ redact("{:.0f}".format(children_of_marriage[0].ssn)) }
+          ${ redact(children_of_marriage[0].ssn) }
           % endif
       - "raSecondChildFirstName": |
           % if len(children_of_marriage) > 1:
@@ -140,7 +140,7 @@ attachment:
           % endif
       - "raLastFourSsnSecondChild": |
           % if len(children_of_marriage) > 1:
-          ${ redact("{:.0f}".format(children_of_marriage[1].ssn)) }
+          ${ redact(children_of_marriage[1].ssn) }
           % endif
       - "raSecondChildLastName": |
           % if len(children_of_marriage) > 1:
@@ -164,7 +164,7 @@ attachment:
           % endif
       - "raLastFourSsnThirdChild": |
           % if len(children_of_marriage) > 2:
-          ${ redact("{:.0f}".format(children_of_marriage[2].ssn)) }
+          ${ redact(children_of_marriage[2].ssn) }
           % endif
       - "raThirdChildFirstName": |
           % if len(children_of_marriage) > 2:
@@ -204,7 +204,7 @@ attachment:
           % endif
       - "raLastFourSsnFourthChild": |
           % if len(children_of_marriage) > 3:
-          ${ redact("{:.0f}".format(children_of_marriage[3].ssn)) }
+          ${ redact(children_of_marriage[3].ssn) }
           % endif
       - "raFifthChildFirstName": |
           % if len(children_of_marriage) > 4:
@@ -224,7 +224,7 @@ attachment:
           % endif
       - "raLastFourSsnFifthChild": |
           % if len(children_of_marriage) > 4:
-          ${ redact("{:.0f}".format(children_of_marriage[4].ssn)) }
+          ${ redact(children_of_marriage[4].ssn) }
           % endif
       - "raFifthChildMiddleName": |
           % if len(children_of_marriage) > 4:
@@ -256,7 +256,7 @@ attachment:
           % endif
       - "raLastFourSsnSixthChild": |
           % if len(children_of_marriage) > 5:
-          ${ redact("{:.0f}".format(children_of_marriage[5].ssn)) }
+          ${ redact(children_of_marriage[5].ssn) }
           % endif
       - "raSixthChildFirstName": |
           % if len(children_of_marriage) > 5:

@@ -32,9 +32,9 @@ attachment:
   skip undefined: True
   pdf template file: form_14.pdf
   fields:
-      - "Respondent CB":  ${ child_support in ["petitioner", "none","third_party"] } 
-      - "Petitioner CB": ${ child_support in ["respondent"] }
-      - "Total Number of Children": ${ number_of_children } 
+      - "Respondent CB":  ${ child_support in [petitioner.name.full(), "none","third_party"] } 
+      - "Petitioner CB": ${ child_support in [respondent.name.full()] }
+      - "Total Number of Children": ${ "1" } 
       - "Line 1 - PRS": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) }
       - "Line 1 PPS": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) }
       - "Line 1a PRS": ${ "$" + thousands(support_recipient.maintenance_received, show_decimals=True) }
@@ -99,8 +99,8 @@ attachment:
   skip undefined: True
   pdf template file: form_14.pdf
   fields:
-      - "Respondent CB":  ${ child_support in ["petitioner", "none","third_party"] } 
-      - "Petitioner CB": ${ child_support in ["respondent"] }
+      - "Respondent CB":  ${ child_support in [petitioner.name.full(), "none","third_party"] } 
+      - "Petitioner CB": ${ child_support in [respondent.name.full()] }
       - "Total Number of Children": ${ "6" } 
       - "Line 1 - PRS": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) }
       - "Line 1 PPS": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) }
@@ -163,8 +163,8 @@ attachment:
   skip undefined: True
   pdf template file: form_14.pdf
   fields:
-      - "Respondent CB":  ${ child_support in ["petitioner", "none","third_party"] } 
-      - "Petitioner CB": ${ child_support in ["respondent"] }
+      - "Respondent CB":  ${ child_support in [petitioner.name.full(), "none","third_party"] } 
+      - "Petitioner CB": ${ child_support in [respondent.name.full()] }
       - "Total Number of Children": ${ 5 } 
       - "Line 1 - PRS": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) }
       - "Line 1 PPS": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) }
@@ -227,8 +227,8 @@ attachment:
   skip undefined: True
   pdf template file: form_14.pdf
   fields:
-      - "Respondent CB":  ${ child_support in ["petitioner", "none","third_party"] } 
-      - "Petitioner CB": ${ child_support in ["respondent"] }
+      - "Respondent CB":  ${ child_support in [petitioner.name.full(), "none","third_party"] } 
+      - "Petitioner CB": ${ child_support in [respondent.name.full()] }
       - "Total Number of Children": ${ 4 } 
       - "Line 1 - PRS": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) }
       - "Line 1 PPS": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) }
@@ -291,8 +291,8 @@ attachment:
   skip undefined: True
   pdf template file: form_14.pdf
   fields:
-      - "Respondent CB":  ${ child_support in ["petitioner", "none","third_party"] } 
-      - "Petitioner CB": ${ child_support in ["respondent"] }
+      - "Respondent CB":  ${ child_support in [petitioner.name.full(), "none","third_party"] } 
+      - "Petitioner CB": ${ child_support in [respondent.name.full()] }
       - "Total Number of Children": ${ 3 } 
       - "Line 1 - PRS": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) }
       - "Line 1 PPS": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) }
@@ -355,8 +355,8 @@ attachment:
   skip undefined: True
   pdf template file: form_14.pdf
   fields:
-      - "Respondent CB":  ${ child_support in ["petitioner", "none","third_party"] } 
-      - "Petitioner CB": ${ child_support in ["respondent"] }
+      - "Respondent CB":  ${ child_support in [petitioner.name.full(), "none","third_party"] } 
+      - "Petitioner CB": ${ child_support in [respondent.name.full()] }
       - "Total Number of Children": ${ 2 } 
       - "Line 1 - PRS": ${ "$" + thousands(support_recipient.monthly_income_1, show_decimals=True) }
       - "Line 1 PPS": ${ "$" + thousands(support_payer.monthly_income_1, show_decimals=True) }
