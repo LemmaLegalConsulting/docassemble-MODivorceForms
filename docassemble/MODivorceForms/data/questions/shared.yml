@@ -1767,7 +1767,7 @@ generic object: ALIndividual
 question: Other minor children for ${ x.name_full() }
 fields:
   - "How many minor children does ${ x.name_full() } have with someone other than ${ x.spouse.name.full() }?": x.other_children
-    default: ${ showifdef('x.other_children_default')}
+    default: ${ len([chi for chi in children if chi.unemancipated and chi.parents[x.name.full()] and not chi.parents[x.spouse.name.full()]]) }
     datatype: integer
     min: 0    
 ---
@@ -2504,22 +2504,24 @@ code: |
       x.debts_owned.append(debt)
   x.debts_award.gathered = True
   x.debts_owned.gathered = True
+
 ---
+id: gather vehicle_owned
 code: |
-  other_debts = users[0].debts_owned.matches(source=["appliances", "computers", "electronics", "furnishings", "personal_goods_other","jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc", "businesses", "stocks", "bonds", "notes", "mortgages", "money market", "securities_other", "farm", "other_assets", "personal_loans", "medical_debt", "student_loans","other"], exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt'])
+  other_debts.clear()
+  for re in users[0].debts_owned.matches(source=["appliances", "computers", "electronics", "furnishings", "personal_goods_other","jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc", "businesses", "stocks", "bonds", "notes", "mortgages", "money market", "securities_other", "farm", "other_assets", "personal_loans", "medical_debt", "student_loans","other"], exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt']):
+    other_debts.append(re)
   other_debts.gathered = True
 ---
 objects:
   - additional_possessions: ALAssetList.using(auto_gather=False)
 ---
+id: gather vehicle_owned
 code: |
   additional_possessions.clear()
-  additional_possessions = users[0].assets_owned.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_accounts_other", "ira", "appliances", "computers", "electronics", "furnishings", "personal_goods_other","jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc", "businesses", "stocks", "bonds", "notes", "mortgages", "money market", "securities_other", "life_insurance", "interest_in_contract", "debts_owed_to_you", "interest_in_litigation", "farm", "interests_in_trust", "other_assets"], exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','checking account','savings account'])
+  for re in users[0].assets_owned.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_accounts_other", "ira", "appliances", "computers", "electronics", "furnishings", "personal_goods_other","jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc", "businesses", "stocks", "bonds", "notes", "mortgages", "money market", "securities_other", "life_insurance", "interest_in_contract", "debts_owed_to_you", "interest_in_litigation", "farm", "interests_in_trust", "other_assets"]):
+    additional_possessions.append(re)
   additional_possessions.gathered = True
----
-code: |
-  vehicles_owned = users[0].assets_owned.matches(source=['car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other'])
-  vehicles_owned.gathered = True
 ---
 id: generic review
 generic object: ALIndividual
@@ -7659,6 +7661,7 @@ review:
     Did you live together as a couple in Missouri?: **${ word(yesno(marriage.live_together_in_mo)) }**
 - raw html: |
     ${ next_accordion("Service", showing=False) }
+  show if: case.filed == "not_filed"
 - Edit: 
     - other_parties[0].service_type
     - invalidate:
@@ -7674,14 +7677,16 @@ review:
     **Service to ${ other_parties[0].name_full() }?**
 
     How will you serve ${ other_parties[0].name_full() }?: ${ showifdef('other_parties[0].service_type') }
+  show if: case.filed == "not_filed"
 - Edit: mail_information
   button: |
     Has ${ respondent.name.first } signed a waiver of service? **${ word(yesno(waiver_of_service)) }**
 
     Does ${ respondent.name.first } have any family in Missouri that ${ respondent.pronoun_subjective() } visits on a regular basis?": **${ word(yesno(missouri_family)) }**
+  show if: case.filed == "not_filed"
 - Edit: 
     - other_parties[0].employer.address.address
-  show if: not (showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'))
+  show if: case.filed == "not_filed" and not (showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'))
   button: |
     Address for your spouse's work address for service
 
@@ -7727,6 +7732,7 @@ review:
     % endif
 
     What is the name of the newspaper where you will publish service?: **${ newspaper }**    
+  show if: case.filed == "not_filed"
 - raw html: |
     ${ end_accordion() }
 ---
@@ -7734,263 +7740,593 @@ id: parenting plan review
 question: Review the parenting plan
     
 review:
-  - raw html: |
-      ${ start_accordion("Children", showing=True) }
-  - note: |
-      PLACEHOLDER
-  - raw html: |
-      ${ next_accordion("Custody", showing=False) }
-  - Edit: legal_custody_other
-    button: |
-      **Sole Legal Custody to Third Party**
+- raw html: |
+    ${ start_accordion("Legal Custody", showing=False) }
+- Edit: legal_custody_other
+  button: |
+    **Sole Legal Custody to Third Party**
 
-      Existing person: ${ showifdef('legal_custody_other') }
+    Existing person: ${ showifdef('legal_custody_other') }
 
-      First: ${ showifdef('legal_custody_other.name.first') }
+    First: ${ showifdef('legal_custody_other.name.first') }
 
-      Middle: ${ showifdef('legal_custody_other.name.middle') }
+    Middle: ${ showifdef('legal_custody_other.name.middle') }
 
-      Last: ${ showifdef('legal_custody_other.name.last') }
-  - Edit: legal_custody
-    button: |
-      **Legal Custody**
+    Last: ${ showifdef('legal_custody_other.name.last') }
+- Edit: legal_custody
+  button: |
+    **Legal Custody**
 
-      What would you like to ask the court to give you in terms of legal custody?: ${ showifdef('legal_custody') }
+    What would you like to ask the court to give you in terms of legal custody?: ${ showifdef('legal_custody') }
 
-      Should this apply to all children involved in this case?: ${ word(yesno(legal_custody_all_children)) }
-  - Edit: legal_custody_sole_explanation
-    button: |
-      **Reason for sole custody**
+    Should this apply to all children involved in this case?: ${ word(yesno(legal_custody_all_children)) }
+- Edit: legal_custody_sole_explanation
+  button: |
+    **Reason for sole custody**
 
-      ${ showifdef('legal_custody_sole_explanation') }
-  - Edit: communications
-    button: |
-      **Communication between parents**
+    ${ showifdef('legal_custody_sole_explanation') }
+- Edit: communications
+  button: |
+    **Communication between parents**
 
-      Communication methods: ${ checkbox_labels('communications', communications) if defined('communications') else '' }
-  - Edit: communications_other
-    button: |
-      **Communication**
+    Communication methods: ${ checkbox_labels('communications', communications) if defined('communications') else '' }
+- Edit: communications_other
+  button: |
+    **Third Person for Party Communication**
 
-      Existing person: ${ showifdef('communications_other') }
+    Existing person: ${ showifdef('communications_other') }
 
-      First: ${ showifdef('communications_other.name.first') }
+    First: ${ showifdef('communications_other.name.first') }
 
-      Middle: ${ showifdef('communications_other.name.middle') }
+    Middle: ${ showifdef('communications_other.name.middle') }
 
-      Last: ${ showifdef('communications_other.name.last') }
- 
-  - Edit: dispute_resolution
-    button: |
-      **Dispute Resolution Procedure**
+    Last: ${ showifdef('communications_other.name.last') }
 
-      Is there another way you would like to resolve disagreements, in addition to mediation?: ${ showifdef('dispute_resolution') } 
-  - Edit: physical_custody
-    button: |
-      **Physical Custody**
+- Edit: dispute_resolution
+  button: |
+    **Dispute Resolution Procedure**
 
-      What would you like to ask the court to give you in terms of physical custody?: ${ showifdef('physical_custody') }
+    Is there another way you would like to resolve disagreements, in addition to mediation?: ${ showifdef('dispute_resolution') } 
+- raw html: |
+    ${ next_accordion("Physical Custody", showing=False) }
+- Edit: physical_custody
+  button: |
+    **Physical Custody**
 
-      Should this apply to all children involved in this case?: ${ word(yesno(physical_custody_all_children)) }
-  - Edit: visitation
-    button: |
-      **Visitation**
+    What would you like to ask the court to give you in terms of physical custody?: ${ showifdef('physical_custody') }
 
-      Should visitation with ${ respondent if physical_custody == petitioner.name.full() else petitioner } be supervised?: ${ word(yesno(visitation)) }
-  - Edit: visitation_supervisor
-    button: |
-      **Visitation**
+    Should this apply to all children involved in this case?: ${ word(yesno(physical_custody_all_children)) }
 
-      Existing person: ${ showifdef('visitation_supervisor') }
+    % if physical_custody == "Joint":
+    Whose address should you use for mailing and educational purposes? ${ value(physical_custody_address) }
+    % endif
+- Edit: visitation
+  button: |
+    **Visitation**
 
-      First: ${ showifdef('visitation_supervisor.name.first') }
+    Should visitation with ${ respondent if physical_custody == petitioner.name.full() else petitioner } be supervised?: ${ word(yesno(visitation)) }
 
-      Middle: ${ showifdef('visitation_supervisor.name.middle') }
+    % if visitation:
+    Unsupervised visitation would endanger the children's physical health or impair their emotional development because:
+    
+    ${ visitation_reason }
+    % endif
+- Edit: visitation_supervisor
+  button: |
+    **Visitation**
 
-      Last: ${ showifdef('visitation_supervisor.name.last') }
-  - Edit: physical_custody_sole_explanation
-    button: |
-      **Reason for sole physical custody**
+    Existing person: ${ showifdef('visitation_supervisor') }
+
+    First: ${ showifdef('visitation_supervisor.name.first') }
+
+    Middle: ${ showifdef('visitation_supervisor.name.middle') }
+
+    Last: ${ showifdef('visitation_supervisor.name.last') }
+- Edit: physical_custody_sole_explanation
+  button: |
+    **Reason for sole physical custody**
+
+    ${ showifdef('physical_custody_sole_explanation') }
+- Edit: physical_custody_other
+  button: |
+    **Sole physical Custody to Third Party**
+
+    Existing person: ${ showifdef('physical_custody_other') }
+
+    First: ${ showifdef('physical_custody_other.name.first') }
+
+    Middle: ${ showifdef('physical_custody_other.name.middle') }
+
+    Last: ${ showifdef('physical_custody_other.name.last') }
+- Edit: others_with_physical_custody
+  button: |
+    **Additional information about children**
+
+    Do you know of anyone other than you or your spouse who has physical custody of any of the children or claims to have custody or visitation rights with respect to any of the children?: ${ word(yesno(others_with_physical_custody)) }
+
+    Do you have information about any other custody proceeding concerning any of the children pending in a court of this or any other state?: ${ word(yesno(other_custody_proceeding)) }
+
+    Have you participated in other litigation concerning the custody of any of the children in this or any other state?: ${ word(yesno(other_litigation)) }
+
+    Have any of the children been a victim of abuse or neglect?: ${ word(yesno(abuse_or_neglect)) }
+
+    Have any orders pertaining to any of the children been entered by the Family Support Division?: ${ word(yesno(family_support_order)) }
+- Edit: domestic_violence
+  button: |
+    **Domestic Violence**
+
+    Has there been a pattern of domestic violence between the parents?: ${ word(yesno(domestic_violence)) }
+
+    % if showifdef('domestic_violence'):
+    Who has committed the domestic violence?: ${ showifdef('domestic_violence_committed_by') }
+    % endif
+
+    % if showifdef('domestic_violence'):
+    Should the address information be restricted?: ${ word(yesno(educational_records_include_victim_address)) }
+    % endif
+- raw html: |
+    ${ next_accordion("Weekly Exchange Schedule", showing=False) }
+- Edit: biweekly_schedule[0]
+  button: |
+    **Weekday and Weekend Exchange Schedule**
+
+    ###Week 1###
+    
+    Day  | Exchange
+    -----|-----------
+    Sunday |  ${ showifdef('biweekly_schedule[0]').strip() }
+    Monday |  ${ showifdef('biweekly_schedule[1]').strip() }
+    Tuesday |  ${ showifdef('biweekly_schedule[2]').strip() }
+    Wednesday |  ${ showifdef('biweekly_schedule[3]').strip() }
+    Thursday |  ${ showifdef('biweekly_schedule[4]').strip() }
+    Friday |  ${ showifdef('biweekly_schedule[5]').strip() }
+    Saturday |  ${ showifdef('biweekly_schedule[6]').strip() }
+   
+    ###Week 2###
+    
+    Day  | Exchange
+    -----|-----------
+    Sunday|${ showifdef('biweekly_schedule[7]').strip() }
+    Monday|${ showifdef('biweekly_schedule[8]').strip() }
+    Tuesday: |  ${ showifdef('biweekly_schedule[9]').strip() }
+    Wednesday: |  ${ showifdef('biweekly_schedule[10]').strip() }
+    Thursday: |  ${ showifdef('biweekly_schedule[11]').strip() }
+    Friday: |  ${ showifdef('biweekly_schedule[12]').strip() }
+    Saturday: |  ${ showifdef('biweekly_schedule[13]').strip() }
+- raw html: |
+    ${ next_accordion("Holiday Exchange Schedule", showing=False) }
+- Edit: 
+    - holidays_default
+    - invalidate: 
+      - holidays_review
+    - recompute:
+      - section_children
+  button: |
+    Holiday |Even Years|Odd Years|From|To
+    --------|-------------------|------------------|----|--
+    ${ holidays["mlk"]["description"] }  | ${ value(holidays["mlk"]["even_years"]) } | ${ value(holidays["mlk"]["odd_years"]) } | ${ holidays["mlk"]["custody_from_time"] } | ${ holidays["mlk"]["custody_to_time"]}
+    ${ holidays["president"]["description"] }  | ${ value(holidays["president"]["even_years"]) } | ${ value(holidays["president"]["odd_years"]) } | ${ holidays["president"]["custody_from_time"] } | ${ holidays["president"]["custody_to_time"]}
+    ${ holidays["memorial"]["description"] }  | ${ value(holidays["memorial"]["even_years"]) } | ${ value(holidays["memorial"]["odd_years"]) } | ${ holidays["memorial"]["custody_from_time"] } | ${ holidays["memorial"]["custody_to_time"]}
+    ${ holidays["independence"]["description"] }  | ${ value(holidays["independence"]["even_years"]) } | ${ value(holidays["independence"]["odd_years"]) } | ${ holidays["independence"]["custody_from_time"] } | ${ holidays["independence"]["custody_to_time"]}
+    ${ holidays["labor"]["description"] }  | ${ value(holidays["labor"]["even_years"]) } | ${ value(holidays["labor"]["odd_years"]) } | ${ holidays["labor"]["custody_from_time"] } | ${ holidays["labor"]["custody_to_time"]}
+    ${ holidays["halloween"]["description"] }  | ${ value(holidays["halloween"]["even_years"]) } | ${ value(holidays["halloween"]["odd_years"]) } | ${ holidays["halloween"]["custody_from_time"] } | ${ holidays["halloween"]["custody_to_time"]}
+    ${ holidays["thanksgiving"]["description"] }  | ${ value(holidays["thanksgiving"]["even_years"]) } | ${ value(holidays["thanksgiving"]["odd_years"]) } | ${ holidays["thanksgiving"]["custody_from_time"] } | ${ holidays["thanksgiving"]["custody_to_time"]}
+    ${ holidays["xmas_eve"]["description"] }  | ${ value(holidays["xmas_eve"]["even_years"]) } | ${ value(holidays["xmas_eve"]["odd_years"]) } | ${ holidays["xmas_eve"]["custody_from_time"] } | ${ holidays["xmas_eve"]["custody_to_time"]}
+    ${ holidays["xmas_day"]["description"] }  | ${ value(holidays["xmas_day"]["even_years"]) } | ${ value(holidays["xmas_day"]["odd_years"]) } | ${ holidays["xmas_day"]["custody_from_time"] } | ${ holidays["xmas_day"]["custody_to_time"]}
+    ${ holidays["mother"]["description"] }  | ${ value(holidays["mother"]["even_years"]) } | ${ value(holidays["mother"]["odd_years"]) } | ${ holidays["mother"]["custody_from_time"] } | ${ holidays["mother"]["custody_to_time"]}
+    ${ holidays["father"]["description"] }  | ${ value(holidays["father"]["even_years"]) } | ${ value(holidays["father"]["odd_years"]) } | ${ holidays["father"]["custody_from_time"] } | ${ holidays["father"]["custody_to_time"]}
+    ${ holidays["petitioner_birthday"]["description"] }  | ${ value(holidays["petitioner_birthday"]["even_years"]) } | ${ value(holidays["petitioner_birthday"]["odd_years"]) } | ${ holidays["petitioner_birthday"]["custody_from_time"] } | ${ holidays["petitioner_birthday"]["custody_to_time"]}
+    ${ holidays["respondent_birthday"]["description"] }  | ${ value(holidays["respondent_birthday"]["even_years"]) } | ${ value(holidays["respondent_birthday"]["odd_years"]) } | ${ holidays["respondent_birthday"]["custody_from_time"] } | ${ holidays["respondent_birthday"]["custody_to_time"]}
+    ${ holidays["children_birthday"]["description"] }  | ${ value(holidays["children_birthday"]["even_years"]) } | ${ value(holidays["children_birthday"]["odd_years"]) } | ${ holidays["children_birthday"]["custody_from_time"] } | ${ holidays["children_birthday"]["custody_to_time"]}
+- edit: other_holidays.revisit
+  button: |
+    % if len(other_holidays.complete_elements()) > 0:
+    You have already mentioned:
+    % for other_holiday in other_holidays.complete_elements():
+    
+     - ${ other_holiday.description }
+    % endfor
+    % else:
+    You have not listed any other holidays.
+    % endif
+- edit: vacation
+  button: |
+    **Vacation Schedule**
+
+    Do you want to set aside specific weeks for vacations?: ${ word(yesno(vacation)) }
+
+    % if showifdef('vacation'):
+    How many weeks each year?: ${ showifdef('vacation_weeks') }
+    % endif
+
+    % if showifdef('vacation'):
+    Do you want to add any extra information about vacations?: ${ showifdef('vacation_invo') }
+    % endif
+- raw html: |
+    ${ next_accordion("Other Provisions", showing=False) }
+- Edit: 
+  - parenting_plan_A_author
+  - invalidate: 
+    - parenting_plan_A_author_other
+  - recompute:
+    - section_children
+  button: |
+    Who helped write part A of the parenting plan?
+    
+    % if parenting_plan_A_author['petitioner']:
+     - ${ petitioner }
+    % endif
+    % if parenting_plan_A_author['respondent']:
+     - ${ respondent }: 
+    % endif
+    % if parenting_plan_A_author['The court']:
+     - The court
+    % endif
+    % if parenting_plan_A_author['The guardian ad litem']:
+     - The guardian ad litem
+    % endif
+    % if parenting_plan_A_author['Other']:
+     - Other: ${ parenting_plan_A_author_other }
+    % endif
+- Edit: location_of_exchange
+  button: |
+    **Specific location for an exchange**
+
+    Where should an exchange occur if a specific location for an exchange is not stated on the schedule?: ${ showifdef('location_of_exchange') }
+
+    When should the exchange occur?: ${ showifdef('time_of_exchange') }
+
+    Where should the exchange occur when school or child care is not in session?: ${ showifdef('location_of_exchange_school_not_in_session') }
+
+    Where should the exchange occur?  (Please include the full address): ${ showifdef('location_of_exchange_specific_location') }
+
+    Add a pick-up for the other parent?: ${ word(yesno(add_pick_up_from_school)) }
+
+    % if showifdef('add_pick_up_from_school') == "True":
+    Time of the pickup: ${ showifdef('time_of_exchange2') }
+    % endif
+- Edit: phone_contact
+  button: |
+    **Telephone Contact with Children**
+
+    Are there restrictions on the time to contact children?: ${ word(yesno(phone_contact)) }
+
+    % if showifdef('phone_contact'):
+    What is the earliest that a child can be contacted on the phone?: ${ showifdef('phone_contact_am') }
+    % endif
+
+    % if showifdef('phone_contact'):
+    What is the latest that a child can be contacted on the phone?: ${ showifdef('phone_contact_pm') }
+    % endif
+- raw html: |
+    ${ next_accordion("Child Support", showing=False) }
+- edit: child_support
+  button: |
+    Who are you asking the court to award child support to?: **${ third_party_other if child_support == "third_party" else "No child support" if child_support == "none" else value(child_support)}**
+- Edit: 
+  - parenting_plan_B_author
+  - invalidate: 
+    - parenting_plan_B_author_other
+  - recompute:
+    - section_children
+  button: |
+    Who helped write part B of the parenting plan?
+    
+    % if parenting_plan_B_author['petitioner']:
+     - ${ petitioner }
+    % endif
+    % if parenting_plan_B_author['respondent']:
+     - ${ respondent }: 
+    % endif
+    % if parenting_plan_B_author['The court']:
+     - The court
+    % endif
+    % if parenting_plan_B_author['The guardian ad litem']:
+     - The guardian ad litem
+    % endif
+    % if parenting_plan_B_author['Other']:
+     - Other: ${ parenting_plan_B_author_other }
+    % endif
+- raw html: |
+    ${ next_accordion("Medical and Dental Insurance", showing=False) }
+- Edit: 
+    - medical_insurance
+    - dental_insurance
+    - users[0].health_insurance_costs
+    - other_parties[0].health_insurance_costs
+  button: |
+    **Parent Responsible for Medical Insurance**
+
+    Who should maintain and pay the cost of medical insurance for the benefit of the children?: ${ choice_label('medical_insurance', showifdef('medical_insurance')) }
+
+    **Parent Responsible for Dental Insurance**
+
+    Who should maintain and pay the cost of dental insurance for the benefit of the children?: ${ choice_label('dental_insurance', showifdef('dental_insurance')) }
+
+    Health insurance costs for ${ users[0] }: **${ users[0].health_insurance_costs }**
+    
+    Health insurance costs for ${ other_parties[0] }: **${ other_parties[0].health_insurance_costs }**
+- Edit: health_expenses_not_covered
+  button: |
+    **Health Expenses Not Covered by Insurance**
+
+    Who should pay health expenses not covered by insurance?: ${ choice_label('health_expenses_not_covered', showifdef('health_expenses_not_covered')) }
+
+    Should that other parent reimburse for a percentage of thse expenses?: ${ word(yesno(health_expenses_not_covered_reimburse)) }
+
+    What percentage?: ${ showifdef('health_expenses_not_covered_reimburse_percentage') }
+- Edit: users[0].extraordinary_medical_costs.revisit
+  button: |
+    % if len(users[0].extraordinary_medical_costs.complete_elements()) > 0:
+    You have told us that you are paying the following extraordinary medical costs: ${ comma_and_list([cost.description for cost in users[0].extraordinary_medical_costs.complete_elements()]) }
+    % else:
+    You said that you are not paying any extraordinary medical costs
+    % endif
+- Edit: other_parties[0].extraordinary_medical_costs.revisit
+  button: |
+    % if len(other_parties[0].extraordinary_medical_costs.complete_elements()) > 0:
+    You have told us that ${ other_parties[0] } paying the following extraordinary medical costs: ${ comma_and_list([cost.description for cost in other_parties[0].extraordinary_medical_costs.complete_elements()]) }
+    % else:
+    You said that ${ other_parties[0] } is not paying any extraordinary medical costs
+    % endif
+- raw html: |
+    ${ next_accordion("Child Care Expenses", showing=False) }
+- Edit: 
+    - pay_work_childcare_expenses
+    - users[0].work_childcare_expenses
+    - other_parties[0].work_childcare_expenses
+  button: |
+    **Child Care Expenses**
+
+    Work-related childcare expenses for ${ users[0] }: **$${ thousands(users[0].work_childcare_expenses) }**
+    
+    Work-related childcare expenses for ${ other_parties[0] }: **$${ thousands(other_parties[0].work_childcare_expenses) }**
+
+    How should work-related childcare expenses be handled?: ${ choice_label('pay_work_childcare_expenses', showifdef('pay_work_childcare_expenses')) }
+
+    % if showifdef('pay_work_childcare_expenses') == "pay_percentage":
+    What percentage of ${ possessify(support_recipient.name_full(), 'childcare costs') }should ${ support_payer.name_full() } reimburse?: ${ showifdef('pay_work_childcare_expenses_percentage') }
+    % endif
+- Edit: users[0].extraordinary_childrearing_costs.revisit
+  button: |
+    % if len(users[0].extraordinary_childrearing_costs.complete_elements()) > 0:
+    You have told us that you are paying the following extraordinary childcare costs: ${ comma_and_list([cost.description for cost in users[0].extraordinary_childrearing_costs.complete_elements()]) }
+    % else:
+    You said that you are not paying any extraordinary childcare costs
+    % endif
+- Edit: other_parties[0].extraordinary_childrearing_costs.revisit
+  button: |
+    % if len(other_parties[0].extraordinary_childrearing_costs.complete_elements()) > 0:
+    You have told us that ${ other_parties[0] } paying the following extraordinary childcare costs: ${ comma_and_list([cost.description for cost in other_parties[0].extraordinary_childrearing_costs.complete_elements()]) }
+    % else:
+    You said that ${ other_parties[0] } is not paying any extraordinary childcare costs
+    % endif
+- raw html: |
+    ${ next_accordion("Income", showing=False) }
+- note: |
+    Your monthly gross income: **$${ thousands(users[0].monthly_gross_income) }**
+- Edit: 
+    - users[0].jobs.revisit
+    - invalidate:
+      - users[0].employer.name.text
+      - users[0].employer.email 
+      - users[0].employer.address.address
+      - users[0].employer.address.city
+      - users[0].employer.address.state
+      - users[0].employer.address.zip
+      - users[0].monthly_gross_income
+    - recompute:
+      - section_income
+  button: |
+    % if users[0].jobs.there_are_any:
+    Your monthly gross income from a job:  **$${ thousands(users[0].jobs.total(times_per_year=12)) }**
+    % else:
+    You have no income from a job.
+    % endif
+- Edit: 
+    - users[0].has_self_employment_income
+    - invalidate:
+      - users[0].employer.name.text
+      - users[0].employer.email 
+      - users[0].employer.address.address
+      - users[0].employer.address.city
+      - users[0].employer.address.state
+      - users[0].employer.address.zip
+      - users[0].monthly_gross_income
+    - recompute:
+      - section_income
+  button: |
+    Your monthly gross income from self employment: **$${ thousands(users[0].self_employment_income) }**
+- Edit: 
+    - users[0].benefits.revisit
+    - recompute:
+      - users[0].monthly_gross_income
+  button: |
+    Your monthly gross income from benefits: **$${ thousands(users[0].benefits.total(times_per_year=12)) }**
+- Edit: users[0].self_supporting
+  button: |
+    Are you able to support yourself on your monthly income?: **${ word(yesno(users[0].self_supporting))}**
+- Edit: users[0].employer.name.text
+  button: |
+    % if users[0].jobs.there_are_any:
+    Tell us about your main employer.
+    % elif users[0].has_self_employment_income:
+    Describe your self employment and provide the address for your self employment.
+    % endif
   
-      ${ showifdef('physical_custody_sole_explanation') }
-  - Edit: physical_custody_other
-    button: |
-      **Sole physical Custody to Third Party**
+    Name: ${ users[0].employer.name.text }
+    
+    Address: ${ users[0].employer.address.on_one_line() }
+    
+    Phone: ${ showifdef('users[0].employer.phone_number') }
+- Edit: users[0].employer.email
+  button: |
+    % if users[0].employer.email_unknown:
+    I don't know the email address for ${ users[0].name.text }
+    % else:
+    Email for ${ users[0].name.text }: **${ users[0].employer.email }**
+    % endif
+- note: |
+    Your spouse's monthly gross income: **$${ thousands(other_parties[0].monthly_gross_income) }**
+- Edit: support_payer.use_assumed_monthly_income
+  button: |
+    Because you don't know if ${ support_payer.name_full() } has a job, you are assuming that ${ support_payer.name.full() } has a monthly job income of ${ support_payer.assumed_monthly_income } because ${ support_payer.assumed_monthly_income_explanation }
+
+- Edit: 
+    - other_parties[0].jobs.revisit
+    - invalidate:
+      - other_parties[0].employer.name.text
+      - other_parties[0].employer.email 
+      - other_parties[0].employer.address.address
+      - other_parties[0].employer.address.unit
+      - other_parties[0].employer.address.city
+      - other_parties[0].employer.address.state
+      - other_parties[0].employer.address.zip
+      - other_parties[0].monthly_gross_income
+    - recompute:
+      - section_income
+  show if: showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]')
+  button: |
+    % if other_parties[0].jobs.there_are_any:
+    Your spouse's monthly gross income from a job:  **$${ thousands(other_parties[0].jobs.total(times_per_year=12)) }**
+    % elif other_parties[0].jobs.there_are_any == False:
+    Your spouse has no income from a job.
+    % elif other_parties[0].jobs.there_are_any == None:
+    You don't know if your spouse has a job.
+    % endif
+- Edit: 
+    - other_parties[0].has_self_employment_income
+    - invalidate:
+      - other_parties[0].employer.name.text
+      - other_parties[0].employer.email 
+      - other_parties[0].employer.address.address
+      - other_parties[0].employer.address.unit
+      - other_parties[0].employer.address.city
+      - other_parties[0].employer.address.state
+      - other_parties[0].employer.address.zip
+      - other_parties[0].monthly_gross_income
+    - recompute:
+      - section_income
+  show if: showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]')
+  button: |
+    % if other_parties[0].has_self_employment_income == True:
+    Your spouse's monthly gross income from self employment: **$${ thousands(other_parties[0].self_employment_income) }**
+    % elif other_parties[0].has_self_employment_income == False:
+    Your spouse has no self employment income.
+    % elif other_parties[0].has_self_employment_income == None:
+    You don't know if your spouse has any self employment income.
+    % endif
+- Edit: 
+    - other_parties[0].benefits.revisit
+    - recompute:
+      - other_parties[0].monthly_gross_income
+  button: |
+    % if len(other_parties[0].benefits) > 0:
+    Your spouse's monthly gross income from benefits: **$${ thousands(other_parties[0].benefits.total(times_per_year=12)) }**
+    % elif other_parties[0].benefits.there_are_any == False:
+    Your spouse has no income from benefits.
+    % elif other_parties[0].benefits.there_are_any == None:
+    You don't know if your spouse has any income from benefits
+    % endif
+- Edit: other_parties[0].self_supporting
+  button: |
+    Is ${ other_parties[0].name_full() } able to support themselves on their monthly income?: **${ "Unknown" if other_parties[0].self_supporting == None else word(yesno(other_parties[0].self_supporting))}**
+- Edit: other_parties[0].employer.name.text
+  button: |
+    % if other_parties[0].jobs.there_are_any:
+    Tell us about ${ other_parties[0].pronoun_possessive("main employer") }.
+    % elif other_parties[0].has_self_employment_income:
+    Describe ${ other_parties[0].pronoun_possessive("self employment") }and provide the address.
+    % endif
   
-      Existing person: ${ showifdef('physical_custody_other') }
-  
-      First: ${ showifdef('physical_custody_other.name.first') }
-  
-      Middle: ${ showifdef('physical_custody_other.name.middle') }
-  
-      Last: ${ showifdef('physical_custody_other.name.last') }
-  - Edit: others_with_physical_custody
-    button: |
-      **Additional information about children**
-  
-      Do you know of anyone other than you or your spouse who has physical custody of any of the children or claims to have custody or visitation rights with respect to any of the children?: ${ word(yesno(others_with_physical_custody)) }
-  
-      Do you have information about any other custody proceeding concerning any of the children pending in a court of this or any other state?: ${ word(yesno(other_custody_proceeding)) }
-  
-      Have you participated in other litigation concerning the custody of any of the children in this or any other state?: ${ word(yesno(other_litigation)) }
-  
-      Have any of the children been a victim of abuse or neglect?: ${ word(yesno(abuse_or_neglect)) }
-  
-      Have any orders pertaining to any of the children been entered by the Family Support Division?: ${ word(yesno(family_support_order)) }
-  - Edit: domestic_violence
-    button: |
-      **Domestic Violence**
+    Name: ${ other_parties[0].employer.name.text }
+    
+    Address: ${ other_parties[0].employer.address.on_one_line() }
+    
+    Phone: ${ showifdef('other_parties[0].employer.phone_number') }
+- Edit: other_parties[0].employer.email
+  button: |
+    % if other_parties[0].employer.email_unknown:
+    I don't know the email address for ${ other_parties[0].name.text }
+    % else:
+    Email for ${ other_parties[0].name.text }: **${ other_parties[0].employer.email }**
+    % endif
+- raw html: |
+    ${ next_accordion("Child Support Payment", showing=False) }
+- Edit: use_presumed_child_support
+  button: |
+    **Presumed Child Support amount**
 
-      Has there been a pattern of domestic violence between the parents?: ${ word(yesno(domestic_violence)) }
+    % if number_of_children > 5:
+     - Six or more children - ${ currency(support_payer.presumed_child_support_amount_12_6 if support_payer.presumed_child_support_amount_12_6 > 0 else 0 ) }
+    
+    % endif
+    % if number_of_children > 4:
+     - Five children - ${ currency(support_payer.presumed_child_support_amount_12_5 if support_payer.presumed_child_support_amount_12_5 > 0 else 0 ) }
+    
+    % endif
+    % if number_of_children > 3:
+     - Four children - ${ currency(support_payer.presumed_child_support_amount_12_4 if support_payer.presumed_child_support_amount_12_4 > 0 else 0 ) }
+    
+    % endif
+    % if number_of_children > 2:
+     - Three children - ${ currency(support_payer.presumed_child_support_amount_12_3 if support_payer.presumed_child_support_amount_12_3 > 0 else 0 ) }
+    
+    % endif
+    % if number_of_children > 1:
+     - Two children - ${ currency(support_payer.presumed_child_support_amount_12_2 if support_payer.presumed_child_support_amount_12_2 > 0 else 0 ) }
+    
+    % endif
+     - One child - ${ currency(support_payer.presumed_child_support_amount_12 if support_payer.presumed_child_support_amount_12 > 0 else 0 ) }
+    
+    Should the court order this amount in monthly child support?: **${ choice_label('use_presumed_child_support', showifdef('use_presumed_child_support')) }**
 
-      % if showifdef('domestic_violence'):
-      Who has committed the domestic violence?: ${ showifdef('domestic_violence_committed_by') }
-      % endif
+    % if showifdef('use_presumed_child_support') == "no":
+    Why is the presumed child support amount unjust and inappropriate?: ${ showifdef('use_presumed_child_support_explanation') }
 
-      % if showifdef('domestic_violence'):
-      Should the address information be restricted?: ${ word(yesno(educational_records_include_victim_address)) }
-      % endif
-  - raw html: |
-      ${ next_accordion("Weekly Exchange Schedule", showing=False) }
-  - Edit: biweekly_schedule
-    button: |
-      **Weekday and Weekend Exchange Schedule**
+    % if defined('actual_child_support_6'):
+     - Six or more children: **$${ thousands(actual_child_support_6) }**
+    % endif
+    % if defined('actual_child_support_5'):
+     - Five children: **$${ thousands(actual_child_support_5) }**
+    % endif
+    % if defined('actual_child_support_4'):
+     - Four children: **$${ thousands(actual_child_support_4) }**
+    % endif
+    % if defined('actual_child_support_3'):
+     - Three children: **$${ thousands(actual_child_support_3) }**
+    % endif
+    % if defined('actual_child_support_2'):
+     - Two children: **$${ thousands(actual_child_support_2) }**
+    % endif
+    % if defined('actual_child_support_1'):
+     - One child: **$${ thousands(actual_child_support_1) }**
+    % endif
+    
+    % endif
+- Edit: child_support_start_date
+  button: |
+    **Child support starting date**
 
-      Sunday Week 1: ${ showifdef('biweekly_schedule[0]') }
+    When should the child support start?: ${ choice_label('child_support_start_date', showifdef('child_support_start_date')) }
 
-      Monday Week 1: ${ showifdef('biweekly_schedule[1]') }
+    % if showifdef('child_support_start_date') == "specific_date":
+    Date: ${ showifdef('child_support_start_date_other_date') }
+    % endif
+- Edit: child_support_method_of_payment
+  button: |
+    **Method of payment of Child Support**
 
-      Tuesday Week 1: ${ showifdef('biweekly_schedule[2]') }
+    How should child support be paid?: ${ choice_label('child_support_method_of_payment', showifdef('child_support_method_of_payment')) }
 
-      Wednesday Week 1: ${ showifdef('biweekly_schedule[3]') }
+    Should child support be paid at the Family Support Payment Center or directly to ${ support_recipient.name_full() }: ${ choice_label('child_support_location_of_payment', showifdef('child_support_location_of_payment')) }
+- note: |
+    **Income Tax Dependents**
 
-      Thursday Week 1: ${ showifdef('biweekly_schedule[4]') }
+    ${ children_of_marriage_minor_tax_table }
+- raw html: |
+    ${ end_accordion() }
 
-      Friday Week 1: ${ showifdef('biweekly_schedule[5]') }
-
-      Saturday Week 1: ${ showifdef('biweekly_schedule[6]') }
-
-      Sunday Week 2: ${ showifdef('biweekly_schedule[7]') }
-
-      Monday Week 2: ${ showifdef('biweekly_schedule[8]') }
-
-      Tuesday Week 2: ${ showifdef('biweekly_schedule[9]') }
-
-      Wednesday Week 2: ${ showifdef('biweekly_schedule[10]') }
-
-      Thursday Week 2: ${ showifdef('biweekly_schedule[11]') }
-
-      Friday Week 2: ${ showifdef('biweekly_schedule[12]') }
-
-      Saturday Week 2: ${ showifdef('biweekly_schedule[13]') }
-  - raw html: |
-      ${ next_accordion("Holiday Exchange Schedule", showing=False) }
-  - note: |
-      PLACEHOLDER
-  - raw html: |
-      ${ next_accordion("Other Provisions", showing=False) }
-  - Edit: location_of_exchange
-    button: |
-      **Specific location for an exchange**
-
-      Where should an exchange occur if a specific location for an exchange is not stated on the schedule?: ${ showifdef('location_of_exchange') }
-
-      When should the exchange occur?: ${ showifdef('time_of_exchange') }
-
-      Where should the exchange occur when school or child care is not in session?: ${ showifdef('location_of_exchange_school_not_in_session') }
-
-      Where should the exchange occur?  (Please include the full address): ${ showifdef('location_of_exchange_specific_location') }
-
-      Add a pick-up for the other parent?: ${ word(yesno(add_pick_up_from_school)) }
-
-      % if showifdef('add_pick_up_from_school') == "True":
-      Time of the pickup: ${ showifdef('time_of_exchange2') }
-      % endif
-  - Edit: phone_contact
-    button: |
-      **Telephone Contact with Children**
-
-      Are there restrictions on the time to contact children?: ${ word(yesno(phone_contact)) }
-
-      % if showifdef('phone_contact'):
-      What is the earliest that a child can be contacted on the phone?: ${ showifdef('phone_contact_am') }
-      % endif
-
-      % if showifdef('phone_contact'):
-      What is the latest that a child can be contacted on the phone?: ${ showifdef('phone_contact_pm') }
-      % endif
-  - raw html: |
-      ${ next_accordion("Child Support", showing=False) }
-  - note: |
-      PLACEHOLDER
-  - raw html: |
-      ${ next_accordion("Medical and Dental Insurance", showing=False) }
-  - Edit: medical_insurance
-    button: |
-      **Parent Responsible for Medical Insurance**
-
-      Who should maintain and pay the cost of medical insurance for the benefit of the children?: ${ choice_label('medical_insurance', showifdef('medical_insurance')) }
-  - Edit: dental_insurance
-    button: |
-      **Parent Responsible for Dental Insurance**
-
-      Who should maintain and pay the cost of dental insurance for the benefit of the children?: ${ choice_label('dental_insurance', showifdef('dental_insurance')) }
-  - Edit: health_expenses_not_covered
-    button: |
-      **Health Expenses Not Covered by Insurance**
-
-      Who should pay health expenses not covered by insurance?: ${ choice_label('health_expenses_not_covered', showifdef('health_expenses_not_covered')) }
-
-      Should that other parent reimburse for a percentage of thse expenses?: ${ word(yesno(health_expenses_not_covered_reimburse)) }
-
-      What percentage?: ${ showifdef('health_expenses_not_covered_reimburse_percentage') }
-  - raw html: |
-      ${ next_accordion("Child Care Expenses", showing=False) }
-  - Edit: pay_work_childcare_expenses
-    button: |
-      **Child Care Expenses**
-
-      How should work-related childcare expenses be handled?: ${ choice_label('pay_work_childcare_expenses', showifdef('pay_work_childcare_expenses')) }
-
-      % if showifdef('pay_work_childcare_expenses') == "pay_percentage":
-      What percentage of ${ possessify(support_recipient.name_full(), 'childcare costs') }should ${ support_payer.name_full() } reimburse?: ${ showifdef('pay_work_childcare_expenses_percentage') }
-      % endif
-  - raw html: |
-      ${ next_accordion("Form 14", showing=False) }
-  - note: |
-      PLACEHOLDER
-  - raw html: |
-      ${ next_accordion("Child Support Payment", showing=False) }
-  - Edit: use_presumed_child_support
-    button: |
-      **Presumed Child Support amount**
-
-      Should the court order this amount in monthly child support?: ${ choice_label('use_presumed_child_support', showifdef('use_presumed_child_support')) }
-
-      % if showifdef('use_presumed_child_support') == "no":
-      Why is the presumed child support amount unjust and inappropriate?: ${ showifdef('use_presumed_child_support_explanation') }
-      % endif
-  - Edit: child_support_start_date
-    button: |
-      **Child support starting date**
-
-      When should the child support start?: ${ choice_label('child_support_start_date', showifdef('child_support_start_date')) }
-
-      % if showifdef('child_support_start_date') == "specific_date":
-      Date: ${ showifdef('child_support_start_date_other_date') }
-      % endif
-  - Edit: child_support_method_of_payment
-    button: |
-      **Method of payment of Child Support**
-
-      How should child support be paid?: ${ choice_label('child_support_method_of_payment', showifdef('child_support_method_of_payment')) }
-
-      Should child support be paid at the Family Support Payment Center or directly to ${ support_recipient.name_full() }: ${ choice_label('child_support_location_of_payment', showifdef('child_support_location_of_payment')) }
-  - Edit: tax_deductions
-    button: |
-      **Tax Deductions for ${ children[i].name_full() }**
-  - raw html: |
-      ${ end_accordion() }
 continue button field: parenting_plan_review
 ---
 
@@ -8446,14 +8782,6 @@ fields:
     datatype: area
     show if: is_additional_provisions_property_statement
 continue button field: property_statement_review
----
-generic object: ALAsset
-code: |
-  x.description_template2 = x.description_template
----
-generic object: ALAsset
-code: |
-  x.loan_description_template2 = x.loan_description_template
 ---
 question: Test
 id: debt checkbox review 
