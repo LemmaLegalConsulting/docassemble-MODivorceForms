@@ -8780,11 +8780,15 @@ fields:
         'property_statement_attachment' in doc_list_selected.true_values()
   - Additional provisions: additional_provisions_property_statement
     datatype: area
-    # js show if, not show if: with only the fee waiver selected the yes/no
-    # field above is not on the screen, and a plain show if left this required
-    # field enabled but hidden, which silently blocked the Next button.
-    js show if: |
-      val("is_additional_provisions_property_statement") === true
+    show if: is_additional_provisions_property_statement
+    # Not required: with only the fee waiver selected the yes/no field above is
+    # not on the screen, so this field stays enabled while hidden and a
+    # required field would silently block the Next button. The validation code
+    # below enforces it when it is actually shown.
+    required: False
+validation code: |
+  if showifdef('is_additional_provisions_property_statement') and not showifdef('additional_provisions_property_statement', '').strip():
+    validation_error("Enter the additional provisions, or answer No.", field='additional_provisions_property_statement')
 continue button field: property_statement_review_screen
 ---
 question: Test
