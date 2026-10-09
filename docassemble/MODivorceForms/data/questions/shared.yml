@@ -8780,7 +8780,11 @@ fields:
         'property_statement_attachment' in doc_list_selected.true_values()
   - Additional provisions: additional_provisions_property_statement
     datatype: area
-    show if: is_additional_provisions_property_statement
+    # js show if, not show if: with only the fee waiver selected the yes/no
+    # field above is not on the screen, and a plain show if left this required
+    # field enabled but hidden, which silently blocked the Next button.
+    js show if: |
+      val("is_additional_provisions_property_statement") === true
 continue button field: property_statement_review_screen
 ---
 question: Test
