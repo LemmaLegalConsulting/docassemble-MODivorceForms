@@ -437,7 +437,7 @@ Scenario: Zip with letters is rejected
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -897,7 +897,7 @@ Scenario: Zip too short is rejected
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -1357,7 +1357,7 @@ Scenario: Phone too short is rejected
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -1816,7 +1816,7 @@ Scenario: Invalid email is rejected
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -2275,7 +2275,7 @@ Scenario: Blank first name is rejected
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -2735,7 +2735,7 @@ Scenario: Birth date in the future is rejected
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -3195,7 +3195,7 @@ Scenario: Party under 18 is rejected
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -3655,7 +3655,7 @@ Scenario: Last-4 SSN letters is rejected
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -4115,7 +4115,7 @@ Scenario: Last-4 SSN too short is rejected
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -4574,7 +4574,7 @@ Scenario: Marriage date in the future is rejected
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -5034,7 +5034,7 @@ Scenario: Separation before marriage is rejected
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -5493,7 +5493,7 @@ Scenario: Separation date in the future is rejected
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -5953,7 +5953,7 @@ Scenario: Negative childcare cost is rejected
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -6413,7 +6413,7 @@ Scenario: Negative expense amount is rejected
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |

@@ -574,7 +574,7 @@ Scenario: 5 children: the Petition addendum lists the 5th child
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 5 |  |
@@ -1233,7 +1233,7 @@ Scenario: 7 children: Petition, Judgment and Parenting Plan get addenda
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 7 |  |
@@ -2023,7 +2023,7 @@ Scenario: 11 children: Confidential Information Sheet addendum must not break do
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 11 |  |
@@ -2495,7 +2495,7 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | other_allegations | word word word word word word word word word w |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -2968,7 +2968,7 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | other_allegations | word word word word word word word word word w |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -3441,7 +3441,7 @@ Scenario: Text exactly at each limit does NOT create an addendum
     | other_allegations | word word word word word word word word wordx |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -3894,7 +3894,7 @@ Scenario: Respondent Answer: long denials and other-relief text overflow
     | debts.review_items | True |  |
     | use_presumed_child_support | yes |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -4373,7 +4373,7 @@ Scenario: Respondent Answer: 4 people the children lived with (limit 3) must not
     | debts.review_items | True |  |
     | use_presumed_child_support | yes |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -4914,7 +4914,7 @@ Scenario: Respondent Answer: 7 children (limit 6) must not break generation
     | debts.review_items | True |  |
     | use_presumed_child_support | yes |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 7 |  |
@@ -5951,7 +5951,7 @@ Scenario: Parenting plan: more than 3 extraordinary costs per parent overflow
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -6464,7 +6464,7 @@ Scenario: Parenting plan: 9 other holidays (limit 7) must not error
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -7075,7 +7075,7 @@ Scenario: Property statement: more than 16 awarded assets overflow
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
