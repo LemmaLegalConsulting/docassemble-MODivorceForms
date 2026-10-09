@@ -433,7 +433,7 @@ Scenario: Petitioner with one minor child gets all documents (default holiday sc
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |

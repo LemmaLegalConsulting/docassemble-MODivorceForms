@@ -269,7 +269,7 @@ Scenario: No children: no parenting plan or Form 14
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | businesses.target_number | 0 |  |
     | debts_owed_to_you.target_number | 0 |  |
     | farm.target_number | 0 |  |
@@ -714,7 +714,7 @@ Scenario: Respondent role (spouse already filed): Answer instead of Petition
     | debts.review_items | True |  |
     | use_presumed_child_support | yes |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -1183,7 +1183,7 @@ Scenario: Case not filed yet
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -1652,7 +1652,7 @@ Scenario: Joint legal and physical custody
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -2019,7 +2019,7 @@ Scenario: Third-party custody
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
     | debts_owed_to_you.target_number | 0 |  |
@@ -2492,7 +2492,7 @@ Scenario: Spouse lives outside Missouri (service scenarios)
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
@@ -3430,7 +3430,7 @@ Scenario: Accented, hyphenated and apostrophe names generate all documents
     | other_allegations_exist | False |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
-    | property_statement_review | True |  |
+    | property_statement_review_screen | True |  |
     | is_additional_provisions_parenting_plan | False |  |
     | businesses.target_number | 0 |  |
     | children.target_number | 1 |  |
