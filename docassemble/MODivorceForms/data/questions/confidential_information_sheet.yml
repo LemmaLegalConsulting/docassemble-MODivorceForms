@@ -61,7 +61,7 @@ attachment:
       - "P_Zip": ${ petitioner.address.zip } 
       - "P_City": ${ petitioner.address.city } 
       - "P_State": ${ petitioner.address.state } 
-      - "P_Contact Telephone Number": ${ phone_number_formatted(petitioner.phone_number) } 
+      - "P_Contact Telephone Number": ${ (phone_number_formatted(petitioner.phone_number) or petitioner.phone_number) } 
       - "petitioner_email": ${ petitioner.email } 
       - "P_Male": ${ petitioner.gender == "male" } 
       - "P_Female": ${ petitioner.gender == "female" } 
@@ -103,7 +103,7 @@ attachment:
       - "respondent_address_zip": ${ respondent.address.zip } 
       - "respondent_address_state": ${ respondent.address.state } 
       - "respondent_address_city": ${ respondent.address.city } 
-      - "respondent_phone": ${ phone_number_formatted(respondent.phone_number) } 
+      - "respondent_phone": ${ (phone_number_formatted(respondent.phone_number) or respondent.phone_number) } 
       - "respondent_email": ${ respondent.email } 
       - "respondent_birthdate": ${ redact(format_date(respondent.birthdate, format='M/d/yyyy')) } 
       - "respondent_gender_female": ${ respondent.gender == "female" } 
@@ -214,14 +214,14 @@ attachment:
       - "petitioner_employersj_address_state": ${ petitioner.employer.address.state } 
       - "petitioner_employersj_address_city": ${ petitioner.employer.address.city } 
       - "petitioner_employersj_address_zip": ${ petitioner.employer.address.zip } 
-      - "petitioner_employersj_phone_number": ${ phone_number_formatted(petitioner.employer.phone_number) } 
+      - "petitioner_employersj_phone_number": ${ (phone_number_formatted(petitioner.employer.phone_number) or petitioner.employer.phone_number) } 
       - "petitioner_employersj_email": ${ petitioner.employer.email } 
       - "respondent_employersj_name_text": ${ respondent.employer.name.text } 
       - "respondent_employersj_address_address": ${ respondent.employer.address.address } 
       - "respondent_employersj_address_city": ${ respondent.employer.address.city } 
       - "respondent_employersj_address_zip": ${ respondent.employer.address.zip } 
       - "respondent_employersj_address_state": ${ respondent.employer.address.state } 
-      - "respondent_employersj_phone_number": ${ phone_number_formatted(respondent.employer.phone_number) } 
+      - "respondent_employersj_phone_number": ${ (phone_number_formatted(respondent.employer.phone_number) or respondent.employer.phone_number) } 
       - "respondent_employersj_email": ${ respondent.employer.email } 
       - "children0": |
           % if len(children_of_marriage_minor) > 0:
@@ -430,7 +430,7 @@ attachment:
       - "submitted_by_address_zip": ${ users[0].attorney.address.zip if users[0].attorney_involved else users[0].address.zip } 
       - "submitted_by_address_city": ${ users[0].attorney.address.city if users[0].attorney_involved else users[0].address.city } 
       - "submitted_by_address_state": ${  users[0].attorney.address.state if users[0].attorney_involved else users[0].address.state } 
-      - "submitted_by_phone": ${ phone_number_formatted(users[0].attorney.phone_number if users[0].attorney_involved else users[0].phone_number) } 
+      - "submitted_by_phone": ${ (phone_number_formatted(users[0].attorney.phone_number if users[0].attorney_involved else users[0].phone_number) or (users[0].attorney.phone_number if users[0].attorney_involved else users[0].phone_number)) } 
       - "submitted_by_email": ${ users[0].attorney.email if users[0].attorney_involved else users[0].email } 
 
 
