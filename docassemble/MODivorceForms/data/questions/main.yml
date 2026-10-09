@@ -161,7 +161,7 @@ code: |
     if relief['maintenance']:
       maintenance_amount
       maintenance_income_withholding
-  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["fee_waiver_attachment"]'):
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
     is_maintenance_currently_paid  
 
   section_relief = True
@@ -348,17 +348,6 @@ code: |
       holidays_review
       other_holidays.gather()
       role_dictionary_full_name
-    elif case.filed in ['other_parties0_filed']:
-      if not agree_with_parenting_plan:
-        exchanges.gather()
-        biweekly_schedule_review
-        if not holidays_default:
-          for key in holidays.keys():
-            if holidays[key]['different']:
-              holidays[key]['even_years']
-        holidays_review
-        other_holidays.gather()
-        role_dictionary_full_name
   
     ask_about_dispute_resolution
     domestic_violence
@@ -532,8 +521,14 @@ code: |
     # No document preview here any more; see the note on the "property statement
     # review" block in shared.yml. Assembling the Statement of Property took
     # 30-60 seconds even in the background, which is not a useful preview.
-    is_additional_provisions_property_statement
-  property_statement_review = True
+    if showifdef('doc_list_selected["property_statement_attachment"]'):
+      is_additional_provisions_property_statement
+      property_statement_review = True
+    # Fee waiver only: the additional provisions field is hidden, so leave
+    # property_statement_review undefined here and let the "property statement
+    # review" question define it with its continue button.
+  else:
+    property_statement_review = True
   
 ---
 id: service interview code

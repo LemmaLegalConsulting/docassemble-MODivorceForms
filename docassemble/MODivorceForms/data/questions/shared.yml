@@ -2281,7 +2281,7 @@ fields:
   - "What date did you separate and stop residing together?": marriage.separation_date
     datatype: date
 validation code: |
-  if as_datetime(marriage.separation_date) > today() or as_datetime(marriage.separation_date) < users[0].birthdate:
+  if as_datetime(marriage.separation_date) > today() or (defined('users[0].birthdate') and as_datetime(marriage.separation_date) < users[0].birthdate):
     validation_error("Please enter a date in the past that isn't before the date you were born.")
 ---
 id: marriage in missouri
