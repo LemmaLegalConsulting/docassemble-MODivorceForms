@@ -444,11 +444,11 @@ attachment:
           % endif
       - "petitioner_phone": |
           % if case.filed ==  "other_parties0_filed":
-          ${ phone_number_formatted(petitioner.phone_number) }
+          ${ (phone_number_formatted(petitioner.phone_number) or petitioner.phone_number) }
           % endif
       - "respondent_phone": |
           % if case.filed in  ["user0_filed","not_filed"]:
-          ${ phone_number_formatted(respondent.phone_number) }
+          ${ (phone_number_formatted(respondent.phone_number) or respondent.phone_number) }
           % endif
 
 ---

@@ -87,7 +87,7 @@ attachment:
       - "raRespondentsZip": ${ respondent.address.zip } 
       - "raRespondentCity": ${ respondent.address.city } 
       - "raRespondentState": ${ respondent.address.state } 
-      - "raRespondentsPhone": ${ phone_number_formatted(respondent.phone_number) } 
+      - "raRespondentsPhone": ${ (phone_number_formatted(respondent.phone_number) or respondent.phone_number) } 
       - "raRespondentsEmail": ${ respondent.email } 
       - "raRespondentsSsnLastFour": ${ redact(respondent.ssn) } 
       - "raRespondentActiveDutyOrNot1": ${ not respondent.active_duty } 
@@ -389,7 +389,7 @@ attachment:
       - "raRespondentsAttorneyCity": ${ respondent.attorney.address.city } 
       - "raRespondentsAttorneyState": ${ respondent.attorney.address.state } 
       - "raRespondentsAttorneyZip": ${ respondent.attorney.address.zip } 
-      - "raRespondentsAttorneyPhone": ${ phone_number_formatted(respondent.attorney.phone_number) } 
+      - "raRespondentsAttorneyPhone": ${ (phone_number_formatted(respondent.attorney.phone_number) or respondent.attorney.phone_number) } 
       - "raRespondentsAttorneyFax": ${ respondent.attorney.fax } 
       - "raRespondentsAttorneyEmail": ${ respondent.attorney.email } 
 ---
