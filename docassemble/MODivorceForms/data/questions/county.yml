@@ -141,7 +141,7 @@ code: |
   case.photo.filename = case.photo_filename
 ---
 id: question if there are multiple courts in a county
-question: Select Court
+question: Select court
 subquestion: |
   % if case.county == "Jackson County":
   Jackson County residents can file and continue their case at either courthouse without restriction. People normally just pick the one closest to them.

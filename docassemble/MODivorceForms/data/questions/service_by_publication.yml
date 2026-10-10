@@ -1,5 +1,5 @@
 id: service by publication follow up
-question: Service by Publication
+question: Service by publication
 subquestion: |
   If attempts to serve your spouse in person have failed, you can file a request to serve them by publication.
   
@@ -58,7 +58,7 @@ attachment:
     - "assistanceofattorney": ${ users[0].attorney_involved and users[0].type_of_assistance == "assistance" }
     - "partytobeservedsuffixjrsriii": ${ other_parties[0].name.suffix }
     - "partytobeservedstreetaddress": ${ other_parties[0].address.line_one() }
-    - "partytobeservedtelephonenumber": ${ phone_number_formatted(other_parties[0].phone_number) }
+    - "partytobeservedtelephonenumber": ${ (phone_number_formatted(other_parties[0].phone_number) or other_parties[0].phone_number) }
     - "partytobeservedmobiletelephonenumber": ${ phone_number_formatted(other_parties[0].mobile) }
     - "partytobeservedemailaddress": ${ other_parties[0].email }
     - "namesfamilyfriendscontacted": ${ location_attempts['friends'] }
@@ -77,8 +77,8 @@ attachment:
     - "attorneycity": ${ users[0].attorney.address.city }
     - "attorneystate": ${ users[0].attorney.address.state }
     - "attorneyzip": ${ users[0].attorney.address.zip }
-    - "attorneytelephonenumber": ${ users[0].attorney.phone }
-    - "attorneyfaxnumber": ${ users[0].attorney.fax }
+    - "attorneytelephonenumber": ${ (phone_number_formatted(users[0].attorney.phone) or users[0].attorney.phone) }
+    - "attorneyfaxnumber": ${ phone_number_formatted(users[0].attorney.fax) }
     - "attorneyemailaddressoptional": ${ users[0].attorney.email }
     - "nameofnewspaper": ${ newspaper }
 
