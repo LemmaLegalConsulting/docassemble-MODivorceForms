@@ -1814,6 +1814,10 @@ subquestion: |
   % if abuse_or_neglect:
   You said that at least one of the children has been a victim of abuse or neglect.
   % endif
+  
+  % if family_support_order:
+  You said that orders pertaining to the children have been entered by the Family Support Division
+  % endif
 fields:
   - no label: children_explanation
     datatype: area
@@ -5879,7 +5883,7 @@ fields:
       is: publication
 ---
 id: code to set service to mail if user is respondent
-if: case.filed in ['other_parties0_filed']
+if: case.filed in ['user0_filed','other_parties0_filed']
 code: |
   other_parties[0].service_type = "home"
 ---
