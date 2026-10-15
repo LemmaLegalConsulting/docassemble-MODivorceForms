@@ -24,12 +24,12 @@ subquestion: |
   % endif  
   
   % if defined('case.website'):
-  [Website](${ case.website })
+  [${ case.court_name } website](${ case.website })
   
   % endif  
   
   % if defined('case.rules'):
-  [Rules](${ case.rules })
+  [${ case.court_name } rules](${ case.rules })
   
   % endif  
   
