@@ -2155,7 +2155,7 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | True |  |
-    | legal_custody_sole_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
+    | legal_custody_sole_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
     | visitation | False |  |
@@ -2209,10 +2209,10 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | phone_contact | False |  |
     | vacation | True |  |
     | vacation_weeks | 1 |  |
-    | vacation_info | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
+    | vacation_info | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | location_of_exchange | school |  |
     | time_of_exchange | Sample When should the exchange occur |  |
-    | location_of_exchange_school_not_in_session | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
+    | location_of_exchange_school_not_in_session | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | add_pick_up_from_school | False |  |
     | starting_parent | users0 |  |
     | use_template | template |  |
@@ -2305,7 +2305,7 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | holidays["children_birthday"]["custody_from_time"] | 9:00 AM |  |
     | holidays["children_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays_review | True |  |
-    | dispute_resolution | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
+    | dispute_resolution | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | ask_about_dispute_resolution | True |  |
     | domestic_violence | False |  |
     | parenting_plan_B_author['Firstname S. Lastname Jr'] | True |  |
@@ -2327,7 +2327,7 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | abuse_or_neglect | True |  |
     | family_support_order | False |  |
     | additional_children_information | True |  |
-    | children_explanation | word word word word word word word word word w |  |
+    | children_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | users[0].has_self_employment_income | False |  |
     | x.benefits.selected_types['food_stamps'] | True | users[0].benefits.selected_types |
     | x.benefits.selected_types['medicaid'] | False | users[0].benefits.selected_types |
@@ -2488,11 +2488,11 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | debts[0].recommended_debt | Firstname S. Lastname Jr |  |
     | debts.review_items | True |  |
     | use_presumed_child_support | no |  |
-    | use_presumed_child_support_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
+    | use_presumed_child_support_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | actual_child_support_1 | Sample One child |  |
     | other_parties[0].service_type | home |  |
     | other_allegations_exist | True |  |
-    | other_allegations | word word word word word word word word word w |  |
+    | other_allegations | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
     | property_statement_review_screen | True |  |
@@ -2628,7 +2628,7 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | True |  |
-    | legal_custody_sole_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
+    | legal_custody_sole_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
     | visitation | False |  |
@@ -2682,10 +2682,10 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | phone_contact | False |  |
     | vacation | True |  |
     | vacation_weeks | 1 |  |
-    | vacation_info | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
+    | vacation_info | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | location_of_exchange | other |  |
     | time_of_exchange | Sample When should the exchange occur |  |
-    | location_of_exchange_specific_location | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
+    | location_of_exchange_specific_location | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | add_pick_up_from_school | False |  |
     | starting_parent | users0 |  |
     | use_template | template |  |
@@ -2778,7 +2778,7 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | holidays["children_birthday"]["custody_from_time"] | 9:00 AM |  |
     | holidays["children_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays_review | True |  |
-    | dispute_resolution | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
+    | dispute_resolution | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | ask_about_dispute_resolution | True |  |
     | domestic_violence | False |  |
     | parenting_plan_B_author['Firstname S. Lastname Jr'] | True |  |
@@ -2800,7 +2800,7 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | abuse_or_neglect | True |  |
     | family_support_order | False |  |
     | additional_children_information | True |  |
-    | children_explanation | word word word word word word word word word w |  |
+    | children_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | users[0].has_self_employment_income | False |  |
     | x.benefits.selected_types['food_stamps'] | True | users[0].benefits.selected_types |
     | x.benefits.selected_types['medicaid'] | False | users[0].benefits.selected_types |
@@ -2961,11 +2961,11 @@ Scenario: Every long-text field one character over its limit goes to an addendum
     | debts[0].recommended_debt | Firstname S. Lastname Jr |  |
     | debts.review_items | True |  |
     | use_presumed_child_support | no |  |
-    | use_presumed_child_support_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
+    | use_presumed_child_support_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | actual_child_support_1 | Sample One child |  |
     | other_parties[0].service_type | home |  |
     | other_allegations_exist | True |  |
-    | other_allegations | word word word word word word word word word w |  |
+    | other_allegations | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
     | property_statement_review_screen | True |  |
@@ -3101,7 +3101,7 @@ Scenario: Text exactly at each limit does NOT create an addendum
     | presumption_video | True |  |
     | legal_custody | Firstname S. Lastname Jr |  |
     | legal_custody_all_children | True |  |
-    | legal_custody_sole_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word wordx |  |
+    | legal_custody_sole_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word wordx |  |
     | physical_custody | Firstname S. Lastname Jr |  |
     | physical_custody_all_children | False |  |
     | visitation | False |  |
@@ -3155,10 +3155,10 @@ Scenario: Text exactly at each limit does NOT create an addendum
     | phone_contact | False |  |
     | vacation | True |  |
     | vacation_weeks | 1 |  |
-    | vacation_info | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word wordx |  |
+    | vacation_info | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word wordx |  |
     | location_of_exchange | school |  |
     | time_of_exchange | Sample When should the exchange occur |  |
-    | location_of_exchange_school_not_in_session | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word wordx |  |
+    | location_of_exchange_school_not_in_session | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word wordx |  |
     | add_pick_up_from_school | False |  |
     | starting_parent | users0 |  |
     | use_template | template |  |
@@ -3251,7 +3251,7 @@ Scenario: Text exactly at each limit does NOT create an addendum
     | holidays["children_birthday"]["custody_from_time"] | 9:00 AM |  |
     | holidays["children_birthday"]["custody_to_time"] | 9:00 AM |  |
     | holidays_review | True |  |
-    | dispute_resolution | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word wordx |  |
+    | dispute_resolution | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word wordx |  |
     | ask_about_dispute_resolution | True |  |
     | domestic_violence | False |  |
     | parenting_plan_B_author['Firstname S. Lastname Jr'] | True |  |
@@ -3273,7 +3273,7 @@ Scenario: Text exactly at each limit does NOT create an addendum
     | abuse_or_neglect | True |  |
     | family_support_order | False |  |
     | additional_children_information | True |  |
-    | children_explanation | word word word word word word word word wordx |  |
+    | children_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word wordx |  |
     | users[0].has_self_employment_income | False |  |
     | x.benefits.selected_types['food_stamps'] | True | users[0].benefits.selected_types |
     | x.benefits.selected_types['medicaid'] | False | users[0].benefits.selected_types |
@@ -3434,11 +3434,11 @@ Scenario: Text exactly at each limit does NOT create an addendum
     | debts[0].recommended_debt | Firstname S. Lastname Jr |  |
     | debts.review_items | True |  |
     | use_presumed_child_support | no |  |
-    | use_presumed_child_support_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word wordx |  |
+    | use_presumed_child_support_explanation | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word wordx |  |
     | actual_child_support_1 | Sample One child |  |
     | other_parties[0].service_type | home |  |
     | other_allegations_exist | True |  |
-    | other_allegations | word word word word word word word word wordx |  |
+    | other_allegations | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word wordx |  |
     | preview_additional_allegations | True |  |
     | is_additional_provisions_property_statement | False |  |
     | property_statement_review_screen | True |  |
@@ -3724,7 +3724,7 @@ Scenario: Respondent Answer: long denials and other-relief text overflow
     | x.health_insurance_costs | 100 | other_parties[0].health_insurance_costs |
     | x.work_childcare_expenses | 100 | other_parties[0].work_childcare_expenses |
     | denials_exist | True |  |
-    | denials | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
+    | denials | word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word w |  |
     | others_with_physical_custody | False |  |
     | other_custody_proceeding | False |  |
     | other_litigation | False |  |

@@ -47,7 +47,7 @@ id: answer overflow fields
 code: |
   answer_attachment[i].overflow_fields["persons_lived_with"].overflow_trigger = 3
   answer_attachment[i].overflow_fields["persons_lived_with"].label = "Additional Addresses"
-  answer_attachment[i].overflow_fields["denials"].overflow_trigger = 650
+  answer_attachment[i].overflow_fields["denials"].overflow_trigger = 670
   answer_attachment[i].overflow_fields["denials"].label = "Denials"
   answer_attachment[i].overflow_fields["relief_other"].overflow_trigger = 480
   answer_attachment[i].overflow_fields["relief_other"].label = "Other Relief"
