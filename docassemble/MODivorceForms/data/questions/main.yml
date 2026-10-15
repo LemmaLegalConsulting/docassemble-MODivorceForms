@@ -374,7 +374,7 @@ code: |
 
   if minor_children and (showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]')):
     additional_children_information
-    if abuse_or_neglect or other_custody_proceeding or other_litigation or others_with_physical_custody or family_support_order:
+    if abuse_or_neglect or other_custody_proceeding or other_litigation or others_with_physical_custody:
       children_explanation
     
   section_children = True

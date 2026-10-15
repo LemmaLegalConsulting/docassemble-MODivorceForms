@@ -1793,6 +1793,11 @@ fields:
     datatype: yesnoradio
     js show if:   |
       val("abuse_or_neglect") === true || val("abuse_or_neglect") === false
+  - note: |
+      You should attach a copy of the order to the Petition for Dissolution of Marriage.
+    js show if: |
+      val("family_support_order") === true 
+      
 ---
 id: single children explanation question
 question: Further information
@@ -1815,9 +1820,6 @@ subquestion: |
   You said that at least one of the children has been a victim of abuse or neglect.
   % endif
   
-  % if family_support_order:
-  You said that orders pertaining to the children have been entered by the Family Support Division
-  % endif
 fields:
   - no label: children_explanation
     datatype: area
@@ -6264,7 +6266,12 @@ review:
     Middle: ${ showifdef('physical_custody_other.name.middle') }
 
     Last: ${ showifdef('physical_custody_other.name.last') }
-- Edit: others_with_physical_custody
+- Edit:
+    - invalidate:
+      - children_explanation
+    - others_with_physical_custody
+    - recompute:
+      - section_children
   button: |
     **Additional information about children**
 
@@ -6277,6 +6284,9 @@ review:
     Have any of the children been a victim of abuse or neglect?: ${ word(yesno(abuse_or_neglect)) }
 
     Have any orders pertaining to any of the children been entered by the Family Support Division?: ${ word(yesno(family_support_order)) }
+- Edit: children_explanation
+  button: |
+    Explanation for answers above: ${ children_explanation }
 - Edit: domestic_violence
   button: |
     **Domestic Violence**
