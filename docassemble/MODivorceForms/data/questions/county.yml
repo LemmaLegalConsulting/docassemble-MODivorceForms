@@ -1158,7 +1158,7 @@ data:
         zip: 64473
         phone: (660) 446-3301
         rules: https://www.courts.mo.gov/file.jsp?id=53533
-        website: https://holtcounty.org/county-offices/circuit-court-clerk/
+        website: https://holtcountymo.gov/county-offices/circuit-court-clerk/
         photo: Holt.jpeg
   Howard County:
     circuit: 14
@@ -1442,7 +1442,7 @@ data:
         zip: 63457
         phone: (573) 767-5352
         rules: https://www.courts.mo.gov/file.jsp?id=36560
-        website: https://lewiscountymo.org/circuit-court-clerk/
+        website: https://lewiscountymo.gov/departments/circuit-court-clerk/
         photo: Lewis.jpeg
         schedule: |
           7:30 a.m. to 4 p.m. Monday through Friday, excluding state holidays (Closed 12:30 to 1 p.m. for lunch)
@@ -2270,7 +2270,7 @@ data:
         zip: 63670
         phone: (573) 883-2705 ext. 135
         rules: https://www.courts.mo.gov/file.jsp?id=65063
-        website: https://www.stegencounty.org/circuit_clerk
+        website: https://www.stegencounty.gov/circuit-clerk
         photo: Ste_Genevieve.jpeg
         schedule: |
           8 a.m. to 5 p.m. Monday through Friday, excluding state holidays 

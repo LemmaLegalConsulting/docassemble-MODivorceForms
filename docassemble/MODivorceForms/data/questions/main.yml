@@ -376,7 +376,7 @@ code: |
     additional_children_information
     if abuse_or_neglect or other_custody_proceeding or other_litigation or others_with_physical_custody:
       children_explanation
-    family_support_order
+    
   section_children = True
 ---
 code: |    
@@ -543,12 +543,6 @@ code: |
   elif other_parties[0].service_type == "work":
     other_parties[0].hours_of_employment
   section_service = True
----
-question: Test Service1
-continue button field: test_service1
----
-question: Test Service2
-continue button field: test_service2
 ---
 ###################### Main order ######################
 comment: |
