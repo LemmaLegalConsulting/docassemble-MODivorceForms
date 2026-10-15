@@ -6151,6 +6151,19 @@ review:
     Explain: ${ showifdef('relief_other') }
     % endif
 - raw html: |
+    ${ next_accordion("Other allegations", showing=False) }
+  show if: showifdef('doc_list_selected["petition_attachment"]')
+- Edit: other_allegations_exist
+  button: |
+    **Other allegations**
+
+    Do you want to make any other allegations?: **${ word(yesno(other_allegations_exist)) }**
+
+    % if other_allegations_exist:
+    ${ showifdef('other_allegations') }
+    % endif
+  show if: showifdef('doc_list_selected["petition_attachment"]')
+- raw html: |
     ${ next_accordion("Answer", showing=False) }
   show if: showifdef('doc_list_selected["answer_attachment"]')
 - Edit: agree_with_parenting_plan
@@ -6771,6 +6784,17 @@ review:
     How should child support be paid?: ${ choice_label('child_support_method_of_payment', showifdef('child_support_method_of_payment')) }
 
     Should child support be paid at the Family Support Payment Center or directly to ${ support_recipient.name_full() }: ${ choice_label('child_support_location_of_payment', showifdef('child_support_location_of_payment')) }
+- Edit: is_additional_provisions_parenting_plan
+  button: |
+    **Additional provisions pertaining to the support of the children**
+
+    Do you want to include additional provisions pertaining to the support of the children?: **${ word(yesno(is_additional_provisions_parenting_plan)) }**
+
+    % if is_additional_provisions_parenting_plan:
+    ${ showifdef('additional_provisions_parenting_plan') }
+    % endif
+  show if: |
+    'parenting_plan_attachment' in doc_list_selected.true_values()
 - note: |
     **Income Tax Dependents**
 
@@ -7234,6 +7258,17 @@ review:
 
     % endfor
 
+- Edit: is_additional_provisions_property_statement
+  button: |
+    **Additional provisions**
+
+    Do you want to include additional provisions in the Statement of Property and Debt and Proposed Separation Agreement?: **${ word(yesno(is_additional_provisions_property_statement)) }**
+
+    % if is_additional_provisions_property_statement:
+    ${ showifdef('additional_provisions_property_statement') }
+    % endif
+  show if: |
+    "property_statement_attachment" in doc_list_selected.true_values()
 - raw html: |
     ${ next_accordion("Children", showing=False) }
 - Edit: 
@@ -8357,6 +8392,11 @@ fields:
     datatype: area
     required: False
     show if: other_allegations_exist
+validation code: |
+  # A hidden field keeps its old value, so clear it when the answer is No.
+  # Otherwise text typed earlier would still print on the Petition.
+  if not other_allegations_exist:
+    other_allegations = ""
 continue button field: preview_additional_allegations
 ---
 id: case information template
@@ -8515,6 +8555,11 @@ fields:
   - Additional provisions: additional_provisions_parenting_plan
     datatype: area
     show if: is_additional_provisions_parenting_plan
+validation code: |
+  # A hidden field keeps its old value, so clear it when the answer is No.
+  # Otherwise text typed earlier would still print on the Parenting Plan.
+  if not is_additional_provisions_parenting_plan:
+    additional_provisions_parenting_plan = ""
 ---
 comment: |
   Review templates for the parenting plan additional provisions screen.
