@@ -544,12 +544,6 @@ code: |
     other_parties[0].hours_of_employment
   section_service = True
 ---
-question: Test Service1
-continue button field: test_service1
----
-question: Test Service2
-continue button field: test_service2
----
 ###################### Main order ######################
 comment: |
   This block includes the logic for standalone interviews.

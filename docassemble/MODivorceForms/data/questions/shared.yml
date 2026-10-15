@@ -2512,7 +2512,7 @@ code: |
   x.debts_owned.gathered = True
 
 ---
-id: gather vehicle_owned
+id: gather other_debts
 code: |
   other_debts.clear()
   for re in users[0].debts_owned.matches(source=["appliances", "computers", "electronics", "furnishings", "personal_goods_other","jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc", "businesses", "stocks", "bonds", "notes", "mortgages", "money market", "securities_other", "farm", "other_assets", "personal_loans", "medical_debt", "student_loans","other"], exclude_source=['house','condominium', 'leasehold','real estate other','car', 'truck', 'motorcycle', 'mobile_home', 'trailer', 'boat', 'airplane', 'vehicles other','credit_card_debt']):
@@ -2522,12 +2522,20 @@ code: |
 objects:
   - additional_possessions: ALAssetList.using(auto_gather=False)
 ---
-id: gather vehicle_owned
+id: gather additional_possessions
 code: |
   additional_possessions.clear()
   for re in users[0].assets_owned.matches(source=["401k", "403b", "tiaacref", "keogh", "tdsp", "tsa", "profitshare", "ssp", "defcomp", "retirement_accounts_other", "ira", "appliances", "computers", "electronics", "furnishings", "personal_goods_other","jewelry", "antiques", "artwork", "guns", "coins_stamps", "tools", "collectibles", "instruments", "china_etc", "businesses", "stocks", "bonds", "notes", "mortgages", "money market", "securities_other", "life_insurance", "interest_in_contract", "debts_owed_to_you", "interest_in_litigation", "farm", "interests_in_trust", "other_assets"]):
     additional_possessions.append(re)
   additional_possessions.gathered = True
+---
+id: gather vehicle_owned
+code: |
+  vehicles_owned.clear()
+  for re in vehicles:
+    if users[0].name.full() in re.ownership:
+      vehicles_owned.append(re)
+  vehicles_owned.gathered = True
 ---
 id: generic review
 generic object: ALIndividual
@@ -4222,12 +4230,12 @@ on change:
   real_estate[i].value: |
     undefine('joint_assets')
 ---
-id: individual assets object
+id: individual assets award object
 generic object: ALIndividual
 objects:
   - x.assets_award: ALAssetList.using(auto_gather=False,display_name="All assets")
 ---
-id: individual assets object
+id: individual assets owned object
 generic object: ALIndividual
 objects:
   - x.assets_owned: ALAssetList.using(auto_gather=False,display_name="All assets")
@@ -4251,7 +4259,7 @@ code: |
   other_parties[0].assets_award.gathered = True
   other_parties[0].assets_owned.gathered = True
 ---
-id: individual assets object
+id: fee waiver asset list objects
 generic object: ALIndividual
 objects:
   - real_estate_owned: ALAssetList.using(auto_gather=False,display_name="All assets")
@@ -4266,14 +4274,6 @@ code: |
     if users[0].name.full() in re.ownership:
       real_estate_owned.append(re)
   real_estate_owned.gathered = True
----
-id: gather vehicle_owned
-code: |
-  vehicles_owned.clear()
-  for re in vehicles:
-    if users[0].name.full() in re.ownership:
-      vehicles_owned.append(re)
-  vehicles_owned.gathered = True
 ---
 id: gather other_assets_owned
 code: |
