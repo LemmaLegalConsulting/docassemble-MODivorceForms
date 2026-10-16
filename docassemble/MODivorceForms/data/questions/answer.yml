@@ -67,6 +67,7 @@ attachment:
   redact: i == "redacted"
   skip undefined: True
   pdf template file: answer.pdf
+  editable: False
   fields:
       - "countyList": ${ case.county } 
       - "petitionersFirstName": ${ petitioner.name.first } 
