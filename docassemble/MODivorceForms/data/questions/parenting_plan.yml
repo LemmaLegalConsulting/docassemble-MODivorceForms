@@ -2107,8 +2107,8 @@ attachment:
       - "pbParentPaidRespondent": ${ child_support == petitioner.name.full() } 
       - "pbParentPayPetitioner": ${ child_support == petitioner.name.full() } 
       - "pbParentPayNone": ${ child_support == "none" } 
-      - "pbParentPayingForm14Only": ${ child_support == "none" } 
-      - "pbParentPayingForm14Only": ${ } 
+      - "pbParentPayingForm14OnlyPetitioner": ${ child_support == "none" } 
+      - "pbParentPayingForm14OnlyRespondent": ${ } 
       - "pbMedInsuranceNone": ${ medical_insurance == "none" } 
       - "pbMedInsurancePetitioner": ${ medical_insurance == petitioner.name.full() } 
       - "pbMedInsuranceRespondent": ${ medical_insurance == respondent.name.full() } 
