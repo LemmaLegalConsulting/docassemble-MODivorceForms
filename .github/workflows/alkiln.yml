@@ -36,6 +36,9 @@ jobs:
           # Existing @known_gap cases specify validation that is not implemented yet.
           # Manual dispatch can opt into them with an explicit tag expression.
           ALKILN_TAG_EXPRESSION: ${{ inputs.tags || 'not @known_gap' }}
+      - name: Diagnose failed package installation
+        if: failure()
+        run: dainstall . --apiurl http://localhost --apikey "$DA_ADMIN_API_KEY" --debug
       - name: Show isolated server errors
         if: failure()
         run: docker exec docassemble_container tail -n 120 /usr/share/docassemble/log/docassemble.log /usr/share/docassemble/log/worker.log || true
