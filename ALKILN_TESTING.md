@@ -9,3 +9,5 @@ Source startup repair: removed an obsolete duplicate publication attachment stub
 The isolated server is pinned to docassemble 1.10.12 (verified amd64 registry digest). Server and worker diagnostics are printed on failure.
 
 Clean-server installer diagnostics identified nginx HTTP 413 before browser execution: this document package exceeds the default 16 MiB API upload cap. The isolated workflow now sets `maximum content length: 67108864` (64 MiB) in its disposable server configuration so the unmodified package can upload. Full baseline execution is pending the corrected run.
+
+The recorded fixtures now select she/her pronouns consistently with their synthetic party profiles. Redundant false pronoun checkbox rows were removed: with current ALKiln/browser markup they selected the self-described option and opened an unanswered required text field. This corrects fixture input; it does not bypass pronoun validation.

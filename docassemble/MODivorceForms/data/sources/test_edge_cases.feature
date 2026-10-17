@@ -72,23 +72,14 @@ Scenario: No children: no parenting plan or Form 14
     | x.birthplace | Sample BIRTHPLACE State or Foreign C | users[0].birthdate |
     | x.ssn | 6789 | users[0].ssn |
     | users[0].gender | female |  |
-    | users[0].pronouns['he/him/his'] | False |  |
-    | users[0].pronouns['she/her/hers'] | False |  |
-    | users[0].pronouns['they/them/theirs'] | False |  |
-    | users[0].pronouns['ze/zir/zirs'] | False |  |
-    | users[0].pronouns['self-described'] | False |  |
+    | users[0].pronouns['she/her/hers'] | True |  |
     | x.race | American Indian or Alaska Native | users[0].race |
     | x.education | 0 | users[0].education_info |
     | x.education_info | True |  |
     | users[0].previously_married | False |  |
     | x.active_duty | False | users[0].active_duty |
     | other_parties[0].gender | female |  |
-    | other_parties[0].pronouns['he/him/his'] | False |  |
-    | other_parties[0].pronouns['she/her/hers'] | False |  |
-    | other_parties[0].pronouns['they/them/theirs'] | False |  |
-    | other_parties[0].pronouns['ze/zir/zirs'] | False |  |
-    | other_parties[0].pronouns['self-described'] | False |  |
-    | other_parties[0].pronouns['unknown'] | False |  |
+    | other_parties[0].pronouns['she/her/hers'] | True |  |
     | x.birthdate | 01/15/1985 | other_parties[0].birthdate |
     | x.birthplace | Sample BIRTHPLACE State or Foreign C | other_parties[0].birthdate |
     | x.ssn | 6789 | other_parties[0].ssn |
@@ -361,18 +352,9 @@ Scenario: Respondent role (spouse already filed): Answer instead of Petition
     | x.attorney_involved | False | other_parties[0].attorney_involved |
     | x.attorney_involved | False | users[0].attorney_involved |
     | x.ssn | 6789 | users[0].ssn |
-    | users[0].pronouns['he/him/his'] | False |  |
-    | users[0].pronouns['she/her/hers'] | False |  |
-    | users[0].pronouns['they/them/theirs'] | False |  |
-    | users[0].pronouns['ze/zir/zirs'] | False |  |
-    | users[0].pronouns['self-described'] | False |  |
+    | users[0].pronouns['she/her/hers'] | True |  |
     | x.active_duty | False | users[0].active_duty |
-    | other_parties[0].pronouns['he/him/his'] | False |  |
-    | other_parties[0].pronouns['she/her/hers'] | False |  |
-    | other_parties[0].pronouns['they/them/theirs'] | False |  |
-    | other_parties[0].pronouns['ze/zir/zirs'] | False |  |
-    | other_parties[0].pronouns['self-described'] | False |  |
-    | other_parties[0].pronouns['unknown'] | False |  |
+    | other_parties[0].pronouns['she/her/hers'] | True |  |
     | x.ssn | 6789 | other_parties[0].ssn |
     | x.ssn_unknown | False | other_parties[0].ssn |
     | x.active_duty | False | other_parties[0].active_duty |
@@ -813,23 +795,14 @@ Scenario: Case not filed yet
     | x.birthplace | Sample BIRTHPLACE State or Foreign C | users[0].birthdate |
     | x.ssn | 6789 | users[0].ssn |
     | users[0].gender | female |  |
-    | users[0].pronouns['he/him/his'] | False |  |
-    | users[0].pronouns['she/her/hers'] | False |  |
-    | users[0].pronouns['they/them/theirs'] | False |  |
-    | users[0].pronouns['ze/zir/zirs'] | False |  |
-    | users[0].pronouns['self-described'] | False |  |
+    | users[0].pronouns['she/her/hers'] | True |  |
     | x.race | American Indian or Alaska Native | users[0].race |
     | x.education | 0 | users[0].education_info |
     | x.education_info | True |  |
     | users[0].previously_married | False |  |
     | x.active_duty | False | users[0].active_duty |
     | other_parties[0].gender | female |  |
-    | other_parties[0].pronouns['he/him/his'] | False |  |
-    | other_parties[0].pronouns['she/her/hers'] | False |  |
-    | other_parties[0].pronouns['they/them/theirs'] | False |  |
-    | other_parties[0].pronouns['ze/zir/zirs'] | False |  |
-    | other_parties[0].pronouns['self-described'] | False |  |
-    | other_parties[0].pronouns['unknown'] | False |  |
+    | other_parties[0].pronouns['she/her/hers'] | True |  |
     | x.birthdate | 01/15/1985 | other_parties[0].birthdate |
     | x.birthplace | Sample BIRTHPLACE State or Foreign C | other_parties[0].birthdate |
     | x.ssn | 6789 | other_parties[0].ssn |
@@ -1283,23 +1256,14 @@ Scenario: Joint legal and physical custody
     | x.birthplace | Sample BIRTHPLACE State or Foreign C | users[0].birthdate |
     | x.ssn | 6789 | users[0].ssn |
     | users[0].gender | female |  |
-    | users[0].pronouns['he/him/his'] | False |  |
-    | users[0].pronouns['she/her/hers'] | False |  |
-    | users[0].pronouns['they/them/theirs'] | False |  |
-    | users[0].pronouns['ze/zir/zirs'] | False |  |
-    | users[0].pronouns['self-described'] | False |  |
+    | users[0].pronouns['she/her/hers'] | True |  |
     | x.race | American Indian or Alaska Native | users[0].race |
     | x.education | 0 | users[0].education_info |
     | x.education_info | True |  |
     | users[0].previously_married | False |  |
     | x.active_duty | False | users[0].active_duty |
     | other_parties[0].gender | female |  |
-    | other_parties[0].pronouns['he/him/his'] | False |  |
-    | other_parties[0].pronouns['she/her/hers'] | False |  |
-    | other_parties[0].pronouns['they/them/theirs'] | False |  |
-    | other_parties[0].pronouns['ze/zir/zirs'] | False |  |
-    | other_parties[0].pronouns['self-described'] | False |  |
-    | other_parties[0].pronouns['unknown'] | False |  |
+    | other_parties[0].pronouns['she/her/hers'] | True |  |
     | x.birthdate | 01/15/1985 | other_parties[0].birthdate |
     | x.birthplace | Sample BIRTHPLACE State or Foreign C | other_parties[0].birthdate |
     | x.ssn | 6789 | other_parties[0].ssn |
@@ -1752,23 +1716,14 @@ Scenario: Third-party custody
     | x.birthplace | Sample BIRTHPLACE State or Foreign C | users[0].birthdate |
     | x.ssn | 6789 | users[0].ssn |
     | users[0].gender | female |  |
-    | users[0].pronouns['he/him/his'] | False |  |
-    | users[0].pronouns['she/her/hers'] | False |  |
-    | users[0].pronouns['they/them/theirs'] | False |  |
-    | users[0].pronouns['ze/zir/zirs'] | False |  |
-    | users[0].pronouns['self-described'] | False |  |
+    | users[0].pronouns['she/her/hers'] | True |  |
     | x.race | American Indian or Alaska Native | users[0].race |
     | x.education | 0 | users[0].education_info |
     | x.education_info | True |  |
     | users[0].previously_married | False |  |
     | x.active_duty | False | users[0].active_duty |
     | other_parties[0].gender | female |  |
-    | other_parties[0].pronouns['he/him/his'] | False |  |
-    | other_parties[0].pronouns['she/her/hers'] | False |  |
-    | other_parties[0].pronouns['they/them/theirs'] | False |  |
-    | other_parties[0].pronouns['ze/zir/zirs'] | False |  |
-    | other_parties[0].pronouns['self-described'] | False |  |
-    | other_parties[0].pronouns['unknown'] | False |  |
+    | other_parties[0].pronouns['she/her/hers'] | True |  |
     | x.birthdate | 01/15/1985 | other_parties[0].birthdate |
     | x.birthplace | Sample BIRTHPLACE State or Foreign C | other_parties[0].birthdate |
     | x.ssn | 6789 | other_parties[0].ssn |
@@ -2115,11 +2070,7 @@ Scenario: Spouse lives outside Missouri (service scenarios)
     | x.birthplace | Sample BIRTHPLACE State or Foreign C | users[0].birthdate |
     | x.ssn | 6789 | users[0].ssn |
     | users[0].gender | female |  |
-    | users[0].pronouns['he/him/his'] | False |  |
-    | users[0].pronouns['she/her/hers'] | False |  |
-    | users[0].pronouns['they/them/theirs'] | False |  |
-    | users[0].pronouns['ze/zir/zirs'] | False |  |
-    | users[0].pronouns['self-described'] | False |  |
+    | users[0].pronouns['she/her/hers'] | True |  |
     | x.race | American Indian or Alaska Native | users[0].race |
     | x.education | 0 | users[0].education_info |
     | x.education_info | True |  |
@@ -2130,12 +2081,7 @@ Scenario: Spouse lives outside Missouri (service scenarios)
     | x.county_length_of_residence_choice | year | other_parties[0].mo_length_of_residence_choice |
     | x.county_length_of_residence_years | 5 | other_parties[0].mo_length_of_residence_choice |
     | other_parties[0].gender | female |  |
-    | other_parties[0].pronouns['he/him/his'] | False |  |
-    | other_parties[0].pronouns['she/her/hers'] | False |  |
-    | other_parties[0].pronouns['they/them/theirs'] | False |  |
-    | other_parties[0].pronouns['ze/zir/zirs'] | False |  |
-    | other_parties[0].pronouns['self-described'] | False |  |
-    | other_parties[0].pronouns['unknown'] | False |  |
+    | other_parties[0].pronouns['she/her/hers'] | True |  |
     | x.birthdate | 01/15/1985 | other_parties[0].birthdate |
     | x.birthplace | Sample BIRTHPLACE State or Foreign C | other_parties[0].birthdate |
     | x.ssn | 6789 | other_parties[0].ssn |
@@ -2592,23 +2538,14 @@ Scenario: Fee waiver selected
     | x.birthplace | Sample BIRTHPLACE State or Foreign C | users[0].birthdate |
     | x.ssn | 6789 | users[0].ssn |
     | users[0].gender | female |  |
-    | users[0].pronouns['he/him/his'] | False |  |
-    | users[0].pronouns['she/her/hers'] | False |  |
-    | users[0].pronouns['they/them/theirs'] | False |  |
-    | users[0].pronouns['ze/zir/zirs'] | False |  |
-    | users[0].pronouns['self-described'] | False |  |
+    | users[0].pronouns['she/her/hers'] | True |  |
     | x.race | American Indian or Alaska Native | users[0].race |
     | x.education | 0 | users[0].education_info |
     | x.education_info | True |  |
     | users[0].previously_married | False |  |
     | x.active_duty | False | users[0].active_duty |
     | other_parties[0].gender | female |  |
-    | other_parties[0].pronouns['he/him/his'] | False |  |
-    | other_parties[0].pronouns['she/her/hers'] | False |  |
-    | other_parties[0].pronouns['they/them/theirs'] | False |  |
-    | other_parties[0].pronouns['ze/zir/zirs'] | False |  |
-    | other_parties[0].pronouns['self-described'] | False |  |
-    | other_parties[0].pronouns['unknown'] | False |  |
+    | other_parties[0].pronouns['she/her/hers'] | True |  |
     | x.birthdate | 01/15/1985 | other_parties[0].birthdate |
     | x.birthplace | Sample BIRTHPLACE State or Foreign C | other_parties[0].birthdate |
     | x.ssn | 6789 | other_parties[0].ssn |
@@ -3060,23 +2997,14 @@ Scenario: Accented, hyphenated and apostrophe names generate all documents
     | x.birthplace | Sample BIRTHPLACE State or Foreign C | users[0].birthdate |
     | x.ssn | 6789 | users[0].ssn |
     | users[0].gender | female |  |
-    | users[0].pronouns['he/him/his'] | False |  |
-    | users[0].pronouns['she/her/hers'] | False |  |
-    | users[0].pronouns['they/them/theirs'] | False |  |
-    | users[0].pronouns['ze/zir/zirs'] | False |  |
-    | users[0].pronouns['self-described'] | False |  |
+    | users[0].pronouns['she/her/hers'] | True |  |
     | x.race | American Indian or Alaska Native | users[0].race |
     | x.education | 0 | users[0].education_info |
     | x.education_info | True |  |
     | users[0].previously_married | False |  |
     | x.active_duty | False | users[0].active_duty |
     | other_parties[0].gender | female |  |
-    | other_parties[0].pronouns['he/him/his'] | False |  |
-    | other_parties[0].pronouns['she/her/hers'] | False |  |
-    | other_parties[0].pronouns['they/them/theirs'] | False |  |
-    | other_parties[0].pronouns['ze/zir/zirs'] | False |  |
-    | other_parties[0].pronouns['self-described'] | False |  |
-    | other_parties[0].pronouns['unknown'] | False |  |
+    | other_parties[0].pronouns['she/her/hers'] | True |  |
     | x.birthdate | 01/15/1985 | other_parties[0].birthdate |
     | x.birthplace | Sample BIRTHPLACE State or Foreign C | other_parties[0].birthdate |
     | x.ssn | 6789 | other_parties[0].ssn |
@@ -3525,23 +3453,14 @@ Scenario: Fee waiver alone with the spouse's phone number left blank
     | x.birthplace | Sample BIRTHPLACE State or Foreign C | users[0].birthdate |
     | x.ssn | 6789 | users[0].ssn |
     | users[0].gender | female |  |
-    | users[0].pronouns['he/him/his'] | False |  |
-    | users[0].pronouns['she/her/hers'] | False |  |
-    | users[0].pronouns['they/them/theirs'] | False |  |
-    | users[0].pronouns['ze/zir/zirs'] | False |  |
-    | users[0].pronouns['self-described'] | False |  |
+    | users[0].pronouns['she/her/hers'] | True |  |
     | x.race | American Indian or Alaska Native | users[0].race |
     | x.education | 0 | users[0].education_info |
     | x.education_info | True |  |
     | users[0].previously_married | False |  |
     | x.active_duty | False | users[0].active_duty |
     | other_parties[0].gender | female |  |
-    | other_parties[0].pronouns['he/him/his'] | False |  |
-    | other_parties[0].pronouns['she/her/hers'] | False |  |
-    | other_parties[0].pronouns['they/them/theirs'] | False |  |
-    | other_parties[0].pronouns['ze/zir/zirs'] | False |  |
-    | other_parties[0].pronouns['self-described'] | False |  |
-    | other_parties[0].pronouns['unknown'] | False |  |
+    | other_parties[0].pronouns['she/her/hers'] | True |  |
     | x.birthdate | 01/15/1985 | other_parties[0].birthdate |
     | x.birthplace | Sample BIRTHPLACE State or Foreign C | other_parties[0].birthdate |
     | x.ssn | 6789 | other_parties[0].ssn |
