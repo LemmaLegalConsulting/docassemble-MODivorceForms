@@ -5,3 +5,5 @@ The default isolated workflow runs the existing suite except scenarios already t
 Browser validation in the isolated workflow is authoritative; the fixture is retained from its original recorded browser run.
 
 Source startup repair: removed an obsolete duplicate publication attachment stub from shared.yml that pointed at nonexistent service_by_publication.docx. The real service_by_publication.yml include already defines the populated PDF attachment using the existing service_by_publication.pdf.
+
+The isolated server is pinned to docassemble 1.10.12 (verified amd64 registry digest). The current AssemblyLine dependency uses custom BirthDate field labels that the older 1.10.7 parser rejects before the first question. Server and worker diagnostics are printed on failure.
