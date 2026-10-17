@@ -7,3 +7,5 @@ Browser validation in the isolated workflow is authoritative; the fixture is ret
 Source startup repair: removed an obsolete duplicate publication attachment stub from shared.yml that pointed at nonexistent service_by_publication.docx. The real service_by_publication.yml include already defines the populated PDF attachment using the existing service_by_publication.pdf.
 
 The isolated server is pinned to docassemble 1.10.12 (verified amd64 registry digest). The current AssemblyLine dependency uses custom BirthDate field labels that the older 1.10.7 parser rejects before the first question. Server and worker diagnostics are printed on failure.
+
+Clean-server installer diagnostics identified nginx HTTP413 before browser execution: this document package exceeds the default16MiB API upload cap. The isolated workflow now sets `maximum content length: 67108864` (64MiB) in its disposable server configuration so the unmodified package can upload. Full baseline execution is pending the corrected run.
