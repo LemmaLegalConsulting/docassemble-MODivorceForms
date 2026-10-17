@@ -6061,14 +6061,6 @@ id: service by mail affidavit objects
 objects:
   - service_by_mail_affidavit_attachment: ALDocument.using(title="Affidavit Service By Mail", filename="service_by_mail_affidavit",  has_addendum=False, )
 ---
-id: service by publication attachment block
-attachment:
-  name: Request for Service By Publication
-  filename: service_by_publication
-  pdf template file: service_by_publication.docx
-  variable name: service_by_mail_publication_attachment[i]
-  skip undefined: True
----
 id: service by publication objects
 objects:
   - service_by_publication_attachment: ALDocument.using(title="Request for Service By Publication", filename="service_by_publication",  has_addendum=False, )
