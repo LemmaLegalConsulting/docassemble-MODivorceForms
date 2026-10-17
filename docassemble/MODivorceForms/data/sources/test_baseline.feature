@@ -452,6 +452,7 @@ Scenario: Petitioner with one minor child gets all documents (default holiday sc
     | x.extraordinary_childrearing_costs.target_number | 0 | users[0].extraordinary_childrearing_costs.target_number |
     | x.extraordinary_medical_costs.target_number | 0 | other_parties[0].extraordinary_medical_costs.target_number |
     | x.extraordinary_medical_costs.target_number | 0 | users[0].extraordinary_medical_costs.target_number |
+  Then the question id should be "download MO divorce forms"
   And I download "petition.pdf"
   And I download "petition_unredacted.pdf"
   And I download "parenting_plan.pdf"
