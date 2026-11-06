@@ -47,6 +47,8 @@ fields:
   - "Is there another way you would like to resolve disagreements, in addition to mediation?": dispute_resolution
     datatype: area
     required: False
+  - note: |
+      ${ redaction_warning }
 continue button field: ask_about_dispute_resolution
 ---
 id: Parenting Plan Part A
@@ -145,6 +147,9 @@ fields:
     datatype: area
     required: False
     show if: vacation
+  - note: |
+      ${ redaction_warning }
+    show if: vacation
 ---
 id: default location of exchange
 question: Specific location for an exchange
@@ -163,6 +168,10 @@ fields:
       val('location_of_exchange') === 'school' 
   - "Where should the exchange occur?  (Please include the full address)": location_of_exchange_specific_location
     datatype: area
+    js show if: |
+      val('location_of_exchange') === 'other'
+  - note: |
+      ${ redaction_warning }
     js show if: |
       val('location_of_exchange') === 'other'
   - Add a pick-up for the other parent?: add_pick_up_from_school
@@ -317,6 +326,11 @@ fields:
       - Yes, this amount is correct.: yes
       - No, the child support amount should be different than the amount${ "s" if number_of_children > 1 else "" } above.: no
   - Why is the presumed child support amount unjust and inappropriate?: use_presumed_child_support_explanation
+    show if: 
+      variable: use_presumed_child_support
+      is: no
+  - note: |
+      ${ redaction_warning }
     show if: 
       variable: use_presumed_child_support
       is: no

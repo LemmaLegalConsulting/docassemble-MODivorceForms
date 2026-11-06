@@ -48,10 +48,10 @@ code: |
         temp_people_choices.append(child.legal_custody_other)
       if defined('child.physical_custody_other.name.first'):
         temp_people_choices.append(child.physical_custody_other)
-  if defined('persons_lived_with'):
-    for person in persons_lived_with.complete_elements():
-      if person != users[0] and person != other_parties[0]:
-        temp_people_choices.append(person)
+  if defined('previous_addresses'):
+    for person in previous_addresses.complete_elements():
+      if person.lived_with != users[0] and person.lived_with != other_parties[0]:
+        temp_people_choices.append(person.lived_with)
   parent_and_people_choices = temp_people_choices
 ---
 id: list of previously entered people without parents
@@ -77,10 +77,10 @@ code: |
         temp_people_choices.append(child.legal_custody_other)
       if defined('child.physical_custody_other.name.first'):
         temp_people_choices.append(child.physical_custody_other)
-  if defined('persons_lived_with'):
-    for person in persons_lived_with:
-      if person != users[0] and person != other_parties[0]:
-        temp_people_choices.append(person)
+  if defined('previous_addresses'):
+    for person in previous_addresses.complete_elements():
+      if person.lived_with != users[0] and person.lived_with != other_parties[0]:
+        temp_people_choices.append(person.lived_with)
   people_choices = temp_people_choices
 ---
 
@@ -192,7 +192,7 @@ id: case.division_number
 question: Case information - division number
 subquestion: |
 
-   collapse_template(case.division_casenet_template) 
+   ${ collapse_template(case.division_casenet_template) }
 
 fields:
   - Division Number: case.division_number
@@ -208,6 +208,17 @@ content: |
   The Case name is after the case number at the top of the screen.
 
   [FILE ch_casename.png, 100%]
+
+  ${ warn_casenet_picture_is_example_template }
+---
+id: case.division_number_casenet_template
+template: case.division_casenet_template
+subject: |
+  How do I find the division number?
+content: | 
+  The division number may be difficult to find.  You may be able to find it under the Scheduled Hearings & Trials tab, next to the Room number.
+  
+  [FILE ch_division_number.png, 100%]
 
   ${ warn_casenet_picture_is_example_template }
 ---
@@ -373,6 +384,9 @@ fields:
   - Is there any other relief you want to request from the court?: relief['other']
     datatype: yesnoradio
   - Explain: relief_other
+    show if: relief['other']
+  - note: |
+      ${ redaction_warning }
     show if: relief['other']
 ---  
 if: not users[0].has_prior_name
@@ -1377,51 +1391,81 @@ review:
       Did ${ children[i].name_full() } live with ${ users[0].name_full() } and ${ other_parties[0].name_full() } on ${ marriage.separation_date }?: ${ yesno( children[i].under_18_in_household) }
   
 ---
-id: lived with other object
+id: previous_addresses object
 objects: 
-  - persons_lived_with: ALPeopleList.using(there_are_any=True)
+  - previous_addresses: DAList.using(object_type=DAObject, there_are_any=True, complete_attribute="complete")
+---
+id: previous_addresses person and address objects
+objects:
+  - previous_addresses[i].address: ALAddress
+  - previous_addresses[i].lived_with: ALIndividual
+  
+---
+id: previous address complete
+code: |
+  previous_addresses[i].info_entered
+  previous_addresses[i].complete = True
 ---
 id: add persons children lived with to whol list
 code: |
   for child in children:
-    if defined('child.lived_with') and child.lived_with not in persons_lived_with.complete_elements():
-      persons_lived_with.append(child.lived_with)
-  persons_lived_with_preload = True
+    if hasattr(child,'lived_with') and defined('child.lived_with.address') and child.lived_with.address not in [temp.address for temp in previous_addresses.complete_elements()]:
+      previous_addresses.appendObject(DAObject)
+      previous_addresses[-1].address = child.lived_with.address
+      previous_addresses[-1].lived_with = child.lived_with
+      previous_addresses[-1].info_entered = True
+      previous_addresses[-1].complete = True
+  previous_addresses_preload = True
 ---
-sets: persons_lived_with[i].name.first
+sets: previous_addresses[i].lived_with.name.first
 id: who children lived with
 reconsider: parent_and_people_choices
-question: Who have the children lived with in the past 5 years?
+question: What addresses have the children lived at in the past 5 years?
 subquestion: |
-  % if len(persons_lived_with.complete_elements()) > 0:
-  You have already said that the children have lived with ${ comma_and_list(persons_lived_with.complete_elements()) }.
+  % if len(previous_addresses.complete_elements()) > 0:
+  You have already said that the children have lived at ${ comma_and_list([temp.address for temp in previous_addresses.complete_elements()]) }.
   % endif
-  
+
+  Add the address and person with whom the children lived.
 fields:
-  - Existing person: persons_lived_with[i]
+  - code: |
+      previous_addresses[i].address.address_fields()
+  - Existing person: previous_addresses[i].lived_with
     datatype: object
     choices: parent_and_people_choices
-    disable others: True
-    exclude:
-     - persons_lived_with.complete_elements()
-  - code: |
-      persons_lived_with[i].name_fields()
-  - code: |
-      persons_lived_with[i].address.address_fields()
+continue button field: previous_addresses[i].info_entered
 validation code: |
-  validate_us_state(persons_lived_with[i].address)
+  validate_us_state(previous_addresses[i].address)
 ---
 id: persons lived with another
-question: Did the children live with anybody else during the last five years?
+question: Did the children live at any other addresses during the last 5 years?
 subquestion: |
   You have already mentioned:
-  % for person in persons_lived_with.complete_elements():
+  % for person in previous_addresses.complete_elements():
 
-   - ${ person.name_full() }, ${ person.address.on_one_line() }
+   - ${ person.lived_with.name_full() }, ${ person.address.on_one_line() }
   % endfor
 fields:
-  - no label: persons_lived_with.there_is_another
+  - no label: previous_addresses.there_is_another
     datatype: yesnoradio
+---
+id: previous addresses revisit
+continue button field: previous_addresses.revisit
+question: Address children have lived at in the last 5 years
+subquestion: |
+  ${ previous_addresses.table }
+
+  ${ previous_addresses.add_action() }
+
+---
+id: table for previous_addresses
+table: previous_addresses.table
+rows: previous_addresses
+columns:
+  - Address: row_item.address.on_one_line()
+  - With: row_item.lived_with.name.full()
+edit:
+  - info_entered
 ---
 id: legal custody of child
 question: Legal custody of ${ children[i].name_full() }
@@ -1520,6 +1564,12 @@ subquestion: |
 fields:
   - no label: legal_custody_sole_explanation
     datatype: area
+  - note: |
+      ${ redaction_warning }
+---
+template: redaction_warning
+content: |
+  You may need to redact this section yourself. Please refer to our video on redaction and Missouri statute 509.520 and Court Operating Rule 2.02(c).
 ---
 id: physical_custody question
 question: Physical custody
@@ -1576,6 +1626,8 @@ subquestion: |
 fields:
   - no label: physical_custody_sole_explanation
     datatype: area
+  - note: |
+      ${ redaction_warning }
 ---
 id: follow up for third party physical custody
 if: physical_custody == "Third Party"
@@ -1823,6 +1875,8 @@ subquestion: |
 fields:
   - no label: children_explanation
     datatype: area
+  - note: |
+      ${ redaction_warning }
 ---  
 ## CHILDREN RELIEF AND SUPPORT
 id: communications question
@@ -5083,6 +5137,9 @@ fields:
   - Reason for assumed monthly income: other_parties[0].assumed_monthly_income_explanation
     default: Income is assumed based on minimum wage, working 40 hours per week.
     show if: other_parties[0].use_assumed_monthly_income
+  - note: |
+      ${ redaction_warning }
+    show if: other_parties[0].use_assumed_monthly_income
   
 ---
 ################################# PUBLIC BENEFITS ##############################
@@ -7326,12 +7383,21 @@ review:
   
     Total number of children included in petition: ${ len(children_of_marriage) }
 
-    Minor children included in parenting plan and other court filings: ${ len(children_of_marriage_minor) }
-    % elif showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]'):
+    % endif
+
+    % if showifdef('doc_list_selected["fee_waiver_attachment"]') or showifdef('doc_list_selected["confidential_information_sheet_attachment"]') or showifdef('doc_list_selected["income_statement_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]') or showifdef('doc_list_selected["form_14_attachment"]') or showifdef('doc_list_selected["answer_attachment"]'):
 
     Minor children included in parenting plan and other court filings: ${ len(children_of_marriage_minor) }
 
     % endif
+- Edit: 
+    - previous_addresses.revisit
+  button: |
+    The children have lived at the following addresses in the last five years:
+
+    % for prev in previous_addresses:
+     - ${ prev.address.on_one_line() } with ${ prev.lived_with }
+    % endfor
 
 - raw html: |
     ${ next_accordion("Information about you", showing=False) }
@@ -8392,6 +8458,9 @@ fields:
     datatype: area
     required: False
     show if: other_allegations_exist
+  - note: |
+      ${ redaction_warning }
+    show if: other_allegations_exist
 validation code: |
   # A hidden field keeps its old value, so clear it when the answer is No.
   # Otherwise text typed earlier would still print on the Petition.
@@ -8554,6 +8623,9 @@ fields:
     datatype: yesnoradio
   - Additional provisions: additional_provisions_parenting_plan
     datatype: area
+    show if: is_additional_provisions_parenting_plan
+  - note: |
+      ${ redaction_warning }
     show if: is_additional_provisions_parenting_plan
 validation code: |
   # A hidden field keeps its old value, so clear it when the answer is No.
@@ -8845,6 +8917,9 @@ fields:
     # required field would silently block the Next button. The validation code
     # below enforces it when it is actually shown.
     required: False
+  - note: |
+      ${ redaction_warning }
+    show if: is_additional_provisions_property_statement
 validation code: |
   if showifdef('is_additional_provisions_property_statement') and not showifdef('additional_provisions_property_statement', '').strip():
     validation_error("Enter the additional provisions, or answer No.", field='additional_provisions_property_statement')

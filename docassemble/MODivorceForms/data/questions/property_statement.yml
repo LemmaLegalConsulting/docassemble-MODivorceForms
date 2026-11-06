@@ -15,6 +15,9 @@ fields:
   - Additional provisions: additional_provisions
     datatype: area
     show if: is_additional_provisions
+  - note: |
+      ${ redaction_warning }
+    show if: is_additional_provisions
 ---
 code: |
   notice_date = today()

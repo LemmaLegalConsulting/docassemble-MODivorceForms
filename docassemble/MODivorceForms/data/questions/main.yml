@@ -321,8 +321,8 @@ code: |
     other_parties[0].other_children
 
   if minor_children and any(key in doc_list_selected.true_values() for key in ["answer_attachment", "petition_attachment"]):
-    persons_lived_with_preload # petition
-    persons_lived_with.gather()
+    previous_addresses_preload # petition
+    previous_addresses.gather()
     
 
   if minor_children and "answer_attachment" in doc_list_selected.true_values():
