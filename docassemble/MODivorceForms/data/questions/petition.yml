@@ -74,8 +74,8 @@ objects:
 ---
 id: petition overflow fields
 code: |
-  petition_attachment[i].overflow_fields["persons_lived_with"].overflow_trigger = 3
-  petition_attachment[i].overflow_fields["persons_lived_with"].label = "39. Additional Addresses"
+  petition_attachment[i].overflow_fields["previous_addresses"].overflow_trigger = 3
+  petition_attachment[i].overflow_fields["previous_addresses"].label = "39. Additional Addresses"
   petition_attachment[i].overflow_fields["children_explanation"].overflow_trigger = 135
   petition_attachment[i].overflow_fields["children_explanation"].label = "44. Additional Information"
   petition_attachment[i].overflow_fields["other_allegations"].overflow_trigger = 200
@@ -1021,77 +1021,77 @@ attachment:
           % if len(children_of_marriage) > 3:
           ${ children_of_marriage[3].birth_certificate_other.name.suffix }
           % endif
-      - "person1ChildrenLivedWithPast5YearsSuffix": ${ persons_lived_with[0].name.suffix } 
-      - "person1ChildrenLivedWithPast5YearsFirstName": ${ persons_lived_with[0].name.first } 
-      - "person1ChildrenLivedWithPast5YearsMiddleName": ${ persons_lived_with[0].name.middle } 
-      - "person1ChildrenLivedWithPast5YearsLastName": ${ persons_lived_with[0].name.last } 
-      - "person1ChildrenLivedWithPast5YearsStreet": ${ persons_lived_with[0].address.line_one() } 
-      - "person1ChildrenLivedWithPast5YearsCity": ${ persons_lived_with[0].address.city } 
-      - "person1ChildrenLivedWithPast5YearsState": ${ persons_lived_with[0].address.state } 
-      - "person1ChildrenLivedWithPast5YearsZip": ${ persons_lived_with[0].address.zip } 
+      - "person1ChildrenLivedWithPast5YearsSuffix": ${ previous_addresses[0].lived_with.name.suffix } 
+      - "person1ChildrenLivedWithPast5YearsFirstName": ${ previous_addresses[0].lived_with.name.first } 
+      - "person1ChildrenLivedWithPast5YearsMiddleName": ${ previous_addresses[0].lived_with.name.middle } 
+      - "person1ChildrenLivedWithPast5YearsLastName": ${ previous_addresses[0].lived_with.name.last } 
+      - "person1ChildrenLivedWithPast5YearsStreet": ${ previous_addresses[0].address.line_one() } 
+      - "person1ChildrenLivedWithPast5YearsCity": ${ previous_addresses[0].address.city } 
+      - "person1ChildrenLivedWithPast5YearsState": ${ previous_addresses[0].address.state } 
+      - "person1ChildrenLivedWithPast5YearsZip": ${ previous_addresses[0].address.zip } 
       - "person2ChildrenLivedWithPast5YearsFirstName": |
-          % if len(persons_lived_with) > 1:
-          ${ persons_lived_with[1].name.first } 
+          % if len(previous_addresses) > 1:
+          ${ previous_addresses[1].lived_with.name.first } 
           % endif
       - "person2ChildrenLivedWithPast5YearsMiddleName": |
-          % if len(persons_lived_with) > 1:
-          ${ persons_lived_with[1].name.middle } 
+          % if len(previous_addresses) > 1:
+          ${ previous_addresses[1].lived_with.name.middle } 
           % endif
       - "person2ChildrenLivedWithPast5YearsLastName": |
-          % if len(persons_lived_with) > 1:
-          ${ persons_lived_with[1].name.last } 
+          % if len(previous_addresses) > 1:
+          ${ previous_addresses[1].lived_with.name.last } 
           % endif
       - "person2ChildrenLivedWithPast5YearsSuffix": |
-          % if len(persons_lived_with) > 1:
-          ${ persons_lived_with[1].name.suffix } 
+          % if len(previous_addresses) > 1:
+          ${ previous_addresses[1].lived_with.name.suffix } 
           % endif
       - "person2ChildrenLivedWithPast5YearsStreet": |
-          % if len(persons_lived_with) > 1:
-          ${ persons_lived_with[1].address.line_one() } 
+          % if len(previous_addresses) > 1:
+          ${ previous_addresses[1].address.line_one() } 
           % endif
       - "person2ChildrenLivedWithPast5YearsCity": |
-          % if len(persons_lived_with) > 1:
-          ${ persons_lived_with[1].address.city } 
+          % if len(previous_addresses) > 1:
+          ${ previous_addresses[1].address.city } 
           % endif 
       - "person2ChildrenLivedWithPast5YearsState": |
-          % if len(persons_lived_with) > 1:
-          ${ persons_lived_with[1].address.state }  
+          % if len(previous_addresses) > 1:
+          ${ previous_addresses[1].address.state }  
           % endif
       - "person2ChildrenLivedWithPast5YearsZip": |
-          % if len(persons_lived_with) > 1:
-          ${ persons_lived_with[1].address.zip }  
+          % if len(previous_addresses) > 1:
+          ${ previous_addresses[1].address.zip }  
           % endif
       - "person3ChildrenLivedWithPast5YearsFirstName": |
-          % if len(persons_lived_with) > 2:
-          ${ persons_lived_with[2].name.first }  
+          % if len(previous_addresses) > 2:
+          ${ previous_addresses[2].lived_with.name.first }  
           % endif
       - "person3ChildrenLivedWithPast5YearsMiddleName": |
-          % if len(persons_lived_with) > 2:
-          ${ persons_lived_with[2].name.middle }  
+          % if len(previous_addresses) > 2:
+          ${ previous_addresses[2].lived_with.name.middle }  
           % endif
       - "person3ChildrenLivedWithPast5YearsLastName": |
-          % if len(persons_lived_with) > 2:
-          ${ persons_lived_with[2].name.last }  
+          % if len(previous_addresses) > 2:
+          ${ previous_addresses[2].lived_with.name.last }  
           % endif
       - "person3ChildrenLivedWithPast5YearsSuffix": |
-          % if len(persons_lived_with) > 2:
-          ${ persons_lived_with[2].name.suffix }  
+          % if len(previous_addresses) > 2:
+          ${ previous_addresses[2].lived_with.name.suffix }  
           % endif
       - "person3ChildrenLivedWithPast5YearsStreet": |
-          % if len(persons_lived_with) > 2:
-          ${ persons_lived_with[2].address.line_one() }  
+          % if len(previous_addresses) > 2:
+          ${ previous_addresses[2].address.line_one() }  
           % endif
       - "person3ChildrenLivedWithPast5YearsZip": |
-          % if len(persons_lived_with) > 2:
-          ${ persons_lived_with[2].address.zip }  
+          % if len(previous_addresses) > 2:
+          ${ previous_addresses[2].address.zip }  
           % endif
       - "person3ChildrenLivedWithPast5YearsCity": |
-          % if len(persons_lived_with) > 2:
-          ${ persons_lived_with[2].address.city }  
+          % if len(previous_addresses) > 2:
+          ${ previous_addresses[2].address.city }  
           % endif
       - "person3ChildrenLivedWithPast5YearsState": |
-          % if len(persons_lived_with) > 2:
-          ${ persons_lived_with[2].address.state }  
+          % if len(previous_addresses) > 2:
+          ${ previous_addresses[2].address.state }  
           % endif
       - "doesAnyoneOtherThanYouOrSpouseHaveCustodyRights1": ${ others_with_physical_custody } 
       - "doesAnyoneOtherThanYouOrSpouseHaveCustodyRights2": ${ not others_with_physical_custody } 

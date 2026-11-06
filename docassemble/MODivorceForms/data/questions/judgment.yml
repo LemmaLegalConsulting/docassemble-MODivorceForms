@@ -70,6 +70,9 @@ fields:
   - Additional information about child custody jurisdiction: legal_custody_jurisdiction_additional_info
     datatype: area
     show if: child_custody_jurisdiction
+  - note: |
+      ${ redaction_warning }
+    show if: child_custody_jurisdiction
 ---
 id: child support jurisdiction
 question: Jurisdiction over child support
@@ -78,6 +81,9 @@ fields:
     datatype: yesnoradio
   - Additional information about child support jurisdiction: child_support_additional_info
     datatype: area
+    show if: child_support_jurisdiction
+  - note: |
+      ${ redaction_warning }
     show if: child_support_jurisdiction
 ---
 id: attorney fees
@@ -173,6 +179,11 @@ fields:
       variable: other_orders_property.exists
       is: True
   - Reason: other_orders_property.reason
+    show if:
+      variable: other_orders_property.exists
+      is: True
+  - note: |
+      ${ redaction_warning }
     show if:
       variable: other_orders_property.exists
       is: True
