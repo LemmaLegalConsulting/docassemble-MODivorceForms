@@ -1401,6 +1401,11 @@ objects:
   - previous_addresses[i].lived_with: ALIndividual
   
 ---
+id: previous address complete
+code: |
+  previous_addresses[i].info_entered
+  previous_addresses[i].complete = True
+---
 id: add persons children lived with to whol list
 code: |
   for child in children:
@@ -1408,6 +1413,7 @@ code: |
       previous_addresses.appendObject(DAObject)
       previous_addresses[-1].address = child.lived_with.address
       previous_addresses[-1].lived_with = child.lived_with
+      previous_addresses[-1].info_entered = True
       previous_addresses[-1].complete = True
   previous_addresses_preload = True
 ---
@@ -1427,7 +1433,7 @@ fields:
   - Existing person: previous_addresses[i].lived_with
     datatype: object
     choices: parent_and_people_choices
-continue button field: previous_addresses[i].complete
+continue button field: previous_addresses[i].info_entered
 validation code: |
   validate_us_state(previous_addresses[i].address)
 ---
@@ -1459,7 +1465,7 @@ columns:
   - Address: row_item.address.on_one_line()
   - With: row_item.lived_with.name.full()
 edit:
-  - complete
+  - info_entered
 ---
 id: legal custody of child
 question: Legal custody of ${ children[i].name_full() }
