@@ -404,7 +404,6 @@ code: |
     if other_parties[0].jobs.there_are_any or other_parties[0].has_self_employment_income: # form_17
       other_parties[0].employer.name.text
       other_parties[0].employer.email # confidential information sheet order
-      other_parties[0].employer.address.address
       if case.filed in ["user0_filed"]:   
         other_parties[0].hours_of_employment
     other_parties[0].jobs.total(times_per_year = 12)
@@ -565,6 +564,7 @@ code: |
     force_ask('review_form')
   al_court_bundle
   signature_date
+  filing_pleadings_video
   # al_court_bundle, not al_user_bundle: the download screen renders
   # al_court_bundle, and download_list_html() only reuses the background
   # results of the bundle it is called on.
@@ -727,11 +727,11 @@ fields:
       - "Divorce (this includes child custody and support)": Divorce
       - "Child Custody and Support (for parents who are not married)": Custody
   - note: |
-      This tool can help with a divorce.  A divorce in Missouri requires that a marriage is irreparably broken and a marriage cannot be preserved.
+      This tool can help with a divorce.  A divorce in Missouri requires that a marriage is irretrievably broken and a marriage cannot be preserved.
     show if: 
       variable: case_type
       is: Divorce
-  - Is your marriage irreparably broken?: marriage.is_broken
+  - Is your marriage irretrievably broken?: marriage.is_broken
     datatype: yesnoradio
     default: True
     show if: 
@@ -997,7 +997,7 @@ data from code:
     value: |
       "judgment_attachment"
     relevant: case.filed in ["user0_filed","not_filed"] and not is_case_contested in ['contested']
-    default: True
+    default: not is_case_contested in ['unknown']
     help: |
       "This document is only for cases wherein both you and your spouse are in agreement on how everything will be divided. If accepted, the judge will sign this document, formally dissolving your marriage."
   - label: |
@@ -1200,6 +1200,30 @@ subquestion: |
   
   ## MAKE SURE TO UPDATE THE COURT IF YOUR MAILING ADDRESS CHANGES
 continue button field: filing_pleadings_video
+---
+id: Filing Pleadings Video Screen
+template: filing_pleadings_template
+subject: Filing pleadings
+content: |
+  [YOUTUBE S4LdshEM3h8]
+
+
+  % if defined('case.address.address'):
+  Your courthouse is located at ${ case.address.on_one_line() } in ${ nice_county_name(case) }.
+  % endif
+  
+  Documents are filed with the Circuit Clerk’s office.
+  
+  Be prepared to pay a filing fee [even if you are filing a Motion to Proceed as a Poor Person].
+  
+  After you file, you will receive a letter in the mail from the court with your assigned case number and first court date.
+  
+  % if minor_children:
+  Check your local court rules to find if your county requires a specific parenting class. If not, go to [courseforparents.com](https://courseforparents.com/) or [Focus on Kids](https://extension.missouri.edu/programs/focus-on-kids)
+  
+  % endif 
+  
+  ## MAKE SURE TO UPDATE THE COURT IF YOUR MAILING ADDRESS CHANGES
 ---
 id: Final Page
 question: Final page

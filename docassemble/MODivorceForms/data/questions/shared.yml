@@ -5844,7 +5844,7 @@ subquestion: |
 fields:
   - Should income withholding be prepared by the person receiving maintenance?: maintenance_income_withholding
     datatype: yesnoradio
-  - Reason income withholding shall not issue: maintenance_income_withholding_reason
+  - Why not?: maintenance_income_withholding_reason
     show if:
       variable: maintenance_income_withholding
       is: False
@@ -5919,7 +5919,7 @@ code: |
     temp_service_type_choices.append({'label': other_parties[0].name_full()  + " has signed a verified Respondent’s Answer to Petition for Dissolution of Marriage, which is being filed with the Petition for Dissolution of Marriage. Therefore, do not issue a summons.","value":"none"})
   if other_parties[0].address.state == "MO":
     temp_service_type_choices.append({'label': other_parties[0].name_full() + " should be served with a summons at their home.","value":"home"})
-  if users[0].name.full() == petitioner.name.full() and (not defined('other_parties[0].jobs.there_are_any') or (len(other_parties[0].jobs) > 0 or other_parties[0].has_self_employment_income) and other_parties[0].employer.address.state == "MO"):
+  if users[0].name.full() == petitioner.name.full() and (not defined('other_parties[0].jobs.there_are_any') or ((len(other_parties[0].jobs) > 0 or other_parties[0].has_self_employment_income) and not other_parties[0].employer.address_unknown) and other_parties[0].employer.address.state == "MO"):
     temp_service_type_choices.append({'label': other_parties[0].name_full() + " should be served with a summons at their place of employment.","value":"work"})
   if users[0].name.full() == petitioner.name.full() and other_parties[0].address.state != "MO" and (not defined('other_parties[0].employer.address.address') or other_parties[0].employer.address.state != "MO"):
     temp_service_type_choices.append({'label': other_parties[0].name_full() + " cannot be served in Missouri. Therefore, service by registered mail is requested. A copy of the Affidavit for Service by Mail is attached to this form. See Missouri Supreme Court Rule 54.12(b).","value":"mail"})
@@ -6030,13 +6030,6 @@ event: mo_divorce_forms_download
 question: |
   All done
 subquestion: |
-
-  Link to specific court website
-  Info on Discovery
-  Info and link on Parenting Class when applicable
-  Photo of Court House
-  Script for hearing
-  Print out of itinerary
   
   Thank you ${users}. Your form is ready to download and deliver.
 
@@ -6049,6 +6042,8 @@ subquestion: |
   [YOUTUBE iSJpUrncf0Y]
 
   % endif
+
+  ${ collapse_template(filing_pleadings_template) }
   
   View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
 
@@ -6569,7 +6564,7 @@ review:
 
     Who should pay health expenses not covered by insurance?: ${ choice_label('health_expenses_not_covered', showifdef('health_expenses_not_covered')) }
 
-    Should that other parent reimburse for a percentage of thse expenses?: ${ word(yesno(health_expenses_not_covered_reimburse)) }
+    Should the other parent reimburse for a percentage of these expenses?: ${ word(yesno(health_expenses_not_covered_reimburse)) }
 
     What percentage?: ${ showifdef('health_expenses_not_covered_reimburse_percentage') }
 - Edit: users[0].extraordinary_medical_costs.revisit
@@ -8167,7 +8162,7 @@ review:
 
     Who should pay health expenses not covered by insurance?: ${ choice_label('health_expenses_not_covered', showifdef('health_expenses_not_covered')) }
 
-    Should that other parent reimburse for a percentage of thse expenses?: ${ word(yesno(health_expenses_not_covered_reimburse)) }
+    Should the other parent reimburse for a percentage of these expenses?: ${ word(yesno(health_expenses_not_covered_reimburse)) }
 
     What percentage?: ${ showifdef('health_expenses_not_covered_reimburse_percentage') }
 - Edit: users[0].extraordinary_medical_costs.revisit
@@ -8836,6 +8831,9 @@ comment: |
   To put the preview back:
     ${ property_statement_bundle._preview_file }
   and restore the generate_preview_task wait in main.yml.
+reconsider:
+  - has_deed_attachment
+  - has_trust_attachment
 id: property statement review 
 question: Review the property statement
 subquestion: |
@@ -8903,6 +8901,14 @@ subquestion: |
   % endfor
   % endif
 
+  % if has_deed_attachment and has_trust_attachment:
+  Remember to attach a copy of the deed to your house and the trust instrument.
+  % elif has_deed_attachment:
+  Remember to attach a copy of the deed to your house.
+  % elif has_trust_attachment:
+  Remember to attach a copy of the trust instrument.
+  % endif
+  
 fields:
   - Do you want to include additional provisions in the Statement of Property and Debt and Proposed Separation Agreement?: is_additional_provisions_property_statement
     datatype: yesnoradio
@@ -8924,6 +8930,20 @@ validation code: |
   if showifdef('is_additional_provisions_property_statement') and not showifdef('additional_provisions_property_statement', '').strip():
     validation_error("Enter the additional provisions, or answer No.", field='additional_provisions_property_statement')
 continue button field: property_statement_review_screen
+---
+id: check to see if a deed will be attached
+code: |
+  has_deed_attachment = any(
+    getattr(asset, "legal_description_attach", False)
+    for asset in users[0].assets_owned
+  )
+---
+id: check to see if a trust will be attached
+code: |
+  has_trust_attachment = any(
+    getattr(asset, "trust_attachment", False)
+    for asset in users[0].assets_owned
+  )
 ---
 question: Test
 id: debt checkbox review 
