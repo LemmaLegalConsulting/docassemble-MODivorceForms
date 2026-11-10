@@ -52,9 +52,15 @@ fields:
 continue button field: ask_about_dispute_resolution
 ---
 id: Parenting Plan Part A
-question: Who helped write Part A of the parenting plan?
+question: Custody of the Children
+subquestion: |
+  In this section, we will work on your parenting plan to address physical and legal custody.
+  
+  ${ collapse_template(physical_custody_template) }
+
+  ${ collapse_template(legal_custody_template) }
 fields:
-  - Check all that apply: parenting_plan_A_author
+  - Who helped write this part of the parenting plan?: parenting_plan_A_author
     datatype: checkboxes
     choices:
       - ${ petitioner.name.full() }
@@ -62,6 +68,18 @@ fields:
       - The court
       - The guardian ad litem
       - Other
+---
+id: legal custody template
+template: legal_custody_template
+subject: What is legal custody?
+content: |
+  Legal custody refers to decision-making authority related to health, education, and general welfare of the chi
+---
+id: physical custody template
+template: physical_custody_template
+subject: What is physical custody?
+content: |
+  Physical custody refers to the time spent with each par
 ---
 id: parenting plan A author other object
 objects: 
@@ -78,7 +96,7 @@ sets:
   - parenting_plan_A_author_other.name.suffix
 
 question: |
-  What other person helped write Part A of the parenting plan?
+  What other person helped write the part of the parenting plan about custody?
 
 fields:
   - Existing person: parenting_plan_A_author_other
@@ -92,9 +110,11 @@ fields:
       parenting_plan_A_author_other.name_fields()
 ---
 id: Parenting Plan Part B
-question: Who helped write Part B of the parenting plan?
+question: Support of the Children
+subquestion: |
+  In this part of the plan, we will work on your parenting plan to address child support.
 fields:
-  - Check all that apply: parenting_plan_B_author
+  - Who helped write this part of the parenting plan?: parenting_plan_B_author
     datatype: checkboxes
     choices:
       - ${ petitioner.name.full() }
@@ -118,7 +138,7 @@ sets:
   - parenting_plan_B_author_other.name.suffix
 
 question: |
-  What other person helped write Part B of the parenting plan?
+  What other person helped write the part of the parenting plan about child support?
 
 fields:
   - Existing person: parenting_plan_B_author_other
@@ -272,7 +292,7 @@ fields:
      - ${ support_recipient }: support_recipient
      - ${ support_payer }: support_payer
      - "All reasonable and necessary medical or dental expenses of the children are covered by insurance." : none
-  - Should that other parent reimburse for a percentage of thse expenses?: health_expenses_not_covered_reimburse
+  - Should the other parent reimburse for a percentage of these expenses?: health_expenses_not_covered_reimburse
     datatype: yesnoradio
     js show if: |
       val('health_expenses_not_covered') === "support_recipient" || val('health_expenses_not_covered') === "support_payer"
@@ -1924,7 +1944,7 @@ attachment:
           % endif
       - "paVacationNone": ${ not vacation } 
       - "paVacationDesignated": ${ vacation } 
-      - "paVacationWeeks": ${ vacation_weeks } 
+      - "paVacationWeeks": ${ thousands(vacation_weeks, show_decimals=False) } 
       - "paVacationInfo1": ${ parenting_plan_attachment[i].safe_value('vacation_info') } 
       - "paLocationExchangesSchool": ${ location_of_exchange == "school" } 
       - "paLocationExchangesSchoolNotInSession1": ${ parenting_plan_attachment[i].safe_value('location_of_exchange_school_not_in_session') } 
@@ -1944,12 +1964,12 @@ attachment:
       - "paPatternDomesticViolenceOne": ${ domestic_violence_committed_by in [petitioner.name.full(), respondent.name.full()] } 
       - "paPatternDomesticViolenceBoth": ${ domestic_violence_committed_by == "both" } 
       - "paDomesticViolenceNone": ${ domestic_violence == False } 
-      - "paDomesticViolenceNoRecords": ${ educational_records_include_victim_address == False and domestic_violence } 
-      - "paDomViolencePetitionerNoRecords": ${ educational_records_include_victim_address == False and domestic_violence_committed_by in [petitioner.name.full()] } 
-      - "paDomViolenceRespondentNoRecords": ${ educational_records_include_victim_address == False and domestic_violence_committed_by in [respondent.name.full()] } 
-      - "paDomesticViolenceRecords": ${ educational_records_include_victim_address == True and domestic_violence } 
-      - "paDomViolencePetitionerRecords": ${ educational_records_include_victim_address == True and domestic_violence_committed_by in [petitioner.name.full()] } 
-      - "paDomViolenceRespondentRecords": ${ educational_records_include_victim_address == True and domestic_violence_committed_by in [respondent.name.full()] } 
+      - "paDomesticViolenceNoRecords": ${ educational_records_include_victim_address == True and domestic_violence } 
+      - "paDomViolencePetitionerNoRecords": ${ educational_records_include_victim_address == True and domestic_violence_committed_by in [petitioner.name.full(),'both'] } 
+      - "paDomViolenceRespondentNoRecords": ${ educational_records_include_victim_address == True and domestic_violence_committed_by in [respondent.name.full(),'both'] } 
+      - "paDomesticViolenceRecords": ${ educational_records_include_victim_address == False and domestic_violence } 
+      - "paDomViolencePetitionerRecords": ${ educational_records_include_victim_address == False and domestic_violence_committed_by in [petitioner.name.full(),'both'] } 
+      - "paDomViolenceRespondentRecords": ${ educational_records_include_victim_address == False and domestic_violence_committed_by in [respondent.name.full(),'both'] } 
       - "countyList2": ${ case.county } 
       - "petitionersFirstName2": ${ petitioner.name.first } 
       - "petitionersMiddleName2": ${ petitioner.name.middle } 

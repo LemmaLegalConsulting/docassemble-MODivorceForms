@@ -209,6 +209,8 @@ attachment:
       - "petitioner_property_item1": |
           % if len(petitioner.assets_award) > 0:
           ${ property_statement_attachment[i].safe_value("petitioner.assets_award[0].award_template_petitioner") }
+          % else:
+          Not applicable
           % endif
       - "petitioner_property2_marital": |
           % if len(petitioner.assets_award) > 1:
@@ -249,6 +251,8 @@ attachment:
       - "petitioner_property_item2": |
           % if len(petitioner.assets_award) > 1:
           ${ property_statement_attachment[i].safe_value("petitioner.assets_award[1].award_template_petitioner") }
+          % else:
+          Not applicable
           % endif
       - "petitioner_property3_marital": |
           % if len(petitioner.assets_award) > 2:
@@ -289,6 +293,8 @@ attachment:
       - "petitioner_property_item3": |
           % if len(petitioner.assets_award) > 2:
           ${ property_statement_attachment[i].safe_value("petitioner.assets_award[2].award_template_petitioner") }
+          % else:
+          Not applicable
           % endif
       - "petitioner_property4_marital": |
           % if len(petitioner.assets_award) > 3:
@@ -329,6 +335,8 @@ attachment:
       - "petitioner_property_item4": |
           % if len(petitioner.assets_award) > 3:
           ${ property_statement_attachment[i].safe_value("petitioner.assets_award[3].award_template_petitioner") }
+          % else:
+          Not applicable
           % endif
       - "petitioner_property5_marital": |
           % if len(petitioner.assets_award) > 4:
@@ -369,6 +377,8 @@ attachment:
       - "petitioner_property_item5": |
           % if len(petitioner.assets_award) > 4:
           ${ property_statement_attachment[i].safe_value("petitioner.assets_award[4].award_template_petitioner") }
+          % else:
+          Not applicable
           % endif
       - "petitioner_property6_marital": |
           % if len(petitioner.assets_award) > 5:
@@ -409,6 +419,8 @@ attachment:
       - "petitioner_property_item6": |
           % if len(petitioner.assets_award) > 5:
           ${ property_statement_attachment[i].safe_value("petitioner.assets_award[5].award_template_petitioner") }
+          % else:
+          Not applicable
           % endif
       - "petitioner_property7_marital": |
           % if len(petitioner.assets_award) > 6:
@@ -449,6 +461,8 @@ attachment:
       - "petitioner_property_item7": |
           % if len(petitioner.assets_award) > 6:
           ${ property_statement_attachment[i].safe_value("petitioner.assets_award[6].award_template_petitioner") }
+          % else:
+          Not applicable
           % endif
       - "petitioner_property8_marital": |
           % if len(petitioner.assets_award) > 7:
@@ -489,6 +503,8 @@ attachment:
       - "petitioner_property_item8": |
           % if len(petitioner.assets_award) > 7:
           ${ property_statement_attachment[i].safe_value("petitioner.assets_award[7].award_template_petitioner") }
+          % else:
+          Not applicable
           % endif
       - "petitioner_property9_marital": |
           % if len(petitioner.assets_award) > 8:
@@ -529,6 +545,8 @@ attachment:
       - "petitioner_property_item9": |
           % if len(petitioner.assets_award) > 8:
           ${ property_statement_attachment[i].safe_value("petitioner.assets_award[8].award_template_petitioner") }
+          % else:
+          Not applicable
           % endif
       - "petitioner_property10_marital": |
           % if len(petitioner.assets_award) > 9:
@@ -569,6 +587,8 @@ attachment:
       - "petitioner_property_item10": |
           % if len(petitioner.assets_award) > 9:
           ${ property_statement_attachment[i].safe_value("petitioner.assets_award[9].award_template_petitioner") }
+          % else:
+          Not applicable
           % endif
       - "petitioner_property11_marital": |
           % if len(petitioner.assets_award) > 10:
@@ -609,6 +629,8 @@ attachment:
       - "petitioner_property_item11": |
           % if len(petitioner.assets_award) > 10:
           ${ property_statement_attachment[i].safe_value("petitioner.assets_award[10].award_template_petitioner") }
+          % else:
+          Not applicable
           % endif
       - "petitioner_property12_marital": |
           % if len(petitioner.assets_award) > 11:
@@ -649,6 +671,8 @@ attachment:
       - "petitioner_property_item12": |
           % if len(petitioner.assets_award) > 11:
           ${ property_statement_attachment[i].safe_value("petitioner.assets_award[11].award_template_petitioner") }
+          % else:
+          Not applicable
           % endif
       - "petitioner_property13_marital": |
           % if len(petitioner.assets_award) > 12:
@@ -689,6 +713,8 @@ attachment:
       - "petitioner_property_item13": |
           % if len(petitioner.assets_award) > 12:
           ${ property_statement_attachment[i].safe_value("petitioner.assets_award[12].award_template_petitioner") }
+          % else:
+          Not applicable
           % endif
       - "petitioner_property14_marital": |
           % if len(petitioner.assets_award) > 13:
@@ -729,6 +755,8 @@ attachment:
       - "petitioner_property_item14": |
           % if len(petitioner.assets_award) > 13:
           ${ property_statement_attachment[i].safe_value("petitioner.assets_award[13].award_template_petitioner") }
+          % else:
+          Not applicable
           % endif
       - "petitioner_property15_marital": |
           % if len(petitioner.assets_award) > 14:
@@ -769,6 +797,8 @@ attachment:
       - "petitioner_property_item15": |
           % if len(petitioner.assets_award) > 14:
           ${ property_statement_attachment[i].safe_value("petitioner.assets_award[14].award_template_petitioner") }
+          % else:
+          Not applicable
           % endif
       - "petitioner_property16_marital": |
           % if len(petitioner.assets_award) > 15:
@@ -809,6 +839,8 @@ attachment:
       - "petitioner_property_item16": |
           % if len(petitioner.assets_award) > 15:
           ${ property_statement_attachment[i].safe_value("petitioner.assets_award[15].award_template_petitioner") }
+          % else:
+          Not applicable
           % endif
       - "respondent_property1_marital": |
           % if len(respondent.assets_award) > 0:
@@ -849,6 +881,8 @@ attachment:
       - "respondent_property_item1": |
           % if len(respondent.assets_award) > 0:
           ${ property_statement_attachment[i].safe_value("respondent.assets_award[0].award_template_respondent") }
+          % else:
+          Not applicable
           % endif
       - "respondent_property2_marital": |
           % if len(respondent.assets_award) > 1:
@@ -889,6 +923,8 @@ attachment:
       - "respondent_property_item2": |
           % if len(respondent.assets_award) > 1:
           ${ property_statement_attachment[i].safe_value("respondent.assets_award[1].award_template_respondent") }
+          % else:
+          Not applicable
           % endif
       - "respondent_property3_marital": |
           % if len(respondent.assets_award) > 2:
@@ -929,6 +965,8 @@ attachment:
       - "respondent_property_item3": |
           % if len(respondent.assets_award) > 2:
           ${ property_statement_attachment[i].safe_value("respondent.assets_award[2].award_template_respondent") }
+          % else:
+          Not applicable
           % endif
       - "respondent_property4_marital": |
           % if len(respondent.assets_award) > 3:
@@ -969,6 +1007,8 @@ attachment:
       - "respondent_property_item4": |
           % if len(respondent.assets_award) > 3:
           ${ property_statement_attachment[i].safe_value("respondent.assets_award[3].award_template_respondent") }
+          % else:
+          Not applicable
           % endif
       - "respondent_property5_marital": |
           % if len(respondent.assets_award) > 4:
@@ -1009,6 +1049,8 @@ attachment:
       - "respondent_property_item5": |
           % if len(respondent.assets_award) > 4:
           ${ property_statement_attachment[i].safe_value("respondent.assets_award[4].award_template_respondent") }
+          % else:
+          Not applicable
           % endif
       - "respondent_property6_marital": |
           % if len(respondent.assets_award) > 5:
@@ -1049,6 +1091,8 @@ attachment:
       - "respondent_property_item6": |
           % if len(respondent.assets_award) > 5:
           ${ property_statement_attachment[i].safe_value("respondent.assets_award[5].award_template_respondent") }
+          % else:
+          Not applicable
           % endif
       - "respondent_property7_marital": |
           % if len(respondent.assets_award) > 6:
@@ -1089,6 +1133,8 @@ attachment:
       - "respondent_property_item7": |
           % if len(respondent.assets_award) > 6:
           ${ property_statement_attachment[i].safe_value("respondent.assets_award[6].award_template_respondent") }
+          % else:
+          Not applicable
           % endif
       - "respondent_property8_marital": |
           % if len(respondent.assets_award) > 7:
@@ -1129,6 +1175,8 @@ attachment:
       - "respondent_property_item8": |
           % if len(respondent.assets_award) > 7:
           ${ property_statement_attachment[i].safe_value("respondent.assets_award[7].award_template_respondent") }
+          % else:
+          Not applicable
           % endif
       - "respondent_property9_marital": |
           % if len(respondent.assets_award) > 8:
@@ -1169,6 +1217,8 @@ attachment:
       - "respondent_property_item9": |
           % if len(respondent.assets_award) > 8:
           ${ property_statement_attachment[i].safe_value("respondent.assets_award[8].award_template_respondent") }
+          % else:
+          Not applicable
           % endif
       - "respondent_property10_marital": |
           % if len(respondent.assets_award) > 9:
@@ -1209,6 +1259,8 @@ attachment:
       - "respondent_property_item10": |
           % if len(respondent.assets_award) > 9:
           ${ property_statement_attachment[i].safe_value("respondent.assets_award[9].award_template_respondent") }
+          % else:
+          Not applicable
           % endif
       - "respondent_property11_marital": |
           % if len(respondent.assets_award) > 10:
@@ -1249,6 +1301,8 @@ attachment:
       - "respondent_property_item11": |
           % if len(respondent.assets_award) > 10:
           ${ property_statement_attachment[i].safe_value("respondent.assets_award[10].award_template_respondent") }
+          % else:
+          Not applicable
           % endif
       - "respondent_property12_marital": |
           % if len(respondent.assets_award) > 11:
@@ -1289,6 +1343,8 @@ attachment:
       - "respondent_property_item12": |
           % if len(respondent.assets_award) > 11:
           ${ property_statement_attachment[i].safe_value("respondent.assets_award[11].award_template_respondent") }
+          % else:
+          Not applicable
           % endif
       - "respondent_property13_marital": |
           % if len(respondent.assets_award) > 12:
@@ -1329,6 +1385,8 @@ attachment:
       - "respondent_property_item13": |
           % if len(respondent.assets_award) > 12:
           ${ property_statement_attachment[i].safe_value("respondent.assets_award[12].award_template_respondent") }
+          % else:
+          Not applicable
           % endif
       - "respondent_property14_marital": |
           % if len(respondent.assets_award) > 13:
@@ -1369,6 +1427,8 @@ attachment:
       - "respondent_property_item14": |
           % if len(respondent.assets_award) > 13:
           ${ property_statement_attachment[i].safe_value("respondent.assets_award[13].award_template_respondent") }
+          % else:
+          Not applicable
           % endif
       - "respondent_property15_marital": |
           % if len(respondent.assets_award) > 14:
@@ -1409,6 +1469,8 @@ attachment:
       - "respondent_property_item15": |
           % if len(respondent.assets_award) > 14:
           ${ property_statement_attachment[i].safe_value("respondent.assets_award[14].award_template_respondent") }
+          % else:
+          Not applicable
           % endif
       - "respondent_property16_marital": |
           % if len(respondent.assets_award) > 15:
@@ -1449,6 +1511,8 @@ attachment:
       - "respondent_property_item16": |
           % if len(respondent.assets_award) > 15:
           ${ property_statement_attachment[i].safe_value("respondent.assets_award[15].award_template_respondent") }
+          % else:
+          Not applicable
           % endif
       - "petitioner_bankruptcy_no": ${ not petitioner.in_bankruptcy } 
       - "petitioner_bankruptcy_yes": ${ petitioner.in_bankruptcy } 
@@ -1497,6 +1561,8 @@ attachment:
       - "petitioner_debt_1": |
           % if len(petitioner.debts_award) > 0:
           ${ petitioner.debts_award[0].loan_description_template_petitioner}
+          % else:
+          Not applicable
           % endif
       - "petitioner_debt_balance_1": |
           % if len(petitioner.debts_award) > 0:
@@ -1525,6 +1591,8 @@ attachment:
       - "petitioner_debt_2": |
           % if len(petitioner.debts_award) > 1:
           ${ petitioner.debts_award[1].loan_description_template_petitioner }
+          % else:
+          Not applicable
           % endif
       - "petitioner_debt_balance_2": |
           % if len(petitioner.debts_award) > 1:
@@ -1553,6 +1621,8 @@ attachment:
       - "petitioner_debt_3": |
           % if len(petitioner.debts_award) > 2:
           ${ petitioner.debts_award[2].loan_description_template_petitioner }
+          % else:
+          Not applicable
           % endif
       - "petitioner_debt_balance_3": |
           % if len(petitioner.debts_award) > 2:
@@ -1581,6 +1651,8 @@ attachment:
       - "petitioner_debt_4": |
           % if len(petitioner.debts_award) > 3:
           ${ petitioner.debts_award[3].loan_description_template_petitioner }
+          % else:
+          Not applicable
           % endif
       - "petitioner_debt_balance_4": |
           % if len(petitioner.debts_award) > 3:
@@ -1609,6 +1681,8 @@ attachment:
       - "petitioner_debt_5": |
           % if len(petitioner.debts_award) > 4:
           ${ petitioner.debts_award[4].loan_description_template_petitioner }
+          % else:
+          Not applicable
           % endif
       - "petitioner_debt_balance_5": |
           % if len(petitioner.debts_award) > 4:
@@ -1637,6 +1711,8 @@ attachment:
       - "petitioner_debt_6": |
           % if len(petitioner.debts_award) > 5:
           ${ petitioner.debts_award[5].loan_description_template_petitioner }
+          % else:
+          Not applicable
           % endif
       - "petitioner_debt_balance_6": |
           % if len(petitioner.debts_award) > 5:
@@ -1665,6 +1741,8 @@ attachment:
       - "petitioner_debt_7": |
           % if len(petitioner.debts_award) > 6:
           ${ petitioner.debts_award[6].loan_description_template_petitioner }
+          % else:
+          Not applicable
           % endif
       - "petitioner_debt_balance_7": |
           % if len(petitioner.debts_award) > 6:
@@ -1693,6 +1771,8 @@ attachment:
       - "petitioner_debt_8": |
           % if len(petitioner.debts_award) > 7:
           ${ petitioner.debts_award[7].loan_description_template_petitioner }
+          % else:
+          Not applicable
           % endif
       - "petitioner_debt_balance_8": |
           % if len(petitioner.debts_award) > 7:
@@ -1721,6 +1801,8 @@ attachment:
       - "petitioner_debt_9": |
           % if len(petitioner.debts_award) > 8:
           ${ petitioner.debts_award[8].loan_description_template_petitioner }
+          % else:
+          Not applicable
           % endif
       - "petitioner_debt_balance_9": |
           % if len(petitioner.debts_award) > 8:
@@ -1749,6 +1831,8 @@ attachment:
       - "petitioner_debt_10": |
           % if len(petitioner.debts_award) > 9:
           ${ petitioner.debts_award[9].loan_description_template_petitioner }
+          % else:
+          Not applicable
           % endif
       - "petitioner_debt_balance_10": |
           % if len(petitioner.debts_award) > 9:
@@ -1777,6 +1861,8 @@ attachment:
       - "petitioner_debt_11": |
           % if len(petitioner.debts_award) > 10:
           ${ petitioner.debts_award[10].loan_description_template_petitioner }
+          % else:
+          Not applicable
           % endif
       - "petitioner_debt_balance_11": |
           % if len(petitioner.debts_award) > 10:
@@ -1805,6 +1891,8 @@ attachment:
       - "petitioner_debt_12": |
           % if len(petitioner.debts_award) > 11:
           ${ petitioner.debts_award[11].loan_description_template_petitioner }
+          % else:
+          Not applicable
           % endif
       - "petitioner_debt_balance_12": |
           % if len(petitioner.debts_award) > 11:
@@ -1833,6 +1921,8 @@ attachment:
       - "petitioner_debt_13": |
           % if len(petitioner.debts_award) > 12:
           ${ petitioner.debts_award[12].loan_description_template_petitioner }
+          % else:
+          Not applicable
           % endif
       - "petitioner_debt_balance_13": |
           % if len(petitioner.debts_award) > 12:
@@ -1861,6 +1951,8 @@ attachment:
       - "petitioner_debt_14": |
           % if len(petitioner.debts_award) > 13:
           ${ petitioner.debts_award[13].loan_description_template_petitioner }
+          % else:
+          Not applicable
           % endif
       - "petitioner_debt_balance_14": |
           % if len(petitioner.debts_award) > 13:
@@ -1889,6 +1981,8 @@ attachment:
       - "petitioner_debt_15": |
           % if len(petitioner.debts_award) > 14:
           ${ petitioner.debts_award[14].loan_description_template_petitioner }
+          % else:
+          Not applicable
           % endif
       - "petitioner_debt_balance_15": |
           % if len(petitioner.debts_award) > 14:
@@ -1917,6 +2011,8 @@ attachment:
       - "respondent_debt_1": |
           % if len(respondent.debts_award) > 0:
           ${ respondent.debts_award[0].loan_description_template_respondent }
+          % else:
+          Not applicable
           % endif
       - "respondent_debt_balance_1": |
           % if len(respondent.debts_award) > 0:
@@ -1945,6 +2041,8 @@ attachment:
       - "respondent_debt_2": |
           % if len(respondent.debts_award) > 1:
           ${ respondent.debts_award[1].loan_description_template_respondent }
+          % else:
+          Not applicable
           % endif
       - "respondent_debt_balance_2": |
           % if len(respondent.debts_award) > 1:
@@ -1973,6 +2071,8 @@ attachment:
       - "respondent_debt_3": |
           % if len(respondent.debts_award) > 2:
           ${ respondent.debts_award[2].loan_description_template_respondent }
+          % else:
+          Not applicable
           % endif
       - "respondent_debt_balance_3": |
           % if len(respondent.debts_award) > 2:
@@ -2001,6 +2101,8 @@ attachment:
       - "respondent_debt_4": |
           % if len(respondent.debts_award) > 3:
           ${ respondent.debts_award[3].loan_description_template_respondent }
+          % else:
+          Not applicable
           % endif
       - "respondent_debt_balance_4": |
           % if len(respondent.debts_award) > 3:
@@ -2029,6 +2131,8 @@ attachment:
       - "respondent_debt_5": |
           % if len(respondent.debts_award) > 4:
           ${ respondent.debts_award[4].loan_description_template_respondent }
+          % else:
+          Not applicable
           % endif
       - "respondent_debt_balance_5": |
           % if len(respondent.debts_award) > 4:
@@ -2057,6 +2161,8 @@ attachment:
       - "respondent_debt_6": |
           % if len(respondent.debts_award) > 5:
           ${ respondent.debts_award[5].loan_description_template_respondent }
+          % else:
+          Not applicable
           % endif
       - "respondent_debt_balance_6": |
           % if len(respondent.debts_award) > 5:
@@ -2085,6 +2191,8 @@ attachment:
       - "respondent_debt_7": |
           % if len(respondent.debts_award) > 6:
           ${ respondent.debts_award[6].loan_description_template_respondent }
+          % else:
+          Not applicable
           % endif
       - "respondent_debt_balance_7": |
           % if len(respondent.debts_award) > 6:
@@ -2113,6 +2221,8 @@ attachment:
       - "respondent_debt_8": |
           % if len(respondent.debts_award) > 7:
           ${ respondent.debts_award[7].loan_description_template_respondent }
+          % else:
+          Not applicable
           % endif
       - "respondent_debt_balance_8": |
           % if len(respondent.debts_award) > 7:
@@ -2141,6 +2251,8 @@ attachment:
       - "respondent_debt_9": |
           % if len(respondent.debts_award) > 8:
           ${ respondent.debts_award[8].loan_description_template_respondent }
+          % else:
+          Not applicable
           % endif
       - "respondent_debt_balance_9": |
           % if len(respondent.debts_award) > 8:
@@ -2169,6 +2281,8 @@ attachment:
       - "respondent_debt_10": |
           % if len(respondent.debts_award) > 9:
           ${ respondent.debts_award[9].loan_description_template_respondent }
+          % else:
+          Not applicable
           % endif
       - "respondent_debt_balance_10": |
           % if len(respondent.debts_award) > 9:
@@ -2197,6 +2311,8 @@ attachment:
       - "respondent_debt_11": |
           % if len(respondent.debts_award) > 10:
           ${ respondent.debts_award[10].loan_description_template_respondent }
+          % else:
+          Not applicable
           % endif
       - "respondent_debt_balance_11": |
           % if len(respondent.debts_award) > 10:
@@ -2225,6 +2341,8 @@ attachment:
       - "respondent_debt_12": |
           % if len(respondent.debts_award) > 11:
           ${ respondent.debts_award[11].loan_description_template_respondent }
+          % else:
+          Not applicable
           % endif
       - "respondent_debt_balance_12": |
           % if len(respondent.debts_award) > 11:
@@ -2253,6 +2371,8 @@ attachment:
       - "respondent_debt_13": |
           % if len(respondent.debts_award) > 12:
           ${ respondent.debts_award[12].loan_description_template_respondent }
+          % else:
+          Not applicable
           % endif
       - "respondent_debt_balance_13": |
           % if len(respondent.debts_award) > 12:
@@ -2281,6 +2401,8 @@ attachment:
       - "respondent_debt_14": |
           % if len(respondent.debts_award) > 13:
           ${ respondent.debts_award[13].loan_description_template_respondent }
+          % else:
+          Not applicable
           % endif
       - "respondent_debt_balance_14": |
           % if len(respondent.debts_award) > 13:
@@ -2309,6 +2431,8 @@ attachment:
       - "respondent_debt_15": |
           % if len(respondent.debts_award) > 14:
           ${ respondent.debts_award[14].loan_description_template_respondent }
+          % else:
+          Not applicable
           % endif
       - "respondent_debt_balance_15": |
           % if len(respondent.debts_award) > 14:
