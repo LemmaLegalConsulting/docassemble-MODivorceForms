@@ -284,9 +284,18 @@ code: |
 ---
 id: children interview order
 code: |  
-  nav.set_section("children")
+  nav.set_section("parenting_plan")
 
   ## We want to ask about legal custody first, if needed.
+  if minor_children and "answer_attachment" in doc_list_selected.true_values():
+    agree_with_parenting_plan
+  
+  
+  if minor_children and showifdef('doc_list_selected["parenting_plan_attachment"]'):
+    nav.set_section("parenting_plan_A")
+    if parenting_plan_A_author["Other"]:
+      parenting_plan_A_author_other.name.first
+      
   
   if minor_children and showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["parenting_plan_attachment"]'):
     presumption_video
@@ -302,58 +311,45 @@ code: |
       third_party_custody_warning
       physical_custody_other.name.first
 
-  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]'):
-    relief['child_support']
-  
-  
-  if minor_children and (any(key in doc_list_selected.true_values() for key in ["answer_attachment", "certificate_of_dissolution_attachment",  "confidential_information_sheet_attachment", "petition_attachment", "income_statement_attachment","form_14_attachment", "judgment_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party")):
-    if child_support != "none": # certificate_of_dissolution
-      child_support_method_of_payment
-      child_support_start_date
-    nav.set_section("children")
-
-  if any(key in doc_list_selected.true_values() for key in ["answer_attachment", "certificate_of_dissolution_attachment",  "confidential_information_sheet_attachment", "petition_attachment", "income_statement_attachment", "judgment_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party"):
-    children.gather()
-  children_list_create
-  number_of_children
-  if any(key in doc_list_selected.true_values() for key in ["fee_waiver_attachment",  "petition_attachment", "income_statement_attachment", "form_14_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party"):
-    users[0].other_children
-    other_parties[0].other_children
-
-  if minor_children and any(key in doc_list_selected.true_values() for key in ["answer_attachment", "petition_attachment"]):
-    previous_addresses_preload # petition
-    previous_addresses.gather()
-    
-
-  if minor_children and "answer_attachment" in doc_list_selected.true_values():
-    agree_with_parenting_plan
-  
-  if minor_children and showifdef('doc_list_selected["parenting_plan_attachment"]') and legal_custody != "Third Party" and physical_custody != "Third Party":
-    if parenting_plan_A_author["Other"]:
-      parenting_plan_A_author_other.name.first
+  if minor_children and showifdef('doc_list_selected["parenting_plan_attachment"]') and legal_custody != "Third Party" and physical_custody != "Third Party":      
     if communications["third_party"]:
       communications_other.name.first
     phone_contact
     vacation
     location_of_exchange
 
-    if case.filed in ['user0_filed','other_parties0_filed','not_filed']:
-      exchanges.gather()
-      biweekly_schedule_review
-      visitation_nights
-      if not holidays_default:
-        for key in holidays.keys():
-          if holidays[key]['different']:
-            holidays[key]['even_years']
-      holidays_review
-      other_holidays.gather()
-      role_dictionary_full_name
+    exchanges.gather()
+    biweekly_schedule_review
+    if not holidays_default:
+      for key in holidays.keys():
+        if holidays[key]['different']:
+          holidays[key]['even_years']
+    holidays_review
+    other_holidays.gather()
+    role_dictionary_full_name
   
     ask_about_dispute_resolution
     domestic_violence
-  
+
+
+  if minor_children and showifdef('doc_list_selected["parenting_plan_attachment"]') and legal_custody != "Third Party" and physical_custody != "Third Party":    
+    nav.set_section("parenting_plan_B") 
     if parenting_plan_B_author["Other"]:
       parenting_plan_B_author_other.name.first
+
+  if showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]'):
+    relief['child_support']
+
+  if minor_children and showifdef('doc_list_selected["parenting_plan_attachment"]') and legal_custody != "Third Party" and physical_custody != "Third Party":    
+    visitation_nights
+  
+  if minor_children and (any(key in doc_list_selected.true_values() for key in ["answer_attachment", "certificate_of_dissolution_attachment",  "confidential_information_sheet_attachment", "petition_attachment", "income_statement_attachment","form_14_attachment", "judgment_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party")):
+    if child_support != "none": # certificate_of_dissolution
+      child_support_method_of_payment
+      child_support_start_date
+    
+      
+  if minor_children and showifdef('doc_list_selected["parenting_plan_attachment"]') and legal_custody != "Third Party" and physical_custody != "Third Party":        
     medical_insurance
     dental_insurance
     health_expenses_not_covered
@@ -366,11 +362,23 @@ code: |
     other_parties[0].health_insurance_costs
     other_parties[0].work_childcare_expenses
     other_parties[0].extraordinary_medical_costs.gather()
-    other_parties[0].extraordinary_childrearing_costs.gather()
+    other_parties[0].extraordinary_childrearing_costs.gather()    
 
+  nav.set_section("children")
+  if any(key in doc_list_selected.true_values() for key in ["answer_attachment", "certificate_of_dissolution_attachment",  "confidential_information_sheet_attachment", "petition_attachment", "income_statement_attachment", "judgment_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party"):
+    children.gather()
+  children_list_create
+  number_of_children
+  
+  
+  
+  if any(key in doc_list_selected.true_values() for key in ["fee_waiver_attachment",  "petition_attachment", "income_statement_attachment", "form_14_attachment"]) or (any(key in doc_list_selected.true_values() for key in ["parenting_plan_attachment"]) and legal_custody != "Third Party" and physical_custody != "Third Party"):
+    users[0].other_children
+    other_parties[0].other_children
 
-  if 'answer_attachment' in doc_list_selected.true_values():
-    denials_exist
+  if minor_children and any(key in doc_list_selected.true_values() for key in ["answer_attachment", "petition_attachment"]):
+    previous_addresses_preload # petition
+    previous_addresses.gather()
 
   if minor_children and (showifdef('doc_list_selected["petition_attachment"]') or showifdef('doc_list_selected["answer_attachment"]')):
     additional_children_information
@@ -641,16 +649,18 @@ code: |
 sections:
   - right_tool: Is this the right tool for you?
   - relief: Help provided
-  - provide_details: Answer questions
+  - case_information: Case information
+  - user_info: Information about you
+  - other_party_info: Information about the other party  
+  - parenting_plan: Parenting Plan
     subsections:
-      - user_info: Information about you
-      - other_party_info: Information about the other party  
-      - children: Children
-      - case_information: Case information
-      - income: Income
-      - expenses: Expenses
-      - assets: Assets
-      - debts: Debts
+      -  parenting_plan_A: Parenting Plan Part A
+      -  parenting_plan_B: Parenting Plan Part B
+  - children: Children
+  - income: Income
+  - expenses: Expenses
+  - assets: Assets
+  - debts: Debts
   - service: Service and Filing Documents
   - review: Review your answers
 ---
@@ -663,6 +673,10 @@ data:
     subsections:
       - user_info: Information about you
       - other_party_info: Information about the other party  
+      - parenting_plan: Parenting Plan
+        subsections:
+          -  parenting_plan_A: Parenting Plan Part A
+          -  parenting_plan_B: Parenting Plan Part B
       - children: Children
       - income: Income
       - expenses: Expenses
